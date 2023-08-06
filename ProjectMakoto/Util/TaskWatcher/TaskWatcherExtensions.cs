@@ -48,9 +48,6 @@ public static class TaskWatcherExtensions
     {
         var v = callingFile.LastIndexOf("ProjectMakoto");
 
-        if (v == -1)
-            return callingFile;
-
-        return callingFile[v..];
+        return v == -1 ? callingFile : callingFile[v..];
     }
 }

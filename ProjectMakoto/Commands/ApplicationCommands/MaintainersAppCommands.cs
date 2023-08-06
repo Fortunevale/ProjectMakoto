@@ -45,15 +45,15 @@ public sealed class MaintainersAppCommands : ApplicationCommandsModule
         {
             try
             {
-                Bot bot = ((Bot)ctx.Services.GetService(typeof(Bot)));
+                var bot = ((Bot)ctx.Services.GetService(typeof(Bot)));
 
                 if (!ctx.User.IsMaintenance(bot.status))
                     return new List<DiscordApplicationCommandAutocompleteChoice>().AsEnumerable();
 
-                IEnumerable<string> filteredCommands = Enum.GetNames(typeof(DevCommands))
+                var filteredCommands = Enum.GetNames(typeof(DevCommands))
                     .Where(x => x.Contains(ctx.FocusedOption.Value.ToString(), StringComparison.InvariantCultureIgnoreCase)).Take(25);
 
-                List<DiscordApplicationCommandAutocompleteChoice> options = filteredCommands
+                var options = filteredCommands
                     .Select(x => new DiscordApplicationCommandAutocompleteChoice(x, x)).ToList();
                 return options.AsEnumerable();
             }
@@ -70,14 +70,14 @@ public sealed class MaintainersAppCommands : ApplicationCommandsModule
         {
             try
             {
-                Bot bot = ((Bot)ctx.Services.GetService(typeof(Bot)));
+                var bot = ((Bot)ctx.Services.GetService(typeof(Bot)));
 
                 if (!ctx.User.IsMaintenance(bot.status))
                     return new List<DiscordApplicationCommandAutocompleteChoice>().AsEnumerable();
 
                 if (ctx.Options.Any(x => x.Name == "command"))
                 {
-                    int currentArgument = ctx.FocusedOption.Name switch
+                    var currentArgument = ctx.FocusedOption.Name switch
                     {
                         "argument1" => 1,
                         "argument2" => 2,
@@ -89,7 +89,7 @@ public sealed class MaintainersAppCommands : ApplicationCommandsModule
                     if (ctx.FocusedOption.Value.ToString().Length > 1)
                         return new List<DiscordApplicationCommandAutocompleteChoice>() { };
 
-                    DevCommands Command = (DevCommands)Enum.Parse(typeof(DevCommands), ctx.Options.First(x => x.Name == "command").Value.ToString());
+                    var Command = (DevCommands)Enum.Parse(typeof(DevCommands), ctx.Options.First(x => x.Name == "command").Value.ToString());
 
                     return Command switch
                     {
@@ -471,7 +471,7 @@ public sealed class MaintainersAppCommands : ApplicationCommandsModule
 
         [SlashCommand("throw", "Throw.")]
         public async Task Throw(InteractionContext ctx)
-            => _ = new Commands.Debug.ThrowCommand().ExecuteCommand(ctx, _bot);
+            => _ = new Commands.Debug.ThrowCommand().ExecuteCommand(ctx, this._bot);
 
         [SlashCommand("test", "Test.")]
         public async Task Test(InteractionContext ctx)

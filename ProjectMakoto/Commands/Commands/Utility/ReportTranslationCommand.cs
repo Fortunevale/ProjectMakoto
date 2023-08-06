@@ -17,7 +17,7 @@ internal sealed class ReportTranslationCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var CommandKey = t.Commands.Utility.ReportTranslation;
+            var CommandKey = this.t.Commands.Utility.ReportTranslation;
 
             if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx))
                 return;
@@ -27,33 +27,33 @@ internal sealed class ReportTranslationCommand : BaseCommand
             var component = (string)arguments["component"];
             var additionalInformation = (string?)arguments["additionalInformation"];
 
-            int tos_version = 1;
+            var tos_version = 1;
 
             if (ctx.DbUser.TranslationReports.AcceptedTOS != tos_version)
             {
-                var button = new DiscordButtonComponent(ButtonStyle.Primary, "accepted-tos", GetString(CommandKey.AcceptTos), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👍")));
+                var button = new DiscordButtonComponent(ButtonStyle.Primary, "accepted-tos", this.GetString(CommandKey.AcceptTos), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👍")));
 
                 var tos_embed = new DiscordEmbedBuilder
                 {
-                    Description = GetString(CommandKey.Tos,
+                    Description = this.GetString(CommandKey.Tos,
                         new TVar("1", 1.ToEmotes()),
                         new TVar("2", 2.ToEmotes()),
                         new TVar("3", 3.ToEmotes()),
                         new TVar("4", 4.ToEmotes()))
-                }.AsAwaitingInput(ctx, GetString(CommandKey.Title));
+                }.AsAwaitingInput(ctx, this.GetString(CommandKey.Title));
 
                 if (ctx.DbUser.TranslationReports.AcceptedTOS != 0 && ctx.DbUser.TranslationReports.AcceptedTOS < tos_version)
                 {
-                    tos_embed.Description = tos_embed.Description.Insert(0, $"**{GetString(CommandKey.TosChangedNotice)}**\n\n");
+                    tos_embed.Description = tos_embed.Description.Insert(0, $"**{this.GetString(CommandKey.TosChangedNotice)}**\n\n");
                 }
 
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(tos_embed).AddComponents(button));
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(tos_embed).AddComponents(button));
 
                 var TosAccept = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
 
                 if (TosAccept.TimedOut)
                 {
-                    ModifyToTimedOut(true);
+                    this.ModifyToTimedOut(true);
                     return;
                 }
 
@@ -73,32 +73,32 @@ internal sealed class ReportTranslationCommand : BaseCommand
 
             if (ctx.DbUser.TranslationReports.RequestCount >= 3)
             {
-                await RespondOrEdit(new DiscordEmbedBuilder()
-                    .WithDescription(GetString(CommandKey.RatelimitReached, true, new TVar("Timestamp", ctx.DbUser.TranslationReports.FirstRequestTime.AddHours(24).ToTimestamp())))
-                    .AsError(ctx, GetString(CommandKey.Title)));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                    .WithDescription(this.GetString(CommandKey.RatelimitReached, true, new TVar("Timestamp", ctx.DbUser.TranslationReports.FirstRequestTime.AddHours(24).ToTimestamp())))
+                    .AsError(ctx, this.GetString(CommandKey.Title)));
                 return;
             }
 
-            var YesButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(t.Common.Yes), false, "✅".UnicodeToEmoji().ToComponent());
-            var NoButton = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), GetString(t.Common.No), false, "❌".UnicodeToEmoji().ToComponent());
+            var YesButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), this.GetString(this.t.Common.Yes), false, "✅".UnicodeToEmoji().ToComponent());
+            var NoButton = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), this.GetString(this.t.Common.No), false, "❌".UnicodeToEmoji().ToComponent());
 
-            await RespondOrEdit(new DiscordMessageBuilder()
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder()
                 .AddEmbed(new DiscordEmbedBuilder()
-                    .WithDescription($"{GetString(CommandKey.ConfirmationPrompt, true)}")
-                    .AsAwaitingInput(ctx, GetString(CommandKey.Title)))
+                    .WithDescription($"{this.GetString(CommandKey.ConfirmationPrompt, true)}")
+                    .AsAwaitingInput(ctx, this.GetString(CommandKey.Title)))
                 .AddComponents(YesButton, NoButton));
 
             var result = await ctx.ResponseMessage.WaitForButtonAsync(ctx.User);
 
             if (result.TimedOut)
             {
-                ModifyToTimedOut();
+                this.ModifyToTimedOut();
                 return;
             }
 
             if (result.Result.GetCustomId() != YesButton.CustomId)
             {
-                DeleteOrInvalidate();
+                this.DeleteOrInvalidate();
                 return;
             }
 
@@ -138,16 +138,16 @@ internal sealed class ReportTranslationCommand : BaseCommand
 
             try
             {
-                await ctx.Bot.GithubClient.Issue.Labels.ReplaceAllForIssue(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository, issue.Number, new string[] { "Translations", "Low Priority" });
+                _ = await ctx.Bot.GithubClient.Issue.Labels.ReplaceAllForIssue(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository, issue.Number, new string[] { "Translations", "Low Priority" });
             }
             catch (Exception ex)
             {
                 _logger.LogWarn("Failed to update labels on reported issue", ex);
             }
 
-            await RespondOrEdit(new DiscordEmbedBuilder()
-                .WithDescription(GetString(CommandKey.ReportSubmitted, true))
-                .AsSuccess(ctx, GetString(CommandKey.Title)));
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                .WithDescription(this.GetString(CommandKey.ReportSubmitted, true))
+                .AsSuccess(ctx, this.GetString(CommandKey.Title)));
         });
     }
 }

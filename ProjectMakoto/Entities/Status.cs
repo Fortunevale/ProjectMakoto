@@ -39,10 +39,7 @@ public sealed class Status
     {
         get
         {
-            if (this.LoadedConfig.SupportServerInvite.IsNullOrWhiteSpace())
-                return "Invite not set.";
-
-            return this.LoadedConfig.SupportServerInvite;
+            return this.LoadedConfig.SupportServerInvite.IsNullOrWhiteSpace() ? "Invite not set." : this.LoadedConfig.SupportServerInvite;
         }
     }
 

@@ -22,7 +22,7 @@ internal sealed class VoicePrivacyEvents : RequiresTranslation
 
     internal async void QueueHandler()
     {
-        Task.Run(async () =>
+        _ = Task.Run(async () =>
         {
             while (true)
             {
@@ -32,10 +32,10 @@ internal sealed class VoicePrivacyEvents : RequiresTranslation
                         Thread.Sleep(1000);
 
                     var task = this.JobsQueue[0];
-                    this.JobsQueue.Remove(task);
+                    _ = this.JobsQueue.Remove(task);
 
                     task.Start();
-                    task.Add(this.Bot);
+                    _ = task.Add(this.Bot);
                 }
                 catch (Exception ex)
                 {
@@ -49,15 +49,15 @@ internal sealed class VoicePrivacyEvents : RequiresTranslation
     {
         if (this.Bot.Guilds[e.Guild.Id].InVoiceTextPrivacy.SetPermissionsEnabled)
         {
-            Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
                 if (e.After?.Channel?.Id != e.Before?.Channel?.Id)
                 {
                     if (e.Before is not null && e.Before.Channel is not null)
-                        await e.Before.Channel.DeleteOverwriteAsync(await e.User.ConvertToMember(e.Guild), tKey.LeftWithSetPermissions.Get(this.Bot.Guilds[e.Guild.Id]));
+                        await e.Before.Channel.DeleteOverwriteAsync(await e.User.ConvertToMember(e.Guild), this.tKey.LeftWithSetPermissions.Get(this.Bot.Guilds[e.Guild.Id]));
 
                     if (e.After is not null && e.After.Channel is not null)
-                        await e.After?.Channel?.AddOverwriteAsync(await e.User.ConvertToMember(e.Guild), Permissions.ReadMessageHistory | Permissions.SendMessages, Permissions.None, tKey.JoinedWithSetPermissions.Get(this.Bot.Guilds[e.Guild.Id]));
+                        await e.After?.Channel?.AddOverwriteAsync(await e.User.ConvertToMember(e.Guild), Permissions.ReadMessageHistory | Permissions.SendMessages, Permissions.None, this.tKey.JoinedWithSetPermissions.Get(this.Bot.Guilds[e.Guild.Id]));
                 }
             }).Add(this.Bot);
         }
@@ -81,7 +81,7 @@ internal sealed class VoicePrivacyEvents : RequiresTranslation
                             if (!discordMessages.Any())
                                 return;
 
-                            int failcount = 0;
+                            var failcount = 0;
 
                             while (true)
                             {
@@ -121,11 +121,11 @@ internal sealed class VoicePrivacyEvents : RequiresTranslation
                                     try
                                     {
                                         var MessagesToDelete = BulkDeletions.Take(100).ToList();
-                                        await e.Before.Channel.DeleteMessagesAsync(MessagesToDelete, tKey.LeftWithDeleteMessages.Get(this.Bot.Guilds[e.Guild.Id]));
+                                        await e.Before.Channel.DeleteMessagesAsync(MessagesToDelete, this.tKey.LeftWithDeleteMessages.Get(this.Bot.Guilds[e.Guild.Id]));
 
-                                        for (int i = 0; i < MessagesToDelete.Count; i++)
+                                        for (var i = 0; i < MessagesToDelete.Count; i++)
                                         {
-                                            BulkDeletions.Remove(MessagesToDelete[i]);
+                                            _ = BulkDeletions.Remove(MessagesToDelete[i]);
                                         }
 
                                         if (BulkDeletions.Any())
@@ -152,8 +152,8 @@ internal sealed class VoicePrivacyEvents : RequiresTranslation
                                     {
                                         var msg = SingleDeletions[0];
 
-                                        await e.Before.Channel.DeleteMessageAsync(msg, tKey.LeftWithDeleteMessages.Get(this.Bot.Guilds[e.Guild.Id]));
-                                        SingleDeletions.Remove(msg);
+                                        await e.Before.Channel.DeleteMessageAsync(msg, this.tKey.LeftWithDeleteMessages.Get(this.Bot.Guilds[e.Guild.Id]));
+                                        _ = SingleDeletions.Remove(msg);
 
                                         if (SingleDeletions.Any())
                                             await Task.Delay(30000);
@@ -185,7 +185,7 @@ internal sealed class VoicePrivacyEvents : RequiresTranslation
 
     internal async Task ChannelCreated(DiscordClient sender, ChannelCreateEventArgs e)
     {
-        Task.Run(async () =>
+        _ = Task.Run(async () =>
         {
             if (this.Bot.Guilds[e.Guild.Id].InVoiceTextPrivacy.SetPermissionsEnabled)
             {
@@ -198,7 +198,7 @@ internal sealed class VoicePrivacyEvents : RequiresTranslation
                     if (b.Value.Parent?.PermissionOverwrites.Any(x => (x.Type == OverwriteType.Role) && (x.Id == e.Guild.EveryoneRole.Id)) ?? false)
                         present = b.Value.Parent.PermissionOverwrites.First(x => (x.Type == OverwriteType.Role) && (x.Id == e.Guild.EveryoneRole.Id));
 
-                    _ = b.Value.AddOverwriteAsync(e.Guild.EveryoneRole, (present?.Allowed ?? Permissions.None), (present?.Denied ?? Permissions.None) | Permissions.ReadMessageHistory | Permissions.SendMessages, tKey.CreatedWithSetPermissions.Get(this.Bot.Guilds[e.Guild.Id]));
+                    _ = b.Value.AddOverwriteAsync(e.Guild.EveryoneRole, (present?.Allowed ?? Permissions.None), (present?.Denied ?? Permissions.None) | Permissions.ReadMessageHistory | Permissions.SendMessages, this.tKey.CreatedWithSetPermissions.Get(this.Bot.Guilds[e.Guild.Id]));
                 }
             }
         }).Add(this.Bot);

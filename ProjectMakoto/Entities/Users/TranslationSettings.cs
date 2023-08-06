@@ -22,7 +22,7 @@ public sealed class TranslationSettings : RequiresParent<User>
         set
         {
             this._LastGoogleSource = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "last_google_source", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "last_google_source", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -33,7 +33,7 @@ public sealed class TranslationSettings : RequiresParent<User>
         set
         {
             this._LastGoogleTarget = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "last_google_target", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "last_google_target", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -45,7 +45,7 @@ public sealed class TranslationSettings : RequiresParent<User>
         set
         {
             this._LastLibreTranslateSource = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "last_libretranslate_source", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "last_libretranslate_source", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -56,7 +56,7 @@ public sealed class TranslationSettings : RequiresParent<User>
         set
         {
             this._LastLibreTranslateTarget = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "last_libretranslate_target", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "last_libretranslate_target", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 }

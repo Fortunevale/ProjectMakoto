@@ -75,7 +75,7 @@ internal sealed class DisCatSharpExtensionsLoader
             SocketEndpoint = endpoint
         };
 
-        bot.DiscordClient.UseLavalink();
+        _ = bot.DiscordClient.UseLavalink();
 
         _logger.LogDebug("Registering DisCatSharp TwoFactor..");
 
@@ -93,7 +93,7 @@ internal sealed class DisCatSharpExtensionsLoader
         bot.DiscordClient.GuildDownloadCompleted += bot.GuildDownloadCompleted;
 
         _logger.LogDebug("Registering Interactivity..");
-        bot.DiscordClient.UseInteractivity(new InteractivityConfiguration { });
+        _ = bot.DiscordClient.UseInteractivity(new InteractivityConfiguration { });
 
         _ = Task.Delay(60000).ContinueWith(t =>
         {
@@ -124,22 +124,22 @@ internal sealed class DisCatSharpExtensionsLoader
             {
                 try
                 {
-                    SingleTranslationKey nameValues = translation.Names;
+                    var nameValues = translation.Names;
 
                     if (nameValues is null)
                         return null;
 
-                    SingleTranslationKey? descriptionValues = translation.Descriptions;
-                    int? typeValue = translation.Type;
-                    CommandTranslation[]? optionsValues = translation.Options;
-                    CommandTranslation[] choicesValues = translation.Choices;
-                    CommandTranslation[] groupsValues = translation.Groups;
-                    CommandTranslation[] commandsValues = translation.Commands;
+                    var descriptionValues = translation.Descriptions;
+                    var typeValue = translation.Type;
+                    var optionsValues = translation.Options;
+                    var choicesValues = translation.Choices;
+                    var groupsValues = translation.Groups;
+                    var commandsValues = translation.Commands;
 
                     _logger.LogTrace("Creating instance of '{type}'", typeToCreate.Name);
                     var translator = Activator.CreateInstance(typeToCreate);
 
-                    PropertyInfo[] createTypeProperties = typeToCreate.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+                    var createTypeProperties = typeToCreate.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
                     createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "name")).SetValue(translator, nameValues["en"]);
 
                     if (typeToCreate == typeof(DisCatSharp.ApplicationCommands.Entities.GroupTranslator) || typeToCreate == typeof(DisCatSharp.ApplicationCommands.Entities.CommandTranslator))
@@ -182,7 +182,7 @@ internal sealed class DisCatSharpExtensionsLoader
                     {
                         _logger.LogTrace("Creating sub-command translations for command '{name}'", nameValues.First());
 
-                        PropertyInfo commandProperty = createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "commands"));
+                        var commandProperty = createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "commands"));
                         commandProperty.SetValue(translator, new List<DisCatSharp.ApplicationCommands.Entities.CommandTranslator>());
                         foreach (var value in commandsValues)
                         {
@@ -202,7 +202,7 @@ internal sealed class DisCatSharpExtensionsLoader
                     {
                         _logger.LogTrace("Creating option translations for command '{name}'", nameValues.First());
 
-                        PropertyInfo optionProperty = createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "options"));
+                        var optionProperty = createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "options"));
                         optionProperty.SetValue(translator, new List<DisCatSharp.ApplicationCommands.Entities.OptionTranslator>());
                         foreach (var value in optionsValues)
                         {
@@ -222,7 +222,7 @@ internal sealed class DisCatSharpExtensionsLoader
                     {
                         _logger.LogTrace("Creating choice translations for command '{name}'", nameValues.First());
 
-                        PropertyInfo choiceProperty = createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "choices"));
+                        var choiceProperty = createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "choices"));
                         choiceProperty.SetValue(translator, new List<DisCatSharp.ApplicationCommands.Entities.ChoiceTranslator>());
                         foreach (var value in choicesValues)
                         {
@@ -242,7 +242,7 @@ internal sealed class DisCatSharpExtensionsLoader
                     {
                         _logger.LogTrace("Creating group translations for command '{name}'", nameValues.First());
 
-                        PropertyInfo groupProperty = createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "groups"));
+                        var groupProperty = createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "groups"));
                         groupProperty.SetValue(translator, new List<DisCatSharp.ApplicationCommands.Entities.SubGroupTranslator>());
 
                         foreach (var value in groupsValues)

@@ -13,17 +13,17 @@ namespace ProjectMakoto.Commands.Music;
 
 internal sealed class RemoveQueueCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckVoiceState();
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await this.CheckVoiceState();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
         {
-            string selection = (string)arguments["selection"];
+            var selection = (string)arguments["selection"];
 
             if (string.IsNullOrWhiteSpace(selection))
             {
-                SendSyntaxError();
+                this.SendSyntaxError();
                 return;
             }
 
@@ -36,9 +36,9 @@ internal sealed class RemoveQueueCommand : BaseCommand
 
             if (conn is null || conn.Channel.Id != ctx.Member.VoiceState.Channel.Id)
             {
-                await RespondOrEdit(embed: new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Music.NotSameChannel, true),
+                    Description = this.GetString(this.t.Commands.Music.NotSameChannel, true),
                 }.AsError(ctx));
                 return;
             }
@@ -47,13 +47,13 @@ internal sealed class RemoveQueueCommand : BaseCommand
 
             if (selection.IsDigitsOnly())
             {
-                int Index = Convert.ToInt32(selection) - 1;
+                var Index = Convert.ToInt32(selection) - 1;
 
                 if (Index < 0 || Index >= ctx.DbGuild.MusicModule.SongQueue.Count)
                 {
-                    await RespondOrEdit(embed: new DiscordEmbedBuilder
+                    _ = await this.RespondOrEdit(embed: new DiscordEmbedBuilder
                     {
-                        Description = GetString(this.t.Commands.Music.RemoveQueue.OutOfRange, true, new TVar("Min", 1), new TVar("Max", ctx.DbGuild.MusicModule.SongQueue.Count)),
+                        Description = this.GetString(this.t.Commands.Music.RemoveQueue.OutOfRange, true, new TVar("Min", 1), new TVar("Max", ctx.DbGuild.MusicModule.SongQueue.Count)),
                     }.AsError(ctx));
                     return;
                 }
@@ -64,9 +64,9 @@ internal sealed class RemoveQueueCommand : BaseCommand
             {
                 if (!ctx.DbGuild.MusicModule.SongQueue.Any(x => x.VideoTitle.ToLower() == selection.ToLower()))
                 {
-                    await RespondOrEdit(embed: new DiscordEmbedBuilder
+                    _ = await this.RespondOrEdit(embed: new DiscordEmbedBuilder
                     {
-                        Description = GetString(this.t.Commands.Music.RemoveQueue.NoSong, true),
+                        Description = this.GetString(this.t.Commands.Music.RemoveQueue.NoSong, true),
                     }.AsError(ctx));
                     return;
                 }
@@ -76,18 +76,18 @@ internal sealed class RemoveQueueCommand : BaseCommand
 
             if (info is null)
             {
-                await RespondOrEdit(embed: new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Music.RemoveQueue.NoSong, true),
+                    Description = this.GetString(this.t.Commands.Music.RemoveQueue.NoSong, true),
                 }.AsError(ctx));
                 return;
             }
 
-            ctx.DbGuild.MusicModule.SongQueue.Remove(info);
+            _ = ctx.DbGuild.MusicModule.SongQueue.Remove(info);
 
-            await RespondOrEdit(embed: new DiscordEmbedBuilder
+            _ = await this.RespondOrEdit(embed: new DiscordEmbedBuilder
             {
-                Description = GetString(this.t.Commands.Music.RemoveQueue.Removed, true, new TVar("Track", $"`[`{info.VideoTitle}`]({info.Url})`")),
+                Description = this.GetString(this.t.Commands.Music.RemoveQueue.Removed, true, new TVar("Track", $"`[`{info.VideoTitle}`]({info.Url})`")),
             }.AsSuccess(ctx));
         });
     }

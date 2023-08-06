@@ -50,7 +50,7 @@ public sealed class DatabaseClient : RequiresBotReference
                 if (!remoteTables.Contains(internalTable.Name))
                 {
                     _logger.LogWarn("Missing table '{Name}'. Creating..", internalTable.Name);
-                    string sql = $"CREATE TABLE `{bot.status.LoadedConfig.Secrets.Database.MainDatabaseName}`.`{internalTable.Name}` ( {string.Join(", ", internalTable.GetProperties().Select(x => $"`{x.Name}` {x.PropertyType.Name.ToUpper()}{(x.TryGetCustomAttribute<MaxValueAttribute>(typeof(MaxValueAttribute), out var maxvalue) ? $"({maxvalue.MaxValue})" : "")}{(x.TryGetCustomAttribute<CollationAttribute>(typeof(CollationAttribute), out var collation) ? $" CHARACTER SET {collation.Collation[..collation.Collation.IndexOf("_")]} COLLATE {collation.Collation}" : "")}{(x.TryGetCustomAttribute<NullableAttribute>(typeof(NullableAttribute), out _) ? " NULL" : " NOT NULL")}"))}{(internalTable.GetProperties().Any(x => x.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _)) ? $", PRIMARY KEY (`{internalTable.GetProperties().First(x => x.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _)).Name}`)" : "")})";
+                    var sql = $"CREATE TABLE `{bot.status.LoadedConfig.Secrets.Database.MainDatabaseName}`.`{internalTable.Name}` ( {string.Join(", ", internalTable.GetProperties().Select(x => $"`{x.Name}` {x.PropertyType.Name.ToUpper()}{(x.TryGetCustomAttribute<MaxValueAttribute>(typeof(MaxValueAttribute), out var maxvalue) ? $"({maxvalue.MaxValue})" : "")}{(x.TryGetCustomAttribute<CollationAttribute>(typeof(CollationAttribute), out var collation) ? $" CHARACTER SET {collation.Collation[..collation.Collation.IndexOf("_")]} COLLATE {collation.Collation}" : "")}{(x.TryGetCustomAttribute<NullableAttribute>(typeof(NullableAttribute), out _) ? " NULL" : " NOT NULL")}"))}{(internalTable.GetProperties().Any(x => x.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _)) ? $", PRIMARY KEY (`{internalTable.GetProperties().First(x => x.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _)).Name}`)" : "")})";
 
                     var cmd = databaseClient.mainDatabaseConnection.CreateCommand();
                     cmd.CommandText = sql;
@@ -67,7 +67,7 @@ public sealed class DatabaseClient : RequiresBotReference
                     if (!remoteColumns.ContainsKey(internalColumn.Name.ToLower()))
                     {
                         _logger.LogWarn("Missing column '{Column}' in '{Table}'. Creating..", internalColumn.Name, internalTable.Name);
-                        string sql = $"ALTER TABLE `{internalTable.Name}` ADD `{internalColumn.Name}` {internalColumn.PropertyType.Name.ToUpper()}{(internalColumn.TryGetCustomAttribute<MaxValueAttribute>(typeof(MaxValueAttribute), out var maxvalue1) ? $"({maxvalue1.MaxValue})" : "")}{(internalColumn.TryGetCustomAttribute<CollationAttribute>(typeof(CollationAttribute), out var collation) ? $" CHARACTER SET {collation.Collation[..collation.Collation.IndexOf("_")]} COLLATE {collation.Collation}" : "")}{(internalColumn.TryGetCustomAttribute<NullableAttribute>(typeof(NullableAttribute), out var nullable) ? " NULL" : " NOT NULL")}{(nullable is not null && internalColumn.TryGetCustomAttribute<DefaultAttribute>(typeof(DefaultAttribute), out var defaultv) ? $" DEFAULT '{defaultv.Default}'" : "")}{(internalColumn.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _) ? $", ADD PRIMARY KEY (`{internalColumn.Name}`)" : "")}";
+                        var sql = $"ALTER TABLE `{internalTable.Name}` ADD `{internalColumn.Name}` {internalColumn.PropertyType.Name.ToUpper()}{(internalColumn.TryGetCustomAttribute<MaxValueAttribute>(typeof(MaxValueAttribute), out var maxvalue1) ? $"({maxvalue1.MaxValue})" : "")}{(internalColumn.TryGetCustomAttribute<CollationAttribute>(typeof(CollationAttribute), out var collation) ? $" CHARACTER SET {collation.Collation[..collation.Collation.IndexOf("_")]} COLLATE {collation.Collation}" : "")}{(internalColumn.TryGetCustomAttribute<NullableAttribute>(typeof(NullableAttribute), out var nullable) ? " NULL" : " NOT NULL")}{(nullable is not null && internalColumn.TryGetCustomAttribute<DefaultAttribute>(typeof(DefaultAttribute), out var defaultv) ? $" DEFAULT '{defaultv.Default}'" : "")}{(internalColumn.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _) ? $", ADD PRIMARY KEY (`{internalColumn.Name}`)" : "")}";
 
                         var cmd = databaseClient.mainDatabaseConnection.CreateCommand();
                         cmd.CommandText = sql;
@@ -82,7 +82,7 @@ public sealed class DatabaseClient : RequiresBotReference
                     if (remoteColumns[internalColumn.Name].ToLower() != internalColumn.PropertyType.Name.ToLower() + (internalColumn.TryGetCustomAttribute<MaxValueAttribute>(typeof(MaxValueAttribute), out var maxvalue) ? $"({maxvalue.MaxValue})" : ""))
                     {
                         _logger.LogWarn("Wrong data type for column '{Column}' in '{Table}'", internalColumn.Name, internalTable.Name);
-                        string sql = $"ALTER TABLE `{internalTable.Name}` CHANGE `{internalColumn.Name}` `{internalColumn.Name}` {internalColumn.PropertyType.Name.ToUpper()}{(maxvalue is not null ? $"({maxvalue.MaxValue})" : "")}{(internalColumn.TryGetCustomAttribute<CollationAttribute>(typeof(CollationAttribute), out var collation) ? $" CHARACTER SET {collation.Collation[..collation.Collation.IndexOf("_")]} COLLATE {collation.Collation}" : "")}{(internalColumn.TryGetCustomAttribute<NullableAttribute>(typeof(NullableAttribute), out var nullable) ? " NULL" : " NOT NULL")}{(nullable is not null && internalColumn.TryGetCustomAttribute<DefaultAttribute>(typeof(DefaultAttribute), out var defaultv) ? $" DEFAULT '{defaultv.Default}'" : "")}{(internalColumn.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _) ? $", ADD PRIMARY KEY (`{internalColumn.Name}`)" : "")}";
+                        var sql = $"ALTER TABLE `{internalTable.Name}` CHANGE `{internalColumn.Name}` `{internalColumn.Name}` {internalColumn.PropertyType.Name.ToUpper()}{(maxvalue is not null ? $"({maxvalue.MaxValue})" : "")}{(internalColumn.TryGetCustomAttribute<CollationAttribute>(typeof(CollationAttribute), out var collation) ? $" CHARACTER SET {collation.Collation[..collation.Collation.IndexOf("_")]} COLLATE {collation.Collation}" : "")}{(internalColumn.TryGetCustomAttribute<NullableAttribute>(typeof(NullableAttribute), out var nullable) ? " NULL" : " NOT NULL")}{(nullable is not null && internalColumn.TryGetCustomAttribute<DefaultAttribute>(typeof(DefaultAttribute), out var defaultv) ? $" DEFAULT '{defaultv.Default}'" : "")}{(internalColumn.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _) ? $", ADD PRIMARY KEY (`{internalColumn.Name}`)" : "")}";
 
                         var cmd = databaseClient.mainDatabaseConnection.CreateCommand();
                         cmd.CommandText = sql;
@@ -117,7 +117,7 @@ public sealed class DatabaseClient : RequiresBotReference
 
         await databaseClient.CheckGuildTables();
 
-        new Task(new Action(async () =>
+        _ = new Task(new Action(async () =>
         {
             _ = databaseClient.CheckDatabaseConnection(databaseClient.mainDatabaseConnection);
             await Task.Delay(10000);
@@ -137,7 +137,7 @@ public sealed class DatabaseClient : RequiresBotReference
 
         IEnumerable<string> GuildTables;
 
-        int retries = 1;
+        var retries = 1;
 
         while (true)
         {
@@ -164,7 +164,7 @@ public sealed class DatabaseClient : RequiresBotReference
             if (!GuildTables.Contains($"{b.Key}"))
             {
                 _logger.LogWarn("Missing table '{Guild}'. Creating..", b.Key);
-                string sql = $"CREATE TABLE `{this.Bot.status.LoadedConfig.Secrets.Database.GuildDatabaseName}`.`{b.Key}` ( {string.Join(", ", typeof(TableDefinitions.guild_users).GetProperties().Select(x => $"`{x.Name}` {x.PropertyType.Name.ToUpper()}{(x.TryGetCustomAttribute<MaxValueAttribute>(typeof(MaxValueAttribute), out var maxvalue) ? $"({maxvalue.MaxValue})" : "")}{(x.TryGetCustomAttribute<CollationAttribute>(typeof(CollationAttribute), out var collation) ? $" CHARACTER SET {collation.Collation[..collation.Collation.IndexOf("_")]} COLLATE {collation.Collation}" : "")}{(x.TryGetCustomAttribute<NullableAttribute>(typeof(NullableAttribute), out _) ? " NULL" : " NOT NULL")}"))}{(typeof(TableDefinitions.guild_users).GetProperties().Any(x => x.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _)) ? $", PRIMARY KEY (`{typeof(TableDefinitions.guild_users).GetProperties().First(x => x.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _)).Name}`)" : "")})";
+                var sql = $"CREATE TABLE `{this.Bot.status.LoadedConfig.Secrets.Database.GuildDatabaseName}`.`{b.Key}` ( {string.Join(", ", typeof(TableDefinitions.guild_users).GetProperties().Select(x => $"`{x.Name}` {x.PropertyType.Name.ToUpper()}{(x.TryGetCustomAttribute<MaxValueAttribute>(typeof(MaxValueAttribute), out var maxvalue) ? $"({maxvalue.MaxValue})" : "")}{(x.TryGetCustomAttribute<CollationAttribute>(typeof(CollationAttribute), out var collation) ? $" CHARACTER SET {collation.Collation[..collation.Collation.IndexOf("_")]} COLLATE {collation.Collation}" : "")}{(x.TryGetCustomAttribute<NullableAttribute>(typeof(NullableAttribute), out _) ? " NULL" : " NOT NULL")}"))}{(typeof(TableDefinitions.guild_users).GetProperties().Any(x => x.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _)) ? $", PRIMARY KEY (`{typeof(TableDefinitions.guild_users).GetProperties().First(x => x.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _)).Name}`)" : "")})";
 
                 var cmd = this.guildDatabaseConnection.CreateCommand();
                 cmd.CommandText = sql;
@@ -188,7 +188,7 @@ public sealed class DatabaseClient : RequiresBotReference
                     if (!Columns.ContainsKey(col.Name))
                     {
                         _logger.LogWarn("Missing column '{Column}' in '{Table}'. Creating..", col.Name, b);
-                        string sql = $"ALTER TABLE `{b}` ADD `{col.Name}` {col.PropertyType.Name.ToUpper()}{(col.TryGetCustomAttribute<MaxValueAttribute>(typeof(MaxValueAttribute), out var maxvalue1) ? $"({maxvalue1.MaxValue})" : "")}{col.PropertyType.Name.ToUpper()}{(col.TryGetCustomAttribute<CollationAttribute>(typeof(CollationAttribute), out var collation) ? $" CHARACTER SET {collation.Collation[..collation.Collation.IndexOf("_")]} COLLATE {collation.Collation}" : "")}{(col.TryGetCustomAttribute<NullableAttribute>(typeof(NullableAttribute), out var nullable) ? " NULL" : " NOT NULL")}{(nullable is not null && col.TryGetCustomAttribute<DefaultAttribute>(typeof(DefaultAttribute), out var defaultv) ? $" DEFAULT '{defaultv.Default}'" : "")}{(col.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _) ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
+                        var sql = $"ALTER TABLE `{b}` ADD `{col.Name}` {col.PropertyType.Name.ToUpper()}{(col.TryGetCustomAttribute<MaxValueAttribute>(typeof(MaxValueAttribute), out var maxvalue1) ? $"({maxvalue1.MaxValue})" : "")}{col.PropertyType.Name.ToUpper()}{(col.TryGetCustomAttribute<CollationAttribute>(typeof(CollationAttribute), out var collation) ? $" CHARACTER SET {collation.Collation[..collation.Collation.IndexOf("_")]} COLLATE {collation.Collation}" : "")}{(col.TryGetCustomAttribute<NullableAttribute>(typeof(NullableAttribute), out var nullable) ? " NULL" : " NOT NULL")}{(nullable is not null && col.TryGetCustomAttribute<DefaultAttribute>(typeof(DefaultAttribute), out var defaultv) ? $" DEFAULT '{defaultv.Default}'" : "")}{(col.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _) ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
 
                         var cmd = this.guildDatabaseConnection.CreateCommand();
                         cmd.CommandText = sql;
@@ -203,7 +203,7 @@ public sealed class DatabaseClient : RequiresBotReference
                     if (Columns[col.Name].ToLower() != col.PropertyType.Name.ToLower() + (col.TryGetCustomAttribute<MaxValueAttribute>(typeof(MaxValueAttribute), out var maxvalue) ? $"({maxvalue.MaxValue})" : ""))
                     {
                         _logger.LogWarn("Wrong data type for column '{Column}' in '{Table}'", col.Name, b);
-                        string sql = $"ALTER TABLE `{b}` CHANGE `{col.Name}` `{col.Name}` {col.PropertyType.Name.ToUpper()}{(maxvalue is not null ? $"({maxvalue.MaxValue})" : "")}{(col.TryGetCustomAttribute<CollationAttribute>(typeof(CollationAttribute), out var collation) ? $" CHARACTER SET {collation.Collation[..collation.Collation.IndexOf("_")]} COLLATE {collation.Collation}" : "")}{(col.TryGetCustomAttribute<NullableAttribute>(typeof(NullableAttribute), out var nullable) ? " NULL" : " NOT NULL")}{(nullable is not null && col.TryGetCustomAttribute<DefaultAttribute>(typeof(DefaultAttribute), out var defaultv) ? $" DEFAULT '{defaultv.Default}'" : "")}{(col.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _) ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
+                        var sql = $"ALTER TABLE `{b}` CHANGE `{col.Name}` `{col.Name}` {col.PropertyType.Name.ToUpper()}{(maxvalue is not null ? $"({maxvalue.MaxValue})" : "")}{(col.TryGetCustomAttribute<CollationAttribute>(typeof(CollationAttribute), out var collation) ? $" CHARACTER SET {collation.Collation[..collation.Collation.IndexOf("_")]} COLLATE {collation.Collation}" : "")}{(col.TryGetCustomAttribute<NullableAttribute>(typeof(NullableAttribute), out var nullable) ? " NULL" : " NOT NULL")}{(nullable is not null && col.TryGetCustomAttribute<DefaultAttribute>(typeof(DefaultAttribute), out var defaultv) ? $" DEFAULT '{defaultv.Default}'" : "")}{(col.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _) ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
 
                         var cmd = this.guildDatabaseConnection.CreateCommand();
                         cmd.CommandText = sql;
@@ -235,9 +235,9 @@ public sealed class DatabaseClient : RequiresBotReference
 
     private async Task CheckDatabaseConnection(MySqlConnection connection)
     {
-        new Task(async () =>
+        _ = new Task(async () =>
         {
-            _ = CheckDatabaseConnection(connection);
+            _ = this.CheckDatabaseConnection(connection);
         }).CreateScheduledTask(DateTime.UtcNow.AddSeconds(120), "database-connection-watcher");
 
         if (this.Disposed)
@@ -268,7 +268,7 @@ public sealed class DatabaseClient : RequiresBotReference
 
             cmd.CommandText += this._helper.GetValueCommand("writetester", 1);
 
-            cmd.Parameters.AddWithValue($"aaa1", 1);
+            _ = cmd.Parameters.AddWithValue($"aaa1", 1);
 
             cmd.CommandText = cmd.CommandText[..(cmd.CommandText.Length - 2)];
             cmd.CommandText += this._helper.GetOverwriteCommand("writetester");
@@ -359,17 +359,17 @@ public sealed class DatabaseClient : RequiresBotReference
                 var cmd = conn.CreateCommand();
                 cmd.CommandText = this._helper.GetSaveCommand(table, propertyname);
 
-                for (int i = 0; i < chunk.Length; i++)
+                for (var i = 0; i < chunk.Length; i++)
                 {
                     var b = chunk[i];
                     var properties = b.GetType().GetProperties();
 
                     cmd.CommandText += this._helper.GetValueCommand(propertyname, i);
-                    for (int i1 = 0; i1 < properties.Length; i1++)
+                    for (var i1 = 0; i1 < properties.Length; i1++)
                     {
                         var prop = properties[i1];
 
-                        cmd.Parameters.AddWithValue($"{prop.Name}{i}", ((BaseColumn)prop.GetValue(b)).GetValue());
+                        _ = cmd.Parameters.AddWithValue($"{prop.Name}{i}", ((BaseColumn)prop.GetValue(b)).GetValue());
                     }
                     properties = null;
                 }
@@ -574,9 +574,9 @@ public sealed class DatabaseClient : RequiresBotReference
             }).ToList()));
         }
 
-        var check = CheckGuildTables();
+        var check = this.CheckGuildTables();
         try
-        { check.Add(this.Bot); await check.WaitAsync(TimeSpan.FromSeconds(120)); }
+        { _ = check.Add(this.Bot); await check.WaitAsync(TimeSpan.FromSeconds(120)); }
         catch { }
 
         lock (this.Bot.Guilds)
@@ -623,7 +623,7 @@ public sealed class DatabaseClient : RequiresBotReference
         if (!this.Bot.status.DatabaseInitialLoadCompleted)
             return;
 
-        this._queue.RunCommand(new MySqlCommand(this._helper.GetUpdateValueCommand(table, columnKey, rowKey, columnToEdit, newValue), connection), QueuePriority.Low).Add(this.Bot);
+        _ = this._queue.RunCommand(new MySqlCommand(this._helper.GetUpdateValueCommand(table, columnKey, rowKey, columnToEdit, newValue), connection), QueuePriority.Low).Add(this.Bot);
         return;
     }
 
@@ -632,7 +632,7 @@ public sealed class DatabaseClient : RequiresBotReference
         foreach (var b in ScheduledTaskExtensions.GetScheduledTasks().Where(x => x.CustomData?.ToString() == "database-connection-watcher"))
             b.Delete();
 
-        int timeout = 0;
+        var timeout = 0;
 
         while (timeout < 30 && this._queue.QueueCount != 0)
         {

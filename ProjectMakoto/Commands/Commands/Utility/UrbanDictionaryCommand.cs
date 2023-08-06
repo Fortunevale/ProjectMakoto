@@ -18,30 +18,30 @@ internal sealed class UrbanDictionaryCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForModerate(ctx, true))
                 return;
 
-            string term = (string)arguments["term"];
+            var term = (string)arguments["term"];
 
             if (!ctx.Channel.IsNsfw && ctx.CommandType != Enums.CommandType.ApplicationCommand)
             {
-                await RespondOrEdit(new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Utility.UrbanDictionary.AdultContentError, true)
+                    Description = this.GetString(this.t.Commands.Utility.UrbanDictionary.AdultContentError, true)
                 }.AsError(ctx));
                 return;
             }
 
-            var Yes = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(this.t.Common.Yes), false, new DiscordComponentEmoji(true.ToEmote(ctx.Bot)));
-            var No = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), GetString(this.t.Common.No), false, new DiscordComponentEmoji(false.ToEmote(ctx.Bot)));
+            var Yes = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), this.GetString(this.t.Common.Yes), false, new DiscordComponentEmoji(true.ToEmote(ctx.Bot)));
+            var No = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), this.GetString(this.t.Common.No), false, new DiscordComponentEmoji(false.ToEmote(ctx.Bot)));
 
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
-                Description = GetString(this.t.Commands.Utility.UrbanDictionary.AdultContentWarning, true)
+                Description = this.GetString(this.t.Commands.Utility.UrbanDictionary.AdultContentWarning, true)
             }.AsAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
 
             var Menu = await ctx.WaitForButtonAsync();
 
             if (Menu.TimedOut)
             {
-                ModifyToTimedOut();
+                this.ModifyToTimedOut();
                 return;
             }
 
@@ -49,17 +49,17 @@ internal sealed class UrbanDictionaryCommand : BaseCommand
 
             if (Menu.GetCustomId() == Yes.CustomId)
             {
-                await RespondOrEdit(new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Utility.UrbanDictionary.LookingUp, true,
+                    Description = this.GetString(this.t.Commands.Utility.UrbanDictionary.LookingUp, true,
                         new TVar("Term", term))
                 }.AsLoading(ctx));
 
                 if (term.IsNullOrWhiteSpace())
                 {
-                    await RespondOrEdit(new DiscordEmbedBuilder
+                    _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = GetString(this.t.Commands.Utility.UrbanDictionary.LookupFail, true,
+                        Description = this.GetString(this.t.Commands.Utility.UrbanDictionary.LookupFail, true,
                             new TVar("Term", term))
                     }.AsError(ctx));
                     return;
@@ -81,9 +81,9 @@ internal sealed class UrbanDictionaryCommand : BaseCommand
 
                 if (!Response.IsSuccessStatusCode)
                 {
-                    await RespondOrEdit(new DiscordEmbedBuilder
+                    _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = GetString(this.t.Commands.Utility.UrbanDictionary.LookupFail, true,
+                        Description = this.GetString(this.t.Commands.Utility.UrbanDictionary.LookupFail, true,
                             new TVar("Term", term))
                     }.AsError(ctx));
                     return;
@@ -93,7 +93,7 @@ internal sealed class UrbanDictionaryCommand : BaseCommand
 
                 try
                 {
-                    UrbanDictionary rawDefinitions = JsonConvert.DeserializeObject<UrbanDictionary>(await Response.Content.ReadAsStringAsync());
+                    var rawDefinitions = JsonConvert.DeserializeObject<UrbanDictionary>(await Response.Content.ReadAsStringAsync());
                     Definitions = rawDefinitions.list.ToList();
                     Definitions.Sort((a, b) => b.RatingRatio.CompareTo(a.RatingRatio));
                 }
@@ -104,29 +104,29 @@ internal sealed class UrbanDictionaryCommand : BaseCommand
 
                 if (!Definitions.IsNotNullAndNotEmpty())
                 {
-                    await RespondOrEdit(new DiscordEmbedBuilder
+                    _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = GetString(this.t.Commands.Utility.UrbanDictionary.NotExist, true, new TVar("Term", term))
+                        Description = this.GetString(this.t.Commands.Utility.UrbanDictionary.NotExist, true, new TVar("Term", term))
                     }.AsError(ctx));
                     return;
                 }
 
                 var embeds = Definitions.Take(3).Select(x => new DiscordEmbedBuilder
                 {
-                    Title = $"**{x.word.Replace("**", "")}** - {GetString(this.t.Commands.Utility.UrbanDictionary.WrittenBy, new TVar("Author", x.author))}",
-                    Description = $"**{GetString(this.t.Commands.Utility.UrbanDictionary.Definition)}**\n\n" +
+                    Title = $"**{x.word.Replace("**", "")}** - {this.GetString(this.t.Commands.Utility.UrbanDictionary.WrittenBy, new TVar("Author", x.author))}",
+                    Description = $"**{this.GetString(this.t.Commands.Utility.UrbanDictionary.Definition)}**\n\n" +
                                   $"{x.definition.Replace("[", "").Replace("]", "")}\n\n" +
-                                  $"**{GetString(this.t.Commands.Utility.UrbanDictionary.Example)}**\n\n" +
+                                  $"**{this.GetString(this.t.Commands.Utility.UrbanDictionary.Example)}**\n\n" +
                                   $"{x.example.Replace("[", "").Replace("]", "")}\n\n" +
                                   $"👍 `{x.thumbs_up}` | 👎 `{x.thumbs_down}` | 🕒 {Formatter.Timestamp(x.written_on, TimestampFormat.LongDateTime)}",
                     Url = x.permalink
                 }.AsInfo(ctx).Build()).ToList();
 
-                await RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(embeds));
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(embeds));
             }
             else
             {
-                DeleteOrInvalidate();
+                this.DeleteOrInvalidate();
             }
         });
     }

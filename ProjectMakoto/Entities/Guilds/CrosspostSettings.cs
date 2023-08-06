@@ -22,7 +22,7 @@ public sealed class CrosspostSettings : RequiresParent<Guild>
         set
         {
             this._DelayBeforePosting = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "crosspostdelay", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "crosspostdelay", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -33,7 +33,7 @@ public sealed class CrosspostSettings : RequiresParent<Guild>
         set
         {
             this._ExcludeBots = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "crosspostexcludebots", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "crosspostexcludebots", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -59,7 +59,7 @@ public sealed class CrosspostSettings : RequiresParent<Guild>
                 while (!this._queue.IsNotNullAndNotEmpty())
                     await Task.Delay(1000);
 
-                KeyValuePair <DiscordMessage, DiscordChannel> keyValuePair = this._queue.First();
+                var keyValuePair = this._queue.First();
                 channel = keyValuePair.Value;
                 message = keyValuePair.Key;
             }
@@ -108,7 +108,7 @@ public sealed class CrosspostSettings : RequiresParent<Guild>
                     while (!task.IsCompleted)
                         task.Wait();
 
-                    this._queue.Remove(message);
+                    _ = this._queue.Remove(message);
                     _logger.LogDebug("Crossposted message in '{Channel}': {Message}", channel.Id, message.Id);
                 }
 
@@ -145,7 +145,7 @@ public sealed class CrosspostSettings : RequiresParent<Guild>
             }
             catch (Exception ex)
             {
-                this._queue.Remove(message);
+                _ = this._queue.Remove(message);
                 _logger.LogError("Failed to process crosspost queue", ex);
             }
         }
@@ -154,7 +154,7 @@ public sealed class CrosspostSettings : RequiresParent<Guild>
     public async Task CrosspostWithRatelimit(DiscordChannel channel, DiscordMessage message)
     {
         if (!this.QueueInitialized)
-            _ = CrosspostQueue();
+            _ = this.CrosspostQueue();
 
         this._queue.Add(message, channel);
 

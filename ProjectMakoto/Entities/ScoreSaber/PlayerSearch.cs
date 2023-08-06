@@ -45,5 +45,4 @@ public class PlayerSearch
         public string description { get; set; }
         public string image { get; set; }
     }
-
 }

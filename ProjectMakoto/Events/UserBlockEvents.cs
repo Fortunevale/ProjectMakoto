@@ -39,7 +39,7 @@ internal sealed class UserBlockEvents : RequiresTranslation
             var blockedMemberHighestRole = blockedMembers?.MaxBy(x => GetModerationStatus(x));
             int GetModerationStatus(DiscordMember? member)
             {
-                int i = -1;
+                var i = -1;
 
                 if (member is not null && member.Permissions.HasAnyPermission(this.ModerationPermissions))
                     i = member.GetRoleHighestPosition();
@@ -52,7 +52,7 @@ internal sealed class UserBlockEvents : RequiresTranslation
                     return;
 
                 _ = joiningMember.SendMessageAsync(new DiscordEmbedBuilder()
-                    .WithDescription(t.Commands.Social.BlockedByVictim.Get(joiningMember.GetDbEntry(this.Bot))
+                    .WithDescription(this.t.Commands.Social.BlockedByVictim.Get(joiningMember.GetDbEntry(this.Bot))
                         .Build(true, new TVar("User", membersWithBlocks.First().Mention)))
                     .AsBotError(new SharedCommandContext()
                     {
@@ -73,7 +73,7 @@ internal sealed class UserBlockEvents : RequiresTranslation
                     return;
 
                 _ = joiningMember.SendMessageAsync(new DiscordEmbedBuilder()
-                    .WithDescription(t.Commands.Social.BlockedVictim.Get(joiningMember.GetDbEntry(this.Bot))
+                    .WithDescription(this.t.Commands.Social.BlockedVictim.Get(joiningMember.GetDbEntry(this.Bot))
                         .Build(true, new TVar("User", $"<@{this.Bot.Users[e.User.Id].BlockedUsers.First(blockedId => e.Channel.Users.Any(user => user.Id == blockedId))}>")))
                     .AsBotError(new SharedCommandContext()
                     {

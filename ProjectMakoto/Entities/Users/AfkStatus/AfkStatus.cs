@@ -22,7 +22,7 @@ public sealed class AfkStatus : RequiresParent<User>
         set
         {
             this._Reason = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "afk_reason", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "afk_reason", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -35,7 +35,7 @@ public sealed class AfkStatus : RequiresParent<User>
         set
         {
             this._TimeStamp = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "afk_since", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "afk_since", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -47,7 +47,7 @@ public sealed class AfkStatus : RequiresParent<User>
         set
         {
             this._MessagesAmount = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "afk_pingamount", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "afk_pingamount", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 

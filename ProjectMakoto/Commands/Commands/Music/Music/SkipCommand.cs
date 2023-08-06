@@ -11,7 +11,7 @@ namespace ProjectMakoto.Commands.Music;
 
 internal sealed class SkipCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckVoiceState();
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await this.CheckVoiceState();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -26,18 +26,18 @@ internal sealed class SkipCommand : BaseCommand
 
             if (conn is null || conn.Channel.Id != ctx.Member.VoiceState.Channel.Id)
             {
-                await RespondOrEdit(embed: new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Music.NotSameChannel, true),
+                    Description = this.GetString(this.t.Commands.Music.NotSameChannel, true),
                 }.AsError(ctx));
                 return;
             }
 
             if (ctx.DbGuild.MusicModule.collectedSkips.Contains(ctx.User.Id))
             {
-                await RespondOrEdit(embed: new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Music.Skip.AlreadyVoted),
+                    Description = this.GetString(this.t.Commands.Music.Skip.AlreadyVoted),
                 }.AsError(ctx));
                 return;
             }
@@ -46,33 +46,33 @@ internal sealed class SkipCommand : BaseCommand
 
             if (ctx.DbGuild.MusicModule.collectedSkips.Count >= (conn.Channel.Users.Count - 1) * 0.51)
             {
-                await conn.StopAsync();
+                _ = await conn.StopAsync();
 
-                await RespondOrEdit(embed: new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Music.Skip.Skipped, true),
+                    Description = this.GetString(this.t.Commands.Music.Skip.Skipped, true),
                 }.AsSuccess(ctx));
                 return;
             }
 
-            DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
+            var embed = new DiscordEmbedBuilder()
             {
-                Description = $"`{GetGuildString(this.t.Commands.Music.Skip.VoteStarted)} ({ctx.DbGuild.MusicModule.collectedSkips.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
+                Description = $"`{this.GetGuildString(this.t.Commands.Music.Skip.VoteStarted)} ({ctx.DbGuild.MusicModule.collectedSkips.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
             }.AsAwaitingInput(ctx);
 
             var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
-            DiscordButtonComponent SkipSongVote = new(ButtonStyle.Danger, Guid.NewGuid().ToString(), GetGuildString(this.t.Commands.Music.Skip.VoteButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⏩")));
-            builder.AddComponents(SkipSongVote);
+            DiscordButtonComponent SkipSongVote = new(ButtonStyle.Danger, Guid.NewGuid().ToString(), this.GetGuildString(this.t.Commands.Music.Skip.VoteButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⏩")));
+            _ = builder.AddComponents(SkipSongVote);
 
-            await RespondOrEdit(builder);
+            _ = await this.RespondOrEdit(builder);
 
             _ = Task.Delay(TimeSpan.FromMinutes(10)).ContinueWith(x =>
             {
                 if (x.IsCompletedSuccessfully)
                 {
                     ctx.Client.ComponentInteractionCreated -= RunInteraction;
-                    ModifyToTimedOut();
+                    this.ModifyToTimedOut();
                 }
             });
 
@@ -80,7 +80,7 @@ internal sealed class SkipCommand : BaseCommand
 
             async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
             {
-                Task.Run(async () =>
+                _ = Task.Run(async () =>
                 {
                     if (e.Message.Id == ctx.ResponseMessage.Id)
                     {
@@ -88,7 +88,7 @@ internal sealed class SkipCommand : BaseCommand
 
                         if (ctx.DbGuild.MusicModule.collectedSkips.Contains(e.User.Id))
                         {
-                            _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ {GetString(this.t.Commands.Music.Skip.AlreadyVoted, true)}").AsEphemeral());
+                            _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ {this.GetString(this.t.Commands.Music.Skip.AlreadyVoted, true)}").AsEphemeral());
                             return;
                         }
 
@@ -96,7 +96,7 @@ internal sealed class SkipCommand : BaseCommand
 
                         if (member.VoiceState is null || member.VoiceState.Channel.Id != conn.Channel.Id)
                         {
-                            _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ {GetString(this.t.Commands.Music.NotSameChannel, true)}").AsEphemeral());
+                            _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ {this.GetString(this.t.Commands.Music.NotSameChannel, true)}").AsEphemeral());
                             return;
                         }
 
@@ -104,17 +104,17 @@ internal sealed class SkipCommand : BaseCommand
 
                         if (ctx.DbGuild.MusicModule.collectedSkips.Count >= (conn.Channel.Users.Count - 1) * 0.51)
                         {
-                            await conn.StopAsync();
+                            _ = await conn.StopAsync();
 
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
-                                Description = GetString(this.t.Commands.Music.Skip.Skipped),
+                                Description = this.GetString(this.t.Commands.Music.Skip.Skipped),
                             }.AsSuccess(ctx)));
                             return;
                         }
 
-                        embed.Description = $"`{GetGuildString(this.t.Commands.Music.Skip.VoteStarted)} ({ctx.DbGuild.MusicModule.collectedSkips.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
-                        await RespondOrEdit(embed.Build());
+                        embed.Description = $"`{this.GetGuildString(this.t.Commands.Music.Skip.VoteStarted)} ({ctx.DbGuild.MusicModule.collectedSkips.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
+                        _ = await this.RespondOrEdit(embed.Build());
                     }
                 }).Add(ctx.Bot);
             }

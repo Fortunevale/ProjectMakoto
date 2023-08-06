@@ -18,21 +18,21 @@ internal sealed class DeleteCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx, true))
                 return;
 
-            var Yes = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(this.t.Common.Yes), false, new DiscordComponentEmoji(true.ToEmote(ctx.Bot)));
-            var No = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), GetString(this.t.Common.No), false, new DiscordComponentEmoji(false.ToEmote(ctx.Bot)));
+            var Yes = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), this.GetString(this.t.Common.Yes), false, new DiscordComponentEmoji(true.ToEmote(ctx.Bot)));
+            var No = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), this.GetString(this.t.Common.No), false, new DiscordComponentEmoji(false.ToEmote(ctx.Bot)));
 
             if (ctx.Bot.objectedUsers.Contains(ctx.User.Id))
             {
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Utility.Data.Object.ProfileAlreadyDeleted, true)
+                    Description = this.GetString(this.t.Commands.Utility.Data.Object.ProfileAlreadyDeleted, true)
                 }.AsBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
 
                 var Menu1 = await ctx.WaitForButtonAsync();
 
                 if (Menu1.TimedOut)
                 {
-                    ModifyToTimedOut();
+                    this.ModifyToTimedOut();
                     return;
                 }
 
@@ -40,35 +40,35 @@ internal sealed class DeleteCommand : BaseCommand
 
                 if (Menu1.GetCustomId() == Yes.CustomId)
                 {
-                    await RespondOrEdit(new DiscordEmbedBuilder
+                    _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = GetString(this.t.Commands.Utility.Data.Object.EnablingDataProcessing, true)
+                        Description = this.GetString(this.t.Commands.Utility.Data.Object.EnablingDataProcessing, true)
                     }.AsBotLoading(ctx));
 
                     try
                     {
-                        ctx.Bot.objectedUsers.Remove(ctx.User.Id);
+                        _ = ctx.Bot.objectedUsers.Remove(ctx.User.Id);
                         await ctx.Bot.DatabaseClient._helper.DeleteRow(ctx.Bot.DatabaseClient.mainDatabaseConnection, "objected_users", "id", $"{ctx.User.Id}");
                     }
                     catch (Exception ex)
                     {
                         _logger.LogError("An exception occurred while trying to remove a user from the objection list", ex);
 
-                        await RespondOrEdit(new DiscordEmbedBuilder
+                        _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                         {
-                            Description = GetString(this.t.Commands.Utility.Data.Object.EnablingDataProcessingError, true)
+                            Description = this.GetString(this.t.Commands.Utility.Data.Object.EnablingDataProcessingError, true)
                         }.AsBotError(ctx));
                         return;
                     }
 
-                    await RespondOrEdit(new DiscordEmbedBuilder
+                    _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = GetString(this.t.Commands.Utility.Data.Object.EnablingDataProcessingSuccess, true)
+                        Description = this.GetString(this.t.Commands.Utility.Data.Object.EnablingDataProcessingSuccess, true)
                     }.AsBotSuccess(ctx));
                 }
                 else
                 {
-                    DeleteOrInvalidate();
+                    this.DeleteOrInvalidate();
                 }
 
                 return;
@@ -76,9 +76,9 @@ internal sealed class DeleteCommand : BaseCommand
 
             if (ctx.DbUser.Data.DeletionRequested)
             {
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Utility.Data.Object.DeletionAlreadyScheduled, true,
+                    Description = this.GetString(this.t.Commands.Utility.Data.Object.DeletionAlreadyScheduled, true,
                     new TVar("RequestTimestamp", ctx.DbUser.Data.DeletionRequestDate.AddDays(-14).ToTimestamp()),
                     new TVar("ScheduleTimestamp", ctx.DbUser.Data.DeletionRequestDate.ToTimestamp()))
                 }.AsBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
@@ -87,7 +87,7 @@ internal sealed class DeleteCommand : BaseCommand
 
                 if (Menu1.TimedOut)
                 {
-                    ModifyToTimedOut();
+                    this.ModifyToTimedOut();
                     return;
                 }
 
@@ -98,29 +98,29 @@ internal sealed class DeleteCommand : BaseCommand
                     ctx.DbUser.Data.DeletionRequested = false;
                     ctx.DbUser.Data.DeletionRequestDate = DateTime.MinValue;
 
-                    await RespondOrEdit(new DiscordEmbedBuilder
+                    _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = GetString(this.t.Commands.Utility.Data.Object.DeletionScheduleReversed, true)
+                        Description = this.GetString(this.t.Commands.Utility.Data.Object.DeletionScheduleReversed, true)
                     }.AsBotSuccess(ctx));
                 }
                 else
                 {
-                    DeleteOrInvalidate();
+                    this.DeleteOrInvalidate();
                 }
 
                 return;
             }
 
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
-                Description = GetString(this.t.Commands.Utility.Data.Object.ObjectionDisclaimer, true, true)
+                Description = this.GetString(this.t.Commands.Utility.Data.Object.ObjectionDisclaimer, true, true)
             }.AsBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
 
             var Menu = await ctx.WaitForButtonAsync();
 
             if (Menu.TimedOut)
             {
-                ModifyToTimedOut();
+                this.ModifyToTimedOut();
                 return;
             }
 
@@ -128,16 +128,16 @@ internal sealed class DeleteCommand : BaseCommand
 
             if (Menu.GetCustomId() == Yes.CustomId)
             {
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Description = $"**{GetString(this.t.Commands.Utility.Data.Object.SecondaryConfirm, true)}**"
+                    Description = $"**{this.GetString(this.t.Commands.Utility.Data.Object.SecondaryConfirm, true)}**"
                 }.AsBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { No, Yes }));
 
                 Menu = await ctx.WaitForButtonAsync();
 
                 if (Menu.TimedOut)
                 {
-                    ModifyToTimedOut();
+                    this.ModifyToTimedOut();
                     return;
                 }
 
@@ -148,19 +148,19 @@ internal sealed class DeleteCommand : BaseCommand
                     ctx.DbUser.Data.DeletionRequestDate = DateTime.UtcNow.AddDays(14);
                     ctx.DbUser.Data.DeletionRequested = true;
 
-                    await RespondOrEdit(new DiscordEmbedBuilder
+                    _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = GetString(this.t.Commands.Utility.Data.Object.ProfileDeletionScheduled, true)
+                        Description = this.GetString(this.t.Commands.Utility.Data.Object.ProfileDeletionScheduled, true)
                     }.AsBotSuccess(ctx));
                 }
                 else
                 {
-                    DeleteOrInvalidate();
+                    this.DeleteOrInvalidate();
                 }
             }
             else
             {
-                DeleteOrInvalidate();
+                this.DeleteOrInvalidate();
             }
         });
     }

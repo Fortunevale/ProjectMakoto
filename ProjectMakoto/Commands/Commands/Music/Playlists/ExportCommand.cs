@@ -18,14 +18,14 @@ internal sealed class ExportCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForModerate(ctx))
                 return;
 
-            string playlistId = (string)arguments["id"];
+            var playlistId = (string)arguments["id"];
 
             if (!ctx.DbUser.UserPlaylists.Any(x => x.PlaylistId == playlistId))
             {
-                await RespondOrEdit(new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Music.Playlists.NoPlaylist, true),
-                }.AsError(ctx, GetString(this.t.Commands.Music.Playlists.Title)));
+                    Description = this.GetString(this.t.Commands.Music.Playlists.NoPlaylist, true),
+                }.AsError(ctx, this.GetString(this.t.Commands.Music.Playlists.Title)));
                 return;
             }
 
@@ -33,10 +33,10 @@ internal sealed class ExportCommand : BaseCommand
 
             using (MemoryStream stream = new(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(SelectedPlaylist, Formatting.Indented))))
             {
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
                 {
-                    Description = GetString(this.t.Commands.Music.Playlists.Export.Exported, true, new TVar("Name", SelectedPlaylist.PlaylistName)),
-                }.AsInfo(ctx, GetString(this.t.Commands.Music.Playlists.Title))).WithFile($"{Guid.NewGuid().ToString().Replace("-", "").ToLower()}.json", stream));
+                    Description = this.GetString(this.t.Commands.Music.Playlists.Export.Exported, true, new TVar("Name", SelectedPlaylist.PlaylistName)),
+                }.AsInfo(ctx, this.GetString(this.t.Commands.Music.Playlists.Title))).WithFile($"{Guid.NewGuid().ToString().Replace("-", "").ToLower()}.json", stream));
             }
         });
     }

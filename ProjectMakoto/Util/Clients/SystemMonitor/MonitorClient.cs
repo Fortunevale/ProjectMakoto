@@ -18,12 +18,12 @@ public sealed class MonitorClient
         if (!bot.status.LoadedConfig.MonitorSystemStatus)
             return;
 
-        InitializeMonitor();
+        this.InitializeMonitor();
     }
 
     ~MonitorClient()
     {
-        _disposed = true;
+        this._disposed = true;
     }
 
     bool _disposed = false;
@@ -54,7 +54,7 @@ public sealed class MonitorClient
 
         _ = Task.Run(async () =>
         {
-            while (!_disposed)
+            while (!this._disposed)
             {
                 try
                 {
@@ -64,7 +64,7 @@ public sealed class MonitorClient
                     _logger.LogDebug(JsonConvert.SerializeObject(sensors, Formatting.Indented));
 
                     if (this.History.Count >= 180)
-                        this.History.Remove(this.History.Min(x => x.Key));
+                        _ = this.History.Remove(this.History.Min(x => x.Key));
 
 
                     this.History.Add(DateTime.UtcNow, sensors);
@@ -116,7 +116,7 @@ public sealed class MonitorClient
                     var matches = Regex.Matches(output, @"(((\w| )*): *(\+*[0-9]*.[0-9]*°C)(?!,|\)))");
                     Dictionary<string, float> tempsDict = new();
 
-                    foreach (Match b in matches.Cast<Match>())
+                    foreach (var b in matches.Cast<Match>())
                     {
                         tempsDict.Add(b.Groups[2].Value, float.Parse(b.Groups[4].Value.Replace("+", "").Replace("°C", "")));
                     }

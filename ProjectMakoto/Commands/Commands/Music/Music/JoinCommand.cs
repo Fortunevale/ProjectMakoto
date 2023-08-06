@@ -11,13 +11,13 @@ namespace ProjectMakoto.Commands.Music;
 
 internal sealed class JoinCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckVoiceState() && await CheckOwnPermissions(Permissions.UseVoice) && await CheckOwnPermissions(Permissions.UseVoiceDetection));
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await this.CheckVoiceState() && await this.CheckOwnPermissions(Permissions.UseVoice) && await this.CheckOwnPermissions(Permissions.UseVoiceDetection));
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
         {
-            bool Announce = arguments?.ContainsKey("announce") ?? false;
+            var Announce = arguments?.ContainsKey("announce") ?? false;
 
             if (Announce)
                 if (await ctx.DbUser.Cooldown.WaitForModerate(ctx))
@@ -42,18 +42,18 @@ internal sealed class JoinCommand : BaseCommand
                 ctx.DbGuild.MusicModule.QueueHandler(ctx.Bot, ctx.Client, node, conn);
 
                 if (Announce)
-                    await RespondOrEdit(new DiscordEmbedBuilder
+                    _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = GetString(this.t.Commands.Music.Join.Joined, true),
+                        Description = this.GetString(this.t.Commands.Music.Join.Joined, true),
                     }.AsSuccess(ctx));
                 return;
             }
 
             if (conn.Channel.Users.Count >= 2 && !(ctx.Member.VoiceState.Channel.Id == conn.Channel.Id))
             {
-                await RespondOrEdit(new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Music.Join.AlreadyUsed, true),
+                    Description = this.GetString(this.t.Commands.Music.Join.AlreadyUsed, true),
                 }.AsError(ctx));
 
                 throw new CancelException();
@@ -66,9 +66,9 @@ internal sealed class JoinCommand : BaseCommand
             }
 
             if (Announce)
-                await RespondOrEdit(new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Music.Join.Joined, true),
+                    Description = this.GetString(this.t.Commands.Music.Join.Joined, true),
                 }.AsSuccess(ctx));
         });
     }

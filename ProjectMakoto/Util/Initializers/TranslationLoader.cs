@@ -26,12 +26,12 @@ internal sealed class TranslationLoader
 
             Dictionary<string, int> counts = new();
 
-            Type objType = obj.GetType();
-            FieldInfo[] fields = objType.GetFields();
+            var objType = obj.GetType();
+            var fields = objType.GetFields();
 
-            foreach (FieldInfo field in fields)
+            foreach (var field in fields)
             {
-                object fieldValue = field.GetValue(obj);
+                var fieldValue = field.GetValue(obj);
                 var elems = fieldValue as IList;
                 if (elems is not null)
                 {

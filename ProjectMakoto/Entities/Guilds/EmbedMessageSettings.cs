@@ -22,7 +22,7 @@ public sealed class EmbedMessageSettings : RequiresParent<Guild>
         set
         {
             this._UseEmbedding = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "embed_messages", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "embed_messages", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -33,7 +33,7 @@ public sealed class EmbedMessageSettings : RequiresParent<Guild>
         set
         {
             this._UseGithubEmbedding = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "embed_github", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "embed_github", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 }

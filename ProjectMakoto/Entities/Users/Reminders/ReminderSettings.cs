@@ -13,15 +13,15 @@ public sealed class ReminderSettings : RequiresParent<User>
 {
     public ReminderSettings(Bot bot, User parent) : base(bot, parent)
     {
-        this._ScheduledReminders.ItemsChanged += RemindersUpdated;
+        this._ScheduledReminders.ItemsChanged += this.RemindersUpdated;
     }
 
     ~ReminderSettings()
     {
-        this.ScheduledReminders.ItemsChanged -= RemindersUpdated;
+        this.ScheduledReminders.ItemsChanged -= this.RemindersUpdated;
     }
 
-    public ObservableList<ReminderItem> ScheduledReminders { get => this._ScheduledReminders; set { this._ScheduledReminders = value; this._ScheduledReminders.ItemsChanged += RemindersUpdated; } }
+    public ObservableList<ReminderItem> ScheduledReminders { get => this._ScheduledReminders; set { this._ScheduledReminders = value; this._ScheduledReminders.ItemsChanged += this.RemindersUpdated; } }
     private ObservableList<ReminderItem> _ScheduledReminders { get; set; } = new();
 
     private async void RemindersUpdated(object? sender, ObservableListUpdate<ReminderItem> e)
@@ -39,11 +39,11 @@ public sealed class ReminderSettings : RequiresParent<User>
                 {
                     var CommandKey = this.Bot.LoadedTranslations.Commands.Utility.Reminders;
 
-                    this.ScheduledReminders.Remove(b);
+                    _ = this.ScheduledReminders.Remove(b);
 
                     var user = await this.Bot.DiscordClient.Guilds.First<KeyValuePair<ulong, DiscordGuild>>(x => x.Value.Members.ContainsKey(this.Parent.Id)).Value.GetMemberAsync(this.Parent.Id);
 
-                    DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                    var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
                         .WithDescription($"> {b.Description.FullSanitize()}\n" +
                         $"{CommandKey.CreatedOn.Get(this.Bot.Users[user.Id]).Build(new TVar("Guild", b.CreationPlace))}\n" +
                         $"{CommandKey.CreatedAt.Get(this.Bot.Users[user.Id]).Build(new TVar("Timestamp", $"{b.CreationTime.ToTimestamp()} ({b.CreationTime.ToTimestamp(TimestampFormat.LongDateTime)})"))}\n" +
@@ -60,8 +60,8 @@ public sealed class ReminderSettings : RequiresParent<User>
                     var msg = await user.SendMessageAsync(builder.AddComponents(snoozeButton));
                 });
 
-                task.Add(this.Bot);
-                task.CreateScheduledTask(b.DueTime, new ScheduledTaskIdentifier(this.Parent.Id, b.UUID, "reminder"));
+                _ = task.Add(this.Bot);
+                _ = task.CreateScheduledTask(b.DueTime, new ScheduledTaskIdentifier(this.Parent.Id, b.UUID, "reminder"));
 
                 _logger.LogDebug("Created scheduled task for reminder by '{User}'", this.Parent.Id);
             }

@@ -15,12 +15,12 @@ internal sealed class ScoreSaberProfileCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            string id = (string)arguments["id"];
+            var id = (string)arguments["id"];
 
             if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx))
                 return;
 
-            bool AddLinkButton = true;
+            var AddLinkButton = true;
 
             if ((string.IsNullOrWhiteSpace(id) || id.Contains('@')))
             {
@@ -34,9 +34,9 @@ internal sealed class ScoreSaberProfileCommand : BaseCommand
                             user = await ctx.Client.GetUserAsync(Convert.ToUInt64(Regex.Match(id, @"<@((!?)(\d*))>").Groups[3].Value));
                         else
                         {
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
-                                Description = GetString(this.t.Commands.ScoreSaber.Profile.InvalidInput, true)
+                                Description = this.GetString(this.t.Commands.ScoreSaber.Profile.InvalidInput, true)
                             }.AsError(ctx, "Score Saber")));
                             return;
                         }
@@ -46,9 +46,9 @@ internal sealed class ScoreSaberProfileCommand : BaseCommand
                 }
                 catch (DisCatSharp.Exceptions.NotFoundException)
                 {
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = GetString(this.t.Commands.ScoreSaber.Profile.NoUser, true)
+                        Description = this.GetString(this.t.Commands.ScoreSaber.Profile.NoUser, true)
                     }.AsError(ctx, "Score Saber")));
                     return;
                 }
@@ -60,9 +60,9 @@ internal sealed class ScoreSaberProfileCommand : BaseCommand
                 }
                 else
                 {
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = GetString(this.t.Commands.ScoreSaber.Profile.NoProfile, true)
+                        Description = this.GetString(this.t.Commands.ScoreSaber.Profile.NoProfile, true)
                     }.AsError(ctx, "Score Saber")));
                     return;
                 }

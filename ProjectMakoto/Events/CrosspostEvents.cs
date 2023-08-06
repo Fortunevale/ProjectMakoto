@@ -22,7 +22,7 @@ internal sealed class CrosspostEvents : RequiresTranslation
 
         foreach (var b in this.Bot.Guilds[e.Guild.Id].Crosspost.CrosspostChannels.ToList())
             if (!e.Guild.Channels.ContainsKey(b))
-                this.Bot.Guilds[e.Guild.Id].Crosspost.CrosspostChannels.Remove(b);
+                _ = this.Bot.Guilds[e.Guild.Id].Crosspost.CrosspostChannels.Remove(b);
 
         if (!this.Bot.Guilds[e.Guild.Id].Crosspost.CrosspostChannels.Contains(e.Channel.Id))
             return;
@@ -36,7 +36,7 @@ internal sealed class CrosspostEvents : RequiresTranslation
                 if (e.Message.WebhookMessage || e.Message.Author.IsBot)
                     return;
 
-            ulong MessageId = e.Message.Id;
+            var MessageId = e.Message.Id;
 
             if (this.Bot.Guilds[e.Guild.Id].Crosspost.DelayBeforePosting > 3)
                 _ = e.Message.CreateReactionAsync(DiscordEmoji.FromUnicode("🕒"));
@@ -61,7 +61,7 @@ internal sealed class CrosspostEvents : RequiresTranslation
                 throw;
             }
 
-            bool ReactionAdded = false;
+            var ReactionAdded = false;
 
             var task = this.Bot.Guilds[e.Guild.Id].Crosspost.CrosspostWithRatelimit(e.Channel, e.Message).ContinueWith(s =>
             {

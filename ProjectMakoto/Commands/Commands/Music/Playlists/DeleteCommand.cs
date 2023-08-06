@@ -18,30 +18,30 @@ internal sealed class DeleteCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForModerate(ctx))
                 return;
 
-            string playlistId = (string)arguments["id"];
+            var playlistId = (string)arguments["id"];
 
             if (!ctx.DbUser.UserPlaylists.Any(x => x.PlaylistId == playlistId))
             {
-                await RespondOrEdit(new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Music.Playlists.NoPlaylist, true),
-                }.AsError(ctx, GetString(this.t.Commands.Music.Playlists.Title)));
+                    Description = this.GetString(this.t.Commands.Music.Playlists.NoPlaylist, true),
+                }.AsError(ctx, this.GetString(this.t.Commands.Music.Playlists.Title)));
                 return;
             }
 
             var SelectedPlaylist = ctx.DbUser.UserPlaylists.First(x => x.PlaylistId == playlistId);
 
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
-                Description = GetString(this.t.Commands.Music.Playlists.Delete.Deleting, true, new TVar("Name", SelectedPlaylist.PlaylistName)),
-            }.AsLoading(ctx, GetString(this.t.Commands.Music.Playlists.Title))));
+                Description = this.GetString(this.t.Commands.Music.Playlists.Delete.Deleting, true, new TVar("Name", SelectedPlaylist.PlaylistName)),
+            }.AsLoading(ctx, this.GetString(this.t.Commands.Music.Playlists.Title))));
 
-            ctx.DbUser.UserPlaylists.Remove(SelectedPlaylist);
+            _ = ctx.DbUser.UserPlaylists.Remove(SelectedPlaylist);
 
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
-                Description = GetString(this.t.Commands.Music.Playlists.Delete.Deleted, true, new TVar("Name", SelectedPlaylist.PlaylistName)),
-            }.AsSuccess(ctx, GetString(this.t.Commands.Music.Playlists.Title))));
+                Description = this.GetString(this.t.Commands.Music.Playlists.Delete.Deleted, true, new TVar("Name", SelectedPlaylist.PlaylistName)),
+            }.AsSuccess(ctx, this.GetString(this.t.Commands.Music.Playlists.Title))));
             await Task.Delay(5000);
             return;
         });

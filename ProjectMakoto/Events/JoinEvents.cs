@@ -22,9 +22,9 @@ internal sealed class JoinEvents : RequiresTranslation
     {
         if (this.Bot.Guilds[e.Guild.Id].Join.AutoBanGlobalBans)
         {
-            if (this.Bot.globalBans.TryGetValue(e.Member.Id, out BanDetails globalBanDetails))
+            if (this.Bot.globalBans.TryGetValue(e.Member.Id, out var globalBanDetails))
             {
-                _ = e.Member.BanAsync(7, $"{tKey.Globalban.Get(Bot.Guilds[e.Guild.Id])}: {globalBanDetails.Reason}");
+                _ = e.Member.BanAsync(7, $"{this.tKey.Globalban.Get(this.Bot.Guilds[e.Guild.Id])}: {globalBanDetails.Reason}");
                 return;
             }
         }
@@ -48,7 +48,7 @@ internal sealed class JoinEvents : RequiresTranslation
                         IconUrl = AuditLogIcons.UserAdded,
                         Name = e.Member.GetUsernameWithIdentifier()
                     },
-                    Description = $"{tKey.UserJoined.Get(Bot.Guilds[e.Guild.Id]).Build(new TVar("Guild", $"**{e.Guild.Name}**"))} {this.Bot.status.LoadedConfig.Emojis.JoinEvent.SelectRandom()}",
+                    Description = $"{this.tKey.UserJoined.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("Guild", $"**{e.Guild.Name}**"))} {this.Bot.status.LoadedConfig.Emojis.JoinEvent.SelectRandom()}",
                     Color = EmbedColors.Success,
                     Thumbnail = new()
                     {
@@ -72,9 +72,9 @@ internal sealed class JoinEvents : RequiresTranslation
                         IconUrl = AuditLogIcons.UserLeft,
                         Name = e.Member.GetUsernameWithIdentifier()
                     },
-                    Description = tKey.UserLeft.Get(Bot.Guilds[e.Guild.Id]).Build(
+                    Description = this.tKey.UserLeft.Get(this.Bot.Guilds[e.Guild.Id]).Build(
                         new TVar("Guild", $"**{e.Guild.Name}**"), 
-                        new TVar("Timestamp", e.Member.JoinedAt.GetTimespanSince().GetHumanReadable(TimeFormat.DAYS, TranslationUtil.GetTranslatedHumanReadableConfig(Bot.Guilds[e.Guild.Id], Bot)))),
+                        new TVar("Timestamp", e.Member.JoinedAt.GetTimespanSince().GetHumanReadable(TimeFormat.DAYS, TranslationUtil.GetTranslatedHumanReadableConfig(this.Bot.Guilds[e.Guild.Id], this.Bot)))),
                     Color = EmbedColors.Error,
                     Thumbnail = new()
                     {

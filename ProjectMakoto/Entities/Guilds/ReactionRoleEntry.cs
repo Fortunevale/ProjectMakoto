@@ -17,10 +17,9 @@ public sealed class ReactionRoleEntry
 
     public DiscordEmoji GetEmoji(DiscordClient client)
     {
-        if (this.EmojiId == 0)
-            return DiscordEmoji.FromName(client, $":{this.EmojiName.Remove(this.EmojiName.LastIndexOf(":"), this.EmojiName.Length - this.EmojiName.LastIndexOf(":"))}:");
-
-        return DiscordEmoji.FromGuildEmote(client, this.EmojiId);
+        return this.EmojiId == 0
+            ? DiscordEmoji.FromName(client, $":{this.EmojiName.Remove(this.EmojiName.LastIndexOf(":"), this.EmojiName.Length - this.EmojiName.LastIndexOf(":"))}:")
+            : DiscordEmoji.FromGuildEmote(client, this.EmojiId);
     }
 
     public ulong RoleId { get; set; }

@@ -22,13 +22,13 @@ internal sealed class ReactionRolesCommandAbstractions
         {
             if (!ctx.Guild.Channels.ContainsKey(b.Value.ChannelId))
             {
-                ctx.DbGuild.ReactionRoles.Remove(b);
+                _ = ctx.DbGuild.ReactionRoles.Remove(b);
                 continue;
             }
 
             if (!ctx.Guild.Roles.ContainsKey(b.Value.RoleId))
             {
-                ctx.DbGuild.ReactionRoles.Remove(b);
+                _ = ctx.DbGuild.ReactionRoles.Remove(b);
                 continue;
             }
 
@@ -45,21 +45,21 @@ internal sealed class ReactionRolesCommandAbstractions
                 {
                     messageCache.Add(b.Key, null);
 
-                    ctx.DbGuild.ReactionRoles.Remove(b);
+                    _ = ctx.DbGuild.ReactionRoles.Remove(b);
                     continue;
                 }
                 catch (DisCatSharp.Exceptions.UnauthorizedException)
                 {
                     messageCache.Add(b.Key, null);
 
-                    ctx.DbGuild.ReactionRoles.Remove(b);
+                    _ = ctx.DbGuild.ReactionRoles.Remove(b);
                     continue;
                 }
             }
 
             if (messageCache[b.Key] == null)
             {
-                ctx.DbGuild.ReactionRoles.Remove(b);
+                _ = ctx.DbGuild.ReactionRoles.Remove(b);
                 continue;
             }
 
@@ -71,7 +71,7 @@ internal sealed class ReactionRolesCommandAbstractions
                 {
                     if (x.IsFaulted)
                     {
-                        ctx.DbGuild.ReactionRoles.Remove(b);
+                        _ = ctx.DbGuild.ReactionRoles.Remove(b);
                     }
                 });
                 continue;

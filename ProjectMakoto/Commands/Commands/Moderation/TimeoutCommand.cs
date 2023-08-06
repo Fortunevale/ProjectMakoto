@@ -11,15 +11,15 @@ namespace ProjectMakoto.Commands;
 
 internal sealed class TimeoutCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.ModerateMembers) && await CheckOwnPermissions(Permissions.ModerateMembers));
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await this.CheckPermissions(Permissions.ModerateMembers) && await this.CheckOwnPermissions(Permissions.ModerateMembers));
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
         {
             DiscordMember victim;
-            string duration = (string)arguments["duration"];
-            string reason = (string)arguments["reason"];
+            var duration = (string)arguments["duration"];
+            var reason = (string)arguments["reason"];
 
             try
             {
@@ -27,7 +27,7 @@ internal sealed class TimeoutCommand : BaseCommand
             }
             catch (DisCatSharp.Exceptions.NotFoundException)
             {
-                SendNoMemberError();
+                this.SendNoMemberError();
                 throw;
             }
             catch (Exception)
@@ -37,14 +37,14 @@ internal sealed class TimeoutCommand : BaseCommand
 
             var CommandKey = this.t.Commands.Moderation.Timeout;
 
-            await RespondOrEdit(new DiscordEmbedBuilder()
-                .WithDescription(GetString(CommandKey.TimingOut, true, new TVar("Victim", victim.Mention)))
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                .WithDescription(this.GetString(CommandKey.TimingOut, true, new TVar("Victim", victim.Mention)))
                 .AsLoading(ctx));
 
             if (string.IsNullOrWhiteSpace(duration))
                 duration = "30m";
 
-            if (!DateTime.TryParse(duration, out DateTime until))
+            if (!DateTime.TryParse(duration, out var until))
             {
                 try
                 {
@@ -61,8 +61,8 @@ internal sealed class TimeoutCommand : BaseCommand
                 }
                 catch (Exception)
                 {
-                    await RespondOrEdit(new DiscordEmbedBuilder()
-                        .WithDescription(GetString(CommandKey.Invalid, true))
+                    _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                        .WithDescription(this.GetString(CommandKey.Invalid, true))
                         .AsError(ctx));
                     return;
                 }
@@ -70,8 +70,8 @@ internal sealed class TimeoutCommand : BaseCommand
 
             if (DateTime.UtcNow > until || DateTime.UtcNow.AddDays(28) < until)
             {
-                await RespondOrEdit(new DiscordEmbedBuilder()
-                    .WithDescription(GetString(CommandKey.Invalid, true))
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                    .WithDescription(this.GetString(CommandKey.Invalid, true))
                     .AsError(ctx));
                 return;
             }
@@ -81,16 +81,16 @@ internal sealed class TimeoutCommand : BaseCommand
                 if (ctx.Member.GetRoleHighestPosition() <= victim.GetRoleHighestPosition())
                     throw new Exception();
 
-                await victim.TimeoutAsync(until, GetGuildString(CommandKey.AuditLog, new TVar("Reason", (reason.IsNullOrWhiteSpace() ? "No reason provided." : reason))));
+                await victim.TimeoutAsync(until, this.GetGuildString(CommandKey.AuditLog, new TVar("Reason", (reason.IsNullOrWhiteSpace() ? "No reason provided." : reason))));
 
-                await RespondOrEdit(new DiscordEmbedBuilder()
-                    .WithDescription(GetString(CommandKey.TimedOut, true, new TVar("Victim", victim.Mention), new TVar("Timestamp", until.ToTimestamp()), new TVar("Reason", reason.IsNullOrWhiteSpace() ? "No reason provided" : reason)))
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                    .WithDescription(this.GetString(CommandKey.TimedOut, true, new TVar("Victim", victim.Mention), new TVar("Timestamp", until.ToTimestamp()), new TVar("Reason", reason.IsNullOrWhiteSpace() ? "No reason provided" : reason)))
                     .AsSuccess(ctx));
             }
             catch (Exception)
             {
-                await RespondOrEdit(new DiscordEmbedBuilder()
-                    .WithDescription(GetString(CommandKey.Failed, true, new TVar("Victim", victim.Mention)))
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                    .WithDescription(this.GetString(CommandKey.Failed, true, new TVar("Victim", victim.Mention)))
                     .AsSuccess(ctx));
             }
         });

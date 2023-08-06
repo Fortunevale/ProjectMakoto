@@ -11,7 +11,7 @@ namespace ProjectMakoto.Commands.Music;
 
 internal sealed class ForceDisconnectCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckVoiceState();
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await this.CheckVoiceState();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -26,30 +26,30 @@ internal sealed class ForceDisconnectCommand : BaseCommand
 
             if (conn is null || conn.Channel.Id != ctx.Member.VoiceState.Channel.Id)
             {
-                await RespondOrEdit(embed: new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Music.NotSameChannel, true),
+                    Description = this.GetString(this.t.Commands.Music.NotSameChannel, true),
                 }.AsError(ctx));
                 return;
             }
 
             if (!ctx.Member.IsDJ(ctx.Bot.status))
             {
-                await RespondOrEdit(embed: new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Music.DjRole, true, new TVar("Role", "DJ")),
+                    Description = this.GetString(this.t.Commands.Music.DjRole, true, new TVar("Role", "DJ")),
                 }.AsError(ctx));
                 return;
             }
 
             ctx.DbGuild.MusicModule.Dispose(ctx.Bot, ctx.Guild.Id, "Graceful Disconnect");
 
-            await conn.StopAsync();
+            _ = await conn.StopAsync();
             await conn.DisconnectAsync();
 
-            await RespondOrEdit(embed: new DiscordEmbedBuilder
+            _ = await this.RespondOrEdit(embed: new DiscordEmbedBuilder
             {
-                Description = GetString(this.t.Commands.Music.ForceDisconnect.Disconnected, true),
+                Description = this.GetString(this.t.Commands.Music.ForceDisconnect.Disconnected, true),
             }.AsSuccess(ctx));
         });
     }

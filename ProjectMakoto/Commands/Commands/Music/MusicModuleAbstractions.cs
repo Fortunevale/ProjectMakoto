@@ -24,7 +24,7 @@ internal sealed class MusicModuleAbstractions
         var session = lava.ConnectedSessions.Values.First(x => x.IsConnected);
 
         var embed = new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]);
-        await ctx.BaseCommand.RespondOrEdit(embed.WithDescription(t.Commands.Music.Play.LookingFor.Get(ctx.DbUser).Build(true, new TVar("Search", searchQuery))).AsLoading(ctx));
+        _ = await ctx.BaseCommand.RespondOrEdit(embed.WithDescription(t.Commands.Music.Play.LookingFor.Get(ctx.DbUser).Build(true, new TVar("Search", searchQuery))).AsLoading(ctx));
 
         LavalinkTrackLoadingResult loadResult;
 
@@ -73,12 +73,12 @@ internal sealed class MusicModuleAbstractions
         else
         {
             embed.Description = t.Commands.Music.Play.PlatformSelect.Get(ctx.DbUser).Build(true);
-            embed.AsAwaitingInput(ctx);
+            _ = embed.AsAwaitingInput(ctx);
 
             var YouTube = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "YouTube", false, new DiscordComponentEmoji(EmojiTemplates.GetYouTube(ctx.Bot)));
             var SoundCloud = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Soundcloud", false, new DiscordComponentEmoji(EmojiTemplates.GetSoundcloud(ctx.Bot)));
 
-            await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent> { YouTube, SoundCloud }));
+            _ = await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent> { YouTube, SoundCloud }));
 
             var Menu1 = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
 
@@ -90,7 +90,7 @@ internal sealed class MusicModuleAbstractions
 
             _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-            await ctx.BaseCommand.RespondOrEdit(embed.WithDescription(t.Commands.Music.Play.LookingFor.Get(ctx.DbUser).Build(true,
+            _ = await ctx.BaseCommand.RespondOrEdit(embed.WithDescription(t.Commands.Music.Play.LookingFor.Get(ctx.DbUser).Build(true,
                 new TVar("Search", searchQuery),
                 new TVar("Platform", (Menu1.GetCustomId() == YouTube.CustomId ? "YouTube" : "SoundCloud")))).AsLoading(ctx));
 
@@ -102,16 +102,16 @@ internal sealed class MusicModuleAbstractions
             _logger.LogError("An exception occurred while trying to load lavalink track.");
             embed.Description = t.Commands.Music.Play.FailedToLoad.Get(ctx.DbUser).Build(true,
                 new TVar("Search", searchQuery));
-            embed.AsError(ctx);
-            await ctx.BaseCommand.RespondOrEdit(embed.Build());
+            _ = embed.AsError(ctx);
+            _ = await ctx.BaseCommand.RespondOrEdit(embed.Build());
             return (null, loadResult, false);
         }
         else if (loadResult.LoadType == LavalinkLoadResultType.Empty)
         {
             embed.Description = t.Commands.Music.Play.NoMatches.Get(ctx.DbUser).Build(true,
                 new TVar("Search", searchQuery));
-            embed.AsError(ctx);
-            await ctx.BaseCommand.RespondOrEdit(embed.Build());
+            _ = embed.AsError(ctx);
+            _ = await ctx.BaseCommand.RespondOrEdit(embed.Build());
             return (null, loadResult, false);
         }
         else if (loadResult.LoadType == LavalinkLoadResultType.Playlist)
@@ -129,8 +129,8 @@ internal sealed class MusicModuleAbstractions
 
             embed.Description = t.Commands.Music.Play.SearchSuccess.Get(ctx.DbUser).Build(true,
                 new TVar("Count", searchResults.Count));
-            embed.AsAwaitingInput(ctx);
-            await ctx.BaseCommand.RespondOrEdit(embed.Build());
+            _ = embed.AsAwaitingInput(ctx);
+            _ = await ctx.BaseCommand.RespondOrEdit(embed.Build());
 
             var UriResult = await ctx.BaseCommand.PromptCustomSelection(searchResults
                 .Select(x => new DiscordStringSelectComponentOption(x.Info.Title.TruncateWithIndication(100), x.Info.Uri.ToString(), $"🔼 {x.Info.Author} | 🕒 {x.Info.Length.GetHumanReadable(TimeFormat.MINUTES)}")).ToList());

@@ -11,32 +11,32 @@ namespace ProjectMakoto.Commands;
 
 internal sealed class UnbanCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.BanMembers) && await CheckOwnPermissions(Permissions.BanMembers));
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await this.CheckPermissions(Permissions.BanMembers) && await this.CheckOwnPermissions(Permissions.BanMembers));
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
         {
-            DiscordUser victim = (DiscordUser)arguments["victim"];
+            var victim = (DiscordUser)arguments["victim"];
 
             var CommandKey = this.t.Commands.Moderation.Unban;
 
-            await RespondOrEdit(new DiscordEmbedBuilder()
-                .WithDescription(GetString(CommandKey.Removing, true, new TVar("Victim", victim.Mention)))
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                .WithDescription(this.GetString(CommandKey.Removing, true, new TVar("Victim", victim.Mention)))
                 .AsLoading(ctx));
 
             try
             {
                 await ctx.Guild.UnbanMemberAsync(victim);
 
-                await RespondOrEdit(new DiscordEmbedBuilder()
-                    .WithDescription(GetString(CommandKey.Removed, true, new TVar("Victim", victim.Mention)))
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                    .WithDescription(this.GetString(CommandKey.Removed, true, new TVar("Victim", victim.Mention)))
                     .AsSuccess(ctx));
             }
             catch (Exception)
             {
-                await RespondOrEdit(new DiscordEmbedBuilder()
-                    .WithDescription(GetString(CommandKey.Failed, true, new TVar("Victim", victim.Mention)))
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                    .WithDescription(this.GetString(CommandKey.Failed, true, new TVar("Victim", victim.Mention)))
                     .AsError(ctx));
             }
         });

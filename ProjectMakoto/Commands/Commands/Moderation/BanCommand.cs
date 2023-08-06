@@ -11,15 +11,15 @@ namespace ProjectMakoto.Commands;
 
 internal sealed class BanCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.BanMembers) && await CheckOwnPermissions(Permissions.BanMembers));
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await this.CheckPermissions(Permissions.BanMembers) && await this.CheckOwnPermissions(Permissions.BanMembers));
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
         {
-            DiscordUser victim = (DiscordUser)arguments["victim"];
-            int deleteMessageDays = (int)arguments["days"] > 7 ? 7 : ((int)arguments["days"] < 0 ? 0 : (int)arguments["days"]);
-            string reason = (string)arguments["reason"];
+            var victim = (DiscordUser)arguments["victim"];
+            var deleteMessageDays = (int)arguments["days"] > 7 ? 7 : ((int)arguments["days"] < 0 ? 0 : (int)arguments["days"]);
+            var reason = (string)arguments["reason"];
 
             var CommandKey = this.t.Commands.Moderation.Ban;
 
@@ -32,27 +32,27 @@ internal sealed class BanCommand : BaseCommand
             catch { }
 
             var embed = new DiscordEmbedBuilder()
-                .WithDescription(GetString(CommandKey.Banning, true, new TVar("Victim", victim.Mention)))
+                .WithDescription(this.GetString(CommandKey.Banning, true, new TVar("Victim", victim.Mention)))
                 .WithThumbnail(victim.AvatarUrl)
                 .AsLoading(ctx);
-            await RespondOrEdit(embed);
+            _ = await this.RespondOrEdit(embed);
 
             try
             {
                 if (ctx.Member.GetRoleHighestPosition() <= bMember.GetRoleHighestPosition())
                     throw new Exception();
 
-                var newReason = (reason.IsNullOrWhiteSpace() ? GetGuildString(this.t.Commands.Moderation.NoReason) : reason);
-                await ctx.Guild.BanMemberAsync(victim.Id, deleteMessageDays, GetGuildString(CommandKey.AuditLog, new TVar("Reason", newReason)));
+                var newReason = (reason.IsNullOrWhiteSpace() ? this.GetGuildString(this.t.Commands.Moderation.NoReason) : reason);
+                await ctx.Guild.BanMemberAsync(victim.Id, deleteMessageDays, this.GetGuildString(CommandKey.AuditLog, new TVar("Reason", newReason)));
 
-                embed = embed.WithDescription(GetString(CommandKey.Banned, true, new TVar("Victim", victim.Mention), new TVar("Reason", newReason))).AsSuccess(ctx);
+                embed = embed.WithDescription(this.GetString(CommandKey.Banned, true, new TVar("Victim", victim.Mention), new TVar("Reason", newReason))).AsSuccess(ctx);
             }
             catch (Exception)
             {
-                embed = embed.WithDescription(GetString(CommandKey.Errored, true, new TVar("Victim", victim.Mention))).AsError(ctx);
+                embed = embed.WithDescription(this.GetString(CommandKey.Errored, true, new TVar("Victim", victim.Mention))).AsError(ctx);
             }
 
-            await RespondOrEdit(embed);
+            _ = await this.RespondOrEdit(embed);
         });
     }
 }

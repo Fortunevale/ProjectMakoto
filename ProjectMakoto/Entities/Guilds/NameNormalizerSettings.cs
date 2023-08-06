@@ -22,7 +22,7 @@ public sealed class NameNormalizerSettings : RequiresParent<Guild>
         set
         {
             this._NameNormalizerEnabled = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "normalizenames", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "normalizenames", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 

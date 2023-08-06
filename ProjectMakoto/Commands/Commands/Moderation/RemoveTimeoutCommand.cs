@@ -11,7 +11,7 @@ namespace ProjectMakoto.Commands;
 
 internal sealed class RemoveTimeoutCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.ModerateMembers) && await CheckOwnPermissions(Permissions.ModerateMembers));
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await this.CheckPermissions(Permissions.ModerateMembers) && await this.CheckOwnPermissions(Permissions.ModerateMembers));
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -25,7 +25,7 @@ internal sealed class RemoveTimeoutCommand : BaseCommand
             }
             catch (DisCatSharp.Exceptions.NotFoundException)
             {
-                SendNoMemberError();
+                this.SendNoMemberError();
                 throw;
             }
             catch (Exception)
@@ -35,21 +35,21 @@ internal sealed class RemoveTimeoutCommand : BaseCommand
 
             var CommandKey = this.t.Commands.Moderation.RemoveTimeout;
 
-            await RespondOrEdit(new DiscordEmbedBuilder()
-                .WithDescription(GetString(CommandKey.Removing, true, new TVar("Victim", victim.Mention)))
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                .WithDescription(this.GetString(CommandKey.Removing, true, new TVar("Victim", victim.Mention)))
                 .AsLoading(ctx));
 
             try
             {
                 await victim.RemoveTimeoutAsync();
-                await RespondOrEdit(new DiscordEmbedBuilder()
-                    .WithDescription(GetString(CommandKey.Removed, true, new TVar("Victim", victim.Mention)))
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                    .WithDescription(this.GetString(CommandKey.Removed, true, new TVar("Victim", victim.Mention)))
                     .AsSuccess(ctx));
             }
             catch (Exception)
             {
-                await RespondOrEdit(new DiscordEmbedBuilder()
-                    .WithDescription(GetString(CommandKey.Failed, true, new TVar("Victim", victim.Mention)))
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                    .WithDescription(this.GetString(CommandKey.Failed, true, new TVar("Victim", victim.Mention)))
                     .AsError(ctx));
             }
         });

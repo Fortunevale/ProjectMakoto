@@ -15,38 +15,38 @@ internal sealed class ReportHostCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            string url = (string)arguments["url"];
+            var url = (string)arguments["url"];
 
             if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx))
                 return;
 
-            int tos_version = 3;
+            var tos_version = 3;
 
             if (ctx.DbUser.UrlSubmissions.AcceptedTOS != tos_version)
             {
-                var button = new DiscordButtonComponent(ButtonStyle.Primary, "accepted-tos", GetString(this.t.Commands.Utility.ReportHost.AcceptTos), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👍")));
+                var button = new DiscordButtonComponent(ButtonStyle.Primary, "accepted-tos", this.GetString(this.t.Commands.Utility.ReportHost.AcceptTos), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👍")));
 
                 var tos_embed = new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Utility.ReportHost.Tos,
+                    Description = this.GetString(this.t.Commands.Utility.ReportHost.Tos,
                         new TVar("1", 1.ToEmotes()),
                         new TVar("2", 2.ToEmotes()),
                         new TVar("3", 3.ToEmotes()),
                         new TVar("4", 4.ToEmotes()))
-                }.AsAwaitingInput(ctx, GetString(this.t.Commands.Utility.ReportHost.Title));
+                }.AsAwaitingInput(ctx, this.GetString(this.t.Commands.Utility.ReportHost.Title));
 
                 if (ctx.DbUser.UrlSubmissions.AcceptedTOS != 0 && ctx.DbUser.UrlSubmissions.AcceptedTOS < tos_version)
                 {
-                    tos_embed.Description = tos_embed.Description.Insert(0, $"**{GetString(this.t.Commands.Utility.ReportHost.TosChangedNotice)}**\n\n");
+                    tos_embed.Description = tos_embed.Description.Insert(0, $"**{this.GetString(this.t.Commands.Utility.ReportHost.TosChangedNotice)}**\n\n");
                 }
 
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(tos_embed).AddComponents(button));
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(tos_embed).AddComponents(button));
 
                 var TosAccept = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
 
                 if (TosAccept.TimedOut)
                 {
-                    ModifyToTimedOut(true);
+                    this.ModifyToTimedOut(true);
                     return;
                 }
 
@@ -57,16 +57,16 @@ internal sealed class ReportHostCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = GetString(this.t.Commands.Utility.ReportHost.Processing, true)
-            }.AsLoading(ctx, GetString(this.t.Commands.Utility.ReportHost.Title));
+                Description = this.GetString(this.t.Commands.Utility.ReportHost.Processing, true)
+            }.AsLoading(ctx, this.GetString(this.t.Commands.Utility.ReportHost.Title));
 
-            await RespondOrEdit(embed);
+            _ = await this.RespondOrEdit(embed);
 
             if (ctx.DbUser.UrlSubmissions.LastTime.AddMinutes(45) > DateTime.UtcNow && !ctx.User.IsMaintenance(ctx.Bot.status))
             {
-                embed.Description = GetString(this.t.Commands.Utility.ReportHost.CooldownError, true,
+                embed.Description = this.GetString(this.t.Commands.Utility.ReportHost.CooldownError, true,
                     new TVar("Timestamp", ctx.DbUser.UrlSubmissions.LastTime.AddMinutes(45).ToTimestamp()));
-                _ = RespondOrEdit(embed.AsError(ctx, GetString(this.t.Commands.Utility.ReportHost.Title)));
+                _ = this.RespondOrEdit(embed.AsError(ctx, this.GetString(this.t.Commands.Utility.ReportHost.Title)));
                 return;
             }
 
@@ -74,8 +74,8 @@ internal sealed class ReportHostCommand : BaseCommand
             {
                 if (ctx.Bot.SubmittedHosts.Where(x => x.Value.Submitter == ctx.User.Id).Count() >= 5)
                 {
-                    embed.Description = GetString(this.t.Commands.Utility.ReportHost.LimitError, true);
-                    _ = RespondOrEdit(embed.AsError(ctx, GetString(this.t.Commands.Utility.ReportHost.Title)));
+                    embed.Description = this.GetString(this.t.Commands.Utility.ReportHost.LimitError, true);
+                    _ = this.RespondOrEdit(embed.AsError(ctx, this.GetString(this.t.Commands.Utility.ReportHost.Title)));
                     return;
                 }
             }
@@ -88,19 +88,19 @@ internal sealed class ReportHostCommand : BaseCommand
             }
             catch (Exception)
             {
-                embed.Description = GetString(this.t.Commands.Utility.ReportHost.InvalidHost, true,
+                embed.Description = this.GetString(this.t.Commands.Utility.ReportHost.InvalidHost, true,
                     new TVar("Host", url, true));
-                _ = RespondOrEdit(embed.AsError(ctx, GetString(this.t.Commands.Utility.ReportHost.Title)));
+                _ = this.RespondOrEdit(embed.AsError(ctx, this.GetString(this.t.Commands.Utility.ReportHost.Title)));
                 return;
             }
 
-            embed.Description = GetString(this.t.Commands.Utility.ReportHost.ConfirmHost, true,
+            embed.Description = this.GetString(this.t.Commands.Utility.ReportHost.ConfirmHost, true,
                 new TVar("Host", host, true));
-            embed.AsAwaitingInput(ctx, GetString(this.t.Commands.Utility.ReportHost.Title));
+            _ = embed.AsAwaitingInput(ctx, this.GetString(this.t.Commands.Utility.ReportHost.Title));
 
-            var ContinueButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(this.t.Common.Confirm), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
+            var ContinueButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), this.GetString(this.t.Common.Confirm), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent>
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent>
             {
                 { ContinueButton },
                 { MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot) }
@@ -110,7 +110,7 @@ internal sealed class ReportHostCommand : BaseCommand
 
             if (e.TimedOut)
             {
-                ModifyToTimedOut(true);
+                this.ModifyToTimedOut(true);
                 return;
             }
 
@@ -118,38 +118,38 @@ internal sealed class ReportHostCommand : BaseCommand
 
             if (e.GetCustomId() == ContinueButton.CustomId)
             {
-                embed.AsLoading(ctx, GetString(this.t.Commands.Utility.ReportHost.Title));
+                _ = embed.AsLoading(ctx, this.GetString(this.t.Commands.Utility.ReportHost.Title));
 
-                embed.Description = GetString(this.t.Commands.Utility.ReportHost.DatabaseCheck, true);
-                await RespondOrEdit(embed);
+                embed.Description = this.GetString(this.t.Commands.Utility.ReportHost.DatabaseCheck, true);
+                _ = await this.RespondOrEdit(embed);
 
                 foreach (var b in ctx.Bot.PhishingHosts)
                 {
                     if (host.Contains(b.Key))
                     {
-                        embed.Description = GetString(this.t.Commands.Utility.ReportHost.DatabaseError, true, new TVar("Host", host, true));
-                        embed.AsError(ctx, GetString(this.t.Commands.Utility.ReportHost.Title));
-                        _ = RespondOrEdit(embed.Build());
+                        embed.Description = this.GetString(this.t.Commands.Utility.ReportHost.DatabaseError, true, new TVar("Host", host, true));
+                        _ = embed.AsError(ctx, this.GetString(this.t.Commands.Utility.ReportHost.Title));
+                        _ = this.RespondOrEdit(embed.Build());
                         return;
                     }
                 }
 
-                embed.Description = GetString(this.t.Commands.Utility.ReportHost.SubmissionCheck, true);
-                await RespondOrEdit(embed);
+                embed.Description = this.GetString(this.t.Commands.Utility.ReportHost.SubmissionCheck, true);
+                _ = await this.RespondOrEdit(embed);
 
                 foreach (var b in ctx.Bot.SubmittedHosts)
                 {
                     if (b.Value.Url == host)
                     {
-                        embed.Description = GetString(this.t.Commands.Utility.ReportHost.SubmissionError, true, new TVar("Host", host, true));
-                        embed.AsError(ctx, GetString(this.t.Commands.Utility.ReportHost.Title));
-                        _ = RespondOrEdit(embed.Build());
+                        embed.Description = this.GetString(this.t.Commands.Utility.ReportHost.SubmissionError, true, new TVar("Host", host, true));
+                        _ = embed.AsError(ctx, this.GetString(this.t.Commands.Utility.ReportHost.Title));
+                        _ = this.RespondOrEdit(embed.Build());
                         return;
                     }
                 }
 
-                embed.Description = GetString(this.t.Commands.Utility.ReportHost.CreatingSubmission, true);
-                await RespondOrEdit(embed);
+                embed.Description = this.GetString(this.t.Commands.Utility.ReportHost.CreatingSubmission, true);
+                _ = await this.RespondOrEdit(embed);
 
                 var channel = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.UrlSubmissions);
 
@@ -160,7 +160,7 @@ internal sealed class ReportHostCommand : BaseCommand
 
                 var subbmited_msg = await channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = StatusIndicatorIcons.Success, Name = GetString(this.t.Commands.Utility.ReportHost.Title) },
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = StatusIndicatorIcons.Success, Name = this.GetString(this.t.Commands.Utility.ReportHost.Title) },
                     Color = EmbedColors.Success,
                     Timestamp = DateTime.UtcNow,
                     Description = $"`Submitted host`: `{host.SanitizeForCode()}`\n" +
@@ -184,13 +184,13 @@ internal sealed class ReportHostCommand : BaseCommand
 
                 ctx.DbUser.UrlSubmissions.LastTime = DateTime.UtcNow;
 
-                embed.Description = GetString(this.t.Commands.Utility.ReportHost.SubmissionCreated, true);
-                embed.AsSuccess(ctx, GetString(this.t.Commands.Utility.ReportHost.Title));
-                await RespondOrEdit(embed);
+                embed.Description = this.GetString(this.t.Commands.Utility.ReportHost.SubmissionCreated, true);
+                _ = embed.AsSuccess(ctx, this.GetString(this.t.Commands.Utility.ReportHost.Title));
+                _ = await this.RespondOrEdit(embed);
             }
             else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
             {
-                DeleteOrInvalidate();
+                this.DeleteOrInvalidate();
             }
         });
     }

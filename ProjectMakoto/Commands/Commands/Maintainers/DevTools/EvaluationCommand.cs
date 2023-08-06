@@ -15,7 +15,7 @@ namespace ProjectMakoto.Commands.DevTools;
 
 internal sealed class EvaluationCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckBotOwner();
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await this.CheckBotOwner();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -23,7 +23,7 @@ internal sealed class EvaluationCommand : BaseCommand
         {
             if (ctx.CommandType is not Enums.CommandType.ApplicationCommand and not Enums.CommandType.ContextMenu)
             {
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder().WithDescription("Evaluating CScript has the potentional of leaking confidential information. Are you sure you want to run this command as Prefix Command?").AsBotWarning(ctx))
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder().WithDescription("Evaluating CScript has the potentional of leaking confidential information. Are you sure you want to run this command as Prefix Command?").AsBotWarning(ctx))
                     .AddComponents(new List<DiscordComponent> { new DiscordButtonComponent(ButtonStyle.Success, "yes", "Yes"),
                                                                 new DiscordButtonComponent(ButtonStyle.Danger, "no", "No")}));
 
@@ -31,20 +31,20 @@ internal sealed class EvaluationCommand : BaseCommand
 
                 if (result.TimedOut || result.GetCustomId() != "yes")
                 {
-                    DeleteOrInvalidate();
+                    this.DeleteOrInvalidate();
                     return;
                 }
             }
 
-            string rawCode = (string)arguments["code"];
+            var rawCode = (string)arguments["code"];
 
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Evaluating..`").AsBotLoading(ctx));
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Evaluating..`").AsBotLoading(ctx));
 
             var code = RegexTemplates.Code.Match(rawCode).Groups[1]?.Value?.Trim() ?? "";
 
             if (code.IsNullOrWhiteSpace())
             {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`No code block was found.`").AsBotError(ctx));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`No code block was found.`").AsBotError(ctx));
                 return;
             }
 
@@ -68,15 +68,15 @@ internal sealed class EvaluationCommand : BaseCommand
                 options = options.WithReferences(AppDomain.CurrentDomain.GetAssemblies().Where(x => !x.IsDynamic && !x.Location.IsNullOrWhiteSpace()));
 
                 var script = CSharpScript.Create(code, options, typeof(SharedCommandContext));
-                script.Compile();
+                _ = script.Compile();
                 var result = await script.RunAsync(ctx).ConfigureAwait(false);
 
-                await RespondOrEdit(new DiscordEmbedBuilder().WithTitle("Successful Evaluation")
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithTitle("Successful Evaluation")
                     .WithDescription($"{(result.ReturnValue?.ToString().IsNullOrWhiteSpace() ?? true ? "`The evaluation did not return any result.`" : $"{result.ReturnValue}")}").AsBotSuccess(ctx));
             }
             catch (Exception ex)
             {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithTitle("Failed Evaluation").WithDescription($"```{ex.Message.SanitizeForCode()}```").AsBotError(ctx));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithTitle("Failed Evaluation").WithDescription($"```{ex.Message.SanitizeForCode()}```").AsBotError(ctx));
             }
         });
     }

@@ -22,7 +22,7 @@ public sealed class PhishingDetectionSettings : RequiresParent<Guild>
         set
         {
             this._DetectPhishing = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "phishing_detect", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "phishing_detect", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -34,7 +34,7 @@ public sealed class PhishingDetectionSettings : RequiresParent<Guild>
         set
         {
             this._WarnOnRedirect = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "phishing_warnonredirect", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "phishing_warnonredirect", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -45,7 +45,7 @@ public sealed class PhishingDetectionSettings : RequiresParent<Guild>
         set
         {
             this._AbuseIpDbReports = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "phishing_abuseipdb", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "phishing_abuseipdb", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -57,7 +57,7 @@ public sealed class PhishingDetectionSettings : RequiresParent<Guild>
         set
         {
             this._PunishmentType = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "phishing_type", Convert.ToInt32(value), Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "phishing_type", Convert.ToInt32(value), this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -69,7 +69,7 @@ public sealed class PhishingDetectionSettings : RequiresParent<Guild>
         set
         {
             this._CustomPunishmentReason = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "phishing_reason", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "phishing_reason", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -81,7 +81,7 @@ public sealed class PhishingDetectionSettings : RequiresParent<Guild>
         set
         {
             this._CustomPunishmentLength = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "phishing_time", Convert.ToInt64(value.TotalSeconds), Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "phishing_time", Convert.ToInt64(value.TotalSeconds), this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 }

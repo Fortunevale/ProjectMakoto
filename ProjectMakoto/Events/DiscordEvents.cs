@@ -32,16 +32,15 @@ internal sealed class DiscordEvents : RequiresTranslation
 
         try
         {
-            if (e.Guild.SystemChannel is null)
-                channel = e.Guild.Channels.Values.OrderBy(x => x.Position).First(x => x.Type == ChannelType.Text && x.Id != x.Guild.RulesChannel?.Id);
-            else
-                channel = e.Guild.SystemChannel;
+            channel = e.Guild.SystemChannel is null
+                ? e.Guild.Channels.Values.OrderBy(x => x.Position).First(x => x.Type == ChannelType.Text && x.Id != x.Guild.RulesChannel?.Id)
+                : e.Guild.SystemChannel;
         }
         catch (Exception) { return; }
 
         if (sender.Guilds.Count >= 100 && (!sender.CurrentUser.IsVerifiedBot || !this.Bot.status.LoadedConfig.AllowMoreThan100Guilds))
         {
-            await channel.SendMessageAsync(tKey.LimitedReached.Get(this.Bot.Guilds[e.Guild.Id]).Build(
+            _ = await channel.SendMessageAsync(this.tKey.LimitedReached.Get(this.Bot.Guilds[e.Guild.Id]).Build(
                 new TVar("IntentsUrl", "<https://support.discord.com/hc/en-us/articles/360040720412>"),
                 new TVar("Invite", $"<{this.Bot.status.DevelopmentServerInvite}>")));
 
@@ -50,7 +49,7 @@ internal sealed class DiscordEvents : RequiresTranslation
             return;
         }
 
-        var msg = await channel.SendMessageAsync(tKey.SuccessfulJoin.Get(this.Bot.Guilds[e.Guild.Id]).Build(false, true,
+        var msg = await channel.SendMessageAsync(this.tKey.SuccessfulJoin.Get(this.Bot.Guilds[e.Guild.Id]).Build(false, true,
             new TVar("Bot", sender.CurrentUser.GetUsername()),
             new TVar("BotMention", sender.CurrentUser.Mention),
             new TVar("Help", sender.GetCommandMention(this.Bot, "help")),
@@ -61,7 +60,7 @@ internal sealed class DiscordEvents : RequiresTranslation
             new TVar("GithubRepo", "<https://s.aitsys.dev/makoto>"),
             new TVar("Timestamp", DateTime.UtcNow.AddMinutes(60).ToTimestamp())));
 
-        new Task(async () =>
+        _ = new Task(async () =>
         {
             _ = msg.DeleteAsync();
         }).CreateScheduledTask(DateTime.UtcNow.AddMinutes(60));

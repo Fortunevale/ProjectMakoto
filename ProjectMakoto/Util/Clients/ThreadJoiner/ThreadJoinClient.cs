@@ -18,7 +18,7 @@ public sealed class ThreadJoinClient
 
     ~ThreadJoinClient()
     {
-        _disposed = true;
+        this._disposed = true;
     }
 
     bool _disposed = false;
@@ -27,7 +27,7 @@ public sealed class ThreadJoinClient
 
     private async Task QueueHandler()
     {
-        while (!_disposed)
+        while (!this._disposed)
         {
             if (this.Queue.Count == 0)
             {
@@ -43,7 +43,7 @@ public sealed class ThreadJoinClient
 
                 lock (this.Queue)
                 {
-                    this.Queue.Remove(b.Key);
+                    _ = this.Queue.Remove(b.Key);
                 }
             }
             finally

@@ -15,16 +15,16 @@ internal sealed class LanguageCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            await RespondOrEdit(new DiscordEmbedBuilder()
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
             {
-                Description = $"{GetString(this.t.Commands.Utility.Language.Disclaimer, true)}\n" +
-                              $"{GetString(this.t.Commands.Utility.Language.Response, true)}: `{(ctx.DbUser.OverrideLocale.IsNullOrWhiteSpace() ? (ctx.DbUser.CurrentLocale.IsNullOrWhiteSpace() ? "en (Default)" : $"{ctx.DbUser.CurrentLocale} (Discord)") : $"{ctx.DbUser.OverrideLocale} (Override)")}`"
+                Description = $"{this.GetString(this.t.Commands.Utility.Language.Disclaimer, true)}\n" +
+                              $"{this.GetString(this.t.Commands.Utility.Language.Response, true)}: `{(ctx.DbUser.OverrideLocale.IsNullOrWhiteSpace() ? (ctx.DbUser.CurrentLocale.IsNullOrWhiteSpace() ? "en (Default)" : $"{ctx.DbUser.CurrentLocale} (Discord)") : $"{ctx.DbUser.OverrideLocale} (Override)")}`"
             });
 
             List<DiscordStringSelectComponentOption> options = new();
             List<DiscordStringSelectComponentOption> newOptions = new();
 
-            newOptions.Add(new DiscordStringSelectComponentOption("Disable Override", "_", GetString(this.t.Commands.Utility.Language.DisableOverride), false, DiscordEmoji.FromUnicode("❌").ToComponent()));
+            newOptions.Add(new DiscordStringSelectComponentOption("Disable Override", "_", this.GetString(this.t.Commands.Utility.Language.DisableOverride), false, DiscordEmoji.FromUnicode("❌").ToComponent()));
 
             options.Add(new DiscordStringSelectComponentOption("English", "en", "English"));
             options.Add(new DiscordStringSelectComponentOption("German", "de", "Deutsch"));
@@ -65,24 +65,21 @@ internal sealed class LanguageCommand : BaseCommand
 
                     if (perc >= 100)
                         emoji = DiscordEmoji.FromUnicode("🟢").ToComponent();
-                    else if (perc >= 85)
-                        emoji = DiscordEmoji.FromUnicode("🟡").ToComponent();
-                    else
-                        emoji = DiscordEmoji.FromUnicode("🔴").ToComponent();
+                    else emoji = perc >= 85 ? DiscordEmoji.FromUnicode("🟡").ToComponent() : DiscordEmoji.FromUnicode("🔴").ToComponent();
 
                     newOptions.Add(new DiscordStringSelectComponentOption(b.Label, b.Value, b.Description.Insert(0, $"{perc.ToString("N1", CultureInfo.CreateSpecificCulture("en-US"))}% | "), false, emoji));
                 }
 
-            var SelectionResult = await PromptCustomSelection(newOptions, GetString(this.t.Commands.Utility.Language.Selector));
+            var SelectionResult = await this.PromptCustomSelection(newOptions, this.GetString(this.t.Commands.Utility.Language.Selector));
 
             if (SelectionResult.TimedOut)
             {
-                ModifyToTimedOut(true);
+                this.ModifyToTimedOut(true);
                 return;
             }
             else if (SelectionResult.Cancelled)
             {
-                DeleteOrInvalidate();
+                this.DeleteOrInvalidate();
                 return;
             }
             else if (SelectionResult.Errored)
@@ -104,7 +101,7 @@ internal sealed class LanguageCommand : BaseCommand
                 }
             }
 
-            await ExecuteCommand(ctx, arguments);
+            await this.ExecuteCommand(ctx, arguments);
             return;
         });
     }

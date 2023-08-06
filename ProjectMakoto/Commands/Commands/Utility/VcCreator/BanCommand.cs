@@ -18,37 +18,37 @@ internal sealed class BanCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx))
                 return;
 
-            DiscordMember victim = (DiscordMember)arguments["victim"];
-            DiscordChannel channel = ctx.Member.VoiceState?.Channel;
+            var victim = (DiscordMember)arguments["victim"];
+            var channel = ctx.Member.VoiceState?.Channel;
 
             if (!ctx.DbGuild.VcCreator.CreatedChannels.ContainsKey(channel?.Id ?? 0))
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.NotAVccChannel, true)).AsError(ctx));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Utility.VoiceChannelCreator.NotAVccChannel, true)).AsError(ctx));
                 return;
             }
 
             if (ctx.DbGuild.VcCreator.CreatedChannels[channel.Id].OwnerId != ctx.User.Id)
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.NotAVccChannelOwner, true)).AsError(ctx));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Utility.VoiceChannelCreator.NotAVccChannelOwner, true)).AsError(ctx));
                 return;
             }
 
             if (!channel.Users.Any(x => x.Id == victim.Id))
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.VictimNotPresent, true,
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Utility.VoiceChannelCreator.VictimNotPresent, true,
                     new TVar("User", victim.Mention))).AsError(ctx));
                 return;
             }
 
             if (ctx.DbGuild.VcCreator.CreatedChannels[channel.Id].OwnerId == victim.Id)
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.Ban.CannotBanSelf, true)).AsError(ctx));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Utility.VoiceChannelCreator.Ban.CannotBanSelf, true)).AsError(ctx));
                 return;
             }
 
             if (ctx.DbGuild.VcCreator.CreatedChannels[channel.Id].BannedUsers.Contains(victim.Id))
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.Ban.VictimAlreadyBanned, true,
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Utility.VoiceChannelCreator.Ban.VictimAlreadyBanned, true,
                     new TVar("User", victim.Mention))).AsError(ctx));
                 return;
             }
@@ -56,7 +56,7 @@ internal sealed class BanCommand : BaseCommand
             ctx.DbGuild.VcCreator.CreatedChannels[channel.Id].BannedUsers.Add(victim.Id);
             await channel.AddOverwriteAsync(victim, deny: Permissions.UseVoice);
             await victim.DisconnectFromVoiceAsync();
-            _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.Ban.VictimBanned, true, new TVar("User", victim.Mention))).AsError(ctx));
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Utility.VoiceChannelCreator.Ban.VictimBanned, true, new TVar("User", victim.Mention))).AsError(ctx));
         });
     }
 }

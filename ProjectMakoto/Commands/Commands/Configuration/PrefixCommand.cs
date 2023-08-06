@@ -11,7 +11,7 @@ namespace ProjectMakoto.Commands;
 
 internal sealed class PrefixCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await this.CheckAdmin();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -19,24 +19,24 @@ internal sealed class PrefixCommand : BaseCommand
         {
             string GetCurrentConfiguration(SharedCommandContext ctx)
             {
-                var pad = TranslationUtil.CalculatePadding(ctx.DbUser, t.Commands.Config.PrefixConfigCommand.CurrentPrefix, t.Commands.Config.PrefixConfigCommand.PrefixDisabled);
+                var pad = TranslationUtil.CalculatePadding(ctx.DbUser, this.t.Commands.Config.PrefixConfigCommand.CurrentPrefix, this.t.Commands.Config.PrefixConfigCommand.PrefixDisabled);
 
-                return $"⌨ `{GetString(t.Commands.Config.PrefixConfigCommand.PrefixDisabled).PadRight(pad)}` : {ctx.DbGuild.PrefixSettings.PrefixDisabled.ToEmote(ctx.Bot)}\n" +
-                       $"🗝 `{GetString(t.Commands.Config.PrefixConfigCommand.CurrentPrefix).PadRight(pad)}` : `{ctx.DbGuild.PrefixSettings.Prefix}`";
+                return $"⌨ `{this.GetString(this.t.Commands.Config.PrefixConfigCommand.PrefixDisabled).PadRight(pad)}` : {ctx.DbGuild.PrefixSettings.PrefixDisabled.ToEmote(ctx.Bot)}\n" +
+                       $"🗝 `{this.GetString(this.t.Commands.Config.PrefixConfigCommand.CurrentPrefix).PadRight(pad)}` : `{ctx.DbGuild.PrefixSettings.Prefix}`";
             }
 
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
 
-            DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
+            var embed = new DiscordEmbedBuilder()
             {
                 Description = GetCurrentConfiguration(ctx)
-            }.AsAwaitingInput(ctx, GetString(this.t.Commands.Config.PrefixConfigCommand.Title));
+            }.AsAwaitingInput(ctx, this.GetString(this.t.Commands.Config.PrefixConfigCommand.Title));
 
-            var TogglePrefixCommands = new DiscordButtonComponent((ctx.DbGuild.PrefixSettings.PrefixDisabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(this.t.Commands.Config.PrefixConfigCommand.TogglePrefixCommands), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⌨")));
-            var ChangePrefix = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), GetString(this.t.Commands.Config.PrefixConfigCommand.ChangePrefix), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗝")));
+            var TogglePrefixCommands = new DiscordButtonComponent((ctx.DbGuild.PrefixSettings.PrefixDisabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(this.t.Commands.Config.PrefixConfigCommand.TogglePrefixCommands), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⌨")));
+            var ChangePrefix = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), this.GetString(this.t.Commands.Config.PrefixConfigCommand.ChangePrefix), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗝")));
 
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
                 { TogglePrefixCommands },
@@ -47,7 +47,7 @@ internal sealed class PrefixCommand : BaseCommand
 
             if (Button.TimedOut)
             {
-                ModifyToTimedOut(true);
+                this.ModifyToTimedOut(true);
                 return;
             }
 
@@ -56,25 +56,25 @@ internal sealed class PrefixCommand : BaseCommand
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
                 ctx.DbGuild.PrefixSettings.PrefixDisabled = !ctx.DbGuild.PrefixSettings.PrefixDisabled;
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (Button.GetCustomId() == ChangePrefix.CustomId)
             {
-                var modal = new DiscordInteractionModalBuilder(GetString(this.t.Commands.Config.PrefixConfigCommand.NewPrefixModalTitle), Guid.NewGuid().ToString());
+                var modal = new DiscordInteractionModalBuilder(this.GetString(this.t.Commands.Config.PrefixConfigCommand.NewPrefixModalTitle), Guid.NewGuid().ToString());
 
-                modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "newPrefix", GetString(this.t.Commands.Config.PrefixConfigCommand.NewPrefix), ctx.Bot.Prefix, 1, 4, true, ctx.DbGuild.PrefixSettings.Prefix));
+                _ = modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "newPrefix", this.GetString(this.t.Commands.Config.PrefixConfigCommand.NewPrefix), ctx.Bot.Prefix, 1, 4, true, ctx.DbGuild.PrefixSettings.Prefix));
 
-                var ModalResult = await PromptModalWithRetry(Button.Result.Interaction, modal, false);
+                var ModalResult = await this.PromptModalWithRetry(Button.Result.Interaction, modal, false);
 
                 if (ModalResult.TimedOut)
                 {
-                    ModifyToTimedOut(true);
+                    this.ModifyToTimedOut(true);
                     return;
                 }
                 else if (ModalResult.Cancelled)
                 {
-                    await ExecuteCommand(ctx, arguments);
+                    await this.ExecuteCommand(ctx, arguments);
                     return;
                 }
                 else if (ModalResult.Errored)
@@ -86,17 +86,17 @@ internal sealed class PrefixCommand : BaseCommand
 
                 if (newPrefix.Length is > 4 or < 1)
                 {
-                    await ExecuteCommand(ctx, arguments);
+                    await this.ExecuteCommand(ctx, arguments);
                     return;
                 }
 
                 ctx.DbGuild.PrefixSettings.Prefix = newPrefix;
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (Button.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
             {
-                DeleteOrInvalidate();
+                this.DeleteOrInvalidate();
             }
         });
     }

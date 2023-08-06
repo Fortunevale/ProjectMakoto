@@ -11,7 +11,7 @@ namespace ProjectMakoto.Commands;
 
 internal sealed class AutoCrosspostCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await this.CheckAdmin();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -24,7 +24,7 @@ internal sealed class AutoCrosspostCommand : BaseCommand
 
             foreach (var b in ctx.DbGuild.Crosspost.CrosspostChannels.ToList())
                 if (!ctx.Guild.Channels.ContainsKey(b))
-                    ctx.DbGuild.Crosspost.CrosspostChannels.Remove(b);
+                    _ = ctx.DbGuild.Crosspost.CrosspostChannels.Remove(b);
 
             string GetCurrentConfiguration(SharedCommandContext ctx)
             {
@@ -37,17 +37,17 @@ internal sealed class AutoCrosspostCommand : BaseCommand
                        $"{(ctx.DbGuild.Crosspost.CrosspostChannels.Count != 0 ? string.Join("\n\n", ctx.DbGuild.Crosspost.CrosspostChannels.Select(x => $"<#{x}> `[#{ctx.Guild.GetChannel(x).Name}]`")) : CommandKey.NoCrosspostChannels.Get(ctx.DbUser).Build(true))}";
             }
 
-            DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
+            var embed = new DiscordEmbedBuilder()
             {
                 Description = GetCurrentConfiguration(ctx)
-            }.AsAwaitingInput(ctx, GetString(CommandKey.Title));
+            }.AsAwaitingInput(ctx, this.GetString(CommandKey.Title));
 
-            var SetDelayButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetDelayButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
-            var ExcludeBots = new DiscordButtonComponent((ctx.DbGuild.Crosspost.ExcludeBots ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.ToggleExcludeBotsButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🤖")));
-            var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.AddChannelButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
-            var RemoveButton = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), GetString(CommandKey.RemoveChannelButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
+            var SetDelayButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.SetDelayButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
+            var ExcludeBots = new DiscordButtonComponent((ctx.DbGuild.Crosspost.ExcludeBots ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.ToggleExcludeBotsButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🤖")));
+            var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.AddChannelButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
+            var RemoveButton = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), this.GetString(CommandKey.RemoveChannelButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
 
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
                 ExcludeBots,
@@ -63,7 +63,7 @@ internal sealed class AutoCrosspostCommand : BaseCommand
 
             if (Button.TimedOut)
             {
-                ModifyToTimedOut(true);
+                this.ModifyToTimedOut(true);
                 return;
             }
 
@@ -73,36 +73,36 @@ internal sealed class AutoCrosspostCommand : BaseCommand
 
                 ctx.DbGuild.Crosspost.ExcludeBots = !ctx.DbGuild.Crosspost.ExcludeBots;
 
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (Button.GetCustomId() == SetDelayButton.CustomId)
             {
 
-                var ModalResult = await PromptModalForTimeSpan(Button.Result.Interaction, TimeSpan.FromMinutes(5), TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(ctx.DbGuild.Crosspost.DelayBeforePosting), false);
+                var ModalResult = await this.PromptModalForTimeSpan(Button.Result.Interaction, TimeSpan.FromMinutes(5), TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(ctx.DbGuild.Crosspost.DelayBeforePosting), false);
 
                 if (ModalResult.TimedOut)
                 {
-                    ModifyToTimedOut(true);
+                    this.ModifyToTimedOut(true);
                     return;
                 }
                 else if (ModalResult.Cancelled)
                 {
-                    await ExecuteCommand(ctx, arguments);
+                    await this.ExecuteCommand(ctx, arguments);
                     return;
                 }
                 else if (ModalResult.Errored)
                 {
                     if (ModalResult.Exception.GetType() == typeof(InvalidOperationException))
                     {
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription(GetString(CommandKey.DurationLimit, true)).AsError(ctx, GetString(CommandKey.Title))));
+                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription(this.GetString(CommandKey.DurationLimit, true)).AsError(ctx, this.GetString(CommandKey.Title))));
                         await Task.Delay(5000);
-                        await ExecuteCommand(ctx, arguments);
+                        await this.ExecuteCommand(ctx, arguments);
                         return;
                     }
                     else if (ModalResult.Exception.GetType() == typeof(ArgumentException))
                     {
-                        await ExecuteCommand(ctx, arguments);
+                        await this.ExecuteCommand(ctx, arguments);
                         return;
                     }
 
@@ -111,7 +111,7 @@ internal sealed class AutoCrosspostCommand : BaseCommand
 
                 ctx.DbGuild.Crosspost.DelayBeforePosting = Convert.ToInt32(ModalResult.Result.TotalSeconds);
 
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (Button.GetCustomId() == AddButton.CustomId)
@@ -120,33 +120,33 @@ internal sealed class AutoCrosspostCommand : BaseCommand
 
                 if (ctx.DbGuild.Crosspost.CrosspostChannels.Count >= 20)
                 {
-                    embed.Description = GetString(CommandKey.ChannelLimit, true, new TVar("Invite", ctx.Bot.status.DevelopmentServerInvite));
-                    embed = embed.AsError(ctx, GetString(CommandKey.Title));
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                    embed.Description = this.GetString(CommandKey.ChannelLimit, true, new TVar("Invite", ctx.Bot.status.DevelopmentServerInvite));
+                    embed = embed.AsError(ctx, this.GetString(CommandKey.Title));
+                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                     await Task.Delay(5000);
-                    await ExecuteCommand(ctx, arguments);
+                    await this.ExecuteCommand(ctx, arguments);
                     return;
                 }
 
-                var ChannelResult = await PromptChannelSelection(ChannelType.News);
+                var ChannelResult = await this.PromptChannelSelection(ChannelType.News);
 
                 if (ChannelResult.TimedOut)
                 {
-                    ModifyToTimedOut(true);
+                    this.ModifyToTimedOut(true);
                     return;
                 }
                 else if (ChannelResult.Cancelled)
                 {
-                    await ExecuteCommand(ctx, arguments);
+                    await this.ExecuteCommand(ctx, arguments);
                     return;
                 }
                 else if (ChannelResult.Failed)
                 {
                     if (ChannelResult.Exception.GetType() == typeof(NullReferenceException))
                     {
-                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(this.t.Commands.Common.Errors.NoChannels, true)));
+                        _ = await this.RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(this.GetString(this.t.Commands.Common.Errors.NoChannels, true)));
                         await Task.Delay(3000);
-                        await ExecuteCommand(ctx, arguments);
+                        await this.ExecuteCommand(ctx, arguments);
                         return;
                     }
 
@@ -155,24 +155,24 @@ internal sealed class AutoCrosspostCommand : BaseCommand
 
                 if (ChannelResult.Result.Type != ChannelType.News)
                 {
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription(GetString(this.t.Commands.Common.Errors.NoChannels, true)).AsError(ctx, GetString(CommandKey.Title))));
+                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription(this.GetString(this.t.Commands.Common.Errors.NoChannels, true)).AsError(ctx, this.GetString(CommandKey.Title))));
                     await Task.Delay(5000);
-                    await ExecuteCommand(ctx, arguments);
+                    await this.ExecuteCommand(ctx, arguments);
                     return;
                 }
 
                 if (ctx.DbGuild.Crosspost.CrosspostChannels.Count >= 50)
                 {
-                    await RespondOrEdit(embed.WithDescription(GetString(CommandKey.ChannelLimit, true, new TVar("Invite", ctx.Bot.status.DevelopmentServerInvite))).AsError(ctx, GetString(CommandKey.Title)));
+                    _ = await this.RespondOrEdit(embed.WithDescription(this.GetString(CommandKey.ChannelLimit, true, new TVar("Invite", ctx.Bot.status.DevelopmentServerInvite))).AsError(ctx, this.GetString(CommandKey.Title)));
                     await Task.Delay(5000);
-                    await ExecuteCommand(ctx, arguments);
+                    await this.ExecuteCommand(ctx, arguments);
                     return;
                 }
 
                 if (!ctx.DbGuild.Crosspost.CrosspostChannels.Contains(ChannelResult.Result.Id))
                     ctx.DbGuild.Crosspost.CrosspostChannels.Add(ChannelResult.Result.Id);
 
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
 
             }
@@ -182,23 +182,23 @@ internal sealed class AutoCrosspostCommand : BaseCommand
 
                 if (ctx.DbGuild.Crosspost.CrosspostChannels.Count == 0)
                 {
-                    await RespondOrEdit(embed.WithDescription(GetString(CommandKey.NoCrosspostChannels, true)).AsError(ctx, GetString(CommandKey.Title)));
+                    _ = await this.RespondOrEdit(embed.WithDescription(this.GetString(CommandKey.NoCrosspostChannels, true)).AsError(ctx, this.GetString(CommandKey.Title)));
                     await Task.Delay(5000);
-                    await ExecuteCommand(ctx, arguments);
+                    await this.ExecuteCommand(ctx, arguments);
                     return;
                 }
 
-                var ChannelResult = await PromptCustomSelection(ctx.DbGuild.Crosspost.CrosspostChannels
+                var ChannelResult = await this.PromptCustomSelection(ctx.DbGuild.Crosspost.CrosspostChannels
                         .Select(x => new DiscordStringSelectComponentOption($"#{ctx.Guild.GetChannel(x).Name} ({x})", x.ToString(), $"{(ctx.Guild.GetChannel(x).Parent is not null ? $"{ctx.Guild.GetChannel(x).Parent.Name}" : "")}")).ToList());
 
                 if (ChannelResult.TimedOut)
                 {
-                    ModifyToTimedOut(true);
+                    this.ModifyToTimedOut(true);
                     return;
                 }
                 else if (ChannelResult.Cancelled)
                 {
-                    await ExecuteCommand(ctx, arguments);
+                    await this.ExecuteCommand(ctx, arguments);
                     return;
                 }
                 else if (ChannelResult.Errored)
@@ -206,17 +206,17 @@ internal sealed class AutoCrosspostCommand : BaseCommand
                     throw ChannelResult.Exception;
                 }
 
-                ulong ChannelToRemove = Convert.ToUInt64(ChannelResult.Result);
+                var ChannelToRemove = Convert.ToUInt64(ChannelResult.Result);
 
                 if (ctx.DbGuild.Crosspost.CrosspostChannels.Contains(ChannelToRemove))
-                    ctx.DbGuild.Crosspost.CrosspostChannels.Remove(ChannelToRemove);
+                    _ = ctx.DbGuild.Crosspost.CrosspostChannels.Remove(ChannelToRemove);
 
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (Button.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
             {
-                DeleteOrInvalidate();
+                this.DeleteOrInvalidate();
                 return;
             }
         });

@@ -22,7 +22,7 @@ internal sealed class EmbedMessagesEvents : RequiresTranslation
         if (e.Guild is null)
             return;
 
-        var Delete = new DiscordButtonComponent(ButtonStyle.Danger, "DeleteEmbedMessage", tKey.Delete.Get(this.Bot.Guilds[e.Guild.Id]), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
+        var Delete = new DiscordButtonComponent(ButtonStyle.Danger, "DeleteEmbedMessage", this.tKey.Delete.Get(this.Bot.Guilds[e.Guild.Id]), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
 
         do
         {
@@ -36,9 +36,9 @@ internal sealed class EmbedMessagesEvents : RequiresTranslation
 
                 var matches = RegexTemplates.DiscordChannelUrl.Matches(e.Message.Content);
 
-                foreach (Match b in matches.GroupBy(x => x.Value).Select(y => y.FirstOrDefault()).Take(2))
+                foreach (var b in matches.GroupBy(x => x.Value).Select(y => y.FirstOrDefault()).Take(2))
                 {
-                    if (!b.Value.TryParseMessageLink(out ulong GuildId, out ulong ChannelId, out ulong MessageId))
+                    if (!b.Value.TryParseMessageLink(out var GuildId, out var ChannelId, out var MessageId))
                         continue;
 
                     if (GuildId != e.Guild.Id)
@@ -60,7 +60,7 @@ internal sealed class EmbedMessagesEvents : RequiresTranslation
                     {
                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = message.Author.AvatarUrl, Name = $"{message.Author.GetUsernameWithIdentifier()} ({message.Author.Id})" },
                         Color = message.Author.BannerColor ?? EmbedColors.Info,
-                        Description = $"[`{t.Common.JumpToMessage.Get(this.Bot.Guilds[e.Guild.Id])}`]({message.JumpLink})\n\n{message.Content}".TruncateWithIndication(2000),
+                        Description = $"[`{this.t.Common.JumpToMessage.Get(this.Bot.Guilds[e.Guild.Id])}`]({message.JumpLink})\n\n{message.Content}".TruncateWithIndication(2000),
                         ImageUrl = (message.Attachments?.Count > 0 && (message.Attachments[0].Filename.EndsWith(".png")
                                                                     || message.Attachments[0].Filename.EndsWith(".jpeg")
                                                                     || message.Attachments[0].Filename.EndsWith(".jpg")
@@ -84,19 +84,19 @@ internal sealed class EmbedMessagesEvents : RequiresTranslation
 
             var matches = RegexTemplates.GitHubUrl.Matches(e.Message.Content);
 
-            foreach (Match b in matches.GroupBy(x => x.Value).Select(y => y.FirstOrDefault()).Take(2))
+            foreach (var b in matches.GroupBy(x => x.Value).Select(y => y.FirstOrDefault()).Take(2))
             {
-                string fileUrl = b.Value;
+                var fileUrl = b.Value;
                 fileUrl = fileUrl.Replace("github.com", "raw.githubusercontent.com");
                 fileUrl = fileUrl.Replace("/blob", "");
                 fileUrl = fileUrl[..fileUrl.LastIndexOf("#")];
 
-                string repoOwner = b.Groups[1].Value;
-                string repoName = b.Groups[2].Value;
+                var repoOwner = b.Groups[1].Value;
+                var repoName = b.Groups[2].Value;
 
-                string relativeFilePath = b.Groups[5].Value;
+                var relativeFilePath = b.Groups[5].Value;
 
-                string fileEnding = "";
+                var fileEnding = "";
 
                 try
                 {
@@ -104,8 +104,8 @@ internal sealed class EmbedMessagesEvents : RequiresTranslation
                 }
                 catch { }
 
-                uint StartLine = Convert.ToUInt32(b.Groups[6].Value.Replace("L", ""));
-                uint EndLine = Convert.ToUInt32(b.Groups[8].Value.IsNullOrWhiteSpace() ? $"{StartLine}" : b.Groups[8].Value.Replace("L", ""));
+                var StartLine = Convert.ToUInt32(b.Groups[6].Value.Replace("L", ""));
+                var EndLine = Convert.ToUInt32(b.Groups[8].Value.IsNullOrWhiteSpace() ? $"{StartLine}" : b.Groups[8].Value.Replace("L", ""));
 
                 if (EndLine < StartLine)
                     return;
@@ -118,11 +118,11 @@ internal sealed class EmbedMessagesEvents : RequiresTranslation
                 if (!lines.IsNotNullAndNotEmpty())
                     return;
 
-                int shortestIndent = -1;
+                var shortestIndent = -1;
 
                 foreach (var c in lines)
                 {
-                    int currentIndent = 0;
+                    var currentIndent = 0;
 
                     foreach (var d in c)
                     {
@@ -138,7 +138,7 @@ internal sealed class EmbedMessagesEvents : RequiresTranslation
 
                 lines = lines.Select(x => x.Remove(0, shortestIndent)).ToList();
 
-                string content = $"`{relativeFilePath}` {(StartLine != EndLine ? tKey.Lines.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("Start", StartLine), new TVar("End", EndLine)) : tKey.Line.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("Start", StartLine)))}\n\n" +
+                var content = $"`{relativeFilePath}` {(StartLine != EndLine ? this.tKey.Lines.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("Start", StartLine), new TVar("End", EndLine)) : this.tKey.Line.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("Start", StartLine)))}\n\n" +
                                     $"```{fileEnding}\n" +
                                     $"{string.Join("\n", lines)}\n" +
                                     $"```";
@@ -162,20 +162,15 @@ internal sealed class EmbedMessagesEvents : RequiresTranslation
 
             _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-            if ((fullMsg.Reference is not null && fullMsg.ReferencedMessage is null) ||
+            _ = (fullMsg.Reference is not null && fullMsg.ReferencedMessage is null) ||
             (fullMsg.ReferencedMessage is not null && fullMsg.ReferencedMessage.Author.Id == e.Interaction.User.Id) ||
-            (await e.User.ConvertToMember(e.Interaction.Guild)).Roles.Any(x => (x.CheckPermission(Permissions.ManageMessages) == PermissionLevel.Allowed) || (x.CheckPermission(Permissions.Administrator) == PermissionLevel.Allowed)))
-            {
-                _ = fullMsg.DeleteAsync().ContinueWith(x =>
+            (await e.User.ConvertToMember(e.Interaction.Guild)).Roles.Any(x => (x.CheckPermission(Permissions.ManageMessages) == PermissionLevel.Allowed) || (x.CheckPermission(Permissions.Administrator) == PermissionLevel.Allowed))
+                ? fullMsg.DeleteAsync().ContinueWith(x =>
                 {
                     if (!x.IsCompletedSuccessfully)
-                        _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ `{tKey.FailedToDelete.Get(this.Bot.Guilds[e.Guild.Id])}`").AsEphemeral());
-                });
-            }
-            else
-            {
-                _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ `{tKey.NotAuthor.Get(this.Bot.Guilds[e.Guild.Id])}`").AsEphemeral());
-            }
+                        _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ `{this.tKey.FailedToDelete.Get(this.Bot.Guilds[e.Guild.Id])}`").AsEphemeral());
+                })
+                : e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ `{this.tKey.NotAuthor.Get(this.Bot.Guilds[e.Guild.Id])}`").AsEphemeral());
         }
     }
 }

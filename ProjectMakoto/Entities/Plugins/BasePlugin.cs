@@ -96,7 +96,7 @@ public abstract class BasePlugin
     public void Load(Bot bot)
     {
         this.Bot = bot;
-        Initialize();
+        _ = this.Initialize();
 
         _ = _ = Task.Run(async () =>
         {
@@ -170,7 +170,7 @@ public abstract class BasePlugin
                 if (this.UpdateUrlCredentials is not null)
                 {
                     this._logger.LogInfo("Private repository detected. Downloading latest version to 'UpdatedPlugins' Directory..");
-                    Directory.CreateDirectory("UpdatedPlugins");
+                    _ = Directory.CreateDirectory("UpdatedPlugins");
                     HttpClient downloadClient = new();
 
                     var asset = release.Assets.First(x => x.Name.EndsWith(".dll"));

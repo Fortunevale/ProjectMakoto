@@ -32,5 +32,4 @@ public class PlayerInfo
         public string description { get; set; }
         public string image { get; set; }
     }
-
 }

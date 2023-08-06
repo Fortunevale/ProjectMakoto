@@ -14,7 +14,7 @@ internal sealed class AvatarCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            DiscordUser victim = (DiscordUser)arguments["victim"];
+            var victim = (DiscordUser)arguments["victim"];
 
             if (await ctx.DbUser.Cooldown.WaitForModerate(ctx))
                 return;
@@ -26,7 +26,7 @@ internal sealed class AvatarCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 ImageUrl = victim.AvatarUrl,
-            }.AsInfo(ctx, GetString(this.t.Commands.Utility.Avatar.Avatar, false, new TVar("User", victim.GetUsernameWithIdentifier())));
+            }.AsInfo(ctx, this.GetString(this.t.Commands.Utility.Avatar.Avatar, false, new TVar("User", victim.GetUsernameWithIdentifier())));
 
             DiscordMember member = null;
 
@@ -34,12 +34,12 @@ internal sealed class AvatarCommand : BaseCommand
             { member = await victim.ConvertToMember(ctx.Guild); }
             catch { }
 
-            var ServerProfilePictureButton = new DiscordButtonComponent(ButtonStyle.Secondary, "ShowServer", GetString(this.t.Commands.Utility.Avatar.ShowServerProfile), (string.IsNullOrWhiteSpace(member?.GuildAvatarHash)), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖥")));
-            var ProfilePictureButton = new DiscordButtonComponent(ButtonStyle.Secondary, "ShowProfile", GetString(this.t.Commands.Utility.Avatar.ShowUserProfile), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
+            var ServerProfilePictureButton = new DiscordButtonComponent(ButtonStyle.Secondary, "ShowServer", this.GetString(this.t.Commands.Utility.Avatar.ShowServerProfile), (string.IsNullOrWhiteSpace(member?.GuildAvatarHash)), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖥")));
+            var ProfilePictureButton = new DiscordButtonComponent(ButtonStyle.Secondary, "ShowProfile", this.GetString(this.t.Commands.Utility.Avatar.ShowUserProfile), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
 
-            DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ServerProfilePictureButton);
+            var builder = new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ServerProfilePictureButton);
 
-            var msg = await RespondOrEdit(builder);
+            var msg = await this.RespondOrEdit(builder);
 
             CancellationTokenSource cancellationTokenSource = new();
 
@@ -50,13 +50,13 @@ internal sealed class AvatarCommand : BaseCommand
                 if (x.IsCompletedSuccessfully)
                 {
                     ctx.Client.ComponentInteractionCreated -= RunInteraction;
-                    ModifyToTimedOut(true);
+                    this.ModifyToTimedOut(true);
                 }
             });
 
             async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
             {
-                Task.Run(async () =>
+                _ = Task.Run(async () =>
                 {
                     if (e.Message?.Id == msg.Id && e.User.Id == ctx.User.Id)
                     {
@@ -68,7 +68,7 @@ internal sealed class AvatarCommand : BaseCommand
                             if (x.IsCompletedSuccessfully)
                             {
                                 ctx.Client.ComponentInteractionCreated -= RunInteraction;
-                                ModifyToTimedOut(true);
+                                this.ModifyToTimedOut(true);
                             }
                         });
 
@@ -77,12 +77,12 @@ internal sealed class AvatarCommand : BaseCommand
                         if (e.GetCustomId() == ServerProfilePictureButton.CustomId)
                         {
                             embed.ImageUrl = member.GuildAvatarUrl;
-                            _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ProfilePictureButton));
+                            _ = this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ProfilePictureButton));
                         }
                         else if (e.GetCustomId() == ProfilePictureButton.CustomId)
                         {
                             embed.ImageUrl = member.AvatarUrl;
-                            _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ServerProfilePictureButton));
+                            _ = this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ServerProfilePictureButton));
                         }
                     }
                 }).Add(ctx.Bot, ctx);

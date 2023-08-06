@@ -29,7 +29,7 @@ public sealed class Member : RequiresParent<Guild>
         set
         {
             this._SavedNickname = value;
-            _ = Bot.DatabaseClient.UpdateValue(this.Parent.Id.ToString(), "userid", this.Id, "saved_nickname", value, Bot.DatabaseClient.guildDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue(this.Parent.Id.ToString(), "userid", this.Id, "saved_nickname", value, this.Bot.DatabaseClient.guildDatabaseConnection);
         }
     }
 
@@ -42,7 +42,7 @@ public sealed class Member : RequiresParent<Guild>
         set
         {
             this._FirstJoinDate = value;
-            _ = Bot.DatabaseClient.UpdateValue(this.Parent.Id.ToString(), "userid", this.Id, "first_join", value, Bot.DatabaseClient.guildDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue(this.Parent.Id.ToString(), "userid", this.Id, "first_join", value, this.Bot.DatabaseClient.guildDatabaseConnection);
         }
     }
 
@@ -55,7 +55,7 @@ public sealed class Member : RequiresParent<Guild>
         set
         {
             this._LastLeaveDate = value;
-            _ = Bot.DatabaseClient.UpdateValue(this.Parent.Id.ToString(), "userid", this.Id, "last_leave", value, Bot.DatabaseClient.guildDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue(this.Parent.Id.ToString(), "userid", this.Id, "last_leave", value, this.Bot.DatabaseClient.guildDatabaseConnection);
         }
     }
 

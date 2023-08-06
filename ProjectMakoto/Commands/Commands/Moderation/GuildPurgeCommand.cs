@@ -11,7 +11,7 @@ namespace ProjectMakoto.Commands;
 
 internal sealed class GuildPurgeCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.ManageMessages) && await CheckPermissions(Permissions.ManageChannels) && await CheckOwnPermissions(Permissions.ManageMessages));
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await this.CheckPermissions(Permissions.ManageMessages) && await this.CheckPermissions(Permissions.ManageChannels) && await this.CheckOwnPermissions(Permissions.ManageMessages));
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -19,26 +19,26 @@ internal sealed class GuildPurgeCommand : BaseCommand
         {
             var CommandKey = this.t.Commands.Moderation.GuildPurge;
 
-            int number = (int)arguments["number"];
-            DiscordUser victim = (DiscordUser)arguments["victim"];
+            var number = (int)arguments["number"];
+            var victim = (DiscordUser)arguments["victim"];
 
             if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx))
                 return;
 
             if (number is > 2000 or < 1)
             {
-                SendSyntaxError();
+                this.SendSyntaxError();
                 return;
             }
 
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder().
-                WithDescription(GetString(CommandKey.Scanning, true, new TVar("Victim", victim.Mention)))
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder().
+                WithDescription(this.GetString(CommandKey.Scanning, true, new TVar("Victim", victim.Mention)))
                 .AsLoading(ctx)));
 
-            int currentProg = 0;
-            int maxProg = ctx.Guild.Channels.Count;
+            var currentProg = 0;
+            var maxProg = ctx.Guild.Channels.Count;
 
-            int allMsg = 0;
+            var allMsg = 0;
             Dictionary<ulong, List<DiscordMessage>> channelList = new();
 
             foreach (var channel in ctx.Guild.Channels.Where(x => x.Value.Type is ChannelType.Text or ChannelType.PublicThread or ChannelType.PrivateThread or ChannelType.News or ChannelType.Voice))
@@ -49,12 +49,12 @@ internal sealed class GuildPurgeCommand : BaseCommand
 
                 currentProg++;
 
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder().
-                    WithDescription($"{GetString(CommandKey.Scanning, true, new TVar("Victim", victim.Mention))}\n" +
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder().
+                    WithDescription($"{this.GetString(CommandKey.Scanning, true, new TVar("Victim", victim.Mention))}\n" +
                                     $"`{StringTools.GenerateASCIIProgressbar(currentProg, maxProg)} {MathTools.CalculatePercentage(currentProg, maxProg),3}%`")
                     .AsLoading(ctx)));
 
-                int MessageInt = number;
+                var MessageInt = number;
 
                 List<DiscordMessage> requested_messages = new();
 
@@ -116,10 +116,10 @@ internal sealed class GuildPurgeCommand : BaseCommand
             foreach (var channel in channelList)
                 foreach (var message in channel.Value.ToList())
                     if (message.CreationTimestamp.GetTimespanSince() > TimeSpan.FromDays(14))
-                        channel.Value.Remove(message);
+                        _ = channel.Value.Remove(message);
 
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
-                .WithDescription($"{GetString(CommandKey.Deleting, true, new TVar("Victim", victim.Mention), new TVar("Count", allMsg))}\n" +
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                .WithDescription($"{this.GetString(CommandKey.Deleting, true, new TVar("Victim", victim.Mention), new TVar("Count", allMsg))}\n" +
                                  $"`{StringTools.GenerateASCIIProgressbar(currentProg, maxProg)} {MathTools.CalculatePercentage(currentProg, maxProg)}%`")
                 .AsLoading(ctx)));
 
@@ -133,8 +133,8 @@ internal sealed class GuildPurgeCommand : BaseCommand
             {
                 try
                 {
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
-                        .WithDescription($"{GetString(CommandKey.Deleting, true, new TVar("Victim", victim.Mention), new TVar("Count", allMsg))}\n" +
+                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                        .WithDescription($"{this.GetString(CommandKey.Deleting, true, new TVar("Victim", victim.Mention), new TVar("Count", allMsg))}\n" +
                                          $"`{StringTools.GenerateASCIIProgressbar(currentProg, maxProg)} {MathTools.CalculatePercentage(currentProg, maxProg)}%`")
                         .AsLoading(ctx)));
 
@@ -149,8 +149,8 @@ internal sealed class GuildPurgeCommand : BaseCommand
                 catch { }
             }
 
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
-                .WithDescription(GetString(CommandKey.Ended, true, new TVar("Victim", victim.Mention), new TVar("Min", currentProg), new TVar("Max", maxProg), new TVar("ChannelCount", channelList.Count)))
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                .WithDescription(this.GetString(CommandKey.Ended, true, new TVar("Victim", victim.Mention), new TVar("Min", currentProg), new TVar("Max", maxProg), new TVar("ChannelCount", channelList.Count)))
                 .AsSuccess(ctx)));
         });
     }

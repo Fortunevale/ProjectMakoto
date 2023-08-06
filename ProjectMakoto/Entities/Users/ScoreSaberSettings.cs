@@ -22,7 +22,7 @@ public sealed class ScoreSaberSettings : RequiresParent<User>
         set
         {
             this._Id = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "scoresaber_id", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "scoresaber_id", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 }

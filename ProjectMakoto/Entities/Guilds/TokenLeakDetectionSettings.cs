@@ -22,7 +22,7 @@ public sealed class TokenLeakDetectionSettings : RequiresParent<Guild>
         set
         {
             this._DetectTokens = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "tokens_detect", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "tokens_detect", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 }

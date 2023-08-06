@@ -14,37 +14,37 @@ internal sealed class LeaderboardCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            int ShowAmount = (int)arguments["ShowAmount"];
+            var ShowAmount = (int)arguments["ShowAmount"];
 
             if (await ctx.DbUser.Cooldown.WaitForModerate(ctx))
                 return;
 
             if (!ctx.DbGuild.Experience.UseExperience)
             {
-                await RespondOrEdit(new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Utility.Leaderboard.Disabled, true,
+                    Description = this.GetString(this.t.Commands.Utility.Leaderboard.Disabled, true,
                         new TVar("Command", $"{ctx.Prefix}experiencesettings config"))
-                }.AsError(ctx, GetString(this.t.Commands.Utility.Leaderboard.Title)));
+                }.AsError(ctx, this.GetString(this.t.Commands.Utility.Leaderboard.Title)));
                 return;
             }
 
             if (ShowAmount is > 50 or < 3)
             {
-                SendSyntaxError();
+                this.SendSyntaxError();
                 return;
             }
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = GetString(this.t.Commands.Utility.Leaderboard.Fetching, true),
-            }.AsLoading(ctx, GetString(this.t.Commands.Utility.Leaderboard.Title));
+                Description = this.GetString(this.t.Commands.Utility.Leaderboard.Fetching, true),
+            }.AsLoading(ctx, this.GetString(this.t.Commands.Utility.Leaderboard.Title));
 
-            await RespondOrEdit(embed: embed);
+            _ = await this.RespondOrEdit(embed: embed);
 
-            int count = 0;
+            var count = 0;
 
-            int currentuserplacement = 0;
+            var currentuserplacement = 0;
 
             foreach (var b in ctx.DbGuild.Members.OrderByDescending(x => x.Value.Experience.Points))
             {
@@ -64,7 +64,7 @@ internal sealed class LeaderboardCommand : BaseCommand
                     if (!members.Any(x => x.Id == b.Key))
                         continue;
 
-                    DiscordMember bMember = members.First(x => x.Id == b.Key);
+                    var bMember = members.First(x => x.Id == b.Key);
 
                     if (bMember is null)
                         continue;
@@ -77,7 +77,7 @@ internal sealed class LeaderboardCommand : BaseCommand
 
                     count++;
 
-                    Board.Add(new KeyValuePair<string, string>("󠂪 󠂪 ", $"**{count.ToEmotes()}**. <@{b.Key}> `{bMember.GetUsernameWithIdentifier()}` ({GetString(this.t.Commands.Utility.Leaderboard.Level, true, new TVar("Level", b.Value.Experience.Level), new TVar("Points", b.Value.Experience.Points))}"));
+                    Board.Add(new KeyValuePair<string, string>("󠂪 󠂪 ", $"**{count.ToEmotes()}**. <@{b.Key}> `{bMember.GetUsernameWithIdentifier()}` ({this.GetString(this.t.Commands.Utility.Leaderboard.Level, true, new TVar("Level", b.Value.Experience.Level), new TVar("Points", b.Value.Experience.Points))}"));
 
                     if (count >= ShowAmount)
                         break;
@@ -88,18 +88,18 @@ internal sealed class LeaderboardCommand : BaseCommand
             var fields = Board.PrepareEmbedFields();
 
             foreach (var field in fields)
-                embed.AddField(new DiscordEmbedField(field.Key, field.Value));
+                _ = embed.AddField(new DiscordEmbedField(field.Key, field.Value));
 
             if (count != 0)
             {
                 embed.Author.IconUrl = ctx.Guild.IconUrl;
-                embed.Description = GetString(this.t.Commands.Utility.Leaderboard.Placement, new TVar("Placement", currentuserplacement));
-                await RespondOrEdit(embed.AsInfo(ctx, GetString(this.t.Commands.Utility.Leaderboard.Title)));
+                embed.Description = this.GetString(this.t.Commands.Utility.Leaderboard.Placement, new TVar("Placement", currentuserplacement));
+                _ = await this.RespondOrEdit(embed.AsInfo(ctx, this.GetString(this.t.Commands.Utility.Leaderboard.Title)));
             }
             else
             {
-                embed.Description = $":no_entry_sign: {GetString(this.t.Commands.Utility.Leaderboard.NoPoints, true)}";
-                await RespondOrEdit(embed.AsInfo(ctx, GetString(this.t.Commands.Utility.Leaderboard.Title)));
+                embed.Description = $":no_entry_sign: {this.GetString(this.t.Commands.Utility.Leaderboard.NoPoints, true)}";
+                _ = await this.RespondOrEdit(embed.AsInfo(ctx, this.GetString(this.t.Commands.Utility.Leaderboard.Title)));
             }
         });
     }

@@ -11,13 +11,13 @@ namespace ProjectMakoto.Commands;
 
 internal sealed class ClearBackupCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.ManageRoles));
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await this.CheckPermissions(Permissions.ManageRoles));
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
         {
-            DiscordUser victim = (DiscordUser)arguments["victim"];
+            var victim = (DiscordUser)arguments["victim"];
 
             if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx))
                 return;
@@ -26,8 +26,8 @@ internal sealed class ClearBackupCommand : BaseCommand
 
             if ((await ctx.Guild.GetAllMembersAsync()).Any(x => x.Id == victim.Id))
             {
-                await RespondOrEdit(new DiscordEmbedBuilder()
-                    .WithDescription(GetString(CommandKey.IsOnServer, true, new TVar("Victim", victim.Mention)))
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                    .WithDescription(this.GetString(CommandKey.IsOnServer, true, new TVar("Victim", victim.Mention)))
                     .WithThumbnail(victim.AvatarUrl)
                     .AsError(ctx));
 
@@ -40,8 +40,8 @@ internal sealed class ClearBackupCommand : BaseCommand
             ctx.DbGuild.Members[victim.Id].MemberRoles.Clear();
             ctx.DbGuild.Members[victim.Id].SavedNickname = "";
 
-            await RespondOrEdit(new DiscordEmbedBuilder()
-                .WithDescription(GetString(CommandKey.Deleted, true, new TVar("Victim", victim.Mention)))
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                .WithDescription(this.GetString(CommandKey.Deleted, true, new TVar("Victim", victim.Mention)))
                 .WithThumbnail(victim.AvatarUrl)
                 .AsSuccess(ctx));
         });

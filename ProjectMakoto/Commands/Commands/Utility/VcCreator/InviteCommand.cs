@@ -18,36 +18,36 @@ internal sealed class InviteCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx))
                 return;
 
-            DiscordMember victim = (DiscordMember)arguments["victim"];
-            DiscordChannel channel = ctx.Member.VoiceState?.Channel;
+            var victim = (DiscordMember)arguments["victim"];
+            var channel = ctx.Member.VoiceState?.Channel;
 
             if (!ctx.DbGuild.VcCreator.CreatedChannels.ContainsKey(channel?.Id ?? 0))
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.NotAVccChannel, true)).AsError(ctx));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Utility.VoiceChannelCreator.NotAVccChannel, true)).AsError(ctx));
                 return;
             }
 
             if (ctx.DbGuild.VcCreator.CreatedChannels[channel.Id].OwnerId != ctx.User.Id)
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.NotAVccChannelOwner, true)).AsError(ctx));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Utility.VoiceChannelCreator.NotAVccChannelOwner, true)).AsError(ctx));
                 return;
             }
 
             if (ctx.DbGuild.VcCreator.CreatedChannels[channel.Id].OwnerId == victim.Id)
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.Invite.CannotInviteSelf, true)).AsError(ctx));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Utility.VoiceChannelCreator.Invite.CannotInviteSelf, true)).AsError(ctx));
                 return;
             }
 
             if (channel.Users.Any(x => x.Id == victim.Id))
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.Invite.AlreadyPresent, true, new TVar("User", victim.Mention))).AsError(ctx));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Utility.VoiceChannelCreator.Invite.AlreadyPresent, true, new TVar("User", victim.Mention))).AsError(ctx));
                 return;
             }
 
             if (victim.IsBot)
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.VictimIsBot, true, new TVar("User", victim.Mention))).AsError(ctx));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Utility.VoiceChannelCreator.VictimIsBot, true, new TVar("User", victim.Mention))).AsError(ctx));
                 return;
             }
 
@@ -55,15 +55,15 @@ internal sealed class InviteCommand : BaseCommand
 
             try
             {
-                await victim.SendMessageAsync(this.t.Commands.Utility.VoiceChannelCreator.Invite.VictimMessage.Get(ctx.Bot.Users[victim.Id]).Build(new TVar("Channel", channel.Mention)));
+                _ = await victim.SendMessageAsync(this.t.Commands.Utility.VoiceChannelCreator.Invite.VictimMessage.Get(ctx.Bot.Users[victim.Id]).Build(new TVar("Channel", channel.Mention)));
             }
             catch (DisCatSharp.Exceptions.UnauthorizedException)
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.Invite.PartialSuccess, true, new TVar("User", victim.Mention))).AsError(ctx));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Utility.VoiceChannelCreator.Invite.PartialSuccess, true, new TVar("User", victim.Mention))).AsError(ctx));
                 return;
             }
 
-            _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.Invite.Success, true, new TVar("User", victim.Mention))).AsSuccess(ctx));
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Utility.VoiceChannelCreator.Invite.Success, true, new TVar("User", victim.Mention))).AsSuccess(ctx));
         });
     }
 }

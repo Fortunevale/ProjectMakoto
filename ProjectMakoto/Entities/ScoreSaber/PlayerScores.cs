@@ -71,5 +71,4 @@ public class PlayerScores
         public string gameMode { get; set; }
         public string difficultyRaw { get; set; }
     }
-
 }

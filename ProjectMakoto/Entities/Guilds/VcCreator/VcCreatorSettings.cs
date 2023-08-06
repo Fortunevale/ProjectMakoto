@@ -16,7 +16,7 @@ public sealed class VcCreatorSettings : RequiresParent<Guild>
     }
 
     Translations.events.vcCreator tKey
-        => Bot.LoadedTranslations.Events.VcCreator;
+        => this.Bot.LoadedTranslations.Events.VcCreator;
 
     private DiscordGuild cachedGuild { get; set; }
 
@@ -26,11 +26,11 @@ public sealed class VcCreatorSettings : RequiresParent<Guild>
         get => this._Channel; set
         {
             this._Channel = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "vccreator_channelid", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "vccreator_channelid", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
-    public ObservableDictionary<ulong, VcCreatorDetails> CreatedChannels { get => this._CreatedChannels; set { this._CreatedChannels = value; this._CreatedChannels.ItemsChanged += CreatedChannelsUpdated; } }
+    public ObservableDictionary<ulong, VcCreatorDetails> CreatedChannels { get => this._CreatedChannels; set { this._CreatedChannels = value; this._CreatedChannels.ItemsChanged += this.CreatedChannelsUpdated; } }
 
     private ObservableDictionary<ulong, VcCreatorDetails> _CreatedChannels { get; set; } = new();
 
@@ -45,14 +45,14 @@ public sealed class VcCreatorSettings : RequiresParent<Guild>
 
         await Task.Delay(5000);
 
-        for (int i = 0; i < this.CreatedChannels.Count; i++)
+        for (var i = 0; i < this.CreatedChannels.Count; i++)
         {
             var b = this.CreatedChannels.ElementAt(i);
 
             if (!this.cachedGuild.Channels.ContainsKey(b.Key))
             {
                 _logger.LogDebug("Channel '{Channel}' was deleted, deleting Vc Creator Entry.", b.Key);
-                this.CreatedChannels.Remove(b.Key);
+                _ = this.CreatedChannels.Remove(b.Key);
                 i--;
             }
         }
@@ -60,12 +60,12 @@ public sealed class VcCreatorSettings : RequiresParent<Guild>
         foreach (var b in this.CreatedChannels)
             if (!b.Value.EventsRegistered)
             {
-                Task.Run(async () =>
+                _ = Task.Run(async () =>
                 {
                     b.Value.EventsRegistered = true;
                     async Task VoiceStateUpdated(DiscordClient sender, VoiceStateUpdateEventArgs e)
                     {
-                        Task.Run(async () =>
+                        _ = Task.Run(async () =>
                         {
                             if (e.Before?.Channel?.Id == b.Key || e.After?.Channel?.Id == b.Key)
                             {
@@ -77,7 +77,7 @@ public sealed class VcCreatorSettings : RequiresParent<Guild>
                                     _logger.LogDebug("Channel '{Channel}' is now empty, deleting.", b.Key);
 
                                     await channel.DeleteAsync();
-                                    this.CreatedChannels.Remove(b.Key);
+                                    _ = this.CreatedChannels.Remove(b.Key);
                                     return;
                                 }
 
@@ -88,7 +88,7 @@ public sealed class VcCreatorSettings : RequiresParent<Guild>
 
                                     b.Value.OwnerId = newOwner.Id;
 
-                                    await channel.SendMessageAsync(new DiscordEmbedBuilder().WithDescription(tKey.NewOwner.Get(Parent).Build(true, new TVar("User", newOwner.Mention))).WithColor(EmbedColors.Info));
+                                    _ = await channel.SendMessageAsync(new DiscordEmbedBuilder().WithDescription(this.tKey.NewOwner.Get(this.Parent).Build(true, new TVar("User", newOwner.Mention))).WithColor(EmbedColors.Info));
                                     return;
                                 }
 
@@ -108,18 +108,18 @@ public sealed class VcCreatorSettings : RequiresParent<Guild>
                                 {
                                     if (e.After?.Channel?.Id == b.Key)
                                     {
-                                        await channel.SendMessageAsync(new DiscordEmbedBuilder().WithDescription(tKey.UserJoined.Get(Parent).Build(true, new TVar("User", e.User.Mention))).WithColor(EmbedColors.Success).WithAuthor(Bot.LoadedTranslations.Events.Actionlog.UserJoined.Get(Parent), "", AuditLogIcons.UserAdded));
+                                        _ = await channel.SendMessageAsync(new DiscordEmbedBuilder().WithDescription(this.tKey.UserJoined.Get(this.Parent).Build(true, new TVar("User", e.User.Mention))).WithColor(EmbedColors.Success).WithAuthor(this.Bot.LoadedTranslations.Events.Actionlog.UserJoined.Get(this.Parent), "", AuditLogIcons.UserAdded));
                                     }
                                     else
                                     {
-                                        await channel.SendMessageAsync(new DiscordEmbedBuilder().WithDescription(tKey.UserLeft.Get(Parent).Build(true, new TVar("User", e.User.Mention))).WithColor(EmbedColors.Error).WithAuthor(Bot.LoadedTranslations.Events.Actionlog.UserLeft.Get(Parent), "", AuditLogIcons.UserLeft));
+                                        _ = await channel.SendMessageAsync(new DiscordEmbedBuilder().WithDescription(this.tKey.UserLeft.Get(this.Parent).Build(true, new TVar("User", e.User.Mention))).WithColor(EmbedColors.Error).WithAuthor(this.Bot.LoadedTranslations.Events.Actionlog.UserLeft.Get(this.Parent), "", AuditLogIcons.UserLeft));
                                     }
                                 }
                             }
                         }).Add(this.Bot);
                     }
 
-                    Task.Run(async () =>
+                    _ = Task.Run(async () =>
                     {
                         await Task.Delay(5000);
 
@@ -130,7 +130,7 @@ public sealed class VcCreatorSettings : RequiresParent<Guild>
                             _logger.LogDebug("No one joined channel '{Channel}', deleting.", b.Key);
 
                             await channel.DeleteAsync();
-                            this.CreatedChannels.Remove(b.Key);
+                            _ = this.CreatedChannels.Remove(b.Key);
                             return;
                         }
                     }).Add(this.Bot);
@@ -145,6 +145,5 @@ public sealed class VcCreatorSettings : RequiresParent<Guild>
                     _logger.LogDebug("Deleted VcCreator Event for '{Channel}'", b.Key);
                 }).Add(this.Bot);
             }
-
     }
 }

@@ -23,7 +23,7 @@ public sealed class Config
                 return;
 
             Thread.Sleep(500);
-            Save(retry + 1);
+            this.Save(retry + 1);
         }
     }
 

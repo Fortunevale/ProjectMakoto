@@ -11,7 +11,7 @@ namespace ProjectMakoto.Commands;
 
 internal sealed class FollowUpdatesCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.ManageWebhooks) && await CheckOwnPermissions(Permissions.ManageWebhooks));
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await this.CheckPermissions(Permissions.ManageWebhooks) && await this.CheckOwnPermissions(Permissions.ManageWebhooks));
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -28,33 +28,33 @@ internal sealed class FollowUpdatesCommand : BaseCommand
                     case FollowChannel.GithubUpdates:
                     {
                         var b = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.GithubLog);
-                        await b.FollowAsync(ctx.Channel);
+                        _ = await b.FollowAsync(ctx.Channel);
                         break;
                     }
                     case FollowChannel.GlobalBans:
                     {
                         var b = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.GlobalBanAnnouncements);
-                        await b.FollowAsync(ctx.Channel);
+                        _ = await b.FollowAsync(ctx.Channel);
                         break;
                     }
                     case FollowChannel.News:
                     {
                         var b = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.News);
-                        await b.FollowAsync(ctx.Channel);
+                        _ = await b.FollowAsync(ctx.Channel);
                         break;
                     }
                 }
 
-                await RespondOrEdit(new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(CommandKey.Followed, true, new TVar("Channel", channel)),
+                    Description = this.GetString(CommandKey.Followed, true, new TVar("Channel", channel)),
                 }.AsSuccess(ctx));
             }
             catch (Exception)
             {
-                await RespondOrEdit(new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(CommandKey.Failed, true, new TVar("Channel", channel)),
+                    Description = this.GetString(CommandKey.Failed, true, new TVar("Channel", channel)),
                 }.AsError(ctx));
             }
         });

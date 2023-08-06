@@ -11,23 +11,23 @@ namespace ProjectMakoto.Commands.DevTools;
 
 internal sealed class UnbanGuildCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckMaintenance();
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await this.CheckMaintenance();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
         {
-            ulong guild = (ulong)arguments["guild"];
+            var guild = (ulong)arguments["guild"];
 
             if (!ctx.Bot.bannedGuilds.ContainsKey(guild))
             {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Guild '{guild}' is not banned from using the bot.`").AsError(ctx));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Guild '{guild}' is not banned from using the bot.`").AsError(ctx));
                 return;
             }
 
-            ctx.Bot.bannedGuilds.Remove(guild);
+            _ = ctx.Bot.bannedGuilds.Remove(guild);
             await ctx.Bot.DatabaseClient._helper.DeleteRow(ctx.Bot.DatabaseClient.mainDatabaseConnection, "banned_guilds", "id", $"{guild}");
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Guild '{guild}' was unbanned from using the bot.`").AsSuccess(ctx));
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Guild '{guild}' was unbanned from using the bot.`").AsSuccess(ctx));
         });
     }
 }

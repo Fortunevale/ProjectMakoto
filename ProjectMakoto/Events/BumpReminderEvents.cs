@@ -31,7 +31,7 @@ internal sealed class BumpReminderEvents : RequiresTranslation
                 bUser = x.Result;
         });
 
-        getuser.Wait(10000);
+        _ = getuser.Wait(10000);
 
         if (!(e.Author.Id == sender.CurrentUser.Id && e.Message.Embeds.Any()))
             this.Bot.BumpReminder.SendPersistentMessage(sender, e.Channel, bUser);
@@ -55,7 +55,7 @@ internal sealed class BumpReminderEvents : RequiresTranslation
                 }
                 else
                 {
-                    List<string> Mentions = e.Message.Embeds[0].Description.ToLower().GetMentions();
+                    var Mentions = e.Message.Embeds[0].Description.ToLower().GetMentions();
 
                     if (Mentions is null || Mentions.Count is 0)
                         throw new Exception("No mentions in message");
@@ -65,8 +65,8 @@ internal sealed class BumpReminderEvents : RequiresTranslation
 
                 this.Bot.Guilds[e.Guild.Id].BumpReminder.LastUserId = _bumper.Id;
 
-                _ = e.Channel.SendMessageAsync($"**{tKey.ServerBumped.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("User", _bumper.Mention))}**\n\n" +
-                                            $"_**{tKey.SubscribeRoleNotice.Get(this.Bot.Guilds[e.Guild.Id])}**_");
+                _ = e.Channel.SendMessageAsync($"**{this.tKey.ServerBumped.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("User", _bumper.Mention))}**\n\n" +
+                                            $"_**{this.tKey.SubscribeRoleNotice.Get(this.Bot.Guilds[e.Guild.Id])}**_");
 
                 try
                 {
@@ -130,7 +130,7 @@ internal sealed class BumpReminderEvents : RequiresTranslation
                     bUser = x.Result;
             });
 
-            getuser.Wait(10000);
+            _ = getuser.Wait(10000);
 
             this.Bot.BumpReminder.SendPersistentMessage(sender, e.Channel, bUser);
         }

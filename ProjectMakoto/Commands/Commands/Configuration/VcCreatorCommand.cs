@@ -11,17 +11,17 @@ namespace ProjectMakoto.Commands;
 
 internal sealed class VcCreatorCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckAdmin() && await CheckOwnPermissions(Permissions.ManageChannels));
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await this.CheckAdmin() && await this.CheckOwnPermissions(Permissions.ManageChannels));
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
         {
-            var CommandKey = t.Commands.Config.VcCreator;
+            var CommandKey = this.t.Commands.Config.VcCreator;
 
             string GetCurrentConfiguration(SharedCommandContext ctx)
             {
-                return $"{EmojiTemplates.GetChannel(ctx.Bot)} `{GetString(CommandKey.Title)}`: {(ctx.DbGuild.VcCreator.Channel == 0 ? false.ToEmote(ctx.Bot) : $"<#{ctx.DbGuild.VcCreator.Channel}>")}";
+                return $"{EmojiTemplates.GetChannel(ctx.Bot)} `{this.GetString(CommandKey.Title)}`: {(ctx.DbGuild.VcCreator.Channel == 0 ? false.ToEmote(ctx.Bot) : $"<#{ctx.DbGuild.VcCreator.Channel}>")}";
             }
 
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
@@ -30,11 +30,11 @@ internal sealed class VcCreatorCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 Description = GetCurrentConfiguration(ctx)
-            }.AsInfo(ctx, GetString(CommandKey.Title));
+            }.AsInfo(ctx, this.GetString(CommandKey.Title));
 
-            var SetChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetVcCreator), false, EmojiTemplates.GetChannel(ctx.Bot).ToComponent());
+            var SetChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.SetVcCreator), false, EmojiTemplates.GetChannel(ctx.Bot).ToComponent());
 
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
                 SetChannel
@@ -45,7 +45,7 @@ internal sealed class VcCreatorCommand : BaseCommand
 
             if (e.TimedOut)
             {
-                ModifyToTimedOut(true);
+                this.ModifyToTimedOut(true);
                 return;
             }
 
@@ -53,44 +53,44 @@ internal sealed class VcCreatorCommand : BaseCommand
 
             if (e.GetCustomId() == SetChannel.CustomId)
             {
-                var ChannelResult = await PromptChannelSelection(ChannelType.Voice, new ChannelPromptConfiguration { DisableOption = GetString(CommandKey.DisableVcCreator) });
+                var ChannelResult = await this.PromptChannelSelection(ChannelType.Voice, new ChannelPromptConfiguration { DisableOption = this.GetString(CommandKey.DisableVcCreator) });
 
                 if (ChannelResult.TimedOut)
                 {
-                    ModifyToTimedOut(true);
+                    this.ModifyToTimedOut(true);
                     return;
                 }
                 else if (ChannelResult.Cancelled)
                 {
-                    await ExecuteCommand(ctx, arguments);
+                    await this.ExecuteCommand(ctx, arguments);
                     return;
                 }
                 else if (ChannelResult.Failed)
                 {
                     if (ChannelResult.Exception.GetType() == typeof(NullReferenceException))
                     {
-                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(CommandKey.NoChannels, true)));
+                        _ = await this.RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(this.GetString(CommandKey.NoChannels, true)));
                         await Task.Delay(3000);
-                        await ExecuteCommand(ctx, arguments);
+                        await this.ExecuteCommand(ctx, arguments);
                         return;
                     }
 
                     throw ChannelResult.Exception;
                 }
 
-                IReadOnlyList<DiscordOverwrite> present = ChannelResult.Result.Parent.PermissionOverwrites;
+                var present = ChannelResult.Result.Parent.PermissionOverwrites;
 
-                var Category = ChannelResult.Result?.Parent ?? await ctx.Guild.CreateChannelAsync(GetString(CommandKey.Title), ChannelType.Category);
-                await ChannelResult.Result?.ModifyAsync(x => { x.Name = $"➕ {GetGuildString(CommandKey.CreateNewChannel)}"; x.Parent = Category; x.PermissionOverwrites = ChannelResult.Result.Parent.PermissionOverwrites.Merge(ctx.Guild.EveryoneRole, Permissions.None, Permissions.ReadMessageHistory | Permissions.UseVoiceDetection | Permissions.Speak); });
+                var Category = ChannelResult.Result?.Parent ?? await ctx.Guild.CreateChannelAsync(this.GetString(CommandKey.Title), ChannelType.Category);
+                await ChannelResult.Result?.ModifyAsync(x => { x.Name = $"➕ {this.GetGuildString(CommandKey.CreateNewChannel)}"; x.Parent = Category; x.PermissionOverwrites = ChannelResult.Result.Parent.PermissionOverwrites.Merge(ctx.Guild.EveryoneRole, Permissions.None, Permissions.ReadMessageHistory | Permissions.UseVoiceDetection | Permissions.Speak); });
 
                 ctx.DbGuild.VcCreator.Channel = ChannelResult.Result?.Id ?? 0;
 
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
             {
-                DeleteOrInvalidate();
+                this.DeleteOrInvalidate();
                 return;
             }
         });

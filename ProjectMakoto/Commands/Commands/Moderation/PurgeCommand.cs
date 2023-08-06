@@ -11,14 +11,14 @@ namespace ProjectMakoto.Commands;
 
 internal sealed class PurgeCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.ManageMessages) && await CheckOwnPermissions(Permissions.ManageMessages));
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await this.CheckPermissions(Permissions.ManageMessages) && await this.CheckOwnPermissions(Permissions.ManageMessages));
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
         {
-            int number = (int)arguments["number"];
-            DiscordUser victim = (DiscordUser)arguments["victim"];
+            var number = (int)arguments["number"];
+            var victim = (DiscordUser)arguments["victim"];
 
             var CommandKey = this.t.Commands.Moderation.Purge;
 
@@ -31,31 +31,28 @@ internal sealed class PurgeCommand : BaseCommand
 
             if (number is > 2000 or < 1)
             {
-                SendSyntaxError();
+                this.SendSyntaxError();
                 return;
             }
 
-            int FailedToDeleteAmount = 0;
+            var FailedToDeleteAmount = 0;
 
             if (number > 100)
             {
-                await RespondOrEdit(new DiscordEmbedBuilder()
-                    .WithDescription(GetString(CommandKey.Fetching, true, new TVar("Count", number)))
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                    .WithDescription(this.GetString(CommandKey.Fetching, true, new TVar("Count", number)))
                     .AsLoading(ctx));
 
-                List<DiscordMessage> fetchedMessages = (await ctx.Channel.GetMessagesAsync(100)).ToList();
+                var fetchedMessages = (await ctx.Channel.GetMessagesAsync(100)).ToList();
 
                 if (fetchedMessages.Any(x => x.Id == ctx.ResponseMessage.Id))
-                    fetchedMessages.Remove(fetchedMessages.First(x => x.Id == ctx.ResponseMessage.Id));
+                    _ = fetchedMessages.Remove(fetchedMessages.First(x => x.Id == ctx.ResponseMessage.Id));
 
                 while (fetchedMessages.Count <= number)
                 {
-                    IReadOnlyList<DiscordMessage> fetch;
-
-                    if (fetchedMessages.Count + 100 <= number)
-                        fetch = await ctx.Channel.GetMessagesBeforeAsync(fetchedMessages.Last().Id, 100);
-                    else
-                        fetch = await ctx.Channel.GetMessagesBeforeAsync(fetchedMessages.Last().Id, number - fetchedMessages.Count);
+                    var fetch = fetchedMessages.Count + 100 <= number
+                        ? await ctx.Channel.GetMessagesBeforeAsync(fetchedMessages.Last().Id, 100)
+                        : await ctx.Channel.GetMessagesBeforeAsync(fetchedMessages.Last().Id, number - fetchedMessages.Count);
 
                     if (fetch.Any())
                         fetchedMessages.AddRange(fetch);
@@ -65,33 +62,33 @@ internal sealed class PurgeCommand : BaseCommand
 
                 if (victim is not null)
                     foreach (var b in fetchedMessages.Where(x => x.Author.Id != victim.Id).ToList())
-                        fetchedMessages.Remove(b);
+                        _ = fetchedMessages.Remove(b);
 
-                int failedDeletion = 0;
+                var failedDeletion = 0;
 
                 foreach (var b in fetchedMessages.Where(x => x.CreationTimestamp < DateTime.UtcNow.AddDays(-14)).ToList())
                 {
-                    fetchedMessages.Remove(b);
+                    _ = fetchedMessages.Remove(b);
                     FailedToDeleteAmount++;
                     failedDeletion++;
                 }
 
                 if (fetchedMessages.Count > 0)
                 {
-                    await RespondOrEdit(new DiscordEmbedBuilder()
-                        .WithDescription(GetString(CommandKey.Fetched, true, new TVar("Count", fetchedMessages.Count)))
+                    _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                        .WithDescription(this.GetString(CommandKey.Fetched, true, new TVar("Count", fetchedMessages.Count)))
                         .AsError(ctx));
                 }
                 else
                 {
-                    await RespondOrEdit(new DiscordEmbedBuilder()
-                        .WithDescription(GetString(CommandKey.NoMessages, true))
+                    _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                        .WithDescription(this.GetString(CommandKey.NoMessages, true))
                         .AsError(ctx));
                     return;
                 }
 
-                int total = fetchedMessages.Count;
-                int deleted = 0;
+                var total = fetchedMessages.Count;
+                var deleted = 0;
 
                 List<Task> deletionOperations = new();
 
@@ -110,7 +107,7 @@ internal sealed class PurgeCommand : BaseCommand
                         }));
 
                         foreach (var b in currentDeletion.ToList())
-                            fetchedMessages.Remove(b);
+                            _ = fetchedMessages.Remove(b);
                     }
                 }
                 catch (Exception ex)
@@ -121,37 +118,37 @@ internal sealed class PurgeCommand : BaseCommand
 
                 while (!deletionOperations.All(x => x.IsCompleted))
                 {
-                    await RespondOrEdit($"`{StringTools.GenerateASCIIProgressbar(deleted, total)} {MathTools.CalculatePercentage(deleted, total),3}%`");
+                    _ = await this.RespondOrEdit($"`{StringTools.GenerateASCIIProgressbar(deleted, total)} {MathTools.CalculatePercentage(deleted, total),3}%`");
                 }
 
-                await RespondOrEdit(new DiscordEmbedBuilder().
-                    WithDescription($"{GetString(CommandKey.Deleted, true, new TVar("Count", deleted))}\n{GetString(CommandKey.Failed, true, new TVar("Count", FailedToDeleteAmount))}")
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().
+                    WithDescription($"{this.GetString(CommandKey.Deleted, true, new TVar("Count", deleted))}\n{this.GetString(CommandKey.Failed, true, new TVar("Count", FailedToDeleteAmount))}")
                     .AsSuccess(ctx));
                 return;
             }
             else
             {
-                List<DiscordMessage> bMessages = (await ctx.Channel.GetMessagesAsync(number)).ToList();
+                var bMessages = (await ctx.Channel.GetMessagesAsync(number)).ToList();
 
                 if (victim is not null)
                 {
                     foreach (var b in bMessages.Where(x => x.Author.Id != victim.Id).ToList())
                     {
-                        bMessages.Remove(b);
+                        _ = bMessages.Remove(b);
                     }
                 }
 
                 foreach (var b in bMessages.Where(x => x.CreationTimestamp < DateTime.UtcNow.AddDays(-14)).ToList())
                 {
-                    bMessages.Remove(b);
+                    _ = bMessages.Remove(b);
                     FailedToDeleteAmount++;
                 }
 
                 if (bMessages.Count > 0)
                     await ctx.Channel.DeleteMessagesAsync(bMessages);
 
-                await RespondOrEdit(new DiscordEmbedBuilder().
-                WithDescription($"{GetString(CommandKey.Deleted, true, new TVar("Count", bMessages.Count))}\n{GetString(CommandKey.Failed, true, new TVar("Count", FailedToDeleteAmount))}")
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().
+                WithDescription($"{this.GetString(CommandKey.Deleted, true, new TVar("Count", bMessages.Count))}\n{this.GetString(CommandKey.Failed, true, new TVar("Count", FailedToDeleteAmount))}")
                 .AsSuccess(ctx));
             }
         });

@@ -10,29 +10,29 @@
 namespace ProjectMakoto.Commands.DevTools;
 internal sealed class GlobalBanCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckMaintenance();
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await this.CheckMaintenance();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
         {
-            DiscordUser victim = (DiscordUser)arguments["victim"];
-            string reason = (string)arguments["reason"];
+            var victim = (DiscordUser)arguments["victim"];
+            var reason = (string)arguments["reason"];
 
             if (reason.IsNullOrWhiteSpace())
             {
-                _ = RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Please provide a reason for the global ban.`").AsError(ctx, "Global Ban"));
+                _ = this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Please provide a reason for the global ban.`").AsError(ctx, "Global Ban"));
                 return;
             }
 
             if (ctx.Bot.globalBans.ContainsKey(victim.Id))
             {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Updating Global Ban Entry for '{victim.GetUsernameWithIdentifier()}'..`").AsLoading(ctx, "Global Ban"));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Updating Global Ban Entry for '{victim.GetUsernameWithIdentifier()}'..`").AsLoading(ctx, "Global Ban"));
                 ctx.Bot.globalBans[victim.Id] = new() { Reason = reason, Moderator = ctx.User.Id };
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Global Ban Entry for '{victim.GetUsernameWithIdentifier()}' updated.`").AsSuccess(ctx, "Global Ban"));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Global Ban Entry for '{victim.GetUsernameWithIdentifier()}' updated.`").AsSuccess(ctx, "Global Ban"));
 
                 var announceChannel1 = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.GlobalBanAnnouncements);
-                await announceChannel1.SendMessageAsync(new DiscordEmbedBuilder
+                _ = await announceChannel1.SendMessageAsync(new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor
                     {
@@ -48,24 +48,24 @@ internal sealed class GlobalBanCommand : BaseCommand
                 return;
             }
 
-            DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
+            var embed = new DiscordEmbedBuilder()
             {
                 Description = $"`Global banning '{victim.GetUsernameWithIdentifier()}' ({victim.Id})`.."
             }.AsLoading(ctx, "Global Ban");
 
-            var msg = RespondOrEdit(embed);
+            var msg = this.RespondOrEdit(embed);
 
             if (ctx.Bot.status.TeamMembers.Contains(victim.Id))
             {
                 embed.Description = $"`'{victim.GetUsernameWithIdentifier()}' is registered in the staff team.`";
-                msg = RespondOrEdit(embed.AsError(ctx, "Global Ban"));
+                msg = this.RespondOrEdit(embed.AsError(ctx, "Global Ban"));
                 return;
             }
 
             ctx.Bot.globalBans.Add(victim.Id, new() { Reason = reason, Moderator = ctx.User.Id });
 
-            int Success = 0;
-            int Failed = 0;
+            var Success = 0;
+            var Failed = 0;
 
             foreach (var b in ctx.Client.Guilds.OrderByDescending(x => x.Key == ctx.Guild.Id))
             {
@@ -88,11 +88,11 @@ internal sealed class GlobalBanCommand : BaseCommand
             }
 
             embed.Description = $"`Banned '{victim.GetUsernameWithIdentifier()}' ({victim.Id}) from {Success}/{Success + Failed} guilds.`";
-            msg = RespondOrEdit(embed.AsSuccess(ctx, "Global Ban"));
+            msg = this.RespondOrEdit(embed.AsSuccess(ctx, "Global Ban"));
 
 
             var announceChannel = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.GlobalBanAnnouncements);
-            await announceChannel.SendMessageAsync(new DiscordEmbedBuilder
+            _ = await announceChannel.SendMessageAsync(new DiscordEmbedBuilder
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {

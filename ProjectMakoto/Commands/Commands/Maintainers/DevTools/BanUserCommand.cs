@@ -11,27 +11,27 @@ namespace ProjectMakoto.Commands.DevTools;
 
 internal sealed class BanUserCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckMaintenance();
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await this.CheckMaintenance();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
         {
-            DiscordUser victim = (DiscordUser)arguments["victim"];
-            string reason = (string)arguments["reason"];
+            var victim = (DiscordUser)arguments["victim"];
+            var reason = (string)arguments["reason"];
 
             if (reason.IsNullOrWhiteSpace())
                 reason = "No reason provided.";
 
             if (ctx.Bot.status.TeamMembers.Contains(victim.Id))
             {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`'{victim.GetUsernameWithIdentifier()}' is registered in the staff team.`").AsError(ctx));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`'{victim.GetUsernameWithIdentifier()}' is registered in the staff team.`").AsError(ctx));
                 return;
             }
 
             if (ctx.Bot.bannedUsers.ContainsKey(victim.Id))
             {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`'{victim.GetUsernameWithIdentifier()}' is already banned from using the bot.`").AsError(ctx));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`'{victim.GetUsernameWithIdentifier()}' is already banned from using the bot.`").AsError(ctx));
                 return;
             }
 
@@ -43,7 +43,7 @@ internal sealed class BanUserCommand : BaseCommand
                 await b.Value.LeaveAsync();
             }
 
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`'{victim.GetUsernameWithIdentifier()}' was banned from using the bot.`").AsSuccess(ctx));
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`'{victim.GetUsernameWithIdentifier()}' was banned from using the bot.`").AsSuccess(ctx));
         });
     }
 }

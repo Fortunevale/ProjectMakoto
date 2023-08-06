@@ -13,33 +13,33 @@ namespace ProjectMakoto.Commands.ReactionRolesCommand;
 
 internal sealed class ConfigCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await this.CheckAdmin();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
         {
-            var CommandKey = t.Commands.Config.ReactionRoles;
+            var CommandKey = this.t.Commands.Config.ReactionRoles;
 
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
 
-            await RespondOrEdit(new DiscordEmbedBuilder
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = GetString(CommandKey.LoadingReactionRoles, true)
-            }.AsLoading(ctx, GetString(CommandKey.Title)));
+                Description = this.GetString(CommandKey.LoadingReactionRoles, true)
+            }.AsLoading(ctx, this.GetString(CommandKey.Title)));
 
-            await ReactionRolesCommandAbstractions.CheckForInvalid(ctx);
+            _ = await ReactionRolesCommandAbstractions.CheckForInvalid(ctx);
 
-            var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.AddNewReactionRole), (ctx.DbGuild.ReactionRoles.Count > 100), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
-            var RemoveButton = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), GetString(CommandKey.RemoveReactionRole), (ctx.DbGuild.ReactionRoles.Count == 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
+            var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.AddNewReactionRole), (ctx.DbGuild.ReactionRoles.Count > 100), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
+            var RemoveButton = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), this.GetString(CommandKey.RemoveReactionRole), (ctx.DbGuild.ReactionRoles.Count == 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = GetString(CommandKey.ReactionRoleCount, true, new TVar("Count", ctx.DbGuild.ReactionRoles.Count))
-            }.AsAwaitingInput(ctx, GetString(CommandKey.Title));
+                Description = this.GetString(CommandKey.ReactionRoleCount, true, new TVar("Count", ctx.DbGuild.ReactionRoles.Count))
+            }.AsAwaitingInput(ctx, this.GetString(CommandKey.Title));
 
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
                 AddButton, RemoveButton
@@ -50,7 +50,7 @@ internal sealed class ConfigCommand : BaseCommand
 
             if (e.TimedOut)
             {
-                ModifyToTimedOut(true);
+                this.ModifyToTimedOut(true);
                 return;
             }
 
@@ -64,31 +64,31 @@ internal sealed class ConfigCommand : BaseCommand
 
                 while (true)
                 {
-                    var SelectMessage = new DiscordButtonComponent((selectedMessage is null ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), GetString(CommandKey.SelectMessage), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
-                    var SelectEmoji = new DiscordButtonComponent((selectedEmoji is null ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), GetString(CommandKey.SelectEmoji), (selectedMessage is null), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("😀")));
-                    var SelectRole = new DiscordButtonComponent((selectedRole is null ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), GetString(CommandKey.SelectRole), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
-                    var Finish = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(t.Common.Submit), (selectedMessage is null || selectedRole is null || selectedEmoji is null), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
+                    var SelectMessage = new DiscordButtonComponent((selectedMessage is null ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), this.GetString(CommandKey.SelectMessage), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
+                    var SelectEmoji = new DiscordButtonComponent((selectedEmoji is null ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), this.GetString(CommandKey.SelectEmoji), (selectedMessage is null), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("😀")));
+                    var SelectRole = new DiscordButtonComponent((selectedRole is null ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), this.GetString(CommandKey.SelectRole), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
+                    var Finish = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), this.GetString(this.t.Common.Submit), (selectedMessage is null || selectedRole is null || selectedEmoji is null), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
                     var pad = TranslationUtil.CalculatePadding(ctx.DbUser, CommandKey.Message, CommandKey.Emoji, CommandKey.Role);
 
                     var action_embed = new DiscordEmbedBuilder
                     {
-                        Description = $"`{GetString(CommandKey.Message).PadRight(pad)}`: {(selectedMessage is null ? GetString(t.Common.NotSelected, true) : $"[`{GetString(t.Common.JumpToMessage)}`]({selectedMessage.JumpLink})")}\n" +
-                                      $"`{GetString(CommandKey.Emoji).PadRight(pad)}`: {(selectedEmoji is null ? GetString(t.Common.NotSelected, true) : selectedEmoji.ToString())}\n" +
-                                      $"`{GetString(CommandKey.Role).PadRight(pad)}`: {(selectedRole is null ? GetString(t.Common.NotSelected, true) : selectedRole.Mention)}"
-                    }.AsAwaitingInput(ctx, GetString(CommandKey.Title));
+                        Description = $"`{this.GetString(CommandKey.Message).PadRight(pad)}`: {(selectedMessage is null ? this.GetString(this.t.Common.NotSelected, true) : $"[`{this.GetString(this.t.Common.JumpToMessage)}`]({selectedMessage.JumpLink})")}\n" +
+                                      $"`{this.GetString(CommandKey.Emoji).PadRight(pad)}`: {(selectedEmoji is null ? this.GetString(this.t.Common.NotSelected, true) : selectedEmoji.ToString())}\n" +
+                                      $"`{this.GetString(CommandKey.Role).PadRight(pad)}`: {(selectedRole is null ? this.GetString(this.t.Common.NotSelected, true) : selectedRole.Mention)}"
+                    }.AsAwaitingInput(ctx, this.GetString(CommandKey.Title));
 
 
                     if (ctx.DbGuild.ReactionRoles.Count > 100)
                     {
-                        action_embed.Description = GetString(CommandKey.ReactionRoleLimitReached, true);
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, GetString(CommandKey.Title))));
+                        action_embed.Description = this.GetString(CommandKey.ReactionRoleLimitReached, true);
+                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
                         await Task.Delay(5000);
-                        await ExecuteCommand(ctx, arguments);
+                        await this.ExecuteCommand(ctx, arguments);
                         return;
                     }
 
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed)
+                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed)
                         .AddComponents(new List<DiscordComponent> { SelectMessage, SelectEmoji, SelectRole, Finish })
                         .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
 
@@ -96,24 +96,24 @@ internal sealed class ConfigCommand : BaseCommand
 
                     if (Menu.TimedOut)
                     {
-                        ModifyToTimedOut();
+                        this.ModifyToTimedOut();
                         return;
                     }
 
                     if (Menu.GetCustomId() == SelectMessage.CustomId)
                     {
-                        var modal = new DiscordInteractionModalBuilder(GetString(CommandKey.Title), Guid.NewGuid().ToString())
-                        .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "url", GetString(CommandKey.MessageUrl), "https://discord.com/channels/012345678901234567/012345678901234567/012345678912345678", null, null, true));
+                        var modal = new DiscordInteractionModalBuilder(this.GetString(CommandKey.Title), Guid.NewGuid().ToString())
+                        .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "url", this.GetString(CommandKey.MessageUrl), "https://discord.com/channels/012345678901234567/012345678901234567/012345678912345678", null, null, true));
 
-                        var ModalResult = await PromptModalWithRetry(Menu.Result.Interaction, modal, new DiscordEmbedBuilder
+                        var ModalResult = await this.PromptModalWithRetry(Menu.Result.Interaction, modal, new DiscordEmbedBuilder
                         {
-                            Description = GetString(CommandKey.MessageUrlInstructions, true),
+                            Description = this.GetString(CommandKey.MessageUrlInstructions, true),
                             ImageUrl = "https://cdn.discordapp.com/attachments/906976602557145110/967753175241203712/unknown.png"
-                        }.AsAwaitingInput(ctx, GetString(CommandKey.Title)), false);
+                        }.AsAwaitingInput(ctx, this.GetString(CommandKey.Title)), false);
 
                         if (ModalResult.TimedOut)
                         {
-                            ModifyToTimedOut(true);
+                            this.ModifyToTimedOut(true);
                             return;
                         }
                         else if (ModalResult.Cancelled)
@@ -127,43 +127,43 @@ internal sealed class ConfigCommand : BaseCommand
 
                         var url = ModalResult.Result.Interaction.GetModalValueByCustomId("url");
 
-                        if (!RegexTemplates.DiscordChannelUrl.IsMatch(url) || !url.TryParseMessageLink(out ulong GuildId, out ulong ChannelId, out ulong MessageId))
+                        if (!RegexTemplates.DiscordChannelUrl.IsMatch(url) || !url.TryParseMessageLink(out var GuildId, out var ChannelId, out var MessageId))
                         {
-                            action_embed.Description = $"{GetString(CommandKey.InvalidMessageUrl, true)}\n" +
+                            action_embed.Description = $"{this.GetString(CommandKey.InvalidMessageUrl, true)}\n" +
                                                        $"`https://discord.com/channels/012345678901234567/012345678901234567/012345678912345678`\n" +
                                                        $"`https://ptb.discord.com/channels/012345678901234567/012345678901234567/012345678912345678`\n" +
                                                        $"`https://canary.discord.com/channels/012345678901234567/012345678901234567/012345678912345678`";
                             action_embed.ImageUrl = "";
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, GetString(CommandKey.Title))));
+                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
                             await Task.Delay(3000);
                             continue;
                         }
 
                         if (GuildId != ctx.Guild.Id)
                         {
-                            action_embed.Description = GetString(CommandKey.MessageUrlWrongGuild, true);
+                            action_embed.Description = this.GetString(CommandKey.MessageUrlWrongGuild, true);
                             action_embed.ImageUrl = "";
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, GetString(CommandKey.Title))));
+                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
                             await Task.Delay(3000);
                             continue;
                         }
 
                         if (!ctx.Guild.Channels.ContainsKey(ChannelId))
                         {
-                            action_embed.Description = GetString(CommandKey.MessageUrlNoChannel, true);
+                            action_embed.Description = this.GetString(CommandKey.MessageUrlNoChannel, true);
                             action_embed.ImageUrl = "";
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, GetString(CommandKey.Title))));
+                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
                             await Task.Delay(3000);
                             continue;
                         }
 
                         var channel = ctx.Guild.GetChannel(ChannelId);
 
-                        if (!channel.TryGetMessage(MessageId, out DiscordMessage reactionMessage))
+                        if (!channel.TryGetMessage(MessageId, out var reactionMessage))
                         {
-                            action_embed.Description = GetString(CommandKey.MessageUrlNoMessage, true);
+                            action_embed.Description = this.GetString(CommandKey.MessageUrlNoMessage, true);
                             action_embed.ImageUrl = "";
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, GetString(CommandKey.Title))));
+                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
                             await Task.Delay(3000);
                             continue;
                         }
@@ -175,15 +175,15 @@ internal sealed class ConfigCommand : BaseCommand
                     {
                         _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        action_embed.Description = GetString(CommandKey.ReactWithEmoji, true);
+                        action_embed.Description = this.GetString(CommandKey.ReactWithEmoji, true);
                         action_embed.ImageUrl = "";
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsAwaitingInput(ctx, GetString(CommandKey.Title))));
+                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsAwaitingInput(ctx, this.GetString(CommandKey.Title))));
 
                         var emoji_wait = await ctx.Client.GetInteractivity().WaitForReactionAsync(x => x.Channel.Id == ctx.Channel.Id && x.User.Id == ctx.User.Id && x.Message.Id == selectedMessage.Id, TimeSpan.FromMinutes(2));
 
                         if (emoji_wait.TimedOut)
                         {
-                            ModifyToTimedOut(true);
+                            this.ModifyToTimedOut(true);
                             return;
                         }
 
@@ -195,16 +195,16 @@ internal sealed class ConfigCommand : BaseCommand
 
                         if (emoji.Id != 0 && !ctx.Guild.Emojis.ContainsKey(emoji.Id))
                         {
-                            action_embed.Description = GetString(CommandKey.NoAccessToEmoji, true);
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, GetString(CommandKey.Title))));
+                            action_embed.Description = this.GetString(CommandKey.NoAccessToEmoji, true);
+                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
                             await Task.Delay(3000);
                             continue;
                         }
 
                         if (ctx.DbGuild.ReactionRoles.Any(x => (x.Key == selectedMessage.Id && x.Value.EmojiName == emoji.GetUniqueDiscordName())))
                         {
-                            action_embed.Description = GetString(CommandKey.EmojiAlreadyUsed, true);
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, GetString(CommandKey.Title))));
+                            action_embed.Description = this.GetString(CommandKey.EmojiAlreadyUsed, true);
+                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
                             await Task.Delay(3000);
                             continue;
                         }
@@ -216,13 +216,13 @@ internal sealed class ConfigCommand : BaseCommand
                     {
                         _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        await RespondOrEdit(action_embed.WithDescription(GetString(CommandKey.SelectRolePrompt, true)).AsAwaitingInput(ctx, GetString(CommandKey.Title)));
+                        _ = await this.RespondOrEdit(action_embed.WithDescription(this.GetString(CommandKey.SelectRolePrompt, true)).AsAwaitingInput(ctx, this.GetString(CommandKey.Title)));
 
-                        var RoleResult = await PromptRoleSelection();
+                        var RoleResult = await this.PromptRoleSelection();
 
                         if (RoleResult.TimedOut)
                         {
-                            ModifyToTimedOut(true);
+                            this.ModifyToTimedOut(true);
                             return;
                         }
                         else if (RoleResult.Cancelled)
@@ -233,7 +233,7 @@ internal sealed class ConfigCommand : BaseCommand
                         {
                             if (RoleResult.Exception.GetType() == typeof(NullReferenceException))
                             {
-                                await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(CommandKey.NoRoles, true)));
+                                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(this.GetString(CommandKey.NoRoles, true)));
                                 await Task.Delay(3000);
                                 continue;
                             }
@@ -243,8 +243,8 @@ internal sealed class ConfigCommand : BaseCommand
 
                         if (ctx.DbGuild.ReactionRoles.Any(x => x.Value.RoleId == RoleResult.Result.Id))
                         {
-                            action_embed.Description = GetString(CommandKey.RoleAlreadyUsed, true);
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, GetString(CommandKey.Title))));
+                            action_embed.Description = this.GetString(CommandKey.RoleAlreadyUsed, true);
+                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
                             await Task.Delay(3000);
                             continue;
                         }
@@ -258,37 +258,37 @@ internal sealed class ConfigCommand : BaseCommand
 
                         if (ctx.DbGuild.ReactionRoles.Count > 100)
                         {
-                            action_embed.Description = GetString(CommandKey.ReactionRoleLimitReached, true);
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, GetString(CommandKey.Title))));
+                            action_embed.Description = this.GetString(CommandKey.ReactionRoleLimitReached, true);
+                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
                             await Task.Delay(5000);
-                            await ExecuteCommand(ctx, arguments);
+                            await this.ExecuteCommand(ctx, arguments);
                             return;
                         }
 
                         if (ctx.DbGuild.ReactionRoles.Any(x => x.Value.RoleId == selectedRole.Id))
                         {
-                            action_embed.Description = GetString(CommandKey.RoleAlreadyUsed, true);
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, GetString(CommandKey.Title))));
+                            action_embed.Description = this.GetString(CommandKey.RoleAlreadyUsed, true);
+                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
                             await Task.Delay(5000);
-                            await ExecuteCommand(ctx, arguments);
+                            await this.ExecuteCommand(ctx, arguments);
                             return;
                         }
 
                         if (selectedEmoji.Id != 0 && !ctx.Guild.Emojis.ContainsKey(selectedEmoji.Id))
                         {
-                            action_embed.Description = GetString(CommandKey.NoAccessToEmoji, true);
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, GetString(CommandKey.Title))));
+                            action_embed.Description = this.GetString(CommandKey.NoAccessToEmoji, true);
+                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
                             await Task.Delay(5000);
-                            await ExecuteCommand(ctx, arguments);
+                            await this.ExecuteCommand(ctx, arguments);
                             return;
                         }
 
                         if (ctx.DbGuild.ReactionRoles.Any(x => (x.Key == selectedMessage.Id && x.Value.EmojiName == selectedEmoji.GetUniqueDiscordName())))
                         {
-                            action_embed.Description = GetString(CommandKey.EmojiAlreadyUsed, true);
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, GetString(CommandKey.Title))));
+                            action_embed.Description = this.GetString(CommandKey.EmojiAlreadyUsed, true);
+                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
                             await Task.Delay(5000);
-                            await ExecuteCommand(ctx, arguments);
+                            await this.ExecuteCommand(ctx, arguments);
                             return;
                         }
 
@@ -302,21 +302,21 @@ internal sealed class ConfigCommand : BaseCommand
 
                         await selectedMessage.CreateReactionAsync(selectedEmoji);
 
-                        embed.Description = GetString(CommandKey.AddedReactionRole, true,
+                        embed.Description = this.GetString(CommandKey.AddedReactionRole, true,
                             new TVar("Role", selectedRole.Mention),
                             new TVar("User", selectedMessage.Author.Mention),
                             new TVar("Channel", selectedMessage.Channel.Mention),
                             new TVar("Emoji", selectedEmoji));
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsSuccess(ctx, GetString(CommandKey.Title))));
+                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsSuccess(ctx, this.GetString(CommandKey.Title))));
                         await Task.Delay(5000);
-                        await ExecuteCommand(ctx, arguments);
+                        await this.ExecuteCommand(ctx, arguments);
                         return;
                     }
                     else if (Menu.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
                     {
                         _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        await ExecuteCommand(ctx, arguments);
+                        await this.ExecuteCommand(ctx, arguments);
                         return;
                     }
 
@@ -325,17 +325,17 @@ internal sealed class ConfigCommand : BaseCommand
             }
             else if (e.GetCustomId() == RemoveButton.CustomId)
             {
-                var RoleResult = await PromptCustomSelection(ctx.DbGuild.ReactionRoles
+                var RoleResult = await this.PromptCustomSelection(ctx.DbGuild.ReactionRoles
                     .Select(x => new DiscordStringSelectComponentOption($"@{ctx.Guild.GetRole(x.Value.RoleId).Name}", x.Value.UUID, $"in Channel #{ctx.Guild.GetChannel(x.Value.ChannelId).Name}", emoji: new DiscordComponentEmoji(x.Value.GetEmoji(ctx.Client)))).ToList());
 
                 if (RoleResult.TimedOut)
                 {
-                    ModifyToTimedOut(true);
+                    this.ModifyToTimedOut(true);
                     return;
                 }
                 else if (RoleResult.Cancelled)
                 {
-                    await ExecuteCommand(ctx, arguments);
+                    await this.ExecuteCommand(ctx, arguments);
                     return;
                 }
                 else if (RoleResult.Errored)
@@ -350,22 +350,22 @@ internal sealed class ConfigCommand : BaseCommand
 
                 var role = ctx.Guild.GetRole(obj.Value.RoleId);
 
-                ctx.DbGuild.ReactionRoles.Remove(obj);
+                _ = ctx.DbGuild.ReactionRoles.Remove(obj);
 
 
-                embed.Description = GetString(CommandKey.RemovedReactionRole, true,
+                embed.Description = this.GetString(CommandKey.RemovedReactionRole, true,
                     new TVar("Role", role.Mention),
                     new TVar("User", reactionMessage?.Author.Mention ?? "`/`"),
                     new TVar("Channel", reactionMessage?.Channel.Mention ?? "`/`"),
                     new TVar("Emoji", obj.Value.GetEmoji(ctx.Client)));
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsSuccess(ctx, GetString(CommandKey.Title))));
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsSuccess(ctx, this.GetString(CommandKey.Title))));
                 await Task.Delay(5000);
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
             {
-                DeleteOrInvalidate();
+                this.DeleteOrInvalidate();
                 return;
             }
         });

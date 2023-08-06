@@ -11,7 +11,7 @@ namespace ProjectMakoto.Commands;
 
 internal sealed class GuildLanguageCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await this.CheckAdmin();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -19,18 +19,18 @@ internal sealed class GuildLanguageCommand : BaseCommand
         {
             string GetCurrentConfiguration(SharedCommandContext ctx)
             {
-                return $"🗨 `{ctx.BaseCommand.GetString(t.Commands.Config.GuildLanguage.Disclaimer)}`\n`{ctx.BaseCommand.GetString(ctx.t.Commands.Config.GuildLanguage.Response)}`: `{(ctx.DbGuild.OverrideLocale.IsNullOrWhiteSpace() ? (ctx.DbGuild.CurrentLocale.IsNullOrWhiteSpace() ? "en (Default)" : $"{ctx.DbGuild.CurrentLocale} (Discord)") : $"{ctx.DbGuild.OverrideLocale} (Override)")}`";
+                return $"🗨 `{ctx.BaseCommand.GetString(this.t.Commands.Config.GuildLanguage.Disclaimer)}`\n`{ctx.BaseCommand.GetString(ctx.t.Commands.Config.GuildLanguage.Response)}`: `{(ctx.DbGuild.OverrideLocale.IsNullOrWhiteSpace() ? (ctx.DbGuild.CurrentLocale.IsNullOrWhiteSpace() ? "en (Default)" : $"{ctx.DbGuild.CurrentLocale} (Discord)") : $"{ctx.DbGuild.OverrideLocale} (Override)")}`";
             }
 
-            await RespondOrEdit((new DiscordEmbedBuilder()
+            _ = await this.RespondOrEdit((new DiscordEmbedBuilder()
             {
                 Description = GetCurrentConfiguration(ctx)
-            }.AsAwaitingInput(ctx, GetString(this.t.Commands.Config.GuildLanguage.Title))));
+            }.AsAwaitingInput(ctx, this.GetString(this.t.Commands.Config.GuildLanguage.Title))));
 
             List<DiscordStringSelectComponentOption> options = new();
             List<DiscordStringSelectComponentOption> newOptions = new();
 
-            newOptions.Add(new DiscordStringSelectComponentOption("Disable Override", "_", GetString(this.t.Commands.Config.GuildLanguage.DisableOverride), false, DiscordEmoji.FromUnicode("❌").ToComponent()));
+            newOptions.Add(new DiscordStringSelectComponentOption("Disable Override", "_", this.GetString(this.t.Commands.Config.GuildLanguage.DisableOverride), false, DiscordEmoji.FromUnicode("❌").ToComponent()));
 
             options.Add(new DiscordStringSelectComponentOption("English", "en", "English"));
             options.Add(new DiscordStringSelectComponentOption("German", "de", "Deutsch"));
@@ -71,24 +71,21 @@ internal sealed class GuildLanguageCommand : BaseCommand
 
                     if (perc >= 100)
                         emoji = DiscordEmoji.FromUnicode("🟢").ToComponent();
-                    else if (perc >= 85)
-                        emoji = DiscordEmoji.FromUnicode("🟡").ToComponent();
-                    else
-                        emoji = DiscordEmoji.FromUnicode("🔴").ToComponent();
+                    else emoji = perc >= 85 ? DiscordEmoji.FromUnicode("🟡").ToComponent() : DiscordEmoji.FromUnicode("🔴").ToComponent();
 
                     newOptions.Add(new DiscordStringSelectComponentOption(b.Label, b.Value, b.Description.Insert(0, $"{perc.ToString("N1", CultureInfo.CreateSpecificCulture("en-US"))}% | "), false, emoji));
                 }
 
-            var SelectionResult = await PromptCustomSelection(newOptions, GetString(this.t.Commands.Config.GuildLanguage.Selector));
+            var SelectionResult = await this.PromptCustomSelection(newOptions, this.GetString(this.t.Commands.Config.GuildLanguage.Selector));
 
             if (SelectionResult.TimedOut)
             {
-                ModifyToTimedOut(true);
+                this.ModifyToTimedOut(true);
                 return;
             }
             else if (SelectionResult.Cancelled)
             {
-                DeleteOrInvalidate();
+                this.DeleteOrInvalidate();
                 return;
             }
             else if (SelectionResult.Errored)
@@ -110,7 +107,7 @@ internal sealed class GuildLanguageCommand : BaseCommand
                 }
             }
 
-            await ExecuteCommand(ctx, arguments);
+            await this.ExecuteCommand(ctx, arguments);
             return;
         });
     }

@@ -46,10 +46,10 @@ public sealed class Translations
     public string SourceDirectory = "";
 
     public string StringsJson
-        => Path.Combine(SourceDirectory, "Translations", "strings.json");
+        => Path.Combine(this.SourceDirectory, "Translations", "strings.json");
     
     public string TranslationCs
-        => Path.Combine(SourceDirectory, "Entities", "Translation", "Translations.cs");
+        => Path.Combine(this.SourceDirectory, "Entities", "Translation", "Translations.cs");
 
     static void Main(string[] args)
     {
@@ -59,7 +59,7 @@ public sealed class Translations
     public async Task Execute(string[] args)
     {
         if (!Directory.Exists($"{new FileInfo(Assembly.GetExecutingAssembly().FullName).Directory.FullName}/logs"))
-            Directory.CreateDirectory($"{new FileInfo(Assembly.GetExecutingAssembly().FullName).Directory.FullName}/logs");
+            _ = Directory.CreateDirectory($"{new FileInfo(Assembly.GetExecutingAssembly().FullName).Directory.FullName}/logs");
 
         _logger = LoggerClient.StartLogger($"{new FileInfo(Assembly.GetExecutingAssembly().FullName).Directory.FullName}/logs/{DateTime.UtcNow:dd-MM-yyyy_HH-mm-ss}.log", CustomLogLevel.Debug, DateTime.UtcNow.AddDays(-3), false);
 
@@ -91,11 +91,11 @@ public sealed class Translations
                         try
                         {
                             List<string> Warnings = new();
-                            string Insert = "";
+                            var Insert = "";
 
                             _logger.LogDebug("Translation file updated. Updating Translations.cs..");
 
-                            JObject jsonFile = (JObject)JsonConvert.DeserializeObject(File.ReadAllText(StringsJson));
+                            var jsonFile = (JObject)JsonConvert.DeserializeObject(File.ReadAllText(this.StringsJson));
 
                             string CreateValidValueName(string str)
                             {
@@ -121,7 +121,7 @@ public sealed class Translations
                                     var entryPoint = $"{ParentPath}/{className}";
                                     var IndexPath = $"// {ParentPath} InsertPoint";
 
-                                    int InsertPosition = 0;
+                                    var InsertPosition = 0;
                                     if (!ParentPath.IsNullOrWhiteSpace())
                                     {
                                         InsertPosition = Insert.IndexOf(IndexPath) + IndexPath.Length;
@@ -134,8 +134,8 @@ public sealed class Translations
                                     {
                                         case JTokenType.Object:
                                         {
-                                            bool containsLocaleCode = false;
-                                            bool localeCodeIsArray = false;
+                                            var containsLocaleCode = false;
+                                            var localeCodeIsArray = false;
 
                                             List<KeyValuePair<string, JToken?>> tokens = new();
                                             foreach (var subItem in item.Value.ToObject<JObject>())
@@ -261,7 +261,7 @@ public sealed class Translations
 
                             Insert = string.Join("\n", Insert.Split("\n").Where(x => !x.Contains("InsertPoint")));
 
-                            File.WriteAllText(TranslationCs, string.Join("\n", SourceOrigin.Replace("// InsertPoint", Insert).ReplaceLineEndings("\n").Split("\n", StringSplitOptions.RemoveEmptyEntries).Where(x => !x.IsNullOrWhiteSpace())));
+                            File.WriteAllText(this.TranslationCs, string.Join("\n", this.SourceOrigin.Replace("// InsertPoint", Insert).ReplaceLineEndings("\n").Split("\n", StringSplitOptions.RemoveEmptyEntries).Where(x => !x.IsNullOrWhiteSpace())));
 
                             _logger.LogDebug("Updated Translations.cs.");
                         }

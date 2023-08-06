@@ -12,22 +12,22 @@ namespace ProjectMakoto.Commands.DevTools;
 internal sealed class Disenroll2FAUserCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx)
-        => await CheckMaintenance() && await CheckBotOwner();
+        => await this.CheckMaintenance() && await this.CheckBotOwner();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
         {
-            DiscordUser victim = (DiscordUser)arguments["victim"];
+            var victim = (DiscordUser)arguments["victim"];
 
             if (!ctx.Client.CheckTwoFactorEnrollmentFor(victim.Id))
             {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{victim.GetUsernameWithIdentifier()} is not enrolled in Two Factor Authentication.`").AsBotError(ctx));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{victim.GetUsernameWithIdentifier()} is not enrolled in Two Factor Authentication.`").AsBotError(ctx));
                 return;
             }
 
             ctx.Client.DisenrollTwoFactor(victim.Id);
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Two Factor Authentication removed for {victim.GetUsername()}.`").AsBotSuccess(ctx));
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Two Factor Authentication removed for {victim.GetUsername()}.`").AsBotSuccess(ctx));
         });
     }
 }

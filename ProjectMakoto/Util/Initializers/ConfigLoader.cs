@@ -15,7 +15,7 @@ internal sealed class ConfigLoader
         if (!File.Exists("config.json"))
             new Config().Save();
 
-        Task.Run(async () =>
+        _ = Task.Run(async () =>
         {
             DateTime lastModify = new();
 
@@ -63,7 +63,7 @@ internal sealed class ConfigLoader
             if (field.FieldType != typeof(ulong))
                 continue;
 
-            ulong v = (ulong)field.GetValue(bot.status.LoadedConfig.Discord);
+            var v = (ulong)field.GetValue(bot.status.LoadedConfig.Discord);
             if (v is not 0UL)
                 continue;
 
@@ -78,7 +78,7 @@ internal sealed class ConfigLoader
             if (field.FieldType != typeof(ulong))
                 continue;
 
-            ulong v = (ulong)field.GetValue(bot.status.LoadedConfig.Channels);
+            var v = (ulong)field.GetValue(bot.status.LoadedConfig.Channels);
             if (v is not 0UL)
                 continue;
 

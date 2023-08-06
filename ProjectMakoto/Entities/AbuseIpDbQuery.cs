@@ -41,5 +41,4 @@ public sealed class AbuseIpDbQuery
         public string? reporterCountryCode { get; set; }
         public string? reporterCountryName { get; set; }
     }
-
 }

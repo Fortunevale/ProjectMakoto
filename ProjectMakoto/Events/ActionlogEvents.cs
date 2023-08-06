@@ -39,33 +39,33 @@ internal sealed class ActionlogEvents : RequiresTranslation
 
     internal async Task UserJoined(DiscordClient sender, GuildMemberAddEventArgs e)
     {
-        if (!await ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.MembersModified)
+        if (!await this.ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.MembersModified)
             return;
 
         var embed = new DiscordEmbedBuilder()
-            .WithAuthor(e.Member.MemberFlags.HasFlag(MemberFlags.DidRejoin) ? tKey.UserRejoined.Get(Bot.Guilds[e.Guild.Id]).Build() : tKey.UserJoined.Get(Bot.Guilds[e.Guild.Id]).Build(), 
+            .WithAuthor(e.Member.MemberFlags.HasFlag(MemberFlags.DidRejoin) ? this.tKey.UserRejoined.Get(this.Bot.Guilds[e.Guild.Id]).Build() : this.tKey.UserJoined.Get(this.Bot.Guilds[e.Guild.Id]).Build(), 
                 null, AuditLogIcons.UserAdded)
             .WithColor(EmbedColors.Success)
-            .WithFooter($"{tKey.UserId.Get(Bot.Guilds[e.Guild.Id]).Build()}: {e.Member.Id}")
+            .WithFooter($"{this.tKey.UserId.Get(this.Bot.Guilds[e.Guild.Id]).Build()}: {e.Member.Id}")
             .WithTimestamp(DateTime.UtcNow)
             .WithThumbnail(e.Member.AvatarUrl)
-            .WithDescription($"**{tKey.User.Get(Bot.Guilds[e.Guild.Id]).Build()}**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`\n" +
-                             $"**{tKey.AccountAge.Get(Bot.Guilds[e.Guild.Id]).Build()}**: {e.Member.CreationTimestamp.ToTimestamp()} ({e.Member.CreationTimestamp.ToTimestamp(TimestampFormat.LongDateTime)})");
+            .WithDescription($"**{this.tKey.User.Get(this.Bot.Guilds[e.Guild.Id]).Build()}**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`\n" +
+                             $"**{this.tKey.AccountAge.Get(this.Bot.Guilds[e.Guild.Id]).Build()}**: {e.Member.CreationTimestamp.ToTimestamp()} ({e.Member.CreationTimestamp.ToTimestamp(TimestampFormat.LongDateTime)})");
 
-        if (this.Bot.globalNotes.TryGetValue(e.Member.Id, out List<BanDetails> globalNote) && globalNote.Any())
+        if (this.Bot.globalNotes.TryGetValue(e.Member.Id, out var globalNote) && globalNote.Any())
         {
-            embed.AddField(new DiscordEmbedField(tKey.StaffNotes.Get(Bot.Guilds[e.Guild.Id]).Build(),
+            _ = embed.AddField(new DiscordEmbedField(this.tKey.StaffNotes.Get(this.Bot.Guilds[e.Guild.Id]).Build(),
                 $"{string.Join("\n\n", globalNote.Select(x => $"{x.Reason.FullSanitize()} - <@{x.Moderator}> {x.Timestamp.ToTimestamp()}"))}".TruncateWithIndication(512)));
         }
 
-        _ = SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed)).ContinueWith(async x =>
+        _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed)).ContinueWith(async x =>
         {
             if (!x.IsCompletedSuccessfully || !this.Bot.Guilds[e.Guild.Id].InviteTracker.Enabled)
                 return;
 
             await Task.Delay(5000);
 
-            int Wait = 0;
+            var Wait = 0;
 
             if (!this.Bot.Guilds[e.Guild.Id].Members.ContainsKey(e.Member.Id))
                 this.Bot.Guilds[e.Guild.Id].Members.Add(e.Member.Id, new(this.Bot, this.Bot.Guilds[e.Guild.Id], e.Member.Id));
@@ -79,11 +79,11 @@ internal sealed class ActionlogEvents : RequiresTranslation
             if (this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code == "")
                 return;
 
-            embed.Description += $"\n\n**{tKey.InvitedBy.Get(Bot.Guilds[e.Guild.Id]).Build()}**: <@{this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.UserId}>\n";
-            embed.Description += $"**{tKey.InviteCode.Get(Bot.Guilds[e.Guild.Id]).Build()}**: `{this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code}`";
+            embed.Description += $"\n\n**{this.tKey.InvitedBy.Get(this.Bot.Guilds[e.Guild.Id]).Build()}**: <@{this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.UserId}>\n";
+            embed.Description += $"**{this.tKey.InviteCode.Get(this.Bot.Guilds[e.Guild.Id]).Build()}**: `{this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code}`";
 
             if (this.Bot.Guilds[e.Guild.Id].InviteNotes.Notes.TryGetValue(this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code, out var inviteNote))
-                embed.Description += $"**{tKey.InviteNote.Get(Bot.Guilds[e.Guild.Id])}**: `{inviteNote.Note.SanitizeForCode()}`";
+                embed.Description += $"**{this.tKey.InviteNote.Get(this.Bot.Guilds[e.Guild.Id])}**: `{inviteNote.Note.SanitizeForCode()}`";
 
             _ = x.Result.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
         });
@@ -91,24 +91,24 @@ internal sealed class ActionlogEvents : RequiresTranslation
 
     internal async Task UserLeft(DiscordClient sender, GuildMemberRemoveEventArgs e)
     {
-        if (!await ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.MembersModified)
+        if (!await this.ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.MembersModified)
             return;
 
         var embed = new DiscordEmbedBuilder()
-            .WithAuthor(tKey.UserLeft.Get(Bot.Guilds[e.Guild.Id]).Build(), null, AuditLogIcons.UserLeft)
+            .WithAuthor(this.tKey.UserLeft.Get(this.Bot.Guilds[e.Guild.Id]).Build(), null, AuditLogIcons.UserLeft)
             .WithColor(EmbedColors.Error)
-            .WithFooter($"{tKey.UserId.Get(Bot.Guilds[e.Guild.Id]).Build()}: {e.Member.Id}")
+            .WithFooter($"{this.tKey.UserId.Get(this.Bot.Guilds[e.Guild.Id]).Build()}: {e.Member.Id}")
             .WithTimestamp(DateTime.UtcNow)
             .WithThumbnail(e.Member.AvatarUrl)
-            .WithDescription($"**{tKey.User.Get(Bot.Guilds[e.Guild.Id]).Build()}**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`\n" +
-                             $"**{tKey.JoinedAt.Get(Bot.Guilds[e.Guild.Id]).Build()}**: {e.Member.JoinedAt.ToTimestamp()} ({e.Member.JoinedAt.ToTimestamp(TimestampFormat.LongDateTime)})");
+            .WithDescription($"**{this.tKey.User.Get(this.Bot.Guilds[e.Guild.Id]).Build()}**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`\n" +
+                             $"**{this.tKey.JoinedAt.Get(this.Bot.Guilds[e.Guild.Id]).Build()}**: {e.Member.JoinedAt.ToTimestamp()} ({e.Member.JoinedAt.ToTimestamp(TimestampFormat.LongDateTime)})");
 
         if (e.Member.Roles.Any())
-            embed.AddField(new DiscordEmbedField(tKey.Roles.Get(Bot.Guilds[e.Guild.Id]).Build(), $"{string.Join(", ", e.Member.Roles.Select(x => x.Mention))}".TruncateWithIndication(1000)));
+            _ = embed.AddField(new DiscordEmbedField(this.tKey.Roles.Get(this.Bot.Guilds[e.Guild.Id]).Build(), $"{string.Join(", ", e.Member.Roles.Select(x => x.Mention))}".TruncateWithIndication(1000)));
 
-        var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+        var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
-        for (int i = 0; i < 3; i++)
+        for (var i = 0; i < 3; i++)
         {
             var AuditKickLogEntries = await e.Guild.GetAuditLogsAsync(actionType: AuditLogActionType.Kick);
             var AuditBanLogEntries = await e.Guild.GetAuditLogsAsync(actionType: AuditLogActionType.Ban);
@@ -119,15 +119,15 @@ internal sealed class ActionlogEvents : RequiresTranslation
 
                 this.Bot.Guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
-                embed.Author.Name = tKey.UserKicked.Get(Bot.Guilds[e.Guild.Id]).Build();
+                embed.Author.Name = this.tKey.UserKicked.Get(this.Bot.Guilds[e.Guild.Id]).Build();
                 embed.Author.IconUrl = AuditLogIcons.UserKicked;
-                embed.Description += $"\n\n**{tKey.KickedBy.Get(Bot.Guilds[e.Guild.Id]).Build()}**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
+                embed.Description += $"\n\n**{this.tKey.KickedBy.Get(this.Bot.Guilds[e.Guild.Id]).Build()}**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
 
                 if (!string.IsNullOrWhiteSpace(Entry.Reason))
-                    embed.Description += $"\n**{tKey.Reason.Get(Bot.Guilds[e.Guild.Id]).Build()}**: {Entry.Reason.SanitizeForCode()}";
+                    embed.Description += $"\n**{this.tKey.Reason.Get(this.Bot.Guilds[e.Guild.Id]).Build()}**: {Entry.Reason.SanitizeForCode()}";
 
                 embed.Footer = new();
-                embed.Footer.Text += $"\n({tKey.FooterAuditLogDisclaimer.Get(Bot.Guilds[e.Guild.Id]).Build(new TVar("Fields", $"'{tKey.KickedBy.Get(Bot.Guilds[e.Guild.Id])}' & '{tKey.Reason.Get(Bot.Guilds[e.Guild.Id])}'"))})";
+                embed.Footer.Text += $"\n({this.tKey.FooterAuditLogDisclaimer.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("Fields", $"'{this.tKey.KickedBy.Get(this.Bot.Guilds[e.Guild.Id])}' & '{this.tKey.Reason.Get(this.Bot.Guilds[e.Guild.Id])}'"))})";
 
                 _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                 break;
@@ -149,10 +149,10 @@ internal sealed class ActionlogEvents : RequiresTranslation
 
     internal async Task MessageDeleted(DiscordClient sender, MessageDeleteEventArgs e)
     {
-        if (!await ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.MessageDeleted || e.Message.WebhookMessage || e.Message is null || e.Message.Author is null || e.Message.Author.IsBot)
+        if (!await this.ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.MessageDeleted || e.Message.WebhookMessage || e.Message is null || e.Message.Author is null || e.Message.Author.IsBot)
             return;
 
-        string prefix = e.Guild.GetGuildPrefix(Bot);
+        var prefix = e.Guild.GetGuildPrefix(this.Bot);
 
         if (e?.Message?.Content?.StartsWith(prefix) ?? false)
             foreach (var command in sender.GetCommandsNext().RegisteredCommands)
@@ -160,96 +160,96 @@ internal sealed class ActionlogEvents : RequiresTranslation
                     return;
 
         var embed = new DiscordEmbedBuilder()
-            .WithAuthor(tKey.MessageDeleted.Get(Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.MessageDeleted)
+            .WithAuthor(this.tKey.MessageDeleted.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.MessageDeleted)
             .WithColor(EmbedColors.Error)
-            .WithFooter($"{tKey.UserId.Get(Bot.Guilds[e.Guild.Id])}: {e.Message.Author.Id}")
+            .WithFooter($"{this.tKey.UserId.Get(this.Bot.Guilds[e.Guild.Id])}: {e.Message.Author.Id}")
             .WithTimestamp(DateTime.UtcNow)
             .WithThumbnail(e.Message.Author.AvatarUrl)
-            .WithDescription($"**{tKey.User.Get(Bot.Guilds[e.Guild.Id])}**: {e.Message.Author.Mention} `{e.Message.Author.GetUsernameWithIdentifier()}`\n" +
-                             $"**{tKey.Channel.Get(Bot.Guilds[e.Guild.Id])}**: {e.Channel.Mention} `[{e.Channel.GetIcon()}{e.Channel.Name}]`");
+            .WithDescription($"**{this.tKey.User.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Message.Author.Mention} `{e.Message.Author.GetUsernameWithIdentifier()}`\n" +
+                             $"**{this.tKey.Channel.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Channel.Mention} `[{e.Channel.GetIcon()}{e.Channel.Name}]`");
 
         if (!string.IsNullOrWhiteSpace(e.Message.Content))
-            embed.AddField(new DiscordEmbedField(tKey.Content.Get(Bot.Guilds[e.Guild.Id]), $"`{e.Message.Content.SanitizeForCode().TruncateWithIndication(1022)}`"));
+            _ = embed.AddField(new DiscordEmbedField(this.tKey.Content.Get(this.Bot.Guilds[e.Guild.Id]), $"`{e.Message.Content.SanitizeForCode().TruncateWithIndication(1022)}`"));
 
         if (e.Message.Attachments.Count != 0)
-            embed.AddField(new DiscordEmbedField(tKey.Attachments.Get(Bot.Guilds[e.Guild.Id]), $"{string.Join("\n", e.Message.Attachments.Select(x => $"`[{x.FileSize.Value.FileSizeToHumanReadable()}]` `{x.Url}`"))}"));
+            _ = embed.AddField(new DiscordEmbedField(this.tKey.Attachments.Get(this.Bot.Guilds[e.Guild.Id]), $"{string.Join("\n", e.Message.Attachments.Select(x => $"`[{x.FileSize.Value.FileSizeToHumanReadable()}]` `{x.Url}`"))}"));
 
         if (e.Message.Stickers.Count != 0)
-            embed.AddField(new DiscordEmbedField(tKey.Stickers.Get(Bot.Guilds[e.Guild.Id]), $"{string.Join("\n", e.Message.Stickers.Select(x => $"`{x.Name}`"))}"));
+            _ = embed.AddField(new DiscordEmbedField(this.tKey.Stickers.Get(this.Bot.Guilds[e.Guild.Id]), $"{string.Join("\n", e.Message.Stickers.Select(x => $"`{x.Name}`"))}"));
 
         if (e.Message.ReferencedMessage is not null)
-            embed.AddField(new DiscordEmbedField(tKey.ReplyTo.Get(Bot.Guilds[e.Guild.Id]), $"{(e.Message.ReferencedMessage.Author is not null ? $"{e.Message.ReferencedMessage.Author.Mention}: " : "")}[`{t.Common.JumpToMessage.Get(Bot.Guilds[e.Guild.Id])}`]({e.Message.ReferencedMessage.JumpLink})"));
+            _ = embed.AddField(new DiscordEmbedField(this.tKey.ReplyTo.Get(this.Bot.Guilds[e.Guild.Id]), $"{(e.Message.ReferencedMessage.Author is not null ? $"{e.Message.ReferencedMessage.Author.Mention}: " : "")}[`{this.t.Common.JumpToMessage.Get(this.Bot.Guilds[e.Guild.Id])}`]({e.Message.ReferencedMessage.JumpLink})"));
 
         if (embed.Fields.Count == 0)
             return;
 
-        _ = SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+        _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
     }
 
     internal async Task VoiceStateUpdated(DiscordClient sender, VoiceStateUpdateEventArgs e)
     {
-        if (!await ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.VoiceStateUpdated)
+        if (!await this.ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.VoiceStateUpdated)
             return;
 
-        DiscordChannel PreviousChannel = e.Before?.Channel;
-        DiscordChannel NewChannel = e.After?.Channel;
+        var PreviousChannel = e.Before?.Channel;
+        var NewChannel = e.After?.Channel;
 
         if (PreviousChannel != NewChannel)
             if (PreviousChannel is null && NewChannel is not null)
             {
-                await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
-                    .WithAuthor(tKey.UserJoinedVoiceChannel.Get(Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.VoiceStateUserJoined)
+                _ = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                    .WithAuthor(this.tKey.UserJoinedVoiceChannel.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.VoiceStateUserJoined)
                     .WithThumbnail(e.User.AvatarUrl)
                     .WithColor(EmbedColors.Success)
-                    .WithFooter($"{tKey.UserId.Get(Bot.Guilds[e.Guild.Id])}: {e.User.Id}")
+                    .WithFooter($"{this.tKey.UserId.Get(this.Bot.Guilds[e.Guild.Id])}: {e.User.Id}")
                     .WithTimestamp(DateTime.UtcNow)
-                    .WithDescription($"**{tKey.User.Get(Bot.Guilds[e.Guild.Id])}**: {e.User.Mention} `{e.User.GetUsernameWithIdentifier()}`\n" +
-                                     $"**{tKey.Channel.Get(Bot.Guilds[e.Guild.Id])}**: {NewChannel.Mention} `[{NewChannel.GetIcon()}{NewChannel.Name}]`")));
+                    .WithDescription($"**{this.tKey.User.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.User.Mention} `{e.User.GetUsernameWithIdentifier()}`\n" +
+                                     $"**{this.tKey.Channel.Get(this.Bot.Guilds[e.Guild.Id])}**: {NewChannel.Mention} `[{NewChannel.GetIcon()}{NewChannel.Name}]`")));
             }
             else if (PreviousChannel is not null && NewChannel is null)
             {
-                await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
-                    .WithAuthor(tKey.UserLeftVoiceChannel.Get(Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.VoiceStateUserLeft)
+                _ = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                    .WithAuthor(this.tKey.UserLeftVoiceChannel.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.VoiceStateUserLeft)
                     .WithThumbnail(e.User.AvatarUrl)
                     .WithColor(EmbedColors.Error)
-                    .WithFooter($"{tKey.UserId.Get(Bot.Guilds[e.Guild.Id])}: {e.User.Id}")
+                    .WithFooter($"{this.tKey.UserId.Get(this.Bot.Guilds[e.Guild.Id])}: {e.User.Id}")
                     .WithTimestamp(DateTime.UtcNow)
-                    .WithDescription($"**{tKey.User.Get(Bot.Guilds[e.Guild.Id])}**: {e.User.Mention} `{e.User.GetUsernameWithIdentifier()}`\n" +
-                                     $"**{tKey.Channel.Get(Bot.Guilds[e.Guild.Id])}**: {PreviousChannel.Mention} `[{PreviousChannel.GetIcon()}{PreviousChannel.Name}]`")));
+                    .WithDescription($"**{this.tKey.User.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.User.Mention} `{e.User.GetUsernameWithIdentifier()}`\n" +
+                                     $"**{this.tKey.Channel.Get(this.Bot.Guilds[e.Guild.Id])}**: {PreviousChannel.Mention} `[{PreviousChannel.GetIcon()}{PreviousChannel.Name}]`")));
             }
             else if (PreviousChannel is not null && NewChannel is not null)
             {
-                await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
-                    .WithAuthor(tKey.UserSwitchedVoiceChannel.Get(Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.VoiceStateUserUpdated)
+                _ = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                    .WithAuthor(this.tKey.UserSwitchedVoiceChannel.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.VoiceStateUserUpdated)
                     .WithThumbnail(e.User.AvatarUrl)
                     .WithColor(EmbedColors.Warning)
-                    .WithFooter($"{tKey.UserId.Get(Bot.Guilds[e.Guild.Id])}: {e.User.Id}")
+                    .WithFooter($"{this.tKey.UserId.Get(this.Bot.Guilds[e.Guild.Id])}: {e.User.Id}")
                     .WithTimestamp(DateTime.UtcNow)
-                    .WithDescription($"**{tKey.User.Get(Bot.Guilds[e.Guild.Id])}**: {e.User.Mention} `{e.User.GetUsernameWithIdentifier()}`\n" +
-                                     $"**{tKey.Channel.Get(Bot.Guilds[e.Guild.Id])}**: {PreviousChannel.Mention} `[{PreviousChannel.GetIcon()}{PreviousChannel.Name}]` ➡ {NewChannel.Mention} `[{NewChannel.GetIcon()}{NewChannel.Name}]`")));
+                    .WithDescription($"**{this.tKey.User.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.User.Mention} `{e.User.GetUsernameWithIdentifier()}`\n" +
+                                     $"**{this.tKey.Channel.Get(this.Bot.Guilds[e.Guild.Id])}**: {PreviousChannel.Mention} `[{PreviousChannel.GetIcon()}{PreviousChannel.Name}]` ➡ {NewChannel.Mention} `[{NewChannel.GetIcon()}{NewChannel.Name}]`")));
             }
     }
 
     internal async Task MessageBulkDeleted(DiscordClient sender, MessageBulkDeleteEventArgs e)
     {
-        if (!await ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.MessageDeleted)
+        if (!await this.ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.MessageDeleted)
             return;
 
         var embed = new DiscordEmbedBuilder()
-            .WithAuthor(tKey.MultipleMessagesDeleted.Get(Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.MessageDeleted)
+            .WithAuthor(this.tKey.MultipleMessagesDeleted.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.MessageDeleted)
             .WithColor(EmbedColors.Error)
             .WithTimestamp(DateTime.UtcNow)
-            .WithDescription($"**{tKey.Channel.Get(Bot.Guilds[e.Guild.Id])}**: {e.Channel.Mention} `[{e.Channel.GetIcon()}{e.Channel.Name}]`\n" +
-                             $"{tKey.CheckAttachedFileForDeletedMessages.Get(Bot.Guilds[e.Guild.Id]).Build(true)}");
+            .WithDescription($"**{this.tKey.Channel.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Channel.Mention} `[{e.Channel.GetIcon()}{e.Channel.Name}]`\n" +
+                             $"{this.tKey.CheckAttachedFileForDeletedMessages.Get(this.Bot.Guilds[e.Guild.Id]).Build(true)}");
 
-        string Messages = "";
+        var Messages = "";
 
         foreach (var b in e.Messages)
         {
             if (b is null || b.WebhookMessage || b.Author is null)
                 continue;
 
-            string CurrentMessage = "";
+            var CurrentMessage = "";
 
             try
             {
@@ -286,15 +286,15 @@ internal sealed class ActionlogEvents : RequiresTranslation
         if (Messages.Length == 0)
             return;
 
-        string FileContent = $"All dates are saved in universal time (UTC+0).\n\n\n" +
+        var FileContent = $"All dates are saved in universal time (UTC+0).\n\n\n" +
                              $"{e.Messages.Count} messages deleted in {e.Channel.GetIcon()}{e.Channel.Name} ({e.Channel.Id}) on {e.Guild.Name} ({e.Guild.Id})\n\n\n" +
                              $"{Messages}";
 
-        string FileName = $"{Guid.NewGuid()}.txt";
+        var FileName = $"{Guid.NewGuid()}.txt";
         File.WriteAllText(FileName, FileContent);
         using (FileStream fileStream = new(FileName, FileMode.Open))
         {
-            await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed).WithFile(FileName, fileStream));
+            _ = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed).WithFile(FileName, fileStream));
         }
 
         _ = Task.Run(async () =>
@@ -314,7 +314,7 @@ internal sealed class ActionlogEvents : RequiresTranslation
 
     internal async Task MessageUpdated(DiscordClient sender, MessageUpdateEventArgs e)
     {
-        if (!await ValidateServer(e.Guild) ||
+        if (!await this.ValidateServer(e.Guild) ||
             !this.Bot.Guilds[e.Guild.Id].ActionLog.MessageDeleted ||
             e.Message is null ||
             e.MessageBefore is null ||
@@ -323,7 +323,7 @@ internal sealed class ActionlogEvents : RequiresTranslation
             e.Message.Author.IsBot)
             return;
 
-        string prefix = e.Guild.GetGuildPrefix(Bot);
+        var prefix = e.Guild.GetGuildPrefix(this.Bot);
 
         if (e?.Message?.Content?.StartsWith(prefix) ?? false)
             foreach (var command in sender.GetCommandsNext().RegisteredCommands)
@@ -331,60 +331,60 @@ internal sealed class ActionlogEvents : RequiresTranslation
                     return;
 
         var embed = new DiscordEmbedBuilder()
-            .WithAuthor(tKey.MessageUpdated.Get(Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.MessageEdited)
+            .WithAuthor(this.tKey.MessageUpdated.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.MessageEdited)
             .WithColor(EmbedColors.Warning)
-            .WithFooter($"{tKey.UserId.Get(Bot.Guilds[e.Guild.Id])}: {e.Message.Author?.Id ?? 0}")
+            .WithFooter($"{this.tKey.UserId.Get(this.Bot.Guilds[e.Guild.Id])}: {e.Message.Author?.Id ?? 0}")
             .WithTimestamp(DateTime.UtcNow)
             .WithThumbnail(e.Message.Author?.AvatarUrl)
-            .WithDescription($"**{tKey.User.Get(Bot.Guilds[e.Guild.Id])}**: {e.Message.Author?.Mention ?? "/"} `{e.Message.Author?.GetUsernameWithIdentifier() ?? "/"}`\n" +
-                             $"**{tKey.Channel.Get(Bot.Guilds[e.Guild.Id])}**: {e.Channel.Mention} `[{e.Channel.GetIcon()}{e.Channel.Name}]`\n" +
-                             $"**{tKey.Message.Get(Bot.Guilds[e.Guild.Id])}**: [`{t.Common.JumpToMessage.Get(Bot.Guilds[e.Guild.Id])}`]({e.Message.JumpLink})");
+            .WithDescription($"**{this.tKey.User.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Message.Author?.Mention ?? "/"} `{e.Message.Author?.GetUsernameWithIdentifier() ?? "/"}`\n" +
+                             $"**{this.tKey.Channel.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Channel.Mention} `[{e.Channel.GetIcon()}{e.Channel.Name}]`\n" +
+                             $"**{this.tKey.Message.Get(this.Bot.Guilds[e.Guild.Id])}**: [`{this.t.Common.JumpToMessage.Get(this.Bot.Guilds[e.Guild.Id])}`]({e.Message.JumpLink})");
 
         if (e.MessageBefore.Content != e.Message.Content)
         {
             if (!string.IsNullOrWhiteSpace(e.MessageBefore.Content))
-                embed.AddField(new DiscordEmbedField(tKey.PreviousContent.Get(Bot.Guilds[e.Guild.Id]), $"`{e.MessageBefore.Content.SanitizeForCode().TruncateWithIndication(1022)}`"));
+                _ = embed.AddField(new DiscordEmbedField(this.tKey.PreviousContent.Get(this.Bot.Guilds[e.Guild.Id]), $"`{e.MessageBefore.Content.SanitizeForCode().TruncateWithIndication(1022)}`"));
 
             if (!string.IsNullOrWhiteSpace(e.Message.Content))
-                embed.AddField(new DiscordEmbedField(tKey.NewContent.Get(Bot.Guilds[e.Guild.Id]), $"`{e.Message.Content.SanitizeForCode().TruncateWithIndication(1022)}`"));
+                _ = embed.AddField(new DiscordEmbedField(this.tKey.NewContent.Get(this.Bot.Guilds[e.Guild.Id]), $"`{e.Message.Content.SanitizeForCode().TruncateWithIndication(1022)}`"));
         }
         else
         {
             return;
         }
 
-        _ = SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+        _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
     }
 
     internal async Task MemberUpdated(DiscordClient sender, GuildMemberUpdateEventArgs e)
     {
-        if (!await ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.MemberModified)
+        if (!await this.ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.MemberModified)
             return;
 
         if (e.NicknameBefore != e.NicknameAfter)
         {
             var embed = new DiscordEmbedBuilder()
-                .WithAuthor(tKey.MessageUpdated.Get(Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.UserUpdated)
+                .WithAuthor(this.tKey.MessageUpdated.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.UserUpdated)
                 .WithColor(EmbedColors.Warning)
-                .WithFooter($"{tKey.UserId.Get(Bot.Guilds[e.Guild.Id])}: {e.Member.Id}")
+                .WithFooter($"{this.tKey.UserId.Get(this.Bot.Guilds[e.Guild.Id])}: {e.Member.Id}")
                 .WithTimestamp(DateTime.UtcNow)
                 .WithThumbnail(e.Member.AvatarUrl)
-                .WithDescription($"**{tKey.User}**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`");
+                .WithDescription($"**{this.tKey.User}**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`");
 
             if (string.IsNullOrWhiteSpace(e.NicknameBefore))
-                embed.Author.Name = tKey.NicknameAdded.Get(Bot.Guilds[e.Guild.Id]);
+                embed.Author.Name = this.tKey.NicknameAdded.Get(this.Bot.Guilds[e.Guild.Id]);
             else
-                embed.AddField(new DiscordEmbedField(tKey.PreviousNickname.Get(Bot.Guilds[e.Guild.Id]), $"`{e.NicknameBefore}`"));
+                _ = embed.AddField(new DiscordEmbedField(this.tKey.PreviousNickname.Get(this.Bot.Guilds[e.Guild.Id]), $"`{e.NicknameBefore}`"));
 
             if (string.IsNullOrWhiteSpace(e.NicknameAfter))
-                embed.Author.Name = tKey.NicknameRemoved.Get(Bot.Guilds[e.Guild.Id]);
+                embed.Author.Name = this.tKey.NicknameRemoved.Get(this.Bot.Guilds[e.Guild.Id]);
             else
-                embed.AddField(new DiscordEmbedField(tKey.NewNickname.Get(Bot.Guilds[e.Guild.Id]), $"`{e.NicknameAfter}`"));
+                _ = embed.AddField(new DiscordEmbedField(this.tKey.NewNickname.Get(this.Bot.Guilds[e.Guild.Id]), $"`{e.NicknameAfter}`"));
 
-            _ = SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+            _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
         }
 
-        bool RolesUpdated = false;
+        var RolesUpdated = false;
 
         foreach (var role in e.RolesBefore)
         {
@@ -424,17 +424,17 @@ internal sealed class ActionlogEvents : RequiresTranslation
         if (RolesUpdated)
         {
             var embed = new DiscordEmbedBuilder()
-                .WithAuthor(tKey.RolesUpdated.Get(Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.UserUpdated)
+                .WithAuthor(this.tKey.RolesUpdated.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.UserUpdated)
                 .WithColor(EmbedColors.Warning)
-                .WithFooter($"{tKey.UserId.Get(Bot.Guilds[e.Guild.Id])}: {e.Member.Id}")
+                .WithFooter($"{this.tKey.UserId.Get(this.Bot.Guilds[e.Guild.Id])}: {e.Member.Id}")
                 .WithTimestamp(DateTime.UtcNow)
                 .WithThumbnail(e.Member.AvatarUrl)
-                .WithDescription($"**{tKey.User.Get(Bot.Guilds[e.Guild.Id])}**: `{e.Member.GetUsernameWithIdentifier()}`");
+                .WithDescription($"**{this.tKey.User.Get(this.Bot.Guilds[e.Guild.Id])}**: `{e.Member.GetUsernameWithIdentifier()}`");
 
-            string Roles = "";
+            var Roles = "";
 
-            bool RolesAdded = false;
-            bool RolesRemoved = false;
+            var RolesAdded = false;
+            var RolesRemoved = false;
 
             foreach (var role in e.RolesAfter)
             {
@@ -456,20 +456,20 @@ internal sealed class ActionlogEvents : RequiresTranslation
 
             if (RolesAdded && !RolesRemoved)
             {
-                embed.Author.Name = tKey.RolesAdded.Get(Bot.Guilds[e.Guild.Id]);
+                embed.Author.Name = this.tKey.RolesAdded.Get(this.Bot.Guilds[e.Guild.Id]);
                 embed.Color = EmbedColors.Success;
                 embed.Author.IconUrl = AuditLogIcons.UserAdded;
             }
             else if (!RolesAdded && RolesRemoved)
             {
-                embed.Author.Name = tKey.RolesRemoved.Get(Bot.Guilds[e.Guild.Id]);
+                embed.Author.Name = this.tKey.RolesRemoved.Get(this.Bot.Guilds[e.Guild.Id]);
                 embed.Color = EmbedColors.Error;
                 embed.Author.IconUrl = AuditLogIcons.UserLeft;
             }
 
             embed.Description += $"\n\n{Roles}";
 
-            _ = SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+            _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
         }
 
         //if (e.TimeoutBefore != e.TimeoutAfter)
@@ -505,13 +505,13 @@ internal sealed class ActionlogEvents : RequiresTranslation
             try
             {
                 if ((e.PendingBefore is null && e.PendingAfter is true) || (e.PendingAfter is true && e.PendingBefore is false))
-                    _ = SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
-                        .WithAuthor(tKey.MembershipApproved.Get(Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.UserAdded)
+                    _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                        .WithAuthor(this.tKey.MembershipApproved.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.UserAdded)
                         .WithColor(EmbedColors.Success)
-                        .WithFooter($"{tKey.UserId.Get(Bot.Guilds[e.Guild.Id])}: {e.Member.Id}")
+                        .WithFooter($"{this.tKey.UserId.Get(this.Bot.Guilds[e.Guild.Id])}: {e.Member.Id}")
                         .WithTimestamp(DateTime.UtcNow)
                         .WithThumbnail(e.Member.AvatarUrl)
-                        .WithDescription($"**{tKey.User.Get(Bot.Guilds[e.Guild.Id])}**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`")));
+                        .WithDescription($"**{this.tKey.User.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`")));
             }
             catch { }
         }
@@ -537,56 +537,56 @@ internal sealed class ActionlogEvents : RequiresTranslation
 
         if (e.GuildAvatarHashBefore != e.GuildAvatarHashAfter)
         {
-            _ = SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
-                .WithAuthor(tKey.GuildProfilePictureUpdated.Get(Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.UserUpdated)
+            _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                .WithAuthor(this.tKey.GuildProfilePictureUpdated.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.UserUpdated)
                 .WithColor(EmbedColors.Warning)
-                .WithFooter($"{tKey.UserId.Get(Bot.Guilds[e.Guild.Id])}: {e.Member.Id}")
+                .WithFooter($"{this.tKey.UserId.Get(this.Bot.Guilds[e.Guild.Id])}: {e.Member.Id}")
                 .WithTimestamp(DateTime.UtcNow)
                 .WithThumbnail(e.Member.AvatarUrl)
                 .WithImageUrl(e.Member.GuildAvatarUrl)
-                .WithDescription($"**{tKey.User.Get(Bot.Guilds[e.Guild.Id])}**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`")));
+                .WithDescription($"**{this.tKey.User.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`")));
         }
     }
 
     internal async Task RoleCreated(DiscordClient sender, GuildRoleCreateEventArgs e)
     {
-        if (!await ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.RolesModified)
+        if (!await this.ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.RolesModified)
             return;
 
-        string GeneratePermissions = string.Join(", ", e.Role.Permissions.GetEnumeration().Select(x => $"`{x.ToTranslatedPermissionString(Bot.Guilds[e.Guild.Id], this.Bot)}`"));
-        string Integration = "";
+        var GeneratePermissions = string.Join(", ", e.Role.Permissions.GetEnumeration().Select(x => $"`{x.ToTranslatedPermissionString(this.Bot.Guilds[e.Guild.Id], this.Bot)}`"));
+        var Integration = "";
 
         if (e.Role.IsManaged)
         {
             if (e.Role.Tags.IsPremiumSubscriber)
-                Integration = $"**{tKey.Integration.Get(Bot.Guilds[e.Guild.Id])}**: `{tKey.ServerBooster.Get(Bot.Guilds[e.Guild.Id])}`\n\n";
+                Integration = $"**{this.tKey.Integration.Get(this.Bot.Guilds[e.Guild.Id])}**: `{this.tKey.ServerBooster.Get(this.Bot.Guilds[e.Guild.Id])}`\n\n";
 
             if (e.Role.Tags.BotId is not null and not 0)
             {
                 var bot = await sender.GetUserAsync((ulong)e.Role.Tags.BotId);
 
-                Integration = $"**{tKey.Integration.Get(Bot.Guilds[e.Guild.Id])}**: {bot.Mention} `{bot.GetUsernameWithIdentifier()}`\n\n";
+                Integration = $"**{this.tKey.Integration.Get(this.Bot.Guilds[e.Guild.Id])}**: {bot.Mention} `{bot.GetUsernameWithIdentifier()}`\n\n";
             }
         }
 
         var embed = new DiscordEmbedBuilder()
-            .WithAuthor(tKey.RoleCreated.Get(Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.UserAdded)
+            .WithAuthor(this.tKey.RoleCreated.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.UserAdded)
             .WithColor(EmbedColors.Success)
-            .WithFooter($"{tKey.RoleId.Get(Bot.Guilds[e.Guild.Id])}: {e.Role.Id}")
+            .WithFooter($"{this.tKey.RoleId.Get(this.Bot.Guilds[e.Guild.Id])}: {e.Role.Id}")
             .WithTimestamp(DateTime.UtcNow)
-            .WithDescription($"**{tKey.Role.Get(Bot.Guilds[e.Guild.Id])}**: {e.Role.Mention} `{e.Role.Name}`\n" +
-                             $"**{tKey.Color.Get(Bot.Guilds[e.Guild.Id])}**: `{e.Role.Color.ToHex()}`\n" +
-                             $"**{tKey.RoleMentionable.Get(Bot.Guilds[e.Guild.Id])}**: {e.Role.IsMentionable.ToPillEmote(this.Bot)}\n" +
-                             $"**{tKey.DisplayedRoleMembers.Get(Bot.Guilds[e.Guild.Id])}**: {e.Role.IsHoisted.ToPillEmote(this.Bot)}\n" +
+            .WithDescription($"**{this.tKey.Role.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Role.Mention} `{e.Role.Name}`\n" +
+                             $"**{this.tKey.Color.Get(this.Bot.Guilds[e.Guild.Id])}**: `{e.Role.Color.ToHex()}`\n" +
+                             $"**{this.tKey.RoleMentionable.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Role.IsMentionable.ToPillEmote(this.Bot)}\n" +
+                             $"**{this.tKey.DisplayedRoleMembers.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Role.IsHoisted.ToPillEmote(this.Bot)}\n" +
                              $"{Integration}" +
-                             $"\n**{tKey.Permissions.Get(Bot.Guilds[e.Guild.Id])}**: {GeneratePermissions}");
+                             $"\n**{this.tKey.Permissions.Get(this.Bot.Guilds[e.Guild.Id])}**: {GeneratePermissions}");
 
-        var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+        var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
         if (!this.Bot.Guilds[e.Guild.Id].ActionLog.AttemptGettingMoreDetails)
             return;
 
-        for (int i = 0; i < 3; i++)
+        for (var i = 0; i < 3; i++)
         {
             var AuditLogEntries = await e.Guild.GetAuditLogsAsync(actionType: AuditLogActionType.RoleCreate);
 
@@ -595,10 +595,10 @@ internal sealed class ActionlogEvents : RequiresTranslation
                 var Entry = (DiscordAuditLogRoleUpdateEntry)AuditLogEntries.First(x => ((DiscordAuditLogRoleUpdateEntry)x).Target.Id == e.Role.Id && !this.Bot.Guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
                 this.Bot.Guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
-                embed.Description += $"\n\n**{tKey.CreatedBy.Get(Bot.Guilds[e.Guild.Id])}**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
+                embed.Description += $"\n\n**{this.tKey.CreatedBy.Get(this.Bot.Guilds[e.Guild.Id])}**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
                 embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = Entry.UserResponsible.AvatarUrl };
 
-                embed.Footer.Text += $"\n({tKey.FooterAuditLogDisclaimer.Get(Bot.Guilds[e.Guild.Id]).Build(new TVar("Fields", $"'{tKey.CreatedBy.Get(Bot.Guilds[e.Guild.Id])}'"))})";
+                embed.Footer.Text += $"\n({this.tKey.FooterAuditLogDisclaimer.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("Fields", $"'{this.tKey.CreatedBy.Get(this.Bot.Guilds[e.Guild.Id])}'"))})";
 
                 _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                 break;
@@ -610,44 +610,44 @@ internal sealed class ActionlogEvents : RequiresTranslation
 
     internal async Task RoleDeleted(DiscordClient sender, GuildRoleDeleteEventArgs e)
     {
-        if (!await ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.RolesModified)
+        if (!await this.ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.RolesModified)
             return;
 
-        string GeneratePermissions = string.Join(", ", e.Role.Permissions.GetEnumeration().Select(x => $"`{x.ToTranslatedPermissionString(Bot.Guilds[e.Guild.Id], this.Bot)}`"));
-        string Integration = "";
+        var GeneratePermissions = string.Join(", ", e.Role.Permissions.GetEnumeration().Select(x => $"`{x.ToTranslatedPermissionString(this.Bot.Guilds[e.Guild.Id], this.Bot)}`"));
+        var Integration = "";
 
         if (e.Role.IsManaged)
         {
             if (e.Role.Tags.IsPremiumSubscriber)
-                Integration = $"**{tKey.Integration.Get(Bot.Guilds[e.Guild.Id])}**: `{tKey.ServerBooster.Get(Bot.Guilds[e.Guild.Id])}`\n\n";
+                Integration = $"**{this.tKey.Integration.Get(this.Bot.Guilds[e.Guild.Id])}**: `{this.tKey.ServerBooster.Get(this.Bot.Guilds[e.Guild.Id])}`\n\n";
 
             if (e.Role.Tags.BotId is not null and not 0)
             {
                 var bot = await sender.GetUserAsync((ulong)e.Role.Tags.BotId);
 
-                Integration = $"**{tKey.Integration.Get(Bot.Guilds[e.Guild.Id])}**: {bot.Mention} `{bot.GetUsernameWithIdentifier()}`\n\n";
+                Integration = $"**{this.tKey.Integration.Get(this.Bot.Guilds[e.Guild.Id])}**: {bot.Mention} `{bot.GetUsernameWithIdentifier()}`\n\n";
             }
         }
 
         var embed = new DiscordEmbedBuilder()
-            .WithAuthor(tKey.RoleDeleted.Get(Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.UserLeft)
+            .WithAuthor(this.tKey.RoleDeleted.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.UserLeft)
             .WithColor(EmbedColors.Error)
-            .WithFooter($"{tKey.RoleId.Get(Bot.Guilds[e.Guild.Id])}: {e.Role.Id}")
+            .WithFooter($"{this.tKey.RoleId.Get(this.Bot.Guilds[e.Guild.Id])}: {e.Role.Id}")
             .WithTimestamp(DateTime.UtcNow)
-            .WithDescription($"**{tKey.Role.Get(Bot.Guilds[e.Guild.Id])}**: `{e.Role.Name}`\n" +
-                             $"**{tKey.Color.Get(Bot.Guilds[e.Guild.Id])}**: `{e.Role.Color.ToHex()}`\n" +
-                             $"**{tKey.RoleMentionable.Get(Bot.Guilds[e.Guild.Id])}**: {e.Role.IsMentionable.ToPillEmote(this.Bot)}\n" +
-                             $"**{tKey.DisplayedRoleMembers.Get(Bot.Guilds[e.Guild.Id])}**: {e.Role.IsHoisted.ToPillEmote(this.Bot)}\n" +
-                             $"{(e.Role.IsManaged ? $"{tKey.RoleWasIntegration.Get(Bot.Guilds[e.Guild.Id]).Build(true)}\n" : "")}" +
+            .WithDescription($"**{this.tKey.Role.Get(this.Bot.Guilds[e.Guild.Id])}**: `{e.Role.Name}`\n" +
+                             $"**{this.tKey.Color.Get(this.Bot.Guilds[e.Guild.Id])}**: `{e.Role.Color.ToHex()}`\n" +
+                             $"**{this.tKey.RoleMentionable.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Role.IsMentionable.ToPillEmote(this.Bot)}\n" +
+                             $"**{this.tKey.DisplayedRoleMembers.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Role.IsHoisted.ToPillEmote(this.Bot)}\n" +
+                             $"{(e.Role.IsManaged ? $"{this.tKey.RoleWasIntegration.Get(this.Bot.Guilds[e.Guild.Id]).Build(true)}\n" : "")}" +
                              $"{Integration}\n" +
-                             $"\n**{tKey.Permissions.Get(Bot.Guilds[e.Guild.Id])}**: {GeneratePermissions}");
+                             $"\n**{this.tKey.Permissions.Get(this.Bot.Guilds[e.Guild.Id])}**: {GeneratePermissions}");
 
-        var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+        var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
         if (!this.Bot.Guilds[e.Guild.Id].ActionLog.AttemptGettingMoreDetails)
             return;
 
-        for (int i = 0; i < 3; i++)
+        for (var i = 0; i < 3; i++)
         {
             var AuditLogEntries = await e.Guild.GetAuditLogsAsync(actionType: AuditLogActionType.RoleDelete);
 
@@ -656,10 +656,10 @@ internal sealed class ActionlogEvents : RequiresTranslation
                 var Entry = (DiscordAuditLogRoleUpdateEntry)AuditLogEntries.First(x => ((DiscordAuditLogRoleUpdateEntry)x).Target.Id == e.Role.Id && !this.Bot.Guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
                 this.Bot.Guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
-                embed.Description += $"\n\n**{tKey.DeletedBy.Get(Bot.Guilds[e.Guild.Id])}**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
+                embed.Description += $"\n\n**{this.tKey.DeletedBy.Get(this.Bot.Guilds[e.Guild.Id])}**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
                 embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = Entry.UserResponsible.AvatarUrl };
 
-                embed.Footer.Text += $"\n({tKey.FooterAuditLogDisclaimer.Get(Bot.Guilds[e.Guild.Id]).Build(new TVar("Fields", $"'{tKey.DeletedBy.Get(Bot.Guilds[e.Guild.Id])}'"))})";
+                embed.Footer.Text += $"\n({this.tKey.FooterAuditLogDisclaimer.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("Fields", $"'{this.tKey.DeletedBy.Get(this.Bot.Guilds[e.Guild.Id])}'"))})";
 
                 _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                 break;
@@ -671,15 +671,15 @@ internal sealed class ActionlogEvents : RequiresTranslation
 
     internal async Task RoleModified(DiscordClient sender, GuildRoleUpdateEventArgs e)
     {
-        if (!await ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.RolesModified)
+        if (!await this.ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.RolesModified)
             return;
 
-        Permissions[] BeforePermissions = e.RoleBefore.Permissions.GetEnumeration();
-        Permissions[] AfterPermissions = e.RoleAfter.Permissions.GetEnumeration();
+        var BeforePermissions = e.RoleBefore.Permissions.GetEnumeration();
+        var AfterPermissions = e.RoleAfter.Permissions.GetEnumeration();
 
-        bool PermissionsAdded = false;
-        bool PermissionsRemoved = false;
-        string PermissionDifference = "";
+        var PermissionsAdded = false;
+        var PermissionsRemoved = false;
+        var PermissionDifference = "";
 
         foreach (var perm in AfterPermissions)
         {
@@ -689,7 +689,7 @@ internal sealed class ActionlogEvents : RequiresTranslation
             if (!BeforePermissions.Contains(perm))
             {
                 PermissionsAdded = true;
-                PermissionDifference += $"`+` `{perm.ToTranslatedPermissionString(Bot.Guilds[e.Guild.Id], this.Bot)}`\n";
+                PermissionDifference += $"`+` `{perm.ToTranslatedPermissionString(this.Bot.Guilds[e.Guild.Id], this.Bot)}`\n";
             }
         }
 
@@ -701,30 +701,29 @@ internal sealed class ActionlogEvents : RequiresTranslation
             if (!AfterPermissions.Contains(perm))
             {
                 PermissionsRemoved = true;
-                PermissionDifference += $"`-` `{perm.ToTranslatedPermissionString(Bot.Guilds[e.Guild.Id], this.Bot)}`\n";
+                PermissionDifference += $"`-` `{perm.ToTranslatedPermissionString(this.Bot.Guilds[e.Guild.Id], this.Bot)}`\n";
             }
         }
 
         if (PermissionDifference.Length > 0)
             if (!PermissionsAdded && PermissionsRemoved)
-                PermissionDifference = $"\n**{tKey.PermissionsRemoved.Get(Bot.Guilds[e.Guild.Id])}**:\n{PermissionDifference}";
-            else if (PermissionsAdded && !PermissionsRemoved)
-                PermissionDifference = $"\n**{tKey.PermissionsAdded.Get(Bot.Guilds[e.Guild.Id])}**:\n{PermissionDifference}";
-            else
-                PermissionDifference = $"\n**{tKey.PermissionsUpdated.Get(Bot.Guilds[e.Guild.Id])}**:\n{PermissionDifference}";
+                PermissionDifference = $"\n**{this.tKey.PermissionsRemoved.Get(this.Bot.Guilds[e.Guild.Id])}**:\n{PermissionDifference}";
+            else PermissionDifference = PermissionsAdded && !PermissionsRemoved
+                ? $"\n**{this.tKey.PermissionsAdded.Get(this.Bot.Guilds[e.Guild.Id])}**:\n{PermissionDifference}"
+                : $"\n**{this.tKey.PermissionsUpdated.Get(this.Bot.Guilds[e.Guild.Id])}**:\n{PermissionDifference}";
 
-        string Integration = "";
+        var Integration = "";
 
         if (e.RoleAfter.IsManaged)
         {
             if (e.RoleAfter.Tags.IsPremiumSubscriber)
-                Integration = $"**{tKey.Integration.Get(Bot.Guilds[e.Guild.Id])}**: `{tKey.ServerBooster.Get(Bot.Guilds[e.Guild.Id])}`\n\n";
+                Integration = $"**{this.tKey.Integration.Get(this.Bot.Guilds[e.Guild.Id])}**: `{this.tKey.ServerBooster.Get(this.Bot.Guilds[e.Guild.Id])}`\n\n";
 
             if (e.RoleAfter.Tags.BotId is not null and not 0)
             {
                 var bot = await sender.GetUserAsync((ulong)e.RoleAfter.Tags.BotId);
 
-                Integration = $"**{tKey.Integration.Get(Bot.Guilds[e.Guild.Id])}**: {bot.Mention} `{bot.GetUsernameWithIdentifier()}`\n\n";
+                Integration = $"**{this.tKey.Integration.Get(this.Bot.Guilds[e.Guild.Id])}**: {bot.Mention} `{bot.GetUsernameWithIdentifier()}`\n\n";
             }
         }
 
@@ -736,24 +735,24 @@ internal sealed class ActionlogEvents : RequiresTranslation
                 return;
 
         var embed = new DiscordEmbedBuilder()
-            .WithAuthor(tKey.RoleUpdated.Get(Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.UserUpdated)
+            .WithAuthor(this.tKey.RoleUpdated.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.UserUpdated)
             .WithColor(EmbedColors.Warning)
-            .WithFooter($"{tKey.RoleId.Get(Bot.Guilds[e.Guild.Id])}: {e.RoleAfter.Id}")
+            .WithFooter($"{this.tKey.RoleId.Get(this.Bot.Guilds[e.Guild.Id])}: {e.RoleAfter.Id}")
             .WithTimestamp(DateTime.UtcNow)
-            .WithDescription($"**{tKey.Role.Get(Bot.Guilds[e.Guild.Id])}**: {e.RoleAfter.Mention} {(e.RoleBefore.Name != e.RoleAfter.Name ? $"`{e.RoleBefore.Name}` ➡ `{e.RoleAfter.Name}`" : $"`{e.RoleAfter.Name}`")}\n" +
-                      $"{(e.RoleBefore.Color.ToHex() != e.RoleAfter.Color.ToHex() ? $"**{tKey.Color.Get(Bot.Guilds[e.Guild.Id])}**: `{e.RoleBefore.Color.ToHex()}` ➡ `{e.RoleAfter.Color.ToHex()}`\n" : "")}" +
-                      $"{(e.RoleBefore.IsMentionable != e.RoleAfter.IsMentionable ? $"**{tKey.RoleMentionable.Get(Bot.Guilds[e.Guild.Id])}**: {e.RoleBefore.IsMentionable.ToPillEmote(this.Bot)} ➡ {e.RoleAfter.IsMentionable.ToPillEmote(this.Bot)}\n" : "")}" +
-                      $"{(e.RoleBefore.IsHoisted != e.RoleAfter.IsHoisted ? $"**{tKey.DisplayedRoleMembers.Get(Bot.Guilds[e.Guild.Id])}**: {e.RoleBefore.IsHoisted.ToPillEmote(this.Bot)} ➡ {e.RoleAfter.IsHoisted.ToPillEmote(this.Bot)}\n" : "")}" +
-                      $"{(e.RoleAfter.IsManaged ? $"\n`{tKey.Integration.Get(Bot.Guilds[e.Guild.Id])}`\n" : "")}" +
+            .WithDescription($"**{this.tKey.Role.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.RoleAfter.Mention} {(e.RoleBefore.Name != e.RoleAfter.Name ? $"`{e.RoleBefore.Name}` ➡ `{e.RoleAfter.Name}`" : $"`{e.RoleAfter.Name}`")}\n" +
+                      $"{(e.RoleBefore.Color.ToHex() != e.RoleAfter.Color.ToHex() ? $"**{this.tKey.Color.Get(this.Bot.Guilds[e.Guild.Id])}**: `{e.RoleBefore.Color.ToHex()}` ➡ `{e.RoleAfter.Color.ToHex()}`\n" : "")}" +
+                      $"{(e.RoleBefore.IsMentionable != e.RoleAfter.IsMentionable ? $"**{this.tKey.RoleMentionable.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.RoleBefore.IsMentionable.ToPillEmote(this.Bot)} ➡ {e.RoleAfter.IsMentionable.ToPillEmote(this.Bot)}\n" : "")}" +
+                      $"{(e.RoleBefore.IsHoisted != e.RoleAfter.IsHoisted ? $"**{this.tKey.DisplayedRoleMembers.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.RoleBefore.IsHoisted.ToPillEmote(this.Bot)} ➡ {e.RoleAfter.IsHoisted.ToPillEmote(this.Bot)}\n" : "")}" +
+                      $"{(e.RoleAfter.IsManaged ? $"\n`{this.tKey.Integration.Get(this.Bot.Guilds[e.Guild.Id])}`\n" : "")}" +
                       $"{Integration}" +
                       $"{PermissionDifference}");
 
-        var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+        var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
         if (!this.Bot.Guilds[e.Guild.Id].ActionLog.AttemptGettingMoreDetails)
             return;
 
-        for (int i = 0; i < 3; i++)
+        for (var i = 0; i < 3; i++)
         {
             var AuditLogEntries = await e.Guild.GetAuditLogsAsync(actionType: AuditLogActionType.RoleUpdate);
 
@@ -762,10 +761,10 @@ internal sealed class ActionlogEvents : RequiresTranslation
                 var Entry = (DiscordAuditLogRoleUpdateEntry)AuditLogEntries.First(x => ((DiscordAuditLogRoleUpdateEntry)x).Target.Id == e.RoleAfter.Id && !this.Bot.Guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
                 this.Bot.Guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
-                embed.Description += $"\n\n**{tKey.ModifiedBy.Get(Bot.Guilds[e.Guild.Id])}**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
+                embed.Description += $"\n\n**{this.tKey.ModifiedBy.Get(this.Bot.Guilds[e.Guild.Id])}**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
                 embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = Entry.UserResponsible.AvatarUrl };
 
-                embed.Footer.Text += $"\n({tKey.FooterAuditLogDisclaimer.Get(Bot.Guilds[e.Guild.Id]).Build(new TVar("Fields", $"'{tKey.ModifiedBy.Get(Bot.Guilds[e.Guild.Id])}'"))})";
+                embed.Footer.Text += $"\n({this.tKey.FooterAuditLogDisclaimer.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("Fields", $"'{this.tKey.ModifiedBy.Get(this.Bot.Guilds[e.Guild.Id])}'"))})";
 
                 _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                 break;
@@ -777,25 +776,25 @@ internal sealed class ActionlogEvents : RequiresTranslation
 
     internal async Task BanAdded(DiscordClient sender, GuildBanAddEventArgs e)
     {
-        if (!await ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.BanlistModified)
+        if (!await this.ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.BanlistModified)
             return;
 
         var embed = new DiscordEmbedBuilder()
-            .WithAuthor(tKey.UserBanned.Get(Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.UserBanned)
+            .WithAuthor(this.tKey.UserBanned.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.UserBanned)
             .WithColor(EmbedColors.Error)
-            .WithFooter($"{tKey.UserId.Get(Bot.Guilds[e.Guild.Id])}: {e.Member.Id}")
+            .WithFooter($"{this.tKey.UserId.Get(this.Bot.Guilds[e.Guild.Id])}: {e.Member.Id}")
             .WithTimestamp(DateTime.UtcNow)
             .WithThumbnail(e.Member.AvatarUrl)
-            .WithDescription($"**{tKey.User.Get(Bot.Guilds[e.Guild.Id])}**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`\n" +
-                             $"**{tKey.JoinedAt.Get(Bot.Guilds[e.Guild.Id])}**: {e.Member.JoinedAt.ToTimestamp()} ({e.Member.JoinedAt.ToTimestamp(TimestampFormat.LongDateTime)})")
-            .AddField(new DiscordEmbedField(tKey.Roles.Get(Bot.Guilds[e.Guild.Id]), $"{string.Join(", ", e.Member.Roles.Select(x => x.Mention))}".TruncateWithIndication(1000)));
+            .WithDescription($"**{this.tKey.User.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`\n" +
+                             $"**{this.tKey.JoinedAt.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Member.JoinedAt.ToTimestamp()} ({e.Member.JoinedAt.ToTimestamp(TimestampFormat.LongDateTime)})")
+            .AddField(new DiscordEmbedField(this.tKey.Roles.Get(this.Bot.Guilds[e.Guild.Id]), $"{string.Join(", ", e.Member.Roles.Select(x => x.Mention))}".TruncateWithIndication(1000)));
 
-        var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+        var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
         if (!this.Bot.Guilds[e.Guild.Id].ActionLog.AttemptGettingMoreDetails)
             return;
 
-        for (int i = 0; i < 3; i++)
+        for (var i = 0; i < 3; i++)
         {
             var AuditLogEntries = await e.Guild.GetAuditLogsAsync(actionType: AuditLogActionType.Ban);
 
@@ -804,12 +803,12 @@ internal sealed class ActionlogEvents : RequiresTranslation
                 var Entry = (DiscordAuditLogBanEntry)AuditLogEntries.First(x => ((DiscordAuditLogBanEntry)x).Target.Id == e.Member.Id && !this.Bot.Guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
                 this.Bot.Guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
-                embed.Description += $"\n\n**{tKey.BannedBy.Get(Bot.Guilds[e.Guild.Id])}**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
+                embed.Description += $"\n\n**{this.tKey.BannedBy.Get(this.Bot.Guilds[e.Guild.Id])}**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
 
                 if (!string.IsNullOrWhiteSpace(Entry.Reason))
-                    embed.Description += $"\n**{tKey.Reason.Get(Bot.Guilds[e.Guild.Id])}**: {Entry.Reason.SanitizeForCode()}";
+                    embed.Description += $"\n**{this.tKey.Reason.Get(this.Bot.Guilds[e.Guild.Id])}**: {Entry.Reason.SanitizeForCode()}";
 
-                embed.Footer.Text += $"\n({tKey.FooterAuditLogDisclaimer.Get(Bot.Guilds[e.Guild.Id]).Build(new TVar("Fields", $"'{tKey.BannedBy.Get(Bot.Guilds[e.Guild.Id])}' & '{tKey.Reason.Get(Bot.Guilds[e.Guild.Id])}'"))})";
+                embed.Footer.Text += $"\n({this.tKey.FooterAuditLogDisclaimer.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("Fields", $"'{this.tKey.BannedBy.Get(this.Bot.Guilds[e.Guild.Id])}' & '{this.tKey.Reason.Get(this.Bot.Guilds[e.Guild.Id])}'"))})";
 
                 _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                 break;
@@ -821,23 +820,23 @@ internal sealed class ActionlogEvents : RequiresTranslation
 
     internal async Task BanRemoved(DiscordClient sender, GuildBanRemoveEventArgs e)
     {
-        if (!await ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.BanlistModified)
+        if (!await this.ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.BanlistModified)
             return;
 
         var embed = new DiscordEmbedBuilder()
-            .WithAuthor(tKey.UserUnbanned.Get(Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.UserBanRemoved)
+            .WithAuthor(this.tKey.UserUnbanned.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.UserBanRemoved)
             .WithColor(EmbedColors.Success)
-            .WithFooter($"{tKey.UserId.Get(Bot.Guilds[e.Guild.Id])}: {e.Member.Id}")
+            .WithFooter($"{this.tKey.UserId.Get(this.Bot.Guilds[e.Guild.Id])}: {e.Member.Id}")
             .WithTimestamp(DateTime.UtcNow)
             .WithThumbnail(e.Member.AvatarUrl)
-            .WithDescription($"**{tKey.User}**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`");
+            .WithDescription($"**{this.tKey.User}**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`");
 
-        var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+        var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
         if (!this.Bot.Guilds[e.Guild.Id].ActionLog.AttemptGettingMoreDetails)
             return;
 
-        for (int i = 0; i < 3; i++)
+        for (var i = 0; i < 3; i++)
         {
             var AuditLogEntries = await e.Guild.GetAuditLogsAsync(actionType: AuditLogActionType.Unban);
 
@@ -846,9 +845,9 @@ internal sealed class ActionlogEvents : RequiresTranslation
                 var Entry = (DiscordAuditLogBanEntry)AuditLogEntries.First(x => ((DiscordAuditLogBanEntry)x).Target.Id == e.Member.Id && !this.Bot.Guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
                 this.Bot.Guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
-                embed.Description += $"\n\n**{tKey.UnbannedBy.Get(Bot.Guilds[e.Guild.Id])}**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
+                embed.Description += $"\n\n**{this.tKey.UnbannedBy.Get(this.Bot.Guilds[e.Guild.Id])}**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
 
-                embed.Footer.Text += $"\n({tKey.FooterAuditLogDisclaimer.Get(Bot.Guilds[e.Guild.Id]).Build(new TVar("Fields", $"'{tKey.UnbannedBy.Get(Bot.Guilds[e.Guild.Id])}'"))})";
+                embed.Footer.Text += $"\n({this.tKey.FooterAuditLogDisclaimer.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("Fields", $"'{this.tKey.UnbannedBy.Get(this.Bot.Guilds[e.Guild.Id])}'"))})";
 
                 _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                 break;
@@ -860,104 +859,104 @@ internal sealed class ActionlogEvents : RequiresTranslation
 
     internal async Task GuildUpdated(DiscordClient sender, GuildUpdateEventArgs e)
     {
-        if (!await ValidateServer(e.GuildAfter) || !this.Bot.Guilds[e.GuildAfter.Id].ActionLog.GuildModified)
+        if (!await this.ValidateServer(e.GuildAfter) || !this.Bot.Guilds[e.GuildAfter.Id].ActionLog.GuildModified)
             return;
 
-        string Description = "";
+        var Description = "";
 
         try
-        { Description += $"{(e.GuildBefore.Owner.Id != e.GuildAfter.Owner.Id ? $"**{tKey.Owner.Get(Bot.Guilds[e.GuildAfter.Id])}**: {e.GuildBefore.Owner.Mention} `{e.GuildBefore.Owner.GetUsernameWithIdentifier()}` ➡ {e.GuildAfter.Owner.Mention} `{e.GuildAfter.Owner.GetUsernameWithIdentifier()}`\n" : "")}"; }
+        { Description += $"{(e.GuildBefore.Owner.Id != e.GuildAfter.Owner.Id ? $"**{this.tKey.Owner.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: {e.GuildBefore.Owner.Mention} `{e.GuildBefore.Owner.GetUsernameWithIdentifier()}` ➡ {e.GuildAfter.Owner.Mention} `{e.GuildAfter.Owner.GetUsernameWithIdentifier()}`\n" : "")}"; }
         catch { }
         try
-        { Description += $"{(e.GuildBefore.Name != e.GuildAfter.Name ? $"**{tKey.Name.Get(Bot.Guilds[e.GuildAfter.Id])}**: `{e.GuildBefore.Name}` ➡ `{e.GuildAfter.Name}`\n" : "")}"; }
+        { Description += $"{(e.GuildBefore.Name != e.GuildAfter.Name ? $"**{this.tKey.Name.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: `{e.GuildBefore.Name}` ➡ `{e.GuildAfter.Name}`\n" : "")}"; }
         catch { }
         try
-        { Description += $"{(e.GuildBefore.Description != e.GuildAfter.Description ? $"**{tKey.Description.Get(Bot.Guilds[e.GuildAfter.Id])}**: `{e.GuildBefore.Description}` ➡ `{e.GuildAfter.Description}`\n" : "")}"; }
+        { Description += $"{(e.GuildBefore.Description != e.GuildAfter.Description ? $"**{this.tKey.Description.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: `{e.GuildBefore.Description}` ➡ `{e.GuildAfter.Description}`\n" : "")}"; }
         catch { }
         try
-        { Description += $"{(e.GuildBefore.PreferredLocale != e.GuildAfter.PreferredLocale ? $"**{tKey.PreferredLocale.Get(Bot.Guilds[e.GuildAfter.Id])}**: `{e.GuildBefore.PreferredLocale}` ➡ `{e.GuildAfter.PreferredLocale}`\n" : "")}"; }
+        { Description += $"{(e.GuildBefore.PreferredLocale != e.GuildAfter.PreferredLocale ? $"**{this.tKey.PreferredLocale.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: `{e.GuildBefore.PreferredLocale}` ➡ `{e.GuildAfter.PreferredLocale}`\n" : "")}"; }
         catch { }
         try
-        { Description += $"{(e.GuildBefore.VanityUrlCode != e.GuildAfter.VanityUrlCode ? $"**{tKey.VanityUrl.Get(Bot.Guilds[e.GuildAfter.Id])}**: `{e.GuildBefore.VanityUrlCode}` ➡ `{e.GuildAfter.VanityUrlCode}`\n" : "")}"; }
+        { Description += $"{(e.GuildBefore.VanityUrlCode != e.GuildAfter.VanityUrlCode ? $"**{this.tKey.VanityUrl.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: `{e.GuildBefore.VanityUrlCode}` ➡ `{e.GuildAfter.VanityUrlCode}`\n" : "")}"; }
         catch { }
         try
-        { Description += $"{(e.GuildBefore.IconHash != e.GuildAfter.IconHash ? $"`{tKey.IconUpdated.Get(Bot.Guilds[e.GuildAfter.Id])}`\n" : "")}"; }
+        { Description += $"{(e.GuildBefore.IconHash != e.GuildAfter.IconHash ? $"`{this.tKey.IconUpdated.Get(this.Bot.Guilds[e.GuildAfter.Id])}`\n" : "")}"; }
         catch { }
         try
-        { Description += $"{(e.GuildBefore.DefaultMessageNotifications != e.GuildAfter.DefaultMessageNotifications ? $"**{tKey.DefaultNotificationSettings.Get(Bot.Guilds[e.GuildAfter.Id])}**: `{e.GuildBefore.DefaultMessageNotifications}` ➡ `{e.GuildAfter.DefaultMessageNotifications}`\n" : "")}"; }
+        { Description += $"{(e.GuildBefore.DefaultMessageNotifications != e.GuildAfter.DefaultMessageNotifications ? $"**{this.tKey.DefaultNotificationSettings.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: `{e.GuildBefore.DefaultMessageNotifications}` ➡ `{e.GuildAfter.DefaultMessageNotifications}`\n" : "")}"; }
         catch { }
         try
-        { Description += $"{(e.GuildBefore.VerificationLevel != e.GuildAfter.VerificationLevel ? $"**{tKey.VerificationLevel.Get(Bot.Guilds[e.GuildAfter.Id])}**: `{e.GuildBefore.VerificationLevel}` ➡ `{e.GuildAfter.VerificationLevel}`\n" : "")}"; }
+        { Description += $"{(e.GuildBefore.VerificationLevel != e.GuildAfter.VerificationLevel ? $"**{this.tKey.VerificationLevel.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: `{e.GuildBefore.VerificationLevel}` ➡ `{e.GuildAfter.VerificationLevel}`\n" : "")}"; }
         catch { }
         try
-        { Description += $"{(e.GuildBefore.BannerHash != e.GuildAfter.BannerHash ? $"`{tKey.BannerUpdated.Get(Bot.Guilds[e.GuildAfter.Id])}`\n" : "")}"; }
+        { Description += $"{(e.GuildBefore.BannerHash != e.GuildAfter.BannerHash ? $"`{this.tKey.BannerUpdated.Get(this.Bot.Guilds[e.GuildAfter.Id])}`\n" : "")}"; }
         catch { }
         try
-        { Description += $"{(e.GuildBefore.SplashHash != e.GuildAfter.SplashHash ? $"`{tKey.SplashUpdated.Get(Bot.Guilds[e.GuildAfter.Id])}`\n" : "")}"; }
+        { Description += $"{(e.GuildBefore.SplashHash != e.GuildAfter.SplashHash ? $"`{this.tKey.SplashUpdated.Get(this.Bot.Guilds[e.GuildAfter.Id])}`\n" : "")}"; }
         catch { }
         try
-        { Description += $"{(e.GuildBefore.HomeHeaderHash != e.GuildAfter.HomeHeaderHash ? $"`{tKey.HomeHeaderUpdated.Get(Bot.Guilds[e.GuildAfter.Id])}`\n" : "")}"; }
+        { Description += $"{(e.GuildBefore.HomeHeaderHash != e.GuildAfter.HomeHeaderHash ? $"`{this.tKey.HomeHeaderUpdated.Get(this.Bot.Guilds[e.GuildAfter.Id])}`\n" : "")}"; }
         catch { }
         try
-        { Description += $"{(e.GuildBefore.DiscoverySplashHash != e.GuildAfter.DiscoverySplashHash ? $"`{tKey.DiscoverySplashUpdated.Get(Bot.Guilds[e.GuildAfter.Id])}`\n" : "")}"; }
+        { Description += $"{(e.GuildBefore.DiscoverySplashHash != e.GuildAfter.DiscoverySplashHash ? $"`{this.tKey.DiscoverySplashUpdated.Get(this.Bot.Guilds[e.GuildAfter.Id])}`\n" : "")}"; }
         catch { }
         try
-        { Description += $"{(e.GuildBefore.MfaLevel != e.GuildAfter.MfaLevel ? $"**{tKey.RequiredMfaLevel}**: {(e.GuildBefore.MfaLevel == MfaLevel.Enabled).ToPillEmote(this.Bot)} ➡ {(e.GuildAfter.MfaLevel == MfaLevel.Enabled).ToPillEmote(this.Bot)}\n" : "")}"; }
+        { Description += $"{(e.GuildBefore.MfaLevel != e.GuildAfter.MfaLevel ? $"**{this.tKey.RequiredMfaLevel}**: {(e.GuildBefore.MfaLevel == MfaLevel.Enabled).ToPillEmote(this.Bot)} ➡ {(e.GuildAfter.MfaLevel == MfaLevel.Enabled).ToPillEmote(this.Bot)}\n" : "")}"; }
         catch { }
         try
-        { Description += $"{(e.GuildBefore.ExplicitContentFilter != e.GuildAfter.ExplicitContentFilter ? $"**{tKey.ExplicitContentFilter.Get(Bot.Guilds[e.GuildAfter.Id])}**: `{e.GuildBefore.ExplicitContentFilter}` ➡ `{e.GuildAfter.ExplicitContentFilter}`\n" : "")}"; }
+        { Description += $"{(e.GuildBefore.ExplicitContentFilter != e.GuildAfter.ExplicitContentFilter ? $"**{this.tKey.ExplicitContentFilter.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: `{e.GuildBefore.ExplicitContentFilter}` ➡ `{e.GuildAfter.ExplicitContentFilter}`\n" : "")}"; }
         catch { }
         try
-        { Description += $"{(e.GuildBefore.WidgetEnabled != e.GuildAfter.WidgetEnabled ? $"**{tKey.GuildWidgetEnabled.Get(Bot.Guilds[e.GuildAfter.Id])}**: {(e.GuildBefore.WidgetEnabled ?? false).ToPillEmote(this.Bot)} ➡ {(e.GuildAfter.WidgetEnabled ?? false).ToPillEmote(this.Bot)}\n" : "")}"; }
+        { Description += $"{(e.GuildBefore.WidgetEnabled != e.GuildAfter.WidgetEnabled ? $"**{this.tKey.GuildWidgetEnabled.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: {(e.GuildBefore.WidgetEnabled ?? false).ToPillEmote(this.Bot)} ➡ {(e.GuildAfter.WidgetEnabled ?? false).ToPillEmote(this.Bot)}\n" : "")}"; }
         catch { }
         try
-        { Description += $"{(e.GuildBefore.WidgetChannel?.Id != e.GuildAfter.WidgetChannel?.Id ? $"**{tKey.GuildWidgetChannel.Get(Bot.Guilds[e.GuildAfter.Id])}**: {e.GuildBefore.WidgetChannel.Mention} `[{e.GuildBefore.WidgetChannel.GetIcon()}{e.GuildBefore.WidgetChannel.Name}]` ➡ {e.GuildAfter.WidgetChannel.Mention} `[{e.GuildAfter.WidgetChannel.GetIcon()}{e.GuildAfter.WidgetChannel.Name}]`\n" : "")}"; }
+        { Description += $"{(e.GuildBefore.WidgetChannel?.Id != e.GuildAfter.WidgetChannel?.Id ? $"**{this.tKey.GuildWidgetChannel.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: {e.GuildBefore.WidgetChannel.Mention} `[{e.GuildBefore.WidgetChannel.GetIcon()}{e.GuildBefore.WidgetChannel.Name}]` ➡ {e.GuildAfter.WidgetChannel.Mention} `[{e.GuildAfter.WidgetChannel.GetIcon()}{e.GuildAfter.WidgetChannel.Name}]`\n" : "")}"; }
         catch { }
         try
-        { Description += $"{(e.GuildBefore.IsLarge != e.GuildAfter.IsLarge ? $"**{tKey.LargeGuild.Get(Bot.Guilds[e.GuildAfter.Id])}**: {e.GuildBefore.IsLarge.ToPillEmote(this.Bot)} ➡ {e.GuildAfter.IsLarge.ToPillEmote(this.Bot)}\n" : "")}"; }
+        { Description += $"{(e.GuildBefore.IsLarge != e.GuildAfter.IsLarge ? $"**{this.tKey.LargeGuild.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: {e.GuildBefore.IsLarge.ToPillEmote(this.Bot)} ➡ {e.GuildAfter.IsLarge.ToPillEmote(this.Bot)}\n" : "")}"; }
         catch { }
         try
-        { Description += $"{(e.GuildBefore.IsNsfw != e.GuildAfter.IsNsfw ? $"**{tKey.NsfwGuild.Get(Bot.Guilds[e.GuildAfter.Id])}**: {e.GuildBefore.IsNsfw.ToPillEmote(this.Bot)} ➡ {e.GuildAfter.IsNsfw.ToPillEmote(this.Bot)}\n" : "")}"; }
+        { Description += $"{(e.GuildBefore.IsNsfw != e.GuildAfter.IsNsfw ? $"**{this.tKey.NsfwGuild.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: {e.GuildBefore.IsNsfw.ToPillEmote(this.Bot)} ➡ {e.GuildAfter.IsNsfw.ToPillEmote(this.Bot)}\n" : "")}"; }
         catch { }
         try
-        { Description += $"{(e.GuildBefore.IsCommunity != e.GuildAfter.IsCommunity ? $"**{tKey.CommunityGuild.Get(Bot.Guilds[e.GuildAfter.Id])}**: {e.GuildBefore.IsCommunity.ToPillEmote(this.Bot)} ➡ {e.GuildAfter.IsCommunity.ToPillEmote(this.Bot)}\n" : "")}"; }
+        { Description += $"{(e.GuildBefore.IsCommunity != e.GuildAfter.IsCommunity ? $"**{this.tKey.CommunityGuild.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: {e.GuildBefore.IsCommunity.ToPillEmote(this.Bot)} ➡ {e.GuildAfter.IsCommunity.ToPillEmote(this.Bot)}\n" : "")}"; }
         catch { }
         try
-        { Description += $"{(e.GuildBefore.HasMemberVerificationGate != e.GuildAfter.HasMemberVerificationGate ? $"**{tKey.MembershipScreening.Get(Bot.Guilds[e.GuildAfter.Id])}**: {e.GuildBefore.HasMemberVerificationGate.ToPillEmote(this.Bot)} ➡ {e.GuildAfter.HasMemberVerificationGate.ToPillEmote(this.Bot)}\n" : "")}"; }
+        { Description += $"{(e.GuildBefore.HasMemberVerificationGate != e.GuildAfter.HasMemberVerificationGate ? $"**{this.tKey.MembershipScreening.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: {e.GuildBefore.HasMemberVerificationGate.ToPillEmote(this.Bot)} ➡ {e.GuildAfter.HasMemberVerificationGate.ToPillEmote(this.Bot)}\n" : "")}"; }
         catch { }
         try
-        { Description += $"{(e.GuildBefore.HasWelcomeScreen != e.GuildAfter.HasWelcomeScreen ? $"**{tKey.WelcomeScreen.Get(Bot.Guilds[e.GuildAfter.Id])}**: {e.GuildBefore.HasWelcomeScreen.ToPillEmote(this.Bot)} ➡ {e.GuildAfter.HasWelcomeScreen.ToPillEmote(this.Bot)}\n" : "")}"; }
+        { Description += $"{(e.GuildBefore.HasWelcomeScreen != e.GuildAfter.HasWelcomeScreen ? $"**{this.tKey.WelcomeScreen.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: {e.GuildBefore.HasWelcomeScreen.ToPillEmote(this.Bot)} ➡ {e.GuildAfter.HasWelcomeScreen.ToPillEmote(this.Bot)}\n" : "")}"; }
         catch { }
         try
-        { Description += $"{(e.GuildBefore.PremiumProgressBarEnabled != e.GuildAfter.PremiumProgressBarEnabled ? $"**{tKey.BoostProgressBar.Get(Bot.Guilds[e.GuildAfter.Id])}**: {e.GuildBefore.PremiumProgressBarEnabled.ToPillEmote(this.Bot)} ➡ {e.GuildAfter.PremiumProgressBarEnabled.ToPillEmote(this.Bot)}\n" : "")}"; }
+        { Description += $"{(e.GuildBefore.PremiumProgressBarEnabled != e.GuildAfter.PremiumProgressBarEnabled ? $"**{this.tKey.BoostProgressBar.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: {e.GuildBefore.PremiumProgressBarEnabled.ToPillEmote(this.Bot)} ➡ {e.GuildAfter.PremiumProgressBarEnabled.ToPillEmote(this.Bot)}\n" : "")}"; }
         catch { }
         try
-        { Description += $"{(e.GuildBefore.RulesChannel?.Id != e.GuildAfter.RulesChannel?.Id ? $"**{tKey.RuleChannel.Get(Bot.Guilds[e.GuildAfter.Id])}**: {e.GuildBefore.RulesChannel.Mention} `[{e.GuildBefore.RulesChannel.GetIcon()}{e.GuildBefore.RulesChannel.Name}]` ➡ {e.GuildAfter.RulesChannel.Mention} `[{e.GuildAfter.RulesChannel.GetIcon()}{e.GuildAfter.RulesChannel.Name}]`\n" : "")}"; }
+        { Description += $"{(e.GuildBefore.RulesChannel?.Id != e.GuildAfter.RulesChannel?.Id ? $"**{this.tKey.RuleChannel.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: {e.GuildBefore.RulesChannel.Mention} `[{e.GuildBefore.RulesChannel.GetIcon()}{e.GuildBefore.RulesChannel.Name}]` ➡ {e.GuildAfter.RulesChannel.Mention} `[{e.GuildAfter.RulesChannel.GetIcon()}{e.GuildAfter.RulesChannel.Name}]`\n" : "")}"; }
         catch { }
         try
-        { Description += $"{(e.GuildBefore.AfkTimeout != e.GuildAfter.AfkTimeout ? $"**{tKey.AfkTimeout.Get(Bot.Guilds[e.GuildAfter.Id])}**: `{TimeSpan.FromSeconds(e.GuildBefore.AfkTimeout).GetHumanReadable(config: TranslationUtil.GetTranslatedHumanReadableConfig(Bot.Guilds[e.GuildAfter.Id], this.Bot))}` ➡ `{TimeSpan.FromSeconds(e.GuildAfter.AfkTimeout).GetHumanReadable(config: TranslationUtil.GetTranslatedHumanReadableConfig(Bot.Guilds[e.GuildAfter.Id], this.Bot))}`\n" : "")}"; }
+        { Description += $"{(e.GuildBefore.AfkTimeout != e.GuildAfter.AfkTimeout ? $"**{this.tKey.AfkTimeout.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: `{TimeSpan.FromSeconds(e.GuildBefore.AfkTimeout).GetHumanReadable(config: TranslationUtil.GetTranslatedHumanReadableConfig(this.Bot.Guilds[e.GuildAfter.Id], this.Bot))}` ➡ `{TimeSpan.FromSeconds(e.GuildAfter.AfkTimeout).GetHumanReadable(config: TranslationUtil.GetTranslatedHumanReadableConfig(this.Bot.Guilds[e.GuildAfter.Id], this.Bot))}`\n" : "")}"; }
         catch { }
         try
-        { Description += $"{(e.GuildBefore.AfkChannel?.Id != e.GuildAfter.AfkChannel?.Id ? $"**{tKey.AfkChannel.Get(Bot.Guilds[e.GuildAfter.Id])}**: {e.GuildBefore.AfkChannel?.Mention} `[{e.GuildBefore.AfkChannel?.GetIcon()}{e.GuildBefore.AfkChannel?.Name}]` ➡ {e.GuildAfter.AfkChannel?.Mention} `[{e.GuildAfter.AfkChannel?.GetIcon()}{e.GuildAfter.AfkChannel?.Name}]`\n" : "")}"; }
+        { Description += $"{(e.GuildBefore.AfkChannel?.Id != e.GuildAfter.AfkChannel?.Id ? $"**{this.tKey.AfkChannel.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: {e.GuildBefore.AfkChannel?.Mention} `[{e.GuildBefore.AfkChannel?.GetIcon()}{e.GuildBefore.AfkChannel?.Name}]` ➡ {e.GuildAfter.AfkChannel?.Mention} `[{e.GuildAfter.AfkChannel?.GetIcon()}{e.GuildAfter.AfkChannel?.Name}]`\n" : "")}"; }
         catch { }
         try
-        { Description += $"{(e.GuildBefore.SystemChannel?.Id != e.GuildAfter.SystemChannel?.Id ? $"**{tKey.SystemChannel.Get(Bot.Guilds[e.GuildAfter.Id])}**: {e.GuildBefore.SystemChannel?.Mention} `[{e.GuildBefore.SystemChannel?.GetIcon()}{e.GuildBefore.SystemChannel?.Name}]` ➡ {e.GuildAfter.SystemChannel?.Mention} `[{e.GuildAfter.SystemChannel?.GetIcon()}{e.GuildAfter.SystemChannel?.Name}]`\n" : "")}"; }
+        { Description += $"{(e.GuildBefore.SystemChannel?.Id != e.GuildAfter.SystemChannel?.Id ? $"**{this.tKey.SystemChannel.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: {e.GuildBefore.SystemChannel?.Mention} `[{e.GuildBefore.SystemChannel?.GetIcon()}{e.GuildBefore.SystemChannel?.Name}]` ➡ {e.GuildAfter.SystemChannel?.Mention} `[{e.GuildAfter.SystemChannel?.GetIcon()}{e.GuildAfter.SystemChannel?.Name}]`\n" : "")}"; }
         catch { }
         try
-        { Description += $"{(e.GuildBefore.PublicUpdatesChannel?.Id != e.GuildAfter.PublicUpdatesChannel?.Id ? $"**{tKey.DiscordUpdateChannel.Get(Bot.Guilds[e.GuildAfter.Id])}**: {e.GuildBefore.PublicUpdatesChannel?.Mention} `[{e.GuildBefore.PublicUpdatesChannel?.GetIcon()}{e.GuildBefore.PublicUpdatesChannel?.Name}]` ➡ {e.GuildAfter.PublicUpdatesChannel?.Mention} `[{e.GuildAfter.PublicUpdatesChannel?.GetIcon()}{e.GuildAfter.PublicUpdatesChannel?.Name}]`\n" : "")}"; }
+        { Description += $"{(e.GuildBefore.PublicUpdatesChannel?.Id != e.GuildAfter.PublicUpdatesChannel?.Id ? $"**{this.tKey.DiscordUpdateChannel.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: {e.GuildBefore.PublicUpdatesChannel?.Mention} `[{e.GuildBefore.PublicUpdatesChannel?.GetIcon()}{e.GuildBefore.PublicUpdatesChannel?.Name}]` ➡ {e.GuildAfter.PublicUpdatesChannel?.Mention} `[{e.GuildAfter.PublicUpdatesChannel?.GetIcon()}{e.GuildAfter.PublicUpdatesChannel?.Name}]`\n" : "")}"; }
         catch { }
         try
-        { Description += $"{(e.GuildBefore.SafetyAltersChannel?.Id != e.GuildAfter.SafetyAltersChannel?.Id ? $"**{tKey.SafetyAlertsChannel.Get(Bot.Guilds[e.GuildAfter.Id])}**: {e.GuildBefore.SafetyAltersChannel?.Mention} `[{e.GuildBefore.SafetyAltersChannel?.GetIcon()}{e.GuildBefore.SafetyAltersChannel?.Name}]` ➡ {e.GuildAfter.SafetyAltersChannel?.Mention} `[{e.GuildAfter.SafetyAltersChannel?.GetIcon()}{e.GuildAfter.SafetyAltersChannel?.Name}]`\n" : "")}"; }
+        { Description += $"{(e.GuildBefore.SafetyAltersChannel?.Id != e.GuildAfter.SafetyAltersChannel?.Id ? $"**{this.tKey.SafetyAlertsChannel.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: {e.GuildBefore.SafetyAltersChannel?.Mention} `[{e.GuildBefore.SafetyAltersChannel?.GetIcon()}{e.GuildBefore.SafetyAltersChannel?.Name}]` ➡ {e.GuildAfter.SafetyAltersChannel?.Mention} `[{e.GuildAfter.SafetyAltersChannel?.GetIcon()}{e.GuildAfter.SafetyAltersChannel?.Name}]`\n" : "")}"; }
         catch { }
         try
-        { Description += $"{(e.GuildBefore.MaxMembers != e.GuildAfter.MaxMembers ? $"**{tKey.MaximumMembers.Get(Bot.Guilds[e.GuildAfter.Id])}**: `{e.GuildBefore.MaxMembers}` ➡ `{e.GuildAfter.MaxMembers}`\n" : "")}"; }
+        { Description += $"{(e.GuildBefore.MaxMembers != e.GuildAfter.MaxMembers ? $"**{this.tKey.MaximumMembers.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: `{e.GuildBefore.MaxMembers}` ➡ `{e.GuildAfter.MaxMembers}`\n" : "")}"; }
         catch { }
 
         if (Description.Length == 0)
             return;
 
         var embed = new DiscordEmbedBuilder()
-            .WithAuthor(tKey.GuildUpdated.Get(Bot.Guilds[e.GuildAfter.Id]), null, AuditLogIcons.GuildUpdated)
+            .WithAuthor(this.tKey.GuildUpdated.Get(this.Bot.Guilds[e.GuildAfter.Id]), null, AuditLogIcons.GuildUpdated)
             .WithColor(EmbedColors.Warning)
             .WithTimestamp(DateTime.UtcNow)
             .WithThumbnail(e.GuildAfter.IconUrl)
@@ -966,12 +965,12 @@ internal sealed class ActionlogEvents : RequiresTranslation
         if (e.GuildBefore.IconHash != e.GuildAfter.IconHash)
             embed.ImageUrl = e.GuildAfter.IconUrl;
 
-        var msg = await SendActionlog(e.GuildAfter, new DiscordMessageBuilder().WithEmbed(embed));
+        var msg = await this.SendActionlog(e.GuildAfter, new DiscordMessageBuilder().WithEmbed(embed));
 
         if (!this.Bot.Guilds[e.GuildAfter.Id].ActionLog.AttemptGettingMoreDetails)
             return;
 
-        for (int i = 0; i < 3; i++)
+        for (var i = 0; i < 3; i++)
         {
             var AuditLogEntries = await e.GuildAfter.GetAuditLogsAsync(actionType: AuditLogActionType.GuildUpdate);
 
@@ -980,10 +979,10 @@ internal sealed class ActionlogEvents : RequiresTranslation
                 var Entry = (DiscordAuditLogGuildEntry)AuditLogEntries.First(x => !this.Bot.Guilds[e.GuildAfter.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
                 this.Bot.Guilds[e.GuildAfter.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
-                embed.Description += $"\n\n**{tKey.ModifiedBy.Get(Bot.Guilds[e.GuildAfter.Id])}**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
+                embed.Description += $"\n\n**{this.tKey.ModifiedBy.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
 
                 embed.Footer = new();
-                embed.Footer.Text += $"\n({tKey.FooterAuditLogDisclaimer.Get(Bot.Guilds[e.GuildAfter.Id]).Build(new TVar("Fields", $"'{tKey.ModifiedBy.Get(Bot.Guilds[e.GuildAfter.Id])}'"))})";
+                embed.Footer.Text += $"\n({this.tKey.FooterAuditLogDisclaimer.Get(this.Bot.Guilds[e.GuildAfter.Id]).Build(new TVar("Fields", $"'{this.tKey.ModifiedBy.Get(this.Bot.Guilds[e.GuildAfter.Id])}'"))})";
 
                 _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                 break;
@@ -995,22 +994,22 @@ internal sealed class ActionlogEvents : RequiresTranslation
 
     internal async Task ChannelCreated(DiscordClient sender, ChannelCreateEventArgs e)
     {
-        if (!await ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.ChannelsModified)
+        if (!await this.ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.ChannelsModified)
             return;
 
         var embed = new DiscordEmbedBuilder()
-            .WithAuthor(tKey.ChannelCreated.Get(Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.ChannelAdded)
+            .WithAuthor(this.tKey.ChannelCreated.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.ChannelAdded)
             .WithColor(EmbedColors.Success)
-            .WithFooter($"{tKey.ChannelId.Get(Bot.Guilds[e.Guild.Id])}: {e.Channel.Id}")
+            .WithFooter($"{this.tKey.ChannelId.Get(this.Bot.Guilds[e.Guild.Id])}: {e.Channel.Id}")
             .WithTimestamp(DateTime.UtcNow)
-            .WithDescription($"**{tKey.Name.Get(Bot.Guilds[e.Guild.Id])}**: {e.Channel.Mention} `[{e.Channel.GetIcon()}{e.Channel.Name}]`");
+            .WithDescription($"**{this.tKey.Name.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Channel.Mention} `[{e.Channel.GetIcon()}{e.Channel.Name}]`");
 
-        var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+        var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
         if (!this.Bot.Guilds[e.Guild.Id].ActionLog.AttemptGettingMoreDetails)
             return;
 
-        for (int i = 0; i < 3; i++)
+        for (var i = 0; i < 3; i++)
         {
             var AuditLogEntries = await e.Guild.GetAuditLogsAsync(actionType: AuditLogActionType.ChannelCreate);
 
@@ -1019,10 +1018,10 @@ internal sealed class ActionlogEvents : RequiresTranslation
                 var Entry = (DiscordAuditLogChannelEntry)AuditLogEntries.First(x => ((DiscordAuditLogChannelEntry)x).Target.Id == e.Channel.Id && !this.Bot.Guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
                 this.Bot.Guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
-                embed.Description += $"\n\n**{tKey.CreatedBy.Get(Bot.Guilds[e.Guild.Id])}**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
+                embed.Description += $"\n\n**{this.tKey.CreatedBy.Get(this.Bot.Guilds[e.Guild.Id])}**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
                 embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = Entry.UserResponsible.AvatarUrl };
 
-                embed.Footer.Text += $"\n({tKey.FooterAuditLogDisclaimer.Get(Bot.Guilds[e.Guild.Id]).Build(new TVar("Fields", $"'{tKey.CreatedBy.Get(Bot.Guilds[e.Guild.Id])}'"))})";
+                embed.Footer.Text += $"\n({this.tKey.FooterAuditLogDisclaimer.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("Fields", $"'{this.tKey.CreatedBy.Get(this.Bot.Guilds[e.Guild.Id])}'"))})";
 
                 _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                 break;
@@ -1034,22 +1033,22 @@ internal sealed class ActionlogEvents : RequiresTranslation
 
     internal async Task ChannelDeleted(DiscordClient sender, ChannelDeleteEventArgs e)
     {
-        if (!await ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.ChannelsModified)
+        if (!await this.ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.ChannelsModified)
             return;
 
         var embed = new DiscordEmbedBuilder()
-            .WithAuthor(tKey.ChannelDeleted.Get(Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.ChannelRemoved)
+            .WithAuthor(this.tKey.ChannelDeleted.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.ChannelRemoved)
             .WithColor(EmbedColors.Error)
-            .WithFooter($"{tKey.ChannelId.Get(Bot.Guilds[e.Guild.Id])}: {e.Channel.Id}")
+            .WithFooter($"{this.tKey.ChannelId.Get(this.Bot.Guilds[e.Guild.Id])}: {e.Channel.Id}")
             .WithTimestamp(DateTime.UtcNow)
-            .WithDescription($"**{tKey.Name.Get(Bot.Guilds[e.Guild.Id])}**: `[{e.Channel.GetIcon()}{e.Channel.Name}]`");
+            .WithDescription($"**{this.tKey.Name.Get(this.Bot.Guilds[e.Guild.Id])}**: `[{e.Channel.GetIcon()}{e.Channel.Name}]`");
 
-        var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+        var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
         if (!this.Bot.Guilds[e.Guild.Id].ActionLog.AttemptGettingMoreDetails)
             return;
 
-        for (int i = 0; i < 3; i++)
+        for (var i = 0; i < 3; i++)
         {
             var AuditLogEntries = await e.Guild.GetAuditLogsAsync(actionType: AuditLogActionType.ChannelDelete);
 
@@ -1058,10 +1057,10 @@ internal sealed class ActionlogEvents : RequiresTranslation
                 var Entry = (DiscordAuditLogChannelEntry)AuditLogEntries.First(x => ((DiscordAuditLogChannelEntry)x).Target.Id == e.Channel.Id && !this.Bot.Guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
                 this.Bot.Guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
-                embed.Description += $"\n\n**{tKey.DeletedBy.Get(Bot.Guilds[e.Guild.Id])}**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
+                embed.Description += $"\n\n**{this.tKey.DeletedBy.Get(this.Bot.Guilds[e.Guild.Id])}**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
                 embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = Entry.UserResponsible.AvatarUrl };
 
-                embed.Footer.Text += $"\n({tKey.FooterAuditLogDisclaimer.Get(Bot.Guilds[e.Guild.Id]).Build(new TVar("Fields", $"'{tKey.DeletedBy.Get(Bot.Guilds[e.Guild.Id])}'"))})";
+                embed.Footer.Text += $"\n({this.tKey.FooterAuditLogDisclaimer.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("Fields", $"'{this.tKey.DeletedBy.Get(this.Bot.Guilds[e.Guild.Id])}'"))})";
 
                 _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                 break;
@@ -1073,33 +1072,33 @@ internal sealed class ActionlogEvents : RequiresTranslation
 
     internal async Task ChannelUpdated(DiscordClient sender, ChannelUpdateEventArgs e)
     {
-        if (!await ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.ChannelsModified)
+        if (!await this.ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.ChannelsModified)
             return;
 
         if (e.ChannelBefore?.Name == e.ChannelAfter?.Name && e.ChannelBefore?.IsNsfw == e.ChannelAfter?.IsNsfw)
             return;
 
-        string Description = $"{(e.ChannelBefore.Name != e.ChannelAfter.Name ? $"**{tKey.Name.Get(Bot.Guilds[e.Guild.Id])}**: {e.ChannelBefore.Mention} `[{e.ChannelBefore.GetIcon()}{e.ChannelBefore.Name}]` ➡ `[{e.ChannelAfter.GetIcon()}{e.ChannelAfter.Name}]`\n" : $"{e.ChannelAfter.Mention} `[{e.ChannelAfter}{e.ChannelAfter.Name}]`\n")}" +
-                             $"{(e.ChannelBefore.IsNsfw != e.ChannelAfter.IsNsfw ? $"**{tKey.NsfwChannel.Get(Bot.Guilds[e.Guild.Id])}**: {e.ChannelBefore.IsNsfw.ToPillEmote(Bot)} ➡ {e.ChannelAfter.IsNsfw.ToPillEmote(Bot)}\n" : "")}" +
-                             $"{(e.ChannelBefore.DefaultAutoArchiveDuration != e.ChannelAfter.DefaultAutoArchiveDuration ? $"**{tKey.DefaultAutoArchiveDuration.Get(Bot.Guilds[e.Guild.Id])}**: `{e.ChannelBefore.DefaultAutoArchiveDuration}` ➡ `{e.ChannelAfter.DefaultAutoArchiveDuration}`\n" : "")}" +
-                             $"{(e.ChannelBefore.Bitrate != e.ChannelAfter.Bitrate ? $"**{tKey.Bitrate.Get(Bot.Guilds[e.Guild.Id])}**: `{e.ChannelBefore.Bitrate?.FileSizeToHumanReadable()}` ➡ `{e.ChannelAfter.Bitrate?.FileSizeToHumanReadable()}`\n" : "")}";
+        var Description = $"{(e.ChannelBefore.Name != e.ChannelAfter.Name ? $"**{this.tKey.Name.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.ChannelBefore.Mention} `[{e.ChannelBefore.GetIcon()}{e.ChannelBefore.Name}]` ➡ `[{e.ChannelAfter.GetIcon()}{e.ChannelAfter.Name}]`\n" : $"{e.ChannelAfter.Mention} `[{e.ChannelAfter}{e.ChannelAfter.Name}]`\n")}" +
+                             $"{(e.ChannelBefore.IsNsfw != e.ChannelAfter.IsNsfw ? $"**{this.tKey.NsfwChannel.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.ChannelBefore.IsNsfw.ToPillEmote(this.Bot)} ➡ {e.ChannelAfter.IsNsfw.ToPillEmote(this.Bot)}\n" : "")}" +
+                             $"{(e.ChannelBefore.DefaultAutoArchiveDuration != e.ChannelAfter.DefaultAutoArchiveDuration ? $"**{this.tKey.DefaultAutoArchiveDuration.Get(this.Bot.Guilds[e.Guild.Id])}**: `{e.ChannelBefore.DefaultAutoArchiveDuration}` ➡ `{e.ChannelAfter.DefaultAutoArchiveDuration}`\n" : "")}" +
+                             $"{(e.ChannelBefore.Bitrate != e.ChannelAfter.Bitrate ? $"**{this.tKey.Bitrate.Get(this.Bot.Guilds[e.Guild.Id])}**: `{e.ChannelBefore.Bitrate?.FileSizeToHumanReadable()}` ➡ `{e.ChannelAfter.Bitrate?.FileSizeToHumanReadable()}`\n" : "")}";
 
         if (Description.Length == 0)
             return;
 
         var embed = new DiscordEmbedBuilder()
-            .WithAuthor(tKey.ChannelModified.Get(Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.ChannelModified)
+            .WithAuthor(this.tKey.ChannelModified.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.ChannelModified)
             .WithColor(EmbedColors.Warning)
-            .WithFooter($"{tKey.ChannelId.Get(Bot.Guilds[e.Guild.Id])}: {e.ChannelAfter.Id}")
+            .WithFooter($"{this.tKey.ChannelId.Get(this.Bot.Guilds[e.Guild.Id])}: {e.ChannelAfter.Id}")
             .WithTimestamp(DateTime.UtcNow)
             .WithDescription(Description);
 
-        var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+        var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
         if (!this.Bot.Guilds[e.Guild.Id].ActionLog.AttemptGettingMoreDetails)
             return;
 
-        for (int i = 0; i < 3; i++)
+        for (var i = 0; i < 3; i++)
         {
             var AuditLogEntries = await e.Guild.GetAuditLogsAsync(actionType: AuditLogActionType.ChannelUpdate);
 
@@ -1108,10 +1107,10 @@ internal sealed class ActionlogEvents : RequiresTranslation
                 var Entry = (DiscordAuditLogChannelEntry)AuditLogEntries.First(x => ((DiscordAuditLogChannelEntry)x).Target.Id == e.ChannelAfter.Id && !this.Bot.Guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
                 this.Bot.Guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
-                embed.Description += $"\n\n**{tKey.ModifiedBy.Get(Bot.Guilds[e.Guild.Id])}**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
+                embed.Description += $"\n\n**{this.tKey.ModifiedBy.Get(this.Bot.Guilds[e.Guild.Id])}**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
                 embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = Entry.UserResponsible.AvatarUrl };
 
-                embed.Footer.Text += $"\n({tKey.FooterAuditLogDisclaimer.Get(Bot.Guilds[e.Guild.Id]).Build(new TVar("Fields", $"'{tKey.ModifiedBy.Get(Bot.Guilds[e.Guild.Id])}'"))})";
+                embed.Footer.Text += $"\n({this.tKey.FooterAuditLogDisclaimer.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("Fields", $"'{this.tKey.ModifiedBy.Get(this.Bot.Guilds[e.Guild.Id])}'"))})";
 
                 _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                 break;
@@ -1123,38 +1122,38 @@ internal sealed class ActionlogEvents : RequiresTranslation
 
     internal async Task InviteCreated(DiscordClient sender, InviteCreateEventArgs e)
     {
-        if (!await ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.InvitesModified)
+        if (!await this.ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.InvitesModified)
             return;
 
-        _ = SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
-            .WithAuthor(tKey.InviteCreated.Get(Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.InviteAdded)
+        _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+            .WithAuthor(this.tKey.InviteCreated.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.InviteAdded)
             .WithColor(EmbedColors.Success)
             .WithTimestamp(DateTime.UtcNow)
-            .WithDescription($"**{tKey.Invite.Get(Bot.Guilds[e.Guild.Id])}**: `https://discord.gg/{e.Invite.Code}`\n" +
-                             $"**{tKey.CreatedBy.Get(Bot.Guilds[e.Guild.Id])}**: {e.Invite.Inviter?.Mention ?? tKey.NoInviter.Get(Bot.Guilds[e.Guild.Id]).Build(true)} `{e.Invite.Inviter?.GetUsernameWithIdentifier() ?? "-"}`\n" +
-                             $"**{tKey.Channel.Get(Bot.Guilds[e.Guild.Id])}**: {e.Channel.Mention} `[{e.Channel.GetIcon()}{e.Channel.Name}]`")));
+            .WithDescription($"**{this.tKey.Invite.Get(this.Bot.Guilds[e.Guild.Id])}**: `https://discord.gg/{e.Invite.Code}`\n" +
+                             $"**{this.tKey.CreatedBy.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Invite.Inviter?.Mention ?? this.tKey.NoInviter.Get(this.Bot.Guilds[e.Guild.Id]).Build(true)} `{e.Invite.Inviter?.GetUsernameWithIdentifier() ?? "-"}`\n" +
+                             $"**{this.tKey.Channel.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Channel.Mention} `[{e.Channel.GetIcon()}{e.Channel.Name}]`")));
     }
 
     internal async Task InviteDeleted(DiscordClient sender, InviteDeleteEventArgs e)
     {
-        if (!await ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.InvitesModified)
+        if (!await this.ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.InvitesModified)
             return;
 
         var embed = new DiscordEmbedBuilder()
-            .WithAuthor(tKey.InviteDeleted.Get(Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.InviteRemoved)
+            .WithAuthor(this.tKey.InviteDeleted.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.InviteRemoved)
             .WithColor(EmbedColors.Error)
             .WithTimestamp(DateTime.UtcNow)
-            .WithDescription($"**{tKey.Invite.Get(Bot.Guilds[e.Guild.Id])}**: `https://discord.gg/{e.Invite.Code}`\n" +
-                             $"**{tKey.CreatedBy.Get(Bot.Guilds[e.Guild.Id])}**: {e.Invite.Inviter?.Mention ?? tKey.NoInviter.Get(Bot.Guilds[e.Guild.Id]).Build(true)} `{e.Invite.Inviter?.GetUsernameWithIdentifier() ?? "-"}`\n" +
-                             $"**{tKey.Channel.Get(Bot.Guilds[e.Guild.Id])}**: {e.Channel.Mention} `[{e.Channel.GetIcon()}{e.Channel.Name}]`");
+            .WithDescription($"**{this.tKey.Invite.Get(this.Bot.Guilds[e.Guild.Id])}**: `https://discord.gg/{e.Invite.Code}`\n" +
+                             $"**{this.tKey.CreatedBy.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Invite.Inviter?.Mention ?? this.tKey.NoInviter.Get(this.Bot.Guilds[e.Guild.Id]).Build(true)} `{e.Invite.Inviter?.GetUsernameWithIdentifier() ?? "-"}`\n" +
+                             $"**{this.tKey.Channel.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Channel.Mention} `[{e.Channel.GetIcon()}{e.Channel.Name}]`");
 
-        var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+        var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
 
         if (!this.Bot.Guilds[e.Guild.Id].ActionLog.AttemptGettingMoreDetails)
             return;
 
-        for (int i = 0; i < 3; i++)
+        for (var i = 0; i < 3; i++)
         {
             var AuditLogEntries = await e.Guild.GetAuditLogsAsync(actionType: AuditLogActionType.InviteDelete);
 
@@ -1163,11 +1162,11 @@ internal sealed class ActionlogEvents : RequiresTranslation
                 var Entry = (DiscordAuditLogInviteEntry)AuditLogEntries.First(x => ((DiscordAuditLogInviteEntry)x).Target.Code == e.Invite.Code && !this.Bot.Guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
                 this.Bot.Guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
-                embed.Description += $"\n\n**{tKey.DeletedBy.Get(Bot.Guilds[e.Guild.Id])}**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
+                embed.Description += $"\n\n**{this.tKey.DeletedBy.Get(this.Bot.Guilds[e.Guild.Id])}**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
                 embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = Entry.UserResponsible.AvatarUrl };
 
                 embed.Footer = new();
-                embed.Footer.Text += $"\n({tKey.FooterAuditLogDisclaimer.Get(Bot.Guilds[e.Guild.Id]).Build(new TVar("Fields", $"'{tKey.DeletedBy.Get(Bot.Guilds[e.Guild.Id])}'"))})";
+                embed.Footer.Text += $"\n({this.tKey.FooterAuditLogDisclaimer.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("Fields", $"'{this.tKey.DeletedBy.Get(this.Bot.Guilds[e.Guild.Id])}'"))})";
 
                 _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                 break;

@@ -18,7 +18,7 @@ public sealed class GoogleTranslateClient
 
     ~GoogleTranslateClient()
     {
-        _disposed = true;
+        this._disposed = true;
     }
 
     bool _disposed = false;
@@ -32,7 +32,7 @@ public sealed class GoogleTranslateClient
 
         client.DefaultRequestHeaders.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36");
 
-        while (!_disposed)
+        while (!this._disposed)
         {
             if (this.Queue.Count == 0 || !this.Queue.Any(x => !x.Value.Resolved && !x.Value.Failed))
             {
@@ -81,7 +81,7 @@ public sealed class GoogleTranslateClient
 
     private async Task<string> MakeRequest(string url)
     {
-        string key = Guid.NewGuid().ToString();
+        var key = Guid.NewGuid().ToString();
         this.Queue.Add(key, new WebRequestItem { Url = url });
 
         while (this.Queue.ContainsKey(key) && !this.Queue[key].Resolved && !this.Queue[key].Failed)
@@ -91,7 +91,7 @@ public sealed class GoogleTranslateClient
             throw new Exception("The request has been removed from the queue prematurely.");
 
         var response = this.Queue[key];
-        this.Queue.Remove(key);
+        _ = this.Queue.Remove(key);
 
         if (response.Resolved)
             return response.Response;
@@ -116,13 +116,13 @@ public sealed class GoogleTranslateClient
             query = await content.ReadAsStringAsync();
         }
 
-        var translateResponse = await MakeRequest($"https://translate.google.com/translate_a/single?client=gtx&{query}&dt=t&ie=UTF-8&oe=UTF-8");
+        var translateResponse = await this.MakeRequest($"https://translate.google.com/translate_a/single?client=gtx&{query}&dt=t&ie=UTF-8&oe=UTF-8");
 
         var parsedResponse = JsonConvert.DeserializeObject<object[]>(translateResponse);
         var parsedTextStep1 = JsonConvert.DeserializeObject<object[]>(parsedResponse[0].ToString());
-        string translatedText = string.Join(" ", parsedTextStep1.Select(x => JsonConvert.DeserializeObject<object[]>(x.ToString())[0].ToString()));
+        var translatedText = string.Join(" ", parsedTextStep1.Select(x => JsonConvert.DeserializeObject<object[]>(x.ToString())[0].ToString()));
 
-        string translationSource = "";
+        var translationSource = "";
 
         if (SourceLanguage == "auto")
         {

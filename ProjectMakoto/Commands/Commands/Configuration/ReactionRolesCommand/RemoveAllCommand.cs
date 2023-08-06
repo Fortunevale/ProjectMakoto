@@ -11,13 +11,13 @@ namespace ProjectMakoto.Commands.ReactionRolesCommand;
 
 internal sealed class RemoveAllCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await this.CheckAdmin();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
         {
-            var CommandKey = t.Commands.Config.ReactionRoles;
+            var CommandKey = this.t.Commands.Config.ReactionRoles;
 
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
@@ -40,7 +40,7 @@ internal sealed class RemoveAllCommand : BaseCommand
                         }
                         else
                         {
-                            SendSyntaxError();
+                            this.SendSyntaxError();
                             return;
                         }
 
@@ -53,34 +53,34 @@ internal sealed class RemoveAllCommand : BaseCommand
 
             if (message is null)
             {
-                SendSyntaxError();
+                this.SendSyntaxError();
                 return;
             }
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = GetString(CommandKey.RemovingAllReactionRoles)
-            }.AsLoading(ctx, GetString(CommandKey.Title));
+                Description = this.GetString(CommandKey.RemovingAllReactionRoles)
+            }.AsLoading(ctx, this.GetString(CommandKey.Title));
 
-            await RespondOrEdit(embed);
+            _ = await this.RespondOrEdit(embed);
             embed.Author.IconUrl = ctx.Guild.IconUrl;
 
             if (!ctx.DbGuild.ReactionRoles.Any(x => x.Key == message.Id))
             {
-                embed.Description = GetString(CommandKey.NoReactionRoles, true);
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, GetString(CommandKey.Title))));
+                embed.Description = this.GetString(CommandKey.NoReactionRoles, true);
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, this.GetString(CommandKey.Title))));
                 return;
             }
 
             foreach (var b in ctx.DbGuild.ReactionRoles.Where(x => x.Key == message.Id).ToList())
-                ctx.DbGuild.ReactionRoles.Remove(b);
+                _ = ctx.DbGuild.ReactionRoles.Remove(b);
 
             _ = message.DeleteAllReactionsAsync();
 
-            embed.Description = GetString(CommandKey.RemovedAllReactionRoles, true,
+            embed.Description = this.GetString(CommandKey.RemovedAllReactionRoles, true,
                 new TVar("User", message?.Author.Mention ?? "`/`"),
                 new TVar("Channel", message?.Channel.Mention ?? "`/`"));
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsSuccess(ctx, GetString(CommandKey.Title))));
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsSuccess(ctx, this.GetString(CommandKey.Title))));
         });
     }
 }

@@ -21,13 +21,12 @@ public sealed class ReminderSnoozeMinifiedSerializer : JsonConverter
 
     public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
     {
-        JArray json = JArray.Load(reader);
+        var json = JArray.Load(reader);
         var objects = json.Values<object>().ToArray();
 
-        if ((PrivateButtonType)objects[0].ToInt32() != PrivateButtonType.ReminderSnooze)
-            throw new InvalidDataException();
-
-        return new ReminderSnoozeButton
+        return (PrivateButtonType)objects[0].ToInt32() != PrivateButtonType.ReminderSnooze
+            ? throw new InvalidDataException()
+            : (object)new ReminderSnoozeButton
         {
             Description = objects[1].ToString(),
         };

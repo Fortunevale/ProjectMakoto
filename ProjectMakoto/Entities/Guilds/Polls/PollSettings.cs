@@ -13,15 +13,15 @@ public sealed class PollSettings : RequiresParent<Guild>
 {
     public PollSettings(Bot bot, Guild parent) : base(bot, parent)
     {
-        this._RunningPolls.ItemsChanged += RunningPollsUpdatedAsync;
+        this._RunningPolls.ItemsChanged += this.RunningPollsUpdatedAsync;
     }
 
     ~PollSettings()
     {
-        this._RunningPolls.ItemsChanged -= RunningPollsUpdatedAsync;
+        this._RunningPolls.ItemsChanged -= this.RunningPollsUpdatedAsync;
     }
 
-    public ObservableList<PollEntry> RunningPolls { get => this._RunningPolls; set { this._RunningPolls = value; this._RunningPolls.ItemsChanged += RunningPollsUpdatedAsync; } }
+    public ObservableList<PollEntry> RunningPolls { get => this._RunningPolls; set { this._RunningPolls = value; this._RunningPolls.ItemsChanged += this.RunningPollsUpdatedAsync; } }
     private ObservableList<PollEntry> _RunningPolls { get; set; } = new();
 
     private async void RunningPollsUpdatedAsync(object? sender, ObservableListUpdate<PollEntry> e)
@@ -37,19 +37,19 @@ public sealed class PollSettings : RequiresParent<Guild>
         foreach (var b in this.RunningPolls.ToList())
             if (!ScheduledTaskExtensions.GetScheduledTasks().ContainsTask("poll", this.Parent.Id, b.SelectUUID))
             {
-                string taskuid = "";
+                var taskuid = "";
                 CancellationTokenSource cancellationTokenSource = new();
 
                 async Task VoteHandling(DiscordClient sender, ComponentInteractionCreateEventArgs e)
                 {
-                    Task.Run(async () =>
+                    _ = Task.Run(async () =>
                     {
                         if (e.Message?.Id == b.MessageId && e.Channel?.Id == b.ChannelId)
                         {
                             if (e.GetCustomId() == b.SelectUUID)
                             {
 
-                                if (b.Votes.TryGetValue(e.User.Id, out List<string> currentVotes))
+                                if (b.Votes.TryGetValue(e.User.Id, out var currentVotes))
                                 {
                                     b.Votes[e.User.Id] = new List<string>(e.Values);
                                     _ = e.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"🔁 {CommandKey.VoteUpdated.Get(this.Parent).Build(true, new TVar("Options", string.Join(", ", e.Values.Select(x => $"'{currentVotes}'"))))}"));
@@ -67,7 +67,7 @@ public sealed class PollSettings : RequiresParent<Guild>
                                     return;
                                 }
                                 _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
-                                this.RunningPolls.Remove(b);
+                                _ = this.RunningPolls.Remove(b);
                                 b.DueTime = DateTime.UtcNow;
                                 await Task.Delay(5000);
                                 this.RunningPolls.Add(b);
@@ -80,28 +80,28 @@ public sealed class PollSettings : RequiresParent<Guild>
 
                 async Task MessageDeletionHandling(DiscordClient client, MessageDeleteEventArgs e)
                 {
-                    Task.Run(async () =>
+                    _ = Task.Run(async () =>
                     {
                         if (e.Message?.Id == b.MessageId)
                         {
                             this.Bot.DiscordClient.ComponentInteractionCreated -= VoteHandling;
                             this.Bot.DiscordClient.MessageDeleted -= MessageDeletionHandling;
                             this.Bot.DiscordClient.ChannelDeleted -= ChannelDeletionHandling;
-                            this.RunningPolls.Remove(b);
+                            _ = this.RunningPolls.Remove(b);
                         }
                     }).Add(this.Bot);
                 }
 
                 async Task ChannelDeletionHandling(DiscordClient client, ChannelDeleteEventArgs e)
                 {
-                    Task.Run(async () =>
+                    _ = Task.Run(async () =>
                     {
                         if (e.Channel?.Id == b.ChannelId)
                         {
                             this.Bot.DiscordClient.ComponentInteractionCreated -= VoteHandling;
                             this.Bot.DiscordClient.MessageDeleted -= MessageDeletionHandling;
                             this.Bot.DiscordClient.ChannelDeleted -= ChannelDeletionHandling;
-                            this.RunningPolls.Remove(b);
+                            _ = this.RunningPolls.Remove(b);
                         }
                     }).Add(this.Bot);
                 }
@@ -116,7 +116,7 @@ public sealed class PollSettings : RequiresParent<Guild>
                     this.Bot.DiscordClient.MessageDeleted -= MessageDeletionHandling;
                     this.Bot.DiscordClient.ChannelDeleted -= ChannelDeletionHandling;
 
-                    this.RunningPolls.Remove(b);
+                    _ = this.RunningPolls.Remove(b);
 
                     var channel = await this.Bot.DiscordClient.GetChannelAsync(b.ChannelId);
                     var message = await channel.GetMessageAsync(b.MessageId, true);
@@ -135,15 +135,15 @@ public sealed class PollSettings : RequiresParent<Guild>
                     try
                     { _ = message.ModifyAsync(new DiscordMessageBuilder().WithEmbed(message.Embeds?.ElementAt(0))); }
                     catch { }
-                    await message.RespondAsync(new DiscordEmbedBuilder()
+                    _ = await message.RespondAsync(new DiscordEmbedBuilder()
                         .WithDescription($"{CommandKey.PollEnded.Get(this.Parent).Build(true)}\n\n**{CommandKey.Results.Get(this.Parent).Build()}**\n{(votes.Count <= 0 ? CommandKey.NoVotes.Get(this.Parent).Build(true) : string.Join("\n\n", votes.OrderByDescending(x => x.Value).Select(x => $"> **{b.Options[x.Key].FullSanitize()}**\n{CommandKey.Votes.Get(this.Parent).Build(true, new TVar("Count", x.Value))}")))}")
                         .WithAuthor($"{CommandKey.Poll.Get(this.Parent)} • {channel.Guild.Name}", null, channel.Guild.IconUrl)
                         .WithColor(EmbedColors.Success));
                 });
 
-                Task.Run(async () =>
+                _ = Task.Run(async () =>
                 {
-                    int LastTotalVotes = -1;
+                    var LastTotalVotes = -1;
 
                     while (this.RunningPolls.Contains(b))
                     {
@@ -154,7 +154,7 @@ public sealed class PollSettings : RequiresParent<Guild>
                             var channel = await this.Bot.DiscordClient.GetChannelAsync(b.ChannelId);
                             var message = await channel.GetMessageAsync(b.MessageId, true);
 
-                            await message.ModifyAsync(new DiscordEmbedBuilder(message.Embeds.ElementAt(0)).WithDescription($"> **{b.PollText}**\n\n_{CommandKey.PollEnding.Get(this.Parent).Build(new TVar("Timestamp", b.DueTime.ToTimestamp()))}._\n\n{CommandKey.TotalVotes.Get(this.Parent).Build(true, new TVar("Count", b.Votes.Count))}").Build());
+                            _ = await message.ModifyAsync(new DiscordEmbedBuilder(message.Embeds.ElementAt(0)).WithDescription($"> **{b.PollText}**\n\n_{CommandKey.PollEnding.Get(this.Parent).Build(new TVar("Timestamp", b.DueTime.ToTimestamp()))}._\n\n{CommandKey.TotalVotes.Get(this.Parent).Build(true, new TVar("Count", b.Votes.Count))}").Build());
                         }
 
                         if (cancellationTokenSource.IsCancellationRequested)
@@ -168,7 +168,7 @@ public sealed class PollSettings : RequiresParent<Guild>
 
                 this.Bot.DiscordClient.ComponentInteractionCreated += VoteHandling;
 
-                task.Add(this.Bot);
+                _ = task.Add(this.Bot);
                 taskuid = task.CreateScheduledTask(b.DueTime.ToUniversalTime(), new ScheduledTaskIdentifier(this.Parent.Id, b.SelectUUID, "poll"));
 
                 this.Bot.DiscordClient.MessageDeleted += MessageDeletionHandling;

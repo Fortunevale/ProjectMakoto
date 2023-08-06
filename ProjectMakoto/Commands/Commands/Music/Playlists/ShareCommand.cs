@@ -18,32 +18,32 @@ internal sealed class ShareCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForModerate(ctx))
                 return;
 
-            string playlistId = (string)arguments["id"];
+            var playlistId = (string)arguments["id"];
 
             if (!ctx.DbUser.UserPlaylists.Any(x => x.PlaylistId == playlistId))
             {
-                await RespondOrEdit(new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Music.Playlists.NoPlaylist, true),
-                }.AsError(ctx, GetString(this.t.Commands.Music.Playlists.Title)));
+                    Description = this.GetString(this.t.Commands.Music.Playlists.NoPlaylist, true),
+                }.AsError(ctx, this.GetString(this.t.Commands.Music.Playlists.Title)));
                 return;
             }
 
             var SelectedPlaylist = ctx.DbUser.UserPlaylists.First(x => x.PlaylistId == playlistId);
 
-            string ShareCode = $"{Guid.NewGuid()}";
+            var ShareCode = $"{Guid.NewGuid()}";
 
             if (!Directory.Exists("PlaylistShares"))
-                Directory.CreateDirectory("PlaylistShares");
+                _ = Directory.CreateDirectory("PlaylistShares");
 
             if (!Directory.Exists($"PlaylistShares/{ctx.User.Id}"))
-                Directory.CreateDirectory($"PlaylistShares/{ctx.User.Id}");
+                _ = Directory.CreateDirectory($"PlaylistShares/{ctx.User.Id}");
 
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
             {
-                Description = GetString(this.t.Commands.Music.Playlists.Share.Shared, true,
+                Description = this.GetString(this.t.Commands.Music.Playlists.Share.Shared, true,
                 new TVar("Command", $"{ctx.Prefix}playlists load-share {ctx.User.Id} {ShareCode}")),
-            }.AsInfo(ctx, GetString(this.t.Commands.Music.Playlists.Title))));
+            }.AsInfo(ctx, this.GetString(this.t.Commands.Music.Playlists.Title))));
 
             File.WriteAllText($"PlaylistShares/{ctx.User.Id}/{ShareCode}.json", JsonConvert.SerializeObject(SelectedPlaylist, Formatting.Indented));
         });

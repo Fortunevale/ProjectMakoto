@@ -11,7 +11,7 @@ namespace ProjectMakoto.Commands;
 
 internal sealed class InVoicePrivacyCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await this.CheckAdmin();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -35,12 +35,12 @@ internal sealed class InVoicePrivacyCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 Description = GetCurrentConfiguration(ctx)
-            }.AsAwaitingInput(ctx, GetString(CommandKey.Title));
+            }.AsAwaitingInput(ctx, this.GetString(CommandKey.Title));
 
-            var ToggleDeletion = new DiscordButtonComponent((ctx.DbGuild.InVoiceTextPrivacy.ClearTextEnabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.ToggleMessageDeletionButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
-            var TogglePermission = new DiscordButtonComponent((ctx.DbGuild.InVoiceTextPrivacy.SetPermissionsEnabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.TogglePermissionProtectionButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📋")));
+            var ToggleDeletion = new DiscordButtonComponent((ctx.DbGuild.InVoiceTextPrivacy.ClearTextEnabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.ToggleMessageDeletionButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
+            var TogglePermission = new DiscordButtonComponent((ctx.DbGuild.InVoiceTextPrivacy.SetPermissionsEnabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.TogglePermissionProtectionButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📋")));
 
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
                 ToggleDeletion,
@@ -52,7 +52,7 @@ internal sealed class InVoicePrivacyCommand : BaseCommand
 
             if (e.TimedOut)
             {
-                ModifyToTimedOut(true);
+                this.ModifyToTimedOut(true);
                 return;
             }
 
@@ -62,7 +62,7 @@ internal sealed class InVoicePrivacyCommand : BaseCommand
             {
                 ctx.DbGuild.InVoiceTextPrivacy.ClearTextEnabled = !ctx.DbGuild.InVoiceTextPrivacy.ClearTextEnabled;
 
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (e.GetCustomId() == TogglePermission.CustomId)
@@ -78,7 +78,7 @@ internal sealed class InVoicePrivacyCommand : BaseCommand
 
                         foreach (var b in ctx.Guild.Channels.Where(x => x.Value.Type == ChannelType.Voice))
                         {
-                            _ = b.Value.AddOverwriteAsync(ctx.Guild.EveryoneRole, Permissions.None, Permissions.ReadMessageHistory | Permissions.SendMessages, GetGuildString(CommandKey.EnabledInVoicePrivacy));
+                            _ = b.Value.AddOverwriteAsync(ctx.Guild.EveryoneRole, Permissions.None, Permissions.ReadMessageHistory | Permissions.SendMessages, this.GetGuildString(CommandKey.EnabledInVoicePrivacy));
                         }
                     }
                     else
@@ -88,17 +88,17 @@ internal sealed class InVoicePrivacyCommand : BaseCommand
 
                         foreach (var b in ctx.Guild.Channels.Where(x => x.Value.Type == ChannelType.Voice))
                         {
-                            _ = b.Value.DeleteOverwriteAsync(ctx.Guild.EveryoneRole, GetGuildString(CommandKey.DisabledInVoicePrivacy));
+                            _ = b.Value.DeleteOverwriteAsync(ctx.Guild.EveryoneRole, this.GetGuildString(CommandKey.DisabledInVoicePrivacy));
                         }
                     }
                 });
 
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
             {
-                DeleteOrInvalidate();
+                this.DeleteOrInvalidate();
                 return;
             }
         });

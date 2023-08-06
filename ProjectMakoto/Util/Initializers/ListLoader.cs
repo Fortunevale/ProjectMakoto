@@ -13,7 +13,7 @@ internal sealed class ListLoader
     public static async Task Load(Bot bot)
     {
         bot.CountryCodes = new();
-        List<string[]> cc = JsonConvert.DeserializeObject<List<string[]>>(File.ReadAllText("Assets/Countries.json"));
+        var cc = JsonConvert.DeserializeObject<List<string[]>>(File.ReadAllText("Assets/Countries.json"));
         foreach (var b in cc)
         {
             bot.CountryCodes._List.Add(b[2], new CountryCodes.CountryInfo
@@ -37,7 +37,7 @@ internal sealed class ListLoader
         _logger.LogDebug("Loaded {Count} countries", bot.CountryCodes.List.Count);
 
         bot.LanguageCodes = new();
-        List<string[]> lc = JsonConvert.DeserializeObject<List<string[]>>(File.ReadAllText("Assets/Languages.json"));
+        var lc = JsonConvert.DeserializeObject<List<string[]>>(File.ReadAllText("Assets/Languages.json"));
         foreach (var b in lc)
         {
             bot.LanguageCodes._List.Add(new LanguageCodes.LanguageInfo

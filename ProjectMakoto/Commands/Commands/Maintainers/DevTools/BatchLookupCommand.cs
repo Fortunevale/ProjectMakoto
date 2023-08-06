@@ -11,19 +11,19 @@ namespace ProjectMakoto.Commands.DevTools;
 
 internal sealed class BatchLookupCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckMaintenance();
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await this.CheckMaintenance();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
         {
-            List<ulong> IDs = ((string)arguments["IDs"]).Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(x => x.ToUInt64()).ToList();
+            var IDs = ((string)arguments["IDs"]).Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(x => x.ToUInt64()).ToList();
 
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Looking up {IDs.Count} users..`\n`{StringTools.GenerateASCIIProgressbar(0d, IDs.Count)}`").AsLoading(ctx));
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Looking up {IDs.Count} users..`\n`{StringTools.GenerateASCIIProgressbar(0d, IDs.Count)}`").AsLoading(ctx));
 
             Dictionary<ulong, DiscordUser> fetched = new();
 
-            for (int i = 0; i < IDs.Count; i++)
+            for (var i = 0; i < IDs.Count; i++)
             {
                 try
                 {
@@ -34,10 +34,10 @@ internal sealed class BatchLookupCommand : BaseCommand
                     fetched.Add(IDs[i], null);
                 }
 
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Looking up {IDs.Count} users..`\n`{StringTools.GenerateASCIIProgressbar(i, IDs.Count)}`").AsLoading(ctx));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Looking up {IDs.Count} users..`\n`{StringTools.GenerateASCIIProgressbar(i, IDs.Count)}`").AsLoading(ctx));
             }
 
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(string.Join("\n", fetched.Select(x => $"{(x.Value is null ? $"❌ `Failed to fetch '{x.Key}'`" : $"✅ {x.Value.Mention} `{x.Value.GetUsernameWithIdentifier()}` (`{x.Value.Id}`)")}"))).AsSuccess(ctx));
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(string.Join("\n", fetched.Select(x => $"{(x.Value is null ? $"❌ `Failed to fetch '{x.Key}'`" : $"✅ {x.Value.Mention} `{x.Value.GetUsernameWithIdentifier()}` (`{x.Value.Id}`)")}"))).AsSuccess(ctx));
         });
     }
 }

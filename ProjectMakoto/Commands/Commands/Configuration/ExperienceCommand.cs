@@ -11,7 +11,7 @@ namespace ProjectMakoto.Commands;
 
 internal sealed class ExperienceCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await this.CheckAdmin();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -32,17 +32,17 @@ internal sealed class ExperienceCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
 
-            DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
+            var embed = new DiscordEmbedBuilder()
             {
                 Description = GetCurrentConfiguration(ctx)
-            }.AsAwaitingInput(ctx, GetString(CommandKey.Title));
+            }.AsAwaitingInput(ctx, this.GetString(CommandKey.Title));
 
             var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
-            var ToggleExperienceSystem = new DiscordButtonComponent((ctx.DbGuild.Experience.UseExperience ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.ToggleExperienceButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✨")));
-            var ToggleBumperBoost = new DiscordButtonComponent((ctx.DbGuild.Experience.BoostXpForBumpReminder ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.ToggleExperienceBoostButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⏫")));
+            var ToggleExperienceSystem = new DiscordButtonComponent((ctx.DbGuild.Experience.UseExperience ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.ToggleExperienceButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✨")));
+            var ToggleBumperBoost = new DiscordButtonComponent((ctx.DbGuild.Experience.BoostXpForBumpReminder ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.ToggleExperienceBoostButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⏫")));
 
-            await RespondOrEdit(builder
+            _ = await this.RespondOrEdit(builder
             .AddComponents(new List<DiscordComponent>
             {
                 ToggleExperienceSystem,
@@ -54,7 +54,7 @@ internal sealed class ExperienceCommand : BaseCommand
 
             if (e.TimedOut)
             {
-                ModifyToTimedOut(true);
+                this.ModifyToTimedOut(true);
                 return;
             }
 
@@ -64,19 +64,19 @@ internal sealed class ExperienceCommand : BaseCommand
             {
                 ctx.DbGuild.Experience.UseExperience = !ctx.DbGuild.Experience.UseExperience;
 
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (e.GetCustomId() == ToggleBumperBoost.CustomId)
             {
                 ctx.DbGuild.Experience.BoostXpForBumpReminder = !ctx.DbGuild.Experience.BoostXpForBumpReminder;
 
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
             {
-                DeleteOrInvalidate();
+                this.DeleteOrInvalidate();
             }
         });
     }

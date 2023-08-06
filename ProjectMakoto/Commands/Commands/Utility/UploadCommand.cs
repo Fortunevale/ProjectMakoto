@@ -15,32 +15,32 @@ internal sealed class UploadCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            Stream stream = (Stream)arguments["stream"];
-            int filesize = (int)arguments["filesize"];
+            var stream = (Stream)arguments["stream"];
+            var filesize = (int)arguments["filesize"];
 
             if (ctx.DbUser.PendingUserUpload is null)
             {
-                await RespondOrEdit(new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Utility.Upload.NoInteraction, true)
+                    Description = this.GetString(this.t.Commands.Utility.Upload.NoInteraction, true)
                 }.AsError(ctx));
                 return;
             }
 
             if (ctx.DbUser.PendingUserUpload.InteractionHandled)
             {
-                await RespondOrEdit(new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Utility.Upload.AlreadyUploaded, true)
+                    Description = this.GetString(this.t.Commands.Utility.Upload.AlreadyUploaded, true)
                 }.AsError(ctx));
                 return;
             }
 
             if (ctx.DbUser.PendingUserUpload.TimeOut.GetTotalSecondsUntil() < 0)
             {
-                await RespondOrEdit(new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Utility.Upload.TimedOut, true,
+                    Description = this.GetString(this.t.Commands.Utility.Upload.TimedOut, true,
                         new TVar("Timestamp", ctx.DbUser.PendingUserUpload.TimeOut.ToTimestamp()))
                 }.AsError(ctx));
                 ctx.DbUser.PendingUserUpload = null;
@@ -51,13 +51,13 @@ internal sealed class UploadCommand : BaseCommand
             ctx.DbUser.PendingUserUpload.FileSize = filesize;
             ctx.DbUser.PendingUserUpload.InteractionHandled = true;
 
-            await RespondOrEdit(new DiscordEmbedBuilder
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = GetString(this.t.Commands.Utility.Upload.Uploaded, true)
+                Description = this.GetString(this.t.Commands.Utility.Upload.Uploaded, true)
             }.AsSuccess(ctx));
 
             await Task.Delay(500);
-            DeleteOrInvalidate();
+            this.DeleteOrInvalidate();
         });
     }
 }

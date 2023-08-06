@@ -13,26 +13,26 @@ internal sealed class DatabaseQueue : RequiresBotReference
 {
     internal DatabaseQueue(Bot _bot) : base(_bot)
     {
-        _ = QueueHandler();
+        _ = this.QueueHandler();
     }
 
     internal async Task QueueHandler()
     {
-        Task.Run(async () =>
+        _ = Task.Run(async () =>
         {
             try
             {
                 while (true)
                 {
-                    bool Removed = false;
+                    var Removed = false;
 
-                    for (int i = 0; i < this.Queue.Count; i++)
+                    for (var i = 0; i < this.Queue.Count; i++)
                     {
                         var obj = this.Queue[i];
 
                         if (obj is null || obj.Executed || obj.Failed)
                         {
-                            this.Queue.Remove(obj);
+                            _ = this.Queue.Remove(obj);
                             Removed = true;
                             break;
                         }
@@ -43,7 +43,7 @@ internal sealed class DatabaseQueue : RequiresBotReference
 
                     RequestQueue b = null;
 
-                    for (int i = 0; i < this.Queue.Count; i++)
+                    for (var i = 0; i < this.Queue.Count; i++)
                     {
                         var obj = this.Queue[i];
 
@@ -75,7 +75,7 @@ internal sealed class DatabaseQueue : RequiresBotReference
                                 }
                                 catch { }
 
-                                b.Command.ExecuteNonQuery();
+                                _ = b.Command.ExecuteNonQuery();
 
                                 b.Executed = true;
                                 break;
@@ -88,7 +88,7 @@ internal sealed class DatabaseQueue : RequiresBotReference
                                 }
                                 catch { }
 
-                                b.Connection.Ping();
+                                _ = b.Connection.Ping();
 
                                 b.Executed = true;
                                 break;
@@ -150,7 +150,7 @@ internal sealed class DatabaseQueue : RequiresBotReference
                     throw;
                 }
 
-                _ = QueueHandler();
+                _ = this.QueueHandler();
                 throw;
             }
         }).Add(this.Bot);

@@ -22,7 +22,7 @@ public sealed class ExperienceUserSettings : RequiresParent<User>
         set
         {
             this._DirectMessageOptOut = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "experience_directmessageoptout", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "experience_directmessageoptout", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 }

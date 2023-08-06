@@ -21,7 +21,7 @@ public class TranslationReportSettings : RequiresParent<User>
         set
         {
             this._AcceptedTOS = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "translationreport_accepted_tos", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "translationreport_accepted_tos", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -33,7 +33,7 @@ public class TranslationReportSettings : RequiresParent<User>
         set
         {
             this._FirstRequestTime = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "translationreport_ratelimit_first", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "translationreport_ratelimit_first", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -44,7 +44,7 @@ public class TranslationReportSettings : RequiresParent<User>
         set
         {
             this._RequestCount = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "translationreport_ratelimit_count", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "translationreport_ratelimit_count", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 }

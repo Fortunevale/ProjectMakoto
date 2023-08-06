@@ -39,5 +39,4 @@ internal sealed class UrbanDictionary
             }
         }
     }
-
 }

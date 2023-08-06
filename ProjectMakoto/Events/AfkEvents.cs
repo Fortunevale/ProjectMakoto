@@ -19,7 +19,7 @@ internal sealed class AfkEvents : RequiresTranslation
         if (this.Bot.objectedUsers.Contains(e.Author.Id) || this.Bot.bannedUsers.ContainsKey(e.Author.Id) || this.Bot.bannedGuilds.ContainsKey(e.Guild?.Id ?? 0))
             return;
 
-        string prefix = e.Guild.GetGuildPrefix(this.Bot);
+        var prefix = e.Guild.GetGuildPrefix(this.Bot);
 
         if (e?.Message?.Content?.StartsWith(prefix) ?? false)
             foreach (var command in sender.GetCommandsNext().RegisteredCommands)
@@ -33,7 +33,7 @@ internal sealed class AfkEvents : RequiresTranslation
 
         if (this.Bot.Users[e.Author.Id].AfkStatus.TimeStamp != DateTime.UnixEpoch && this.Bot.Users[e.Author.Id].AfkStatus.LastMentionTrigger.AddSeconds(10) < DateTime.UtcNow)
         {
-            DateTime cache = new DateTime().ToUniversalTime().AddTicks(this.Bot.Users[e.Author.Id].AfkStatus.TimeStamp.Ticks);
+            var cache = new DateTime().ToUniversalTime().AddTicks(this.Bot.Users[e.Author.Id].AfkStatus.TimeStamp.Ticks);
 
             this.Bot.Users[e.Author.Id].AfkStatus.Reason = "";
             this.Bot.Users[e.Author.Id].AfkStatus.TimeStamp = DateTime.UnixEpoch;
@@ -48,7 +48,7 @@ internal sealed class AfkEvents : RequiresTranslation
                 new TVar("Timestamp", cache.ToTimestamp()))
             };
 
-            bool ExtendDelay = false;
+            var ExtendDelay = false;
 
             if (this.Bot.Users[e.Author.Id].AfkStatus.MessagesAmount > 0)
             {

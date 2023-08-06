@@ -11,7 +11,7 @@ namespace ProjectMakoto.Commands;
 
 internal sealed class AutoUnarchiveCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await this.CheckAdmin();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -24,7 +24,7 @@ internal sealed class AutoUnarchiveCommand : BaseCommand
                 foreach (var b in ctx.DbGuild.AutoUnarchiveThreads.ToList())
                 {
                     if (!ctx.Guild.Channels.ContainsKey(b))
-                        ctx.DbGuild.AutoUnarchiveThreads.Remove(b);
+                        _ = ctx.DbGuild.AutoUnarchiveThreads.Remove(b);
                 }
 
                 return $"{(ctx.DbGuild.AutoUnarchiveThreads.Any() ? string.Join("\n", ctx.DbGuild.AutoUnarchiveThreads.Select(x => $"{ctx.Guild.GetChannel(x).Mention} [`#{ctx.Guild.GetChannel(x).Name}`] (`{x}`)")) : ctx.Bot.LoadedTranslations.Commands.Config.AutoUnarchive.NoChannels.Get(ctx.DbUser).Build(true))}";
@@ -35,13 +35,13 @@ internal sealed class AutoUnarchiveCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = $"{GetCurrentConfiguration(ctx)}\n\n{GetString(CommandKey.Explanation)}"
-            }.AsAwaitingInput(ctx, GetString(CommandKey.Title));
+                Description = $"{GetCurrentConfiguration(ctx)}\n\n{this.GetString(CommandKey.Explanation)}"
+            }.AsAwaitingInput(ctx, this.GetString(CommandKey.Title));
 
-            var Add = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(CommandKey.AddChannelButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
-            var Remove = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), GetString(CommandKey.RemoveChannelButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
+            var Add = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), this.GetString(CommandKey.AddChannelButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
+            var Remove = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), this.GetString(CommandKey.RemoveChannelButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
 
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
                 Add,
@@ -53,7 +53,7 @@ internal sealed class AutoUnarchiveCommand : BaseCommand
 
             if (e.TimedOut)
             {
-                ModifyToTimedOut(true);
+                this.ModifyToTimedOut(true);
                 return;
             }
 
@@ -61,25 +61,25 @@ internal sealed class AutoUnarchiveCommand : BaseCommand
 
             if (e.GetCustomId() == Add.CustomId)
             {
-                var ChannelResult = await PromptChannelSelection(new ChannelType[] { ChannelType.Text, ChannelType.Forum });
+                var ChannelResult = await this.PromptChannelSelection(new ChannelType[] { ChannelType.Text, ChannelType.Forum });
 
                 if (ChannelResult.TimedOut)
                 {
-                    ModifyToTimedOut(true);
+                    this.ModifyToTimedOut(true);
                     return;
                 }
                 else if (ChannelResult.Cancelled)
                 {
-                    await ExecuteCommand(ctx, arguments);
+                    await this.ExecuteCommand(ctx, arguments);
                     return;
                 }
                 else if (ChannelResult.Failed)
                 {
                     if (ChannelResult.Exception.GetType() == typeof(NullReferenceException))
                     {
-                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(this.t.Commands.Common.Errors.NoChannels)));
+                        _ = await this.RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(this.GetString(this.t.Commands.Common.Errors.NoChannels)));
                         await Task.Delay(3000);
-                        await ExecuteCommand(ctx, arguments);
+                        await this.ExecuteCommand(ctx, arguments);
                         return;
                     }
 
@@ -89,22 +89,22 @@ internal sealed class AutoUnarchiveCommand : BaseCommand
                 if (!ctx.DbGuild.AutoUnarchiveThreads.Contains(ChannelResult.Result.Id))
                     ctx.DbGuild.AutoUnarchiveThreads.Add(ChannelResult.Result.Id);
 
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (e.GetCustomId() == Remove.CustomId)
             {
-                var ChannelResult = await PromptCustomSelection(ctx.DbGuild.AutoUnarchiveThreads
+                var ChannelResult = await this.PromptCustomSelection(ctx.DbGuild.AutoUnarchiveThreads
                         .Select(x => new DiscordStringSelectComponentOption($"#{ctx.Guild.GetChannel(x).Name} ({x})", x.ToString(), $"{(ctx.Guild.GetChannel(x).Parent is not null ? $"{ctx.Guild.GetChannel(x).Parent.Name}" : "")}")).ToList());
 
                 if (ChannelResult.TimedOut)
                 {
-                    ModifyToTimedOut(true);
+                    this.ModifyToTimedOut(true);
                     return;
                 }
                 else if (ChannelResult.Cancelled)
                 {
-                    await ExecuteCommand(ctx, arguments);
+                    await this.ExecuteCommand(ctx, arguments);
                     return;
                 }
                 else if (ChannelResult.Errored)
@@ -112,17 +112,17 @@ internal sealed class AutoUnarchiveCommand : BaseCommand
                     throw ChannelResult.Exception;
                 }
 
-                ulong ChannelToRemove = Convert.ToUInt64(ChannelResult.Result);
+                var ChannelToRemove = Convert.ToUInt64(ChannelResult.Result);
 
                 if (ctx.DbGuild.AutoUnarchiveThreads.Contains(ChannelToRemove))
-                    ctx.DbGuild.AutoUnarchiveThreads.Remove(ChannelToRemove);
+                    _ = ctx.DbGuild.AutoUnarchiveThreads.Remove(ChannelToRemove);
 
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
             {
-                DeleteOrInvalidate();
+                this.DeleteOrInvalidate();
                 return;
             }
         });

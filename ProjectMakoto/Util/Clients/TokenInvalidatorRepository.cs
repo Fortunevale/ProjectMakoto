@@ -13,18 +13,18 @@ public class TokenInvalidatorRepository : RequiresBotReference
 {
     internal TokenInvalidatorRepository(Bot bot) : base(bot)
     {
-        this.SyncRepository().Add(bot);
+        _ = this.SyncRepository().Add(bot);
     }
 
     private async Task SyncRepository()
     {
         Task task = new(() =>
         {
-            _ = SyncRepository();
+            _ = this.SyncRepository();
         });
 
         _ = task.CreateScheduledTask(DateTime.UtcNow.AddMinutes(30));
-        task.Add(this.Bot);
+        _ = task.Add(this.Bot);
 
         await this.Pull();
     }
@@ -35,7 +35,7 @@ public class TokenInvalidatorRepository : RequiresBotReference
 
         foreach (var directory in Directory.GetDirectories(startDirectory))
         {
-            (bool found, FileInfo fileInfo) = SearchForString(searchQuery, directory);
+            (var found, var fileInfo) = this.SearchForString(searchQuery, directory);
 
             if (found)
                 return (true, fileInfo);
@@ -62,7 +62,7 @@ public class TokenInvalidatorRepository : RequiresBotReference
 
             this.PullRunning = true;
 
-            if (!ExistsOnPath("git"))
+            if (!this.ExistsOnPath("git"))
             {
                 _logger.LogWarn("Git was not found, cannot sync token invalidator repository.");
                 return;
@@ -70,9 +70,9 @@ public class TokenInvalidatorRepository : RequiresBotReference
 
             if (!Directory.Exists("GitHub"))
             {
-                Directory.CreateDirectory("GitHub");
+                _ = Directory.CreateDirectory("GitHub");
 
-                Process.Start(new ProcessStartInfo()
+                _ = Process.Start(new ProcessStartInfo()
                 {
                     FileName = "git",
                     Arguments = $"clone https://github.com/{this.Bot.status.LoadedConfig.Secrets.Github.TokenLeakRepoOwner}/{this.Bot.status.LoadedConfig.Secrets.Github.TokenLeakRepo}.git",
@@ -109,7 +109,7 @@ public class TokenInvalidatorRepository : RequiresBotReference
             pull.BeginOutputReadLine();
             pull.BeginErrorReadLine();
 
-            string pullOutput = "";
+            var pullOutput = "";
 
             pull.OutputDataReceived += (e, s) =>
             {
@@ -136,7 +136,7 @@ public class TokenInvalidatorRepository : RequiresBotReference
     }
 
     private bool ExistsOnPath(string fileName) 
-        => GetFullPath(fileName) != null;
+        => this.GetFullPath(fileName) != null;
 
     private string GetFullPath(string fileName)
     {
