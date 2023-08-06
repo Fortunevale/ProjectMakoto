@@ -11,12 +11,11 @@ using System.Collections.Concurrent;
 
 namespace ProjectMakoto.Util;
 
-public sealed class AbuseIpDbClient
+public sealed class AbuseIpDbClient : RequiresBotReference
 {
-    internal AbuseIpDbClient(Bot bot)
+    internal AbuseIpDbClient(Bot bot) : base(bot)
     {
-        this._bot = bot;
-        _ = this.QueueHandler();
+        this.QueueHandler();
     }
 
     ~AbuseIpDbClient()
@@ -26,94 +25,95 @@ public sealed class AbuseIpDbClient
 
     bool _disposed = false;
 
-    private Bot _bot { get; set; }
-
     private readonly ConcurrentDictionary<string, WebRequestItem> Queue = new();
 
     private Dictionary<string, Tuple<AbuseIpDbQuery, DateTime>> Cache = new();
 
     private int RequestsRemaining = 1;
 
-    private async Task QueueHandler()
+    private void QueueHandler()
     {
-        HttpClient client = new();
-
-        while (this._bot.status.LoadedConfig.Secrets.AbuseIpDbToken.IsNullOrWhiteSpace())
+        _ = Task.Run(async () =>
         {
-            await Task.Delay(5000);
-        }
+            HttpClient client = new();
 
-        client.DefaultRequestHeaders.Add("Key", this._bot.status.LoadedConfig.Secrets.AbuseIpDbToken);
-        client.DefaultRequestHeaders.Add("Accept", "application/json");
-
-        while (!this._disposed)
-        {
-            while (this.RequestsRemaining <= 0)
+            while (this.Bot.status.LoadedConfig.Secrets.AbuseIpDbToken.IsNullOrWhiteSpace())
             {
-                var now = DateTimeOffset.UtcNow;
-                var tomorrow = new DateTimeOffset(now.Year, now.Month, now.Day, 0, 0, 0, TimeSpan.Zero).AddDays(1);
-
-                _logger.LogWarn("Daily Ratelimit reached for AbuseIPDB. Waiting until {tomorrow}..", tomorrow);
-                var delay = tomorrow - DateTimeOffset.UtcNow;
-
-                if (delay > TimeSpan.Zero)
-                    await Task.Delay(delay);
-
-                _logger.LogInfo("Ratelimit cleared for AbuseIPDB.");
-                this.RequestsRemaining = 1;
+                await Task.Delay(5000);
             }
 
-            if (this.Queue.IsEmpty || !this.Queue.Any(x => !x.Value.Resolved && !x.Value.Failed))
+            client.DefaultRequestHeaders.Add("Key", this.Bot.status.LoadedConfig.Secrets.AbuseIpDbToken);
+            client.DefaultRequestHeaders.Add("Accept", "application/json");
+
+            while (!this._disposed)
             {
-                await Task.Delay(100);
-                continue;
-            }
-
-            var b = this.Queue.First(x => !x.Value.Resolved && !x.Value.Failed);
-
-            try
-            {
-                var response = await client.GetAsync(b.Value.Url);
-
-                this.Queue[b.Key].StatusCode = response.StatusCode;
-
-                if (!response.IsSuccessStatusCode)
+                while (this.RequestsRemaining <= 0)
                 {
-                    if (response.StatusCode == HttpStatusCode.NotFound)
-                        throw new Exceptions.NotFoundException();
+                    var now = DateTimeOffset.UtcNow;
+                    var tomorrow = new DateTimeOffset(now.Year, now.Month, now.Day, 0, 0, 0, TimeSpan.Zero).AddDays(1);
 
-                    if (response.StatusCode == HttpStatusCode.InternalServerError)
-                        throw new Exceptions.InternalServerErrorException();
+                    _logger.LogWarn("Daily Ratelimit reached for AbuseIPDB. Waiting until {tomorrow}..", tomorrow);
+                    var delay = tomorrow - DateTimeOffset.UtcNow;
 
-                    if (response.StatusCode == HttpStatusCode.Forbidden)
-                        throw new Exceptions.ForbiddenException();
+                    if (delay > TimeSpan.Zero)
+                        await Task.Delay(delay);
 
-                    if (response.StatusCode == HttpStatusCode.TooManyRequests)
-                    {
-                        this.RequestsRemaining = 0;
-                        _logger.LogError("Daily Ratelimit hit for AbuseIPDB.");
-                        continue;
-                    }
-
-                    throw new Exception($"Unhandled, unsuccessful request: {response.StatusCode}");
+                    _logger.LogInfo("Ratelimit cleared for AbuseIPDB.");
+                    this.RequestsRemaining = 1;
                 }
 
-                this.RequestsRemaining = response.Headers.First(x => x.Key == "X-RateLimit-Remaining").Value.First().ToInt32();
-                _logger.LogDebug("{RequestsRemaining} AbuseIPDB requests remaining.", this.RequestsRemaining);
+                if (this.Queue.IsEmpty || !this.Queue.Any(x => !x.Value.Resolved && !x.Value.Failed))
+                {
+                    Thread.Sleep(100);
+                    continue;
+                }
 
-                this.Queue[b.Key].Response = await response.Content.ReadAsStringAsync();
-                this.Queue[b.Key].Resolved = true;
+                var b = this.Queue.First(x => !x.Value.Resolved && !x.Value.Failed);
+
+                try
+                {
+                    var response = await client.GetAsync(b.Value.Url);
+
+                    this.Queue[b.Key].StatusCode = response.StatusCode;
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        if (response.StatusCode == HttpStatusCode.NotFound)
+                            throw new Exceptions.NotFoundException();
+
+                        if (response.StatusCode == HttpStatusCode.InternalServerError)
+                            throw new Exceptions.InternalServerErrorException();
+
+                        if (response.StatusCode == HttpStatusCode.Forbidden)
+                            throw new Exceptions.ForbiddenException();
+
+                        if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                        {
+                            this.RequestsRemaining = 0;
+                            _logger.LogError("Daily Ratelimit hit for AbuseIPDB.");
+                            continue;
+                        }
+
+                        throw new Exception($"Unhandled, unsuccessful request: {response.StatusCode}");
+                    }
+
+                    this.RequestsRemaining = response.Headers.First(x => x.Key == "X-RateLimit-Remaining").Value.First().ToInt32();
+                    _logger.LogDebug("{RequestsRemaining} AbuseIPDB requests remaining.", this.RequestsRemaining);
+
+                    this.Queue[b.Key].Response = await response.Content.ReadAsStringAsync();
+                    this.Queue[b.Key].Resolved = true;
+                }
+                catch (Exception ex)
+                {
+                    this.Queue[b.Key].Failed = true;
+                    this.Queue[b.Key].Exception = ex;
+                }
+                finally
+                {
+                    await Task.Delay(1000);
+                }
             }
-            catch (Exception ex)
-            {
-                this.Queue[b.Key].Failed = true;
-                this.Queue[b.Key].Exception = ex;
-            }
-            finally
-            {
-                await Task.Delay(1000);
-            }
-        }
+        }).Add(this.Bot).IsVital();
     }
 
     private async Task<string> MakeRequest(string url)

@@ -12,11 +12,11 @@ using ProjectMakoto.Enums.ScoreSaber;
 
 namespace ProjectMakoto.Util;
 
-public class ScoreSaberClient
+public class ScoreSaberClient : RequiresBotReference
 {
-    internal ScoreSaberClient()
+    internal ScoreSaberClient(Bot bot) : base(bot)
     {
-        _ = this.QueueHandler();
+        this.QueueHandler();
     }
 
     ~ScoreSaberClient()
@@ -28,58 +28,61 @@ public class ScoreSaberClient
 
     readonly Dictionary<string, WebRequestItem> Queue = new();
 
-    private async Task QueueHandler()
+    private void QueueHandler()
     {
-        HttpClient client = new();
-
-        while (!this._disposed)
+        _ = Task.Run(async () =>
         {
-            if (this.Queue.Count == 0 || !this.Queue.Any(x => !x.Value.Resolved && !x.Value.Failed))
+            HttpClient client = new();
+
+            while (!this._disposed)
             {
-                await Task.Delay(100);
-                continue;
-            }
-
-            var b = this.Queue.First(x => !x.Value.Resolved && !x.Value.Failed);
-
-            try
-            {
-                _logger.LogTrace("Sending Request to '{Url}'..", b.Value.Url);
-                var response = await client.GetAsync(b.Value.Url);
-
-                this.Queue[b.Key].StatusCode = response.StatusCode;
-
-                if (!response.IsSuccessStatusCode)
+                if (this.Queue.Count == 0 || !this.Queue.Any(x => !x.Value.Resolved && !x.Value.Failed))
                 {
-                    if (response.StatusCode == HttpStatusCode.NotFound)
-                        throw new NotFoundException("");
-
-                    if (response.StatusCode == HttpStatusCode.UnprocessableEntity)
-                        throw new UnprocessableEntityException("");
-
-                    if (response.StatusCode == HttpStatusCode.InternalServerError)
-                        throw new InternalServerErrorException("");
-
-                    if (response.StatusCode == HttpStatusCode.Forbidden)
-                        throw new ForbiddenException("");
-
-                    throw new Exception($"Unsuccessful request: {response.StatusCode}");
+                    await Task.Delay(100);
+                    continue;
                 }
 
+                var b = this.Queue.First(x => !x.Value.Resolved && !x.Value.Failed);
 
-                this.Queue[b.Key].Response = await response.Content.ReadAsStringAsync();
-                this.Queue[b.Key].Resolved = true;
+                try
+                {
+                    _logger.LogTrace("Sending Request to '{Url}'..", b.Value.Url);
+                    var response = await client.GetAsync(b.Value.Url);
+
+                    this.Queue[b.Key].StatusCode = response.StatusCode;
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        if (response.StatusCode == HttpStatusCode.NotFound)
+                            throw new NotFoundException("");
+
+                        if (response.StatusCode == HttpStatusCode.UnprocessableEntity)
+                            throw new UnprocessableEntityException("");
+
+                        if (response.StatusCode == HttpStatusCode.InternalServerError)
+                            throw new InternalServerErrorException("");
+
+                        if (response.StatusCode == HttpStatusCode.Forbidden)
+                            throw new ForbiddenException("");
+
+                        throw new Exception($"Unsuccessful request: {response.StatusCode}");
+                    }
+
+
+                    this.Queue[b.Key].Response = await response.Content.ReadAsStringAsync();
+                    this.Queue[b.Key].Resolved = true;
+                }
+                catch (Exception ex)
+                {
+                    this.Queue[b.Key].Failed = true;
+                    this.Queue[b.Key].Exception = ex;
+                }
+                finally
+                {
+                    await Task.Delay(100);
+                }
             }
-            catch (Exception ex)
-            {
-                this.Queue[b.Key].Failed = true;
-                this.Queue[b.Key].Exception = ex;
-            }
-            finally
-            {
-                await Task.Delay(100);
-            }
-        }
+        }).Add(this.Bot).IsVital();
     }
 
     private async Task<string> MakeRequest(string url)

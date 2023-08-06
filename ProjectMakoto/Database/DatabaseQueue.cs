@@ -13,10 +13,10 @@ internal sealed class DatabaseQueue : RequiresBotReference
 {
     internal DatabaseQueue(Bot _bot) : base(_bot)
     {
-        _ = this.QueueHandler();
+        this.QueueHandler();
     }
 
-    internal async Task QueueHandler()
+    internal void QueueHandler()
     {
         _ = Task.Run(async () =>
         {
@@ -59,7 +59,7 @@ internal sealed class DatabaseQueue : RequiresBotReference
 
                     if (b is null)
                     {
-                        await Task.Delay(50);
+                        Thread.Sleep(50);
                         continue;
                     }
 
@@ -150,7 +150,7 @@ internal sealed class DatabaseQueue : RequiresBotReference
                     throw;
                 }
 
-                _ = this.QueueHandler();
+                this.QueueHandler();
                 throw;
             }
         }).Add(this.Bot);
@@ -175,7 +175,7 @@ internal sealed class DatabaseQueue : RequiresBotReference
             if (value.Executed || value.Failed || sw.ElapsedMilliseconds > 30000)
                 break;
 
-            await Task.Delay(50);
+            Thread.Sleep(50);
         }
 
         sw.Stop();
@@ -207,7 +207,7 @@ internal sealed class DatabaseQueue : RequiresBotReference
             if (value.Executed || value.Failed || sw.ElapsedMilliseconds > 30000)
                 break;
 
-            await Task.Delay(50);
+            Thread.Sleep(50);
         }
 
         sw.Stop();

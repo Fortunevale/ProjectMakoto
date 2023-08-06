@@ -38,10 +38,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AsyncFixer" Version="1.6.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="Dapper" Version="2.0.143" />
     <PackageReference Include="DisCatSharp" Version="10.4.2-nightly-011" />
     <PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.4.2-nightly-011" />

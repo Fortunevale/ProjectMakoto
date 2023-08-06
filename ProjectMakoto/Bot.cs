@@ -128,8 +128,8 @@ public sealed class Bot
 
                 this.BumpReminder = new(this);
 
-                this.ScoreSaberClient = new ScoreSaberClient();
-                this.TranslationClient = new GoogleTranslateClient();
+                this.ScoreSaberClient = new ScoreSaberClient(this);
+                this.TranslationClient = new GoogleTranslateClient(this);
                 this.ThreadJoinClient = new ThreadJoinClient();
 
                 await Util.Initializers.ListLoader.Load(this);
