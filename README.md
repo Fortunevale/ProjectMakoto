@@ -47,41 +47,14 @@ Makoto has a lot of features, current notable features are:
 
 ## [Click here to invite the bot](https://discord.com/api/oauth2/authorize?client_id=947716263394824213&permissions=8&scope=bot%20applications.commands)
 
-- Phishing Protection is enabled by default, people will be banned if they send a link known to be malicious. To change this, run `/phishing config`.
-- Automatic User/Bot Token invalidation is turned on by default. If you don't know what this means, just leave it on. If you know what this means and you don't want this happen, run `/tokendetection config` to disable it.
-- Every new server is automatically opted into a global ban system. When someone is known to break Discord's TOS or Community Guidelines, they'll be banned on join or when the ban happens. They will not be banned when the bot is freshly added to your server. To change this behaviour you can use `/join config`.
+- Phishing Protection is enabled by default, people will be banned if they send a link known to be malicious. To change this, run `/config phishing`.
+- Automatic User/Bot Token invalidation is turned on by default. If you don't know what this means, just leave it on. If you know what this means and you don't want this happen, run `/config tokendetection` to disable it.
+- Every new server is automatically opted into a global ban system. When someone is known to break Discord's TOS or Community Guidelines, they'll be banned on join or when the ban happens. They will not be banned when the bot is freshly added to your server. To change this behaviour you can use `/config join`.
 - You can join a support server [here](https://s.aitsys.dev/makotoguild).
 <br></br>
 ## Building, Debugging and Deployment
 
-We have a step by step guide you can follow to start contributing: [CONTRIBUTING.md](./CONTRIBUTING.md).
-
-### Prerequisites
-
-- [.NET 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
-- The mentioned dependencies [below](#required-dependencies-that-you-cant-get-on-nuget)
-- Your favourite C# IDE. My personal choice is [Visual Studio Community 2022](https://visualstudio.microsoft.com/vs/community/).
-
-### Required Dependencies that you can't get on nuget:
-
-- [Lavalink](https://github.com/freyacodes/Lavalink)
-- [LibreTranslate](https://github.com/LibreTranslate/LibreTranslate) (Please set up your own instance.)
-- [A MySQL Database](https://dev.mysql.com/doc/mysql-installation-excerpt/8.0/en/general-installation-issues.html)
-
-### Required APIs, Keys and Tokens
-
-- [Discord Team](https://discord.com/developers/teams)
-- [Discord Application](https://discord.com/developers/applications/)
-   - The Application must be in previously mentioned Discord Team. The staff-check requires this.
-- [Kawaii API Key](https://kawaii.red/)
-   - This is mainly for social commands like `hug`, `cuddle`, `pat` and so on.
-- [AbuseIPDB API Key](https://www.abuseipdb.com/account)
-    - This is required for the AbuseIPDB check.
-<br></br>
-- [Github Account](https://github.com/) with a [Personal Access Token](https://github.com/settings/tokens) for your Github Account
-   - The personal access token should have the `repo` permissions.
-   - This is required for the `/dev_tools create-issue` command.
-<br></br>
+We have a step by step guide you can follow to start contributing to or running Makoto [here](./CONTRIBUTING.md).
 ## Credits
 
 - [DisCatSharp](https://github.com/Aiko-IT-Systems/DisCatSharp) by Aiko-IT-Systems
