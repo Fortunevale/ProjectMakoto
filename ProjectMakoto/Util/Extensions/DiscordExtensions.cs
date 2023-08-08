@@ -73,6 +73,9 @@ internal static class DiscordExtensions
                     catch {}
                 }
 
+                if (msg.Flags?.HasMessageFlag(MessageFlags.SuppressedEmbeds) ?? false)
+                    return "";
+
                 return $"<discord-embed " +
                 $"slot=\"embeds\" \" " +
                 $"provider=\"{Sanitize(embed.Provider?.Name)}\" " +
@@ -85,8 +88,6 @@ internal static class DiscordExtensions
                 $"image=\"{Sanitize(embed.Image?.Url?.ToString())}\" " +
                 $"thumbnail=\"{Sanitize(videoId is null ? embed.Thumbnail?.Url?.ToString() : "")}\" " +
                 $"video=\"{Sanitize(videoId ?? embed.Video?.Url?.ToString())}\" " +
-                $"video-height=\"{(embed.Video?.Height ?? 225)}\" " +
-                $"video-width=\"{(embed.Video?.Width ?? 400)}\" " +
                 $"color=\"{(embed.Color.HasValue ? embed.Color.Value.ToHex() : "")}\">" +
                 $"{((embed.Description.Length > 0 && videoId is null) ? $"<discord-embed-description slot=\"description\">{Sanitize(embed.Description).ConvertMarkdownToHtml(bot)}</discord-embed-description>" : "")}" +
                 $"{(embed.Fields?.Count > 0 ? $"<discord-embed-fields slot=\"fields\">{string.Join("", embed.Fields.Select(field =>
@@ -98,7 +99,7 @@ internal static class DiscordExtensions
                         $"field-title=\"{Sanitize(field.Name)}\" " +
                         $"inline=\"{field.Inline.ToString().ToLower()}\" " +
                         $"inline-index=\"{GetFieldIndex(field.Inline)}\" " +
-                        $">{Sanitize(field.Value)}</discord-embed-field>";
+                        $">{Sanitize(field.Value).ConvertMarkdownToHtml(bot)}</discord-embed-field>";
                     }))}</discord-embed-fields>" : "")}" +
                 $"{(embed.Footer is not null ? $"<discord-embed-footer " +
                     $"slot=\"footer\" " +
@@ -166,6 +167,11 @@ internal static class DiscordExtensions
         {
             return $"<discord-inline-code>{e.Groups[1].Value}</discord-inline-code>";
         }, RegexOptions.Compiled);
+        
+        md = Regex.Replace(md, @"\```([^\n`]+)\```", (e) =>
+        {
+            return $"<pre><code>{e.Groups[1].Value}</code></pre>";
+        }, RegexOptions.Compiled | RegexOptions.Multiline);
 
         md = Regex.Replace(md, @"\*\*([^\n*]+)\*\*", (e) =>
         {
@@ -197,7 +203,7 @@ internal static class DiscordExtensions
             return $"<discord-quote>{e.Groups[1].Value}</discord-quote>";
         }, RegexOptions.Compiled);
 
-        md = Regex.Replace(md, @"&lt;/([\w]*):(?:\d*)&gt;", (e) =>
+        md = Regex.Replace(md, @"&lt;/([\w -]*):(?:\d*)&gt;", (e) =>
         {
             return $"<discord-mention type=\"slash\">{e.Groups[1].Value}</discord-mention>";
         }, RegexOptions.Compiled);
@@ -248,6 +254,13 @@ internal static class DiscordExtensions
             {
                 return $"@{e.Groups[1].Value}";
             }
+        }, RegexOptions.Compiled);
+
+        md = Regex.Replace(md, @"&lt;(a)?:(\w+):(\d+)&gt;", (e) =>
+        {
+            var url = $"https://cdn.discordapp.com/emojis/{e.Groups[3].Value}.{(e.Groups[1].Success ? "gif" : "png")}";
+
+            return $"<discord-custom-emoji name=\"{e.Groups[2].Value}\" url=\"{url}\"></discord-custom-emoji>";
         }, RegexOptions.Compiled);
 
         return md;
