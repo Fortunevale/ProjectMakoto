@@ -238,74 +238,15 @@ internal sealed class ActionlogEvents : RequiresTranslation
             .WithDescription($"**{this.tKey.Channel.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Channel.Mention} `[{e.Channel.GetIcon()}{e.Channel.Name}]`\n" +
                              $"{this.tKey.CheckAttachedFileForDeletedMessages.Get(this.Bot.Guilds[e.Guild.Id]).Build(true)}");
 
-        var Messages = "";
-
-        foreach (var b in e.Messages)
-        {
-            if (b is null || b.WebhookMessage || b.Author is null)
-                continue;
-
-            var CurrentMessage = "";
-
-            try
-            {
-                CurrentMessage += $"[{b.Timestamp.ToUniversalTime():dd.MM.yyyy, HH:mm:ss zzz}] {b.Author.GetUsernameWithIdentifier()} (UserId: '{b.Author.Id}' | MessageId: {b.Id})\n";
-            }
-            catch (Exception)
-            {
-                CurrentMessage += $"[{b.Timestamp.ToUniversalTime():dd.MM.yyyy, HH:mm:ss zzz}] Unknown#0000 (UserId: '{b.Author.Id}' | MessageId: {b.Id})\n";
-            }
-
-            if (b.ReferencedMessage is not null)
-                CurrentMessage += $"[Reply to {b.ReferencedMessage.Id}]\n";
-
-            if (!string.IsNullOrWhiteSpace(b.Content))
-                CurrentMessage += $"{b.Content}";
-
-            if (b.Attachments.Count != 0)
-            {
-                CurrentMessage += $"\n\n[Attachments]\n" +
-                                    $"{string.Join("\n", b.Attachments.Select(x => $"`[{Math.Round(Convert.ToDecimal(x.FileSize / 1024), 2)} KB]` `{x.Url}`"))}";
-
-            }
-
-            if (b.Stickers.Count != 0)
-            {
-                CurrentMessage += $"\n\n[Stickers]\n" +
-                                    $"{string.Join("\n", b.Stickers.Select(x => $"`{x.Name}`"))}";
-
-            }
-
-            Messages += $"{CurrentMessage}\n\n";
-        }
+        var Messages = e.Messages.GenerateHtmlFromMessages(this.Bot);
 
         if (Messages.Length == 0)
             return;
 
-        var FileContent = $"All dates are saved in universal time (UTC+0).\n\n\n" +
-                             $"{e.Messages.Count} messages deleted in {e.Channel.GetIcon()}{e.Channel.Name} ({e.Channel.Id}) on {e.Guild.Name} ({e.Guild.Id})\n\n\n" +
-                             $"{Messages}";
+        var FileName = $"{Guid.NewGuid()}.html";
 
-        var FileName = $"{Guid.NewGuid()}.txt";
-        await File.WriteAllTextAsync(FileName, FileContent);
-        using (FileStream fileStream = new(FileName, FileMode.Open))
-        {
+        using (var fileStream = new MemoryStream(Encoding.UTF8.GetBytes(Messages)))
             _ = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed).WithFile(FileName, fileStream));
-        }
-
-        _ = Task.Run(async () =>
-        {
-            while (true)
-            {
-                try
-                {
-                    File.Delete(FileName);
-                    return;
-                }
-                catch { }
-                await Task.Delay(1000);
-            }
-        });
     }
 
     internal async Task MessageUpdated(DiscordClient sender, MessageUpdateEventArgs e)

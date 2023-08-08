@@ -1720,7 +1720,17 @@
             "Descriptions": {
               "en": "test",
               "de": "test"
-            }
+            },
+            "Options": [
+              {
+                "Names": {
+                  "en": "test"
+                },
+                "Descriptions": {
+                  "en": "test"
+                }
+              }
+            ]
           },
           {
             "Names": {
