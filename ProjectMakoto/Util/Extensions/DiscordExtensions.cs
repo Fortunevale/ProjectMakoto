@@ -85,6 +85,9 @@ internal static class DiscordExtensions
                 $"image=\"{Sanitize(embed.Image?.Url?.ToString())}\" " +
                 $"thumbnail=\"{Sanitize(videoId is null ? embed.Thumbnail?.Url?.ToString() : "")}\" " +
                 $"video=\"{Sanitize(videoId ?? embed.Video?.Url?.ToString())}\" " +
+                $"video-height=\"{(embed.Video?.Height ?? "225")}\" " +
+                $"video-width=\"{(embed.Video?.Width ?? "400")}\" " +
+                $"video=\"{Sanitize(videoId ?? embed.Video?.Url?.ToString())}\" " +
                 $"color=\"{(embed.Color.HasValue ? embed.Color.Value.ToHex() : "")}\">" +
                 $"{((embed.Description.Length > 0 && videoId is null) ? $"<discord-embed-description slot=\"description\">{Sanitize(embed.Description).ConvertMarkdownToHtml(bot)}</discord-embed-description>" : "")}" +
                 $"{(embed.Fields?.Count > 0 ? $"<discord-embed-fields slot=\"fields\">{string.Join("", embed.Fields.Select(field =>
