@@ -85,7 +85,7 @@ internal static class DiscordExtensions
                 $"author-image=\"{Sanitize(embed.Author?.IconUrl?.ToString())}\" " +
                 $"author-name=\"{Sanitize(embed.Author?.Name)}\" " +
                 $"author-url=\"{Sanitize(embed.Author?.Url?.ToString())}\" " +
-                $"embed-title=\"{Sanitize(embed.Title)}\" " +
+                $"embed-title=\"{Sanitize(embed.Title.ConvertMarkdownToHtml(bot))}\" " +
                 $"url=\"{Sanitize(embed.Url?.ToString())}\" " +
                 $"image=\"{Sanitize(embed.Image?.Url?.ToString())}\" " +
                 $"thumbnail=\"{Sanitize(videoId is null ? embed.Thumbnail?.Url?.ToString() : "")}\" " +
@@ -186,8 +186,11 @@ internal static class DiscordExtensions
             .Replace("<!-- Messages -->", string.Join("\n", messageStrings));
     }
 
-    internal static string ConvertMarkdownToHtml(this string md, Bot bot)
+    internal static string ConvertMarkdownToHtml(this string? md, Bot bot)
     {
+        if (md.IsNullOrWhiteSpace())
+            return md;
+
         md = Regex.Replace(md, @"(?<!\\)\`([^\n`]+?)\`", (e) =>
         {
             return $"<discord-inline-code>{e.Groups[1].Value}</discord-inline-code>";
@@ -291,6 +294,21 @@ internal static class DiscordExtensions
             var url = $"https://cdn.discordapp.com/emojis/{e.Groups[3].Value}.{(e.Groups[1].Success ? "gif" : "png")}";
 
             return $"<discord-custom-emoji name=\"{e.Groups[2].Value}\" url=\"{url}\"></discord-custom-emoji>";
+        }, RegexOptions.Compiled);
+
+        md = Regex.Replace(md, @"(?<!\\)(?<!\&gt;)(?<!a):\w+?:", (e) =>
+        {
+            if (!DiscordEmoji.TryFromName(bot.DiscordClient, e.Value, false, out var emoji))
+                return e.Value;
+            else
+                try
+                {
+                    return $"{emoji.UnicodeEmoji}";
+                }
+                catch (Exception)
+                {
+                    return e.Value;
+                }
         }, RegexOptions.Compiled);
 
         md = md.Replace("\\*", "*");
