@@ -173,6 +173,7 @@ internal static class DiscordExtensions
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
                     Error = (serializer, err) =>
                     {
+                        _logger.LogError("Failed to serialize member '{member}' at '{path}'", err.ErrorContext.Error, err.ErrorContext.Member, err.ErrorContext.Path);
                         err.ErrorContext.Handled = true;
                     },
                 })))
@@ -196,9 +197,14 @@ internal static class DiscordExtensions
             return $"<discord-inline-code>{e.Groups[1].Value}</discord-inline-code>";
         }, RegexOptions.Compiled);
         
-        md = Regex.Replace(md, @"(?<!\\)(?:\`\`\`)((.|\n)+?)(?:\`\`\`)", (e) =>
+        md = Regex.Replace(md, @"(?<!\\)(?:\`\`\`)(?:(\w{2,15})\n)?((?:.|\n)+?)(?:\`\`\`)", (e) =>
         {
-            return $"<code class=\"multiline\">{e.Groups[1].Value}</code>";
+            var lang = "";
+
+            if (e.Groups[1].Success)
+                lang = e.Groups[1].Value;
+
+            return $"<discord-code-block language=\"{lang}\"><pre>{e.Groups[2].Value}</pre></discord-code-block>";
         }, RegexOptions.Compiled | RegexOptions.Multiline);
 
         md = Regex.Replace(md, @"(?<!\\)\*\*([^\n*]+?)(?<!\\)\*\*", (e) =>
@@ -238,7 +244,7 @@ internal static class DiscordExtensions
 
         md = Regex.Replace(md, @"(?<!\\)&lt;t:(\d+?)(:(\w))?&gt;", (e) =>
         {
-            return $"<discord-time format=\"{e.Groups[3].Value}\" timestamp=\"{e.Groups[1].Value}\"/>";
+            return $"<discord-time format=\"{e.Groups[3].Value}\" timestamp=\"{e.Groups[1].Value}\"></discord-time>";
         }, RegexOptions.Compiled);
         
         md = Regex.Replace(md, @"(?<!\\)&lt;/([\w -]+?):(?:\d+?)&gt;", (e) =>
@@ -324,7 +330,7 @@ internal static class DiscordExtensions
         md = md.Replace("\\`", "`");
         md = md.Replace("\\|", "|");
 
-        return md.ReplaceLineEndings("<br />");
+        return md; // .ReplaceLineEndings("<br />")
     }
 
     internal static Permissions[] GetEnumeration(this Permissions perms)
