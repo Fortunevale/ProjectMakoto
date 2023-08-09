@@ -78,6 +78,22 @@ internal static class DiscordExtensions
                 if (msg.Flags?.HasMessageFlag(MessageFlags.SuppressedEmbeds) ?? false)
                     return "";
 
+                if (embed.Type is "image" && (embed.Provider is null || embed.Provider.Name.IsNullOrWhiteSpace()))
+                {
+                    return $"<discord-attachment slot=\"attachments\" " +
+                    $"type=\"image\" " +
+                    $"url=\"{Sanitize(embed.Url.ToString())}\" />";
+                }
+                
+                if (embed.Type is "video" && (embed.Provider is null || embed.Provider.Name.IsNullOrWhiteSpace()))
+                {
+                    return $"<discord-attachment slot=\"attachments\" " +
+                    $"type=\"video\" " +
+                    $"url=\"{Sanitize(embed.Video.Url.ToString())}\" " +
+                    $"height=\"{embed.Video.Height}\" " +
+                    $"width=\"{embed.Video.Width}\"/>";
+                }
+
                 return $"<discord-embed " +
                 $"slot=\"embeds\" " +
                 $"provider=\"{Sanitize(embed.Provider?.Name)}\" " +
@@ -91,7 +107,7 @@ internal static class DiscordExtensions
                 $"thumbnail=\"{Sanitize(videoId is null ? embed.Thumbnail?.Url?.ToString() : "")}\" " +
                 $"video=\"{Sanitize(videoId ?? embed.Video?.Url?.ToString())}\" " +
                 $"color=\"{(embed.Color.HasValue ? embed.Color.Value.ToHex() : "")}\">" +
-                $"{((embed.Description?.Length > 0 && videoId is null) ? $"<discord-embed-description slot=\"description\">{Sanitize(embed.Description).ConvertMarkdownToHtml(bot)}</discord-embed-description>" : "")}" +
+                $"{((embed.Description?.Length > 0 && videoId is null) ? $"<discord-embed-description slot=\"description\">{Sanitize(embed.Description).ConvertMarkdownToHtml(bot, true)}</discord-embed-description>" : "")}" +
                 $"{(embed.Fields?.Count > 0 ? $"<discord-embed-fields slot=\"fields\">{string.Join("", embed.Fields.Select(field =>
                     {
                         if (!field.Inline)
@@ -101,14 +117,14 @@ internal static class DiscordExtensions
                         $"field-title=\"{Sanitize(field.Name)}\" " +
                         $"inline=\"{field.Inline.ToString().ToLower()}\" " +
                         $"inline-index=\"{GetFieldIndex(field.Inline)}\" " +
-                        $">{Sanitize(field.Value).ConvertMarkdownToHtml(bot)}</discord-embed-field>";
+                        $">{Sanitize(field.Value).ConvertMarkdownToHtml(bot, true)}</discord-embed-field>";
                     }))}</discord-embed-fields>" : "")}" +
                 $"{(embed.Footer is not null ? $"<discord-embed-footer " +
                     $"slot=\"footer\" " +
                     $"footer-image=\"{Sanitize(embed.Footer?.IconUrl?.ToString())}\" " +
                     $"timestamp=\"{embed.Timestamp?.ToUnixTimeSeconds()}\" " +
                     $"twenty-four=\"true\">" +
-                    $"{Sanitize(embed.Footer?.Text).ConvertMarkdownToHtml(bot)}</discord-embed-footer>" : "")}" +
+                    $"{Sanitize(embed.Footer?.Text)}</discord-embed-footer>" : "")}" +
                 $"</discord-embed>";
             }))}" +
             $"{string.Join("", msg.Attachments?.Select(x =>
@@ -145,6 +161,32 @@ internal static class DiscordExtensions
                 $"height=\"{x.Height}\" " +
                 $"width=\"{x.Width}\"/>";
             }))}" +
+            $"{(msg.Components?.Count > 0 ? $"<discord-attachments slot=\"components\">{string.Join("", msg.Components.Select(c1 =>
+            {
+                return $"<discord-action-row>{string.Join("", c1.Components.Select(c2 =>
+                {
+                    if (c2.Type is not ComponentType.Button)
+                        return string.Empty;
+
+                    if (c2 is DiscordLinkButtonComponent linkButton)
+                        return $"<discord-button " +
+                            $"type=\"secondary\" disabled=\"{linkButton.Disabled.ToString().ToLower()}\" " +
+                            $"url=\"{Sanitize(linkButton.Url)}\" " +
+                            $"{(linkButton.Emoji is not null ? $"emoji=\"https://cdn.discordapp.com/emojis/{linkButton.Emoji?.Id}.png\" " : "")}" +
+                            $"{(linkButton.Emoji is not null ? $"emoji-name=\"{Sanitize(linkButton.Emoji?.Name)}\"" : "")} \">" +
+                                $"{Sanitize(linkButton.Label)}" +
+                            $"</discord-button>";
+
+                    var button = c2 as DiscordButtonComponent;
+
+                    return $"<discord-button " +
+                    $"type=\"{button.Style.ToString().ToLower()}\" disabled=\"{button.Disabled.ToString().ToLower()}\" " +
+                    $"{(button.Emoji is not null ? $"emoji=\"https://cdn.discordapp.com/emojis/{button.Emoji?.Id}.png\" " : "")}" +
+                    $"{(button.Emoji is not null ? $"emoji-name=\"{Sanitize(button.Emoji?.Name)}\"" : "")} \">" +
+                        $"{Sanitize(button.Label)}" +
+                    $"</discord-button>";
+                }))}</discord-action-row>";
+            }))}</discord-attachments>" : "")}" +
             $"{string.Join("", msg.Stickers?.Select(x =>
             {
                 var tempUrl = x.Url.TruncateAt(true, '?');
@@ -187,14 +229,19 @@ internal static class DiscordExtensions
             .Replace("<!-- Messages -->", string.Join("\n", messageStrings));
     }
 
-    internal static string ConvertMarkdownToHtml(this string? md, Bot bot)
+    internal static string ConvertMarkdownToHtml(this string? md, Bot bot, bool isEmbed = false)
     {
         if (md.IsNullOrWhiteSpace())
             return md;
 
+        md = md.ReplaceLineEndings("\n");
+
+        if (isEmbed)
+            md = string.Join("\n", md.Split("\n").Select(x => $"<div>{x}</div>"));
+
         md = Regex.Replace(md, @"(?<!\\)\`([^\n`]+?)\`", (e) =>
         {
-            return $"<discord-inline-code>{e.Groups[1].Value.Replace(" ", "&nbsp;")}</discord-inline-code>";
+            return $"<discord-inline-code in-embed=\"{isEmbed.ToString().ToLower()}\" >{e.Groups[1].Value.Replace(" ", "&nbsp;")}</discord-inline-code>";
         }, RegexOptions.Compiled);
         
         md = Regex.Replace(md, @"(?<!\\)(?:\`\`\`)(?:(\w{2,15})\n)?((?:.|\n)+?)(?:\`\`\`)", (e) =>
