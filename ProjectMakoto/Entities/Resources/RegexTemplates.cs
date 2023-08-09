@@ -18,7 +18,7 @@ internal sealed class RegexTemplates
     public static readonly Regex SoundcloudUrl = new(@"^https?:\/\/(soundcloud\.com|snd\.sc)\/(.*)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
     public static readonly Regex YouTubeUrl = new(@"^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
     public static readonly Regex DiscordChannelUrl = new(@"((https|http):\/\/(ptb\.|canary\.)?discord.com\/channels\/(\d+)\/(\d+)\/(\d+))", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-    public static readonly Regex Url = new(@"((http|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:\/⁄~\+#]*[\w\-\@?^=%&amp;\/⁄~\+#])?)", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant);
+    public static readonly Regex Url = new(@"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     public static readonly Regex Token = new(@"(mfa\.[a-z0-9_-]{20,})|((?<botid>[a-z0-9_-]{23,28})\.(?<creation>[a-z0-9_-]{6,7})\.(?<enc>[a-z0-9_-]{27,}))", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
