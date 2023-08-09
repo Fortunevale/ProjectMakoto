@@ -7,6 +7,9 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using System.Web;
+using Newtonsoft.Json.Serialization;
+
 namespace ProjectMakoto.Util;
 
 internal static class DiscordExtensions
@@ -53,9 +56,8 @@ internal static class DiscordExtensions
             $"{(msg.ReferencedMessage is not null ? 
                 $"<discord-reply slot=\"reply\"" +
                 $" author=\"{Sanitize(msg.ReferencedMessage.Author?.GetUsername() ?? "Unknown User")} ({msg.Author?.Id})\"" +
-                $" avatar=\"{msg.ReferencedMessage.Author?.AvatarUrl}\">{Sanitize(msg.ReferencedMessage.Content)
-                    .ConvertMarkdownToHtml(bot)
-                    .TruncateWithIndication(100)}" +
+                $" avatar=\"{msg.ReferencedMessage.Author?.AvatarUrl}\">{Sanitize(msg.ReferencedMessage.Content.TruncateWithIndication(100))
+                    .ConvertMarkdownToHtml(bot)}" +
                 $"</discord-reply>" : "")}" +
             $"{Sanitize(msg.Content).ConvertMarkdownToHtml(bot)}" +
             $"{string.Join("", msg.Embeds?.Select(embed =>
@@ -89,7 +91,7 @@ internal static class DiscordExtensions
                 $"thumbnail=\"{Sanitize(videoId is null ? embed.Thumbnail?.Url?.ToString() : "")}\" " +
                 $"video=\"{Sanitize(videoId ?? embed.Video?.Url?.ToString())}\" " +
                 $"color=\"{(embed.Color.HasValue ? embed.Color.Value.ToHex() : "")}\">" +
-                $"{((embed.Description.Length > 0 && videoId is null) ? $"<discord-embed-description slot=\"description\">{Sanitize(embed.Description).ConvertMarkdownToHtml(bot)}</discord-embed-description>" : "")}" +
+                $"{((embed.Description?.Length > 0 && videoId is null) ? $"<discord-embed-description slot=\"description\">{Sanitize(embed.Description).ConvertMarkdownToHtml(bot)}</discord-embed-description>" : "")}" +
                 $"{(embed.Fields?.Count > 0 ? $"<discord-embed-fields slot=\"fields\">{string.Join("", embed.Fields.Select(field =>
                     {
                         if (!field.Inline)
@@ -143,6 +145,19 @@ internal static class DiscordExtensions
                 $"height=\"{x.Height}\" " +
                 $"width=\"{x.Width}\"/>";
             }))}" +
+            $"{string.Join("", msg.Stickers?.Select(x =>
+            {
+                var tempUrl = x.Url.TruncateAt(true, '?');
+                var type = "image";
+                var alt = x.Description;
+
+                return $"<discord-attachment slot=\"attachments\" " +
+                $"type=\"{type}\" " +
+                $"url=\"{Sanitize(x.Url)}\" " +
+                $"alt=\"{Sanitize(alt)}\" " +
+                $"height=\"160\" " +
+                $"width=\"160\"/>";
+            }))}" +
             $"</discord-message>";
 
             return messageBuilder;
@@ -152,6 +167,16 @@ internal static class DiscordExtensions
             return string.Empty;
 
         return LoadedHtml
+            .Replace("<--! RawMessages -->", Uri.EscapeDataString(JsonConvert.SerializeObject(messages.OrderBy(x => x.Id.GetSnowflakeTime().Ticks), new JsonSerializerSettings
+                {
+                    Formatting = Formatting.Indented,
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                    Error = (serializer, err) =>
+                    {
+                        err.ErrorContext.Handled = true;
+                    },
+                })))
+            .Replace("<--! RawMessageFileName -->", $"{Guid.NewGuid()}.txt")
             .Replace("<!-- Title -->", "Chat History")
             .Replace("<!-- MessageCount -->", messages.Count())
             .Replace("<!-- Channel -->", $"{messages.First().Channel.GetIcon()}{Sanitize(messages.First().Channel.Name)} (<i>{messages.First().Channel.Id}</i>)")
@@ -163,47 +188,52 @@ internal static class DiscordExtensions
 
     internal static string ConvertMarkdownToHtml(this string md, Bot bot)
     {
-        md = Regex.Replace(md, @"\`([^\n`]+)\`", (e) =>
+        md = Regex.Replace(md, @"(?<!\\)\`([^\n`]+?)\`", (e) =>
         {
             return $"<discord-inline-code>{e.Groups[1].Value}</discord-inline-code>";
         }, RegexOptions.Compiled);
         
-        md = Regex.Replace(md, @"\```([^\n`]+)\```", (e) =>
+        md = Regex.Replace(md, @"(?<!\\)(?:\`\`\`)((.|\n)+?)(?:\`\`\`)", (e) =>
         {
-            return $"<pre><code>{e.Groups[1].Value}</code></pre>";
+            return $"<code class=\"multiline\">{e.Groups[1].Value}</code>";
         }, RegexOptions.Compiled | RegexOptions.Multiline);
 
-        md = Regex.Replace(md, @"\*\*([^\n*]+)\*\*", (e) =>
+        md = Regex.Replace(md, @"(?<!\\)\*\*([^\n*]+?)(?<!\\)\*\*", (e) =>
         {
             return $"<discord-bold>{e.Groups[1].Value}</discord-bold>";
         }, RegexOptions.Compiled);
 
-        md = Regex.Replace(md, @"\~\~([^\n~]+)\~\~", (e) =>
+        md = Regex.Replace(md, @"(?<!\\)\~\~([^\n~]+?)(?<!\\)\~\~", (e) =>
         {
             return $"<s>{e.Groups[1].Value}</s>";
         }, RegexOptions.Compiled);
 
-        md = Regex.Replace(md, @"\|\|([^\n|]+)\|\|", (e) =>
+        md = Regex.Replace(md, @"(?<!\\)__([^\n~]+?)(?<!\\)__", (e) =>
+        {
+            return $"<u>{e.Groups[1].Value}</u>";
+        }, RegexOptions.Compiled);
+
+        md = Regex.Replace(md, @"(?<!\\)\|\|([^\n|]+?)(?<!\\)\|\|", (e) =>
         {
             return $"<discord-spoiler>{e.Groups[1].Value}</discord-spoiler>";
         }, RegexOptions.Compiled);
 
-        md = Regex.Replace(md, @"\*([^\n*]+)\*", (e) =>
+        md = Regex.Replace(md, @"(?<!\\)\*([^\n*]+?)(?<!\\)\*", (e) =>
         {
             return $"<discord-italic>{e.Groups[1].Value}</discord-italic>";
         }, RegexOptions.Compiled);
 
-        md = Regex.Replace(md, @"_([^\n_]+)_", (e) =>
+        md = Regex.Replace(md, @"(?<![\\_])_([^\n_]+?)(?<!\\)_", (e) =>
         {
             return $"<discord-italic>{e.Groups[1].Value}</discord-italic>";
         }, RegexOptions.Compiled);
         
-        md = Regex.Replace(md, @"^&gt; ([^\n_]+)", (e) =>
+        md = Regex.Replace(md, @"^(?<!\\)&gt; ([^\n_]+?)", (e) =>
         {
             return $"<discord-quote>{e.Groups[1].Value}</discord-quote>";
-        }, RegexOptions.Compiled);
+        }, RegexOptions.Compiled | RegexOptions.Multiline);
 
-        md = Regex.Replace(md, @"&lt;/([\w -]*):(?:\d*)&gt;", (e) =>
+        md = Regex.Replace(md, @"(?<!\\)&lt;/([\w -]+?):(?:\d+?)&gt;", (e) =>
         {
             return $"<discord-mention type=\"slash\">{e.Groups[1].Value}</discord-mention>";
         }, RegexOptions.Compiled);
@@ -218,7 +248,7 @@ internal static class DiscordExtensions
             return $"<a target=\"_blank\" href=\"{url}\">{url}</a>";
         }, RegexOptions.Compiled);
 
-        md = Regex.Replace(md, @"&lt;@(?:!)?(\d*)&gt;", (e) =>
+        md = Regex.Replace(md, @"(?<!\\)&lt;@(?:!)?(\d+?)&gt;", (e) =>
         {
             try
             {
@@ -230,7 +260,7 @@ internal static class DiscordExtensions
             }
         }, RegexOptions.Compiled);
 
-        md = Regex.Replace(md, @"&lt;#(?:!)?(\d*)&gt;", (e) =>
+        md = Regex.Replace(md, @"(?<!\\)&lt;#(?:!)?(\d+?)&gt;", (e) =>
         {
             try
             {
@@ -256,14 +286,22 @@ internal static class DiscordExtensions
             }
         }, RegexOptions.Compiled);
 
-        md = Regex.Replace(md, @"&lt;(a)?:(\w+):(\d+)&gt;", (e) =>
+        md = Regex.Replace(md, @"(?<!\\)&lt;(a)?:(\w+?):(\d+?)&gt;", (e) =>
         {
             var url = $"https://cdn.discordapp.com/emojis/{e.Groups[3].Value}.{(e.Groups[1].Success ? "gif" : "png")}";
 
             return $"<discord-custom-emoji name=\"{e.Groups[2].Value}\" url=\"{url}\"></discord-custom-emoji>";
         }, RegexOptions.Compiled);
 
-        return md;
+        md = md.Replace("\\*", "*");
+        md = md.Replace("\\_", "_");
+        md = md.Replace("\\&gt;", "&gt;");
+        md = md.Replace("\\&lt;", "&lt;");
+        md = md.Replace("\\~", "~");
+        md = md.Replace("\\`", "`");
+        md = md.Replace("\\|", "|");
+
+        return md.ReplaceLineEndings("<br />");
     }
 
     internal static Permissions[] GetEnumeration(this Permissions perms)
