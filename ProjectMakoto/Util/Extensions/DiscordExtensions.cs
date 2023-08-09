@@ -79,7 +79,7 @@ internal static class DiscordExtensions
                     return "";
 
                 return $"<discord-embed " +
-                $"slot=\"embeds\" \" " +
+                $"slot=\"embeds\" " +
                 $"provider=\"{Sanitize(embed.Provider?.Name)}\" " +
                 $"provider-url=\"{Sanitize(embed.Provider?.Url?.ToString())}\" " +
                 $"author-image=\"{Sanitize(embed.Author?.IconUrl?.ToString())}\" " +
@@ -194,7 +194,7 @@ internal static class DiscordExtensions
 
         md = Regex.Replace(md, @"(?<!\\)\`([^\n`]+?)\`", (e) =>
         {
-            return $"<discord-inline-code>{e.Groups[1].Value}</discord-inline-code>";
+            return $"<discord-inline-code>{e.Groups[1].Value.Replace(" ", "&nbsp;")}</discord-inline-code>";
         }, RegexOptions.Compiled);
         
         md = Regex.Replace(md, @"(?<!\\)(?:\`\`\`)(?:(\w{2,15})\n)?((?:.|\n)+?)(?:\`\`\`)", (e) =>
@@ -204,7 +204,7 @@ internal static class DiscordExtensions
             if (e.Groups[1].Success)
                 lang = e.Groups[1].Value;
 
-            return $"<discord-code-block language=\"{lang}\"><pre>{e.Groups[2].Value}</pre></discord-code-block>";
+            return $"<discord-code-block language=\"{lang}\"><pre>{e.Groups[2].Value.Replace(" ", "&nbsp;")}</pre></discord-code-block>";
         }, RegexOptions.Compiled | RegexOptions.Multiline);
 
         md = Regex.Replace(md, @"(?<!\\)\*\*([^\n*]+?)(?<!\\)\*\*", (e) =>

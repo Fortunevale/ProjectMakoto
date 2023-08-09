@@ -14,11 +14,20 @@
 
             --font: "gg-sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
         }
-
-        * {
-            font-family: var(--font) !important;
-        }
-
+		
+		discord-inline-code {
+			background: #2c2d2f !important;
+		}
+		
+		discord-embed-description > discord-inline-code,
+		discord-embed-field > discord-inline-code {
+			background: #1f1f21 !important;
+		}
+		
+		body > p {
+			font-family: var(--font);
+		}
+		
         html {
             height: 100%;
             width: 100%;
