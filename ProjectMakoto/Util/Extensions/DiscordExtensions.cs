@@ -236,6 +236,11 @@ internal static class DiscordExtensions
             return $"<discord-quote>{e.Groups[1].Value}</discord-quote>";
         }, RegexOptions.Compiled | RegexOptions.Multiline);
 
+        md = Regex.Replace(md, @"(?<!\\)&lt;t:(\d+?)(:(\w))?&gt;", (e) =>
+        {
+            return $"<discord-time format=\"{e.Groups[3].Value}\" timestamp=\"{e.Groups[1].Value}\"/>";
+        }, RegexOptions.Compiled);
+        
         md = Regex.Replace(md, @"(?<!\\)&lt;/([\w -]+?):(?:\d+?)&gt;", (e) =>
         {
             return $"<discord-mention type=\"slash\">{e.Groups[1].Value}</discord-mention>";
