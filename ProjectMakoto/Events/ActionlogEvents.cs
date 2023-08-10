@@ -238,12 +238,33 @@ internal sealed class ActionlogEvents : RequiresTranslation
             .WithDescription($"**{this.tKey.Channel.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Channel.Mention} `[{e.Channel.GetIcon()}{e.Channel.Name}]`\n" +
                              $"{this.tKey.CheckAttachedFileForDeletedMessages.Get(this.Bot.Guilds[e.Guild.Id]).Build(true)}");
 
-        var Messages = e.Messages.GenerateHtmlFromMessages(this.Bot);
+        string FileName;
+        string Messages;
+
+        try
+        {
+            FileName = $"{Guid.NewGuid()}.html";
+            Messages = e.Messages.GenerateHtmlFromMessages(this.Bot);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("Failed to generate html from messages", ex);
+
+            FileName = $"{Guid.NewGuid()}.json";
+            Messages = JsonConvert.SerializeObject(e.Messages.OrderBy(x => x.Id.GetSnowflakeTime().Ticks), new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                Error = (serializer, err) =>
+                {
+                    _logger.LogError("Failed to serialize member '{member}' at '{path}'", err.ErrorContext.Error, err.ErrorContext.Member, err.ErrorContext.Path);
+                    err.ErrorContext.Handled = true;
+                },
+            });
+        }
 
         if (Messages.Length == 0)
             return;
-
-        var FileName = $"{Guid.NewGuid()}.html";
 
         using (var fileStream = new MemoryStream(Encoding.UTF8.GetBytes(Messages)))
             _ = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed).WithFile(FileName, fileStream));
