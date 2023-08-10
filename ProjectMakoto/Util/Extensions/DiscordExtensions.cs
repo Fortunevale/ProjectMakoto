@@ -299,7 +299,7 @@ internal static class DiscordExtensions
             return $"<discord-mention type=\"slash\">{e.Groups[1].Value}</discord-mention>";
         }, RegexOptions.Compiled);
         
-        md = Regex.Replace(md, @"(&lt;)?(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))", (e) =>
+        md = Regex.Replace(md, @"(&lt;)?(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=;]*))", (e) =>
         {
             var url = e.Groups[2].Value;
 
