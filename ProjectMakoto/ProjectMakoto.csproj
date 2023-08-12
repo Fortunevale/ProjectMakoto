@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -39,13 +39,14 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.143" />
-    <PackageReference Include="DisCatSharp" Version="10.4.2-nightly-011" />
-    <PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.4.2-nightly-011" />
-    <PackageReference Include="DisCatSharp.CommandsNext" Version="10.4.2-nightly-011" />
-    <PackageReference Include="DisCatSharp.Common" Version="10.4.2-nightly-011" />
+    <PackageReference Include="DisCatSharp" Version="10.4.2-nightly-015" />
+    <PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.4.2-nightly-015" />
+    <PackageReference Include="DisCatSharp.CommandsNext" Version="10.4.2-nightly-015" />
+    <PackageReference Include="DisCatSharp.Common" Version="10.4.2-nightly-015" />
     <PackageReference Include="DisCatSharp.Extensions.TwoFactorCommands" Version="1.0.0-alpha-007" />
-    <PackageReference Include="DisCatSharp.Interactivity" Version="10.4.2-nightly-011" />
-    <PackageReference Include="DisCatSharp.Lavalink" Version="10.4.2-nightly-011" />
+    <PackageReference Include="DisCatSharp.Interactivity" Version="10.4.2-nightly-015" />
+    <PackageReference Include="DisCatSharp.Lavalink" Version="10.4.2-nightly-015" />
+    <PackageReference Include="HtmlSanitizer" Version="8.0.692" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.7.0-2.final" />
     <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="4.7.0-2.final" />
     <PackageReference Include="MySql.Data" Version="8.1.0" />
@@ -95,6 +96,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Assets\Countries.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\DiscordMessages.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Assets\Languages.json">

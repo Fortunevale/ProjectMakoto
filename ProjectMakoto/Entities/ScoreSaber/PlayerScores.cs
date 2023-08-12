@@ -1,4 +1,4 @@
-﻿namespace ProjectMakoto.Entities.ScoreSaber;
+namespace ProjectMakoto.Entities.ScoreSaber;
 
 public class PlayerScores
 {

@@ -1,4 +1,4 @@
-﻿namespace ProjectMakoto.Exceptions;
+namespace ProjectMakoto.Exceptions;
 
 public class UnprocessableEntityException : Exception
 {

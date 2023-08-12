@@ -1720,7 +1720,17 @@
             "Descriptions": {
               "en": "test",
               "de": "test"
-            }
+            },
+            "Options": [
+              {
+                "Names": {
+                  "en": "test"
+                },
+                "Descriptions": {
+                  "en": "test"
+                }
+              }
+            ]
           },
           {
             "Names": {
@@ -3407,6 +3417,14 @@
         "NeverJoined": {
           "en": "User never joined this server.",
           "de": "Nutzer ist diesem Server noch nie beigetreten."
+        },
+        "NoRoles": {
+          "en": "User doesn't have any roles.",
+          "de": "Nutzer hat keine Rollen."
+        },
+        "NoStoredRoles": {
+          "en": "User doesn't have any stored roles.",
+          "de": "Nutzer hatte keine Rollen."
         },
         "IsBanned": {
           "en": "User is currently banned from this server.",
@@ -5241,7 +5259,7 @@
         },
         "TimedOut": {
           "en": "{Victim} was timed out for '{Reason}'. The Timeout will run out {Timestamp}.",
-          "de": "{Victim} würde für '{Reason}' in Timeout versetzt. Der Timeout wird {Timestamp} ablaufen."
+          "de": "{Victim} wurde für '{Reason}' in Timeout versetzt. Der Timeout wird {Timestamp} ablaufen."
         },
         "Failed": {
           "en": "Couldn't timeout {Victim}.",

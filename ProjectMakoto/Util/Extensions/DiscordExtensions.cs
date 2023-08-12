@@ -7,10 +7,379 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using System.Web;
+using Newtonsoft.Json.Serialization;
+
 namespace ProjectMakoto.Util;
 
 internal static class DiscordExtensions
 {
+    private static string? LoadedHtml = null;
+
+    public static string GenerateHtmlFromMessages(this IEnumerable<DiscordMessage> messages, Bot bot)
+    {
+        var sanitizer = new Ganss.Xss.HtmlSanitizer(new()
+        {
+            AllowedSchemes = new SortedSet<string> { "http", "https" },
+        });
+
+        string Sanitize(string? str)
+        {
+            if (str is null)
+                return null;
+
+            return sanitizer.Sanitize(str.Replace("<", "&lt;").Replace(">", "&gt;"));
+        }
+
+        LoadedHtml ??= File.ReadAllText("Assets/DiscordMessages.html");
+
+        var currentFieldIndex = 0;
+        int GetFieldIndex(bool inline)
+        {
+            if (!inline)
+                return 1;
+
+            currentFieldIndex++;
+            return currentFieldIndex;
+        }
+
+        var messageStrings = messages.OrderBy(x => x.Id.GetSnowflakeTime().Ticks).Select(msg =>
+        {
+            var messageBuilder = 
+            $"<discord-message author=\"{Sanitize(msg.Author?.GetUsername() ?? "Unknown User")} ({msg.Author?.Id})\" " +
+            $"avatar=\"{msg.Author?.AvatarUrl}\" timestamp=\"{msg.Id.GetSnowflakeTime().ToUnixTimeSeconds()}\" " +
+            $"twenty-four=\"true\" " +
+            $"bot={((msg.Author?.IsBot ?? false) && !msg.WebhookMessage).ToString().ToLower()} " +
+            $"verified={((msg.Author?.IsVerifiedBot ?? false) && !msg.WebhookMessage).ToString().ToLower()} " +
+            $"webhook={msg.WebhookMessage.ToString().ToLower()} " +
+            $"edited={msg.IsEdited.ToString().ToLower()}>" +
+            $"{(msg.ReferencedMessage is not null ? 
+                $"<discord-reply slot=\"reply\"" +
+                $" author=\"{Sanitize(msg.ReferencedMessage.Author?.GetUsername() ?? "Unknown User")} ({msg.Author?.Id})\"" +
+                $" avatar=\"{msg.ReferencedMessage.Author?.AvatarUrl}\">{Sanitize(msg.ReferencedMessage.Content.TruncateWithIndication(100))
+                    .ConvertMarkdownToHtml(bot)}" +
+                $"</discord-reply>" : "")}" +
+            $"{Sanitize(msg.Content).ConvertMarkdownToHtml(bot)}" +
+            $"{string.Join("", msg.Embeds?.Select(embed =>
+            {
+                currentFieldIndex = 0;
+
+                string? videoId = null;
+
+                if (embed.Provider?.Name == "YouTube")
+                {
+                    try
+                    {
+                        videoId = RegexTemplates.YouTubeUrl.Match(msg.Content).Groups[5].Value;
+                    }
+                    catch {}
+                }
+
+                if (msg.Flags?.HasMessageFlag(MessageFlags.SuppressedEmbeds) ?? false)
+                    return "";
+
+                if (embed.Type is "image" && (embed.Provider is null || embed.Provider.Name.IsNullOrWhiteSpace()))
+                {
+                    return $"<discord-attachment slot=\"attachments\" " +
+                    $"type=\"image\" " +
+                    $"url=\"{Sanitize(embed.Url.ToString())}\" />";
+                }
+                
+                if (embed.Type is "video" && (embed.Provider is null || embed.Provider.Name.IsNullOrWhiteSpace()))
+                {
+                    return $"<discord-attachment slot=\"attachments\" " +
+                    $"type=\"video\" " +
+                    $"url=\"{Sanitize(embed.Video.Url.ToString())}\" " +
+                    $"height=\"{embed.Video.Height}\" " +
+                    $"width=\"{embed.Video.Width}\"/>";
+                }
+
+                return $"<discord-embed " +
+                $"slot=\"embeds\" " +
+                $"provider=\"{Sanitize(embed.Provider?.Name)}\" " +
+                $"provider-url=\"{Sanitize(embed.Provider?.Url?.ToString())}\" " +
+                $"author-image=\"{Sanitize(embed.Author?.IconUrl?.ToString())}\" " +
+                $"author-name=\"{Sanitize(embed.Author?.Name)}\" " +
+                $"author-url=\"{Sanitize(embed.Author?.Url?.ToString())}\" " +
+                $"embed-title=\"{Sanitize(embed.Title.ConvertMarkdownToHtml(bot))}\" " +
+                $"url=\"{Sanitize(embed.Url?.ToString())}\" " +
+                $"image=\"{Sanitize(embed.Image?.Url?.ToString())}\" " +
+                $"thumbnail=\"{Sanitize(videoId is null ? embed.Thumbnail?.Url?.ToString() : "")}\" " +
+                $"video=\"{Sanitize(videoId ?? embed.Video?.Url?.ToString())}\" " +
+                $"color=\"{(embed.Color.HasValue ? embed.Color.Value.ToHex() : "")}\">" +
+                $"{((embed.Description?.Length > 0 && videoId is null) ? $"<discord-embed-description slot=\"description\">{Sanitize(embed.Description).ConvertMarkdownToHtml(bot, true)}</discord-embed-description>" : "")}" +
+                $"{(embed.Fields?.Count > 0 ? $"<discord-embed-fields slot=\"fields\">{string.Join("", embed.Fields.Select(field =>
+                    {
+                        if (!field.Inline)
+                            currentFieldIndex = 0;
+
+                        return $"<discord-embed-field " +
+                        $"field-title=\"{Sanitize(field.Name)}\" " +
+                        $"inline=\"{field.Inline.ToString().ToLower()}\" " +
+                        $"inline-index=\"{GetFieldIndex(field.Inline)}\" " +
+                        $">{Sanitize(field.Value).ConvertMarkdownToHtml(bot, true)}</discord-embed-field>";
+                    }))}</discord-embed-fields>" : "")}" +
+                $"{(embed.Footer is not null ? $"<discord-embed-footer " +
+                    $"slot=\"footer\" " +
+                    $"footer-image=\"{Sanitize(embed.Footer?.IconUrl?.ToString())}\" " +
+                    $"timestamp=\"{embed.Timestamp?.ToUnixTimeSeconds()}\" " +
+                    $"twenty-four=\"true\">" +
+                    $"{Sanitize(embed.Footer?.Text)}</discord-embed-footer>" : "")}" +
+                $"</discord-embed>";
+            }))}" +
+            $"{string.Join("", msg.Attachments?.Select(x =>
+            {
+                var tempUrl = x.Url.TruncateAt(true, '?');
+                var type = string.Empty;
+                var alt = x.Description;
+
+                if (x.Url.EndsWith(".jpg", StringComparison.InvariantCultureIgnoreCase) ||
+                    x.Url.EndsWith(".jpeg", StringComparison.InvariantCultureIgnoreCase) ||
+                    x.Url.EndsWith(".png", StringComparison.InvariantCultureIgnoreCase) ||
+                    x.Url.EndsWith(".webp", StringComparison.InvariantCultureIgnoreCase) ||
+                    x.Url.EndsWith(".gifv", StringComparison.InvariantCultureIgnoreCase) ||
+                    x.Url.EndsWith(".gif", StringComparison.InvariantCultureIgnoreCase))
+                    type = "image";
+                else if (x.Url.EndsWith(".webm", StringComparison.InvariantCultureIgnoreCase) ||
+                    x.Url.EndsWith(".mp4", StringComparison.InvariantCultureIgnoreCase))
+                    type = "video";
+                else if (x.Url.EndsWith(".wav", StringComparison.InvariantCultureIgnoreCase) ||
+                    x.Url.EndsWith(".ogg", StringComparison.InvariantCultureIgnoreCase) ||
+                    x.Url.EndsWith(".mp3", StringComparison.InvariantCultureIgnoreCase))
+                    type = "audio";
+                else
+                {
+                    type = "file";
+                    alt = tempUrl[(tempUrl.LastIndexOf('/') + 1)..];
+                }
+
+                return $"<discord-attachment slot=\"attachments\" " +
+                $"type=\"{type}\" " +
+                $"url=\"{Sanitize(x.Url)}\" " +
+                $"alt=\"{Sanitize(alt)}\" " +
+                $"size=\"{x.FileSize.Value.FileSizeToHumanReadable()}\" " +
+                $"height=\"{x.Height}\" " +
+                $"width=\"{x.Width}\"/>";
+            }))}" +
+            $"{(msg.Components?.Count > 0 ? $"<discord-attachments slot=\"components\">{string.Join("", msg.Components.Select(c1 =>
+            {
+                return $"<discord-action-row>{string.Join("", c1.Components.Select(c2 =>
+                {
+                    if (c2.Type is not ComponentType.Button)
+                        return string.Empty;
+
+                    if (c2 is DiscordLinkButtonComponent linkButton)
+                        return $"<discord-button " +
+                            $"type=\"secondary\" disabled=\"{linkButton.Disabled.ToString().ToLower()}\" " +
+                            $"url=\"{Sanitize(linkButton.Url)}\" " +
+                            $"{(linkButton.Emoji is not null ? $"emoji=\"https://cdn.discordapp.com/emojis/{linkButton.Emoji?.Id}.png\" " : "")}" +
+                            $"{(linkButton.Emoji is not null ? $"emoji-name=\"{Sanitize(linkButton.Emoji?.Name)}\"" : "")} \">" +
+                                $"{Sanitize(linkButton.Label)}" +
+                            $"</discord-button>";
+
+                    var button = c2 as DiscordButtonComponent;
+
+                    return $"<discord-button " +
+                    $"type=\"{button.Style.ToString().ToLower()}\" disabled=\"{button.Disabled.ToString().ToLower()}\" " +
+                    $"{(button.Emoji is not null ? $"emoji=\"https://cdn.discordapp.com/emojis/{button.Emoji?.Id}.png\" " : "")}" +
+                    $"{(button.Emoji is not null ? $"emoji-name=\"{Sanitize(button.Emoji?.Name)}\"" : "")} \">" +
+                        $"{Sanitize(button.Label)}" +
+                    $"</discord-button>";
+                }))}</discord-action-row>";
+            }))}</discord-attachments>" : "")}" +
+            $"{string.Join("", msg.Stickers?.Select(x =>
+            {
+                var tempUrl = x.Url.TruncateAt(true, '?');
+                var type = "image";
+                var alt = x.Description;
+
+                return $"<discord-attachment slot=\"attachments\" " +
+                $"type=\"{type}\" " +
+                $"url=\"{Sanitize(x.Url)}\" " +
+                $"alt=\"{Sanitize(alt)}\" " +
+                $"height=\"160\" " +
+                $"width=\"160\"/>";
+            }))}" +
+            $"</discord-message>";
+
+            return messageBuilder;
+        }).ToArray();
+
+        if (!messageStrings.Any())
+            return string.Empty;
+
+        return LoadedHtml
+            .Replace("<--! RawMessages -->", Uri.EscapeDataString(JsonConvert.SerializeObject(messages.OrderBy(x => x.Id.GetSnowflakeTime().Ticks), new JsonSerializerSettings
+                {
+                    Formatting = Formatting.Indented,
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                    Error = (serializer, err) =>
+                    {
+                        _logger.LogError("Failed to serialize member '{member}' at '{path}'", err.ErrorContext.Error, err.ErrorContext.Member, err.ErrorContext.Path);
+                        err.ErrorContext.Handled = true;
+                    },
+                })))
+            .Replace("<--! RawMessageFileName -->", $"{Guid.NewGuid()}.txt")
+            .Replace("<!-- Title -->", "Chat History")
+            .Replace("<!-- MessageCount -->", messages.Count())
+            .Replace("<!-- Channel -->", $"{messages.First().Channel.GetIcon()}{Sanitize(messages.First().Channel.Name)} (<i>{messages.First().Channel.Id}</i>)")
+            .Replace("<!-- Guild -->", $"{Sanitize(messages.First().Channel.Guild.Name)} (<i>{messages.First().Channel.Guild.Id}</i>)")
+            .Replace("<!-- GenerationTime -->", DateTime.UtcNow.ToString())
+            .Replace("<!-- Bot -->", bot.DiscordClient.CurrentUser.GetUsernameWithIdentifier())
+            .Replace("<!-- Messages -->", string.Join("\n", messageStrings));
+    }
+
+    internal static string ConvertMarkdownToHtml(this string? md, Bot bot, bool isEmbed = false)
+    {
+        if (md.IsNullOrWhiteSpace())
+            return md;
+
+        md = md.ReplaceLineEndings("\n");
+
+        if (isEmbed)
+            md = string.Join("\n", md.Split("\n").Select(x => $"<div>{x}</div>"));
+
+        md = Regex.Replace(md, @"(?<!\\)\`([^\n`]+?)\`", (e) =>
+        {
+            return $"<discord-inline-code in-embed=\"{isEmbed.ToString().ToLower()}\" >{e.Groups[1].Value.Replace(" ", "&nbsp;")}</discord-inline-code>";
+        }, RegexOptions.Compiled);
+        
+        md = Regex.Replace(md, @"(?<!\\)(?:\`\`\`)(?:(\w{2,15})\n)?((?:.|\n)+?)(?:\`\`\`)", (e) =>
+        {
+            var lang = "";
+
+            if (e.Groups[1].Success)
+                lang = e.Groups[1].Value;
+
+            return $"<discord-code-block language=\"{lang}\"><pre>{e.Groups[2].Value.Replace(" ", "&nbsp;")}</pre></discord-code-block>";
+        }, RegexOptions.Compiled | RegexOptions.Multiline);
+
+        md = Regex.Replace(md, @"(?<!\\)\*\*([^\n*]+?)(?<!\\)\*\*", (e) =>
+        {
+            return $"<discord-bold>{e.Groups[1].Value}</discord-bold>";
+        }, RegexOptions.Compiled);
+
+        md = Regex.Replace(md, @"(?<!\\)\~\~([^\n~]+?)(?<!\\)\~\~", (e) =>
+        {
+            return $"<s>{e.Groups[1].Value}</s>";
+        }, RegexOptions.Compiled);
+
+        md = Regex.Replace(md, @"(?<!\\)__([^\n~]+?)(?<!\\)__", (e) =>
+        {
+            return $"<u>{e.Groups[1].Value}</u>";
+        }, RegexOptions.Compiled);
+
+        md = Regex.Replace(md, @"(?<!\\)\|\|([^\n|]+?)(?<!\\)\|\|", (e) =>
+        {
+            return $"<discord-spoiler>{e.Groups[1].Value}</discord-spoiler>";
+        }, RegexOptions.Compiled);
+
+        md = Regex.Replace(md, @"(?<!\\)\*([^\n*]+?)(?<!\\)\*", (e) =>
+        {
+            return $"<discord-italic>{e.Groups[1].Value}</discord-italic>";
+        }, RegexOptions.Compiled);
+
+        md = Regex.Replace(md, @"(?<![\\_])_([^\n_]+?)(?<!\\)_", (e) =>
+        {
+            return $"<discord-italic>{e.Groups[1].Value}</discord-italic>";
+        }, RegexOptions.Compiled);
+        
+        md = Regex.Replace(md, @"^(?<!\\)&gt; ([^\n_]+?)", (e) =>
+        {
+            return $"<discord-quote>{e.Groups[1].Value}</discord-quote>";
+        }, RegexOptions.Compiled | RegexOptions.Multiline);
+
+        md = Regex.Replace(md, @"(?<!\\)&lt;t:(\d+?)(:(\w))?&gt;", (e) =>
+        {
+            return $"<discord-time format=\"{e.Groups[3].Value}\" timestamp=\"{e.Groups[1].Value}\"></discord-time>";
+        }, RegexOptions.Compiled);
+        
+        md = Regex.Replace(md, @"(?<!\\)&lt;/([\w -]+?):(?:\d+?)&gt;", (e) =>
+        {
+            return $"<discord-mention type=\"slash\">{e.Groups[1].Value}</discord-mention>";
+        }, RegexOptions.Compiled);
+        
+        md = Regex.Replace(md, @"(&lt;)?(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=;]*))", (e) =>
+        {
+            var url = e.Groups[2].Value;
+
+            if ((e.Groups[1]?.Success ?? false) && url.Contains("&gt;"))
+                url = url[..url.IndexOf("&gt;")];
+
+            return $"<a target=\"_blank\" href=\"{url}\">{url}</a>";
+        }, RegexOptions.Compiled);
+
+        md = Regex.Replace(md, @"(?<!\\)&lt;@(?:!)?(\d+?)&gt;", (e) =>
+        {
+            try
+            {
+                return $"<discord-mention>{bot.DiscordClient!.GetUserAsync(e.Groups[1].Value.ToUInt64()).GetAwaiter().GetResult().GetUsername()}</discord-mention>";
+            }
+            catch (Exception)
+            {
+                return $"@{e.Groups[1].Value}";
+            }
+        }, RegexOptions.Compiled);
+
+        md = Regex.Replace(md, @"(?<!\\)&lt;#(?:!)?(\d+?)&gt;", (e) =>
+        {
+            try
+            {
+                var channel = bot.DiscordClient!.GetChannelAsync(e.Groups[1].Value.ToUInt64()).GetAwaiter().GetResult();
+                var type = channel.Type switch
+                {
+                    ChannelType.Voice => "voice",
+                    ChannelType.Stage => "voice",
+                    ChannelType.Forum => "forum",
+                    ChannelType.GuildMedia => "forum",
+                    ChannelType.PublicThread => "thread",
+                    ChannelType.PrivateThread => "thread",
+                    ChannelType.NewsThread => "thread",
+                    _ => "channel"
+                };
+
+
+                return $"<discord-mention type=\"{type}\">{channel.Name}</discord-mention>";
+            }
+            catch (Exception)
+            {
+                return $"@{e.Groups[1].Value}";
+            }
+        }, RegexOptions.Compiled);
+
+        md = Regex.Replace(md, @"(?<!\\)&lt;(a)?:(\w+?):(\d+?)&gt;", (e) =>
+        {
+            var url = $"https://cdn.discordapp.com/emojis/{e.Groups[3].Value}.{(e.Groups[1].Success ? "gif" : "png")}";
+
+            return $"<discord-custom-emoji name=\"{e.Groups[2].Value}\" url=\"{url}\"></discord-custom-emoji>";
+        }, RegexOptions.Compiled);
+
+        md = Regex.Replace(md, @"(?<!\\)(?<!\&gt;)(?<!a):\w+?:", (e) =>
+        {
+            if (!DiscordEmoji.TryFromName(bot.DiscordClient, e.Value, false, out var emoji))
+                return e.Value;
+            else
+                try
+                {
+                    return $"{emoji.UnicodeEmoji}";
+                }
+                catch (Exception)
+                {
+                    return e.Value;
+                }
+        }, RegexOptions.Compiled);
+
+        md = md.Replace("\\*", "*");
+        md = md.Replace("\\_", "_");
+        md = md.Replace("\\&gt;", "&gt;");
+        md = md.Replace("\\&lt;", "&lt;");
+        md = md.Replace("\\~", "~");
+        md = md.Replace("\\`", "`");
+        md = md.Replace("\\|", "|");
+
+        return md; // .ReplaceLineEndings("<br />")
+    }
+
     internal static Permissions[] GetEnumeration(this Permissions perms)
         => Enum.GetValues(perms.GetType()).Cast<Enum>().Where(x => perms.HasFlag(x)).Select(x => (Permissions)x.ToInt64()).ToArray();
 
@@ -42,7 +411,7 @@ internal static class DiscordExtensions
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "DCS0101:[Discord] InExperiment", Justification = "<Pending>")]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "DCS0102:[Discord] Deprecated", Justification = "<Pending>")]
     internal static string GetUsernameWithIdentifier(this DiscordUser user)
-        => user.IsMigrated ? user.UsernameWithGlobalName : user.UsernameWithDiscriminator;
+        => user.IsMigrated ? $"{user.GlobalName} ({user.Username})" : user.UsernameWithDiscriminator;
 
     internal static string ToTranslatedPermissionString(this Permissions perm, Guild guild, Bot _bot)
         => GetTranslationObject(perm, _bot) == _bot.LoadedTranslations.Common.MissingTranslation ? perm.ToPermissionString().Log(CustomLogLevel.Warn, "Missing Translation") : GetTranslationObject(perm, _bot).Get(guild);

@@ -1185,6 +1185,8 @@ public sealed class Translations
                 public SingleTranslationKey GlobalBanned;
                 public SingleTranslationKey JoinedBefore;
                 public SingleTranslationKey IsBanned;
+                public SingleTranslationKey NoStoredRoles;
+                public SingleTranslationKey NoRoles;
                 public SingleTranslationKey NeverJoined;
                 public SingleTranslationKey Bot;
                 public SingleTranslationKey System;
