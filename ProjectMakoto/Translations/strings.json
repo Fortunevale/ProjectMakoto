@@ -5259,7 +5259,7 @@
         },
         "TimedOut": {
           "en": "{Victim} was timed out for '{Reason}'. The Timeout will run out {Timestamp}.",
-          "de": "{Victim} würde für '{Reason}' in Timeout versetzt. Der Timeout wird {Timestamp} ablaufen."
+          "de": "{Victim} wurde für '{Reason}' in Timeout versetzt. Der Timeout wird {Timestamp} ablaufen."
         },
         "Failed": {
           "en": "Couldn't timeout {Victim}.",
