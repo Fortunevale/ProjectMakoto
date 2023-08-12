@@ -3418,6 +3418,14 @@
           "en": "User never joined this server.",
           "de": "Nutzer ist diesem Server noch nie beigetreten."
         },
+        "NoRoles": {
+          "en": "User doesn't have any roles.",
+          "de": "Nutzer hat keine Rollen."
+        },
+        "NoStoredRoles": {
+          "en": "User doesn't have any stored roles.",
+          "de": "Nutzer hatte keine Rollen."
+        },
         "IsBanned": {
           "en": "User is currently banned from this server.",
           "de": "Nutzer ist aktuell von diesem Server gebannt."
