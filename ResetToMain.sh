@@ -1,12 +1,10 @@
-echo "Resetting dev branch in 10 seconds, Ctrl+C to cancel."
-sleep 5
-echo "Resetting dev branch in 5 seconds, Ctrl+C to cancel."
+echo "Resetting dev branch in 5 seconds.."
 sleep 2
-echo "Resetting dev branch in 3 seconds, Ctrl+C to cancel."
+echo "Resetting dev branch in 3 seconds.."
 sleep 1
-echo "Resetting dev branch in 2 seconds, Ctrl+C to cancel."
+echo "Resetting dev branch in 2 seconds.."
 sleep 1
-echo "Resetting dev branch in 1 seconds, Ctrl+C to cancel."
+echo "Resetting dev branch in 1 seconds.."
 sleep 1
 echo "Resetting dev branch.."
 echo "Pulling main branch.."
