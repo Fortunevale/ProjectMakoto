@@ -744,8 +744,15 @@ internal sealed class ActionlogEvents : RequiresTranslation
             .WithTimestamp(DateTime.UtcNow)
             .WithThumbnail(e.Member.AvatarUrl)
             .WithDescription($"**{this.tKey.User.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`\n" +
-                             $"**{this.tKey.JoinedAt.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Member.JoinedAt.ToTimestamp()} ({e.Member.JoinedAt.ToTimestamp(TimestampFormat.LongDateTime)})")
-            .AddField(new DiscordEmbedField(this.tKey.Roles.Get(this.Bot.Guilds[e.Guild.Id]), $"{string.Join(", ", e.Member.Roles.Select(x => x.Mention))}".TruncateWithIndication(1000)));
+                             $"**{this.tKey.JoinedAt.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Member.JoinedAt.ToTimestamp()} ({e.Member.JoinedAt.ToTimestamp(TimestampFormat.LongDateTime)})");
+
+        if (e.Member.Roles?.Count > 0)
+        {
+            _ = embed.AddField(new DiscordEmbedField(
+                this.tKey.Roles.Get(this.Bot.Guilds[e.Guild.Id]),
+                $"{string.Join(", ", e.Member.Roles.Select(x => x.Mention))}"
+                    .TruncateWithIndication(1000)));
+        }
 
         var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
