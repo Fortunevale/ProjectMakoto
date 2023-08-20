@@ -43,7 +43,7 @@
     <PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.4.2-nightly-017" />
     <PackageReference Include="DisCatSharp.CommandsNext" Version="10.4.2-nightly-017" />
     <PackageReference Include="DisCatSharp.Common" Version="10.4.2-nightly-017" />
-    <PackageReference Include="DisCatSharp.Extensions.TwoFactorCommands" Version="1.0.0-alpha-007" />
+    <PackageReference Include="DisCatSharp.Extensions.TwoFactorCommands" Version="2.0.0" />
     <PackageReference Include="DisCatSharp.Interactivity" Version="10.4.2-nightly-017" />
     <PackageReference Include="DisCatSharp.Lavalink" Version="10.4.2-nightly-017" />
     <PackageReference Include="HtmlSanitizer" Version="8.0.692" />
