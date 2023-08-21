@@ -57,6 +57,33 @@ internal sealed class SyncTasks
                             }
                         }
                     }
+
+                    var userCache = new Dictionary<ulong, DiscordUser?>();
+
+                    if (user.Value.BlockedUsers.Count > 0)
+                    {
+                        for (var i = 0; i < user.Value.BlockedUsers.Count; i++)
+                        {
+                            var b = user.Value.BlockedUsers[i];
+
+                            if (!userCache.TryGetValue(b, out var victim))
+                            {
+                                if (bot.DiscordClient.TryGetUser(b, out var fetched))
+                                    userCache.Add(b, fetched);
+                                else
+                                    userCache.Add(b, null);
+
+                                victim = userCache[b];
+                            }
+
+                            if (victim is null || victim.Id == bot.DiscordClient.CurrentUser.Id || victim.Id == user.Key || victim.IsBot || (victim.Flags?.HasFlag(UserFlags.Staff) ?? false))
+                            {
+                                _logger.LogDebug("Removing '{victim}' from '{owner}' blocklist", b, user.Value.Id);
+                                i--;
+                                _ = user.Value.BlockedUsers.Remove(b);
+                            }
+                        }
+                    }
                 }
             }).Add(bot);
 
