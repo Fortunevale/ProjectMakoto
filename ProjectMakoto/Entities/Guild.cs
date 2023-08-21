@@ -34,7 +34,7 @@ public sealed class Guild : RequiresBotReference
         this.VcCreator = new(bot, this);
         this.PrefixSettings = new(bot, this);
 
-        this.Members = new(bot, (id) =>
+        this.Members = new((id) =>
         {
             return new Member(bot, this, id);
         });
