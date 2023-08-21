@@ -122,11 +122,11 @@ public sealed class Bot
             {
                 await Util.Initializers.ConfigLoader.Load(this);
 
-                this.Users = new(this, (id) =>
+                this.Users = new((id) =>
                 {
                     return new Entities.User(this, id);
                 });
-                this.Guilds = new(this, (id) =>
+                this.Guilds = new((id) =>
                 {
                     return new Entities.Guild(this, id);
                 });
