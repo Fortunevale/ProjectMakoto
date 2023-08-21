@@ -34,7 +34,10 @@ public sealed class Guild : RequiresBotReference
         this.VcCreator = new(bot, this);
         this.PrefixSettings = new(bot, this);
 
-        this.Members = new();
+        this.Members = new(bot, (id) =>
+        {
+            return new Member(bot, this, id);
+        });
     }
 
     internal ulong Id { get; set; }
@@ -59,7 +62,7 @@ public sealed class Guild : RequiresBotReference
     public List<LevelRewardEntry> LevelRewards { get; set; } = new();
     public List<KeyValuePair<ulong, ReactionRoleEntry>> ReactionRoles { get; set; } = new();
 
-    public Dictionary<ulong, Member> Members { get; set; }
+    public SelfFillingDictionary<Member> Members { get; set; }
 
     public Lavalink MusicModule { get; set; }
 

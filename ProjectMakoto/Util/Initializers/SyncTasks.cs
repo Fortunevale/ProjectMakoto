@@ -280,9 +280,6 @@ internal sealed class SyncTasks
 
                 foreach (var member in guildMembers)
                 {
-                    if (!bot.Guilds[guild.Key].Members.ContainsKey(member.Id))
-                        bot.Guilds[guild.Key].Members.Add(member.Id, new(bot, bot.Guilds[guild.Key], member.Id));
-
                     bot.ExperienceHandler.CheckExperience(member.Id, guild.Value);
 
                     if (bot.Guilds[guild.Key].Members[member.Id].FirstJoinDate == DateTime.UnixEpoch)
