@@ -28,9 +28,15 @@ public sealed class SelfFillingDictionary<T> : RequiresBotReference, IDictionary
             if (!this._items.ContainsKey(key) && key != 0)
             {
                 if (_newValuePredicate is not null)
+                {
+                    _logger.LogTrace("Creating '{id}' of type '{type}'", key, typeof(T).Name);
                     this._items.Add(key, _newValuePredicate.Invoke(key));
+                }
                 else
+                {
+                    _logger.LogWarn("Creating '{id}' of type '{type}' with default value", key, typeof(T).Name);
                     this._items.Add(key, default);
+                }
             }
 
             return this._items[key];
@@ -41,9 +47,15 @@ public sealed class SelfFillingDictionary<T> : RequiresBotReference, IDictionary
             if (!this._items.ContainsKey(key) && key != 0)
             {
                 if (_newValuePredicate is not null)
+                {
+                    _logger.LogTrace("Creating '{id}' of type '{type}'", key, typeof(T).Name);
                     this._items.Add(key, _newValuePredicate.Invoke(key));
+                }
                 else
+                {
+                    _logger.LogWarn("Creating '{id}' of type '{type}' with default value", key, typeof(T).Name);
                     this._items.Add(key, default);
+                }
             }
 
             this._items[key] = value;
