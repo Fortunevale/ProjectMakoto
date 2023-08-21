@@ -29,7 +29,7 @@ internal sealed class VcCreatorEvents : RequiresTranslation
                 if (!this.Bot.Guilds[e.Guild.Id].VcCreator.LastCreatedChannel.ContainsKey(e.User.Id))
                     this.Bot.Guilds[e.Guild.Id].VcCreator.LastCreatedChannel.Add(e.User.Id, DateTime.MinValue);
 
-                if (e.After.Channel.Parent is null || e.After.Channel.Parent.Children.Count >= 50 || this.Bot.Guilds[e.Guild.Id].VcCreator.LastCreatedChannel[e.User.Id].GetTimespanSince() < TimeSpan.FromSeconds(30))
+                if (e.After.Channel.Parent is null || e.After.Channel.Parent.Children.Count >= 50 || e.Guild.Channels.Count >= 500 || this.Bot.Guilds[e.Guild.Id].VcCreator.LastCreatedChannel[e.User.Id].GetTimespanSince() < TimeSpan.FromSeconds(30))
                 {
                     await member.DisconnectFromVoiceAsync();
                     return;
