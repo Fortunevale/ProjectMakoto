@@ -11,12 +11,14 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ProjectMakoto.Entities;
 
-public sealed class SelfFillingDictionary<T> : RequiresBotReference, IDictionary<ulong, T> where T : BaseSelfFillingListValue<T>
+public sealed class SelfFillingDictionary<T> : RequiresBotReference, IDictionary<ulong, T>
 {
-    public SelfFillingDictionary(Bot bot) : base(bot)
+    public SelfFillingDictionary(Bot bot, Func<ulong, T>? newValuePredicate = null) : base(bot)
     {
+        this._newValuePredicate = newValuePredicate;
     }
 
+    private Func<ulong, T>? _newValuePredicate;
     private Dictionary<ulong, T> _items = new();
 
     public T this[ulong key]
@@ -25,8 +27,10 @@ public sealed class SelfFillingDictionary<T> : RequiresBotReference, IDictionary
         {
             if (!this._items.ContainsKey(key) && key != 0)
             {
-                var t = new BaseSelfFillingListValue<T>(this.Bot, key);
-                this._items.Add(key, t.Convert(t));
+                if (_newValuePredicate is not null)
+                    this._items.Add(key, _newValuePredicate.Invoke(key));
+                else
+                    this._items.Add(key, default);
             }
 
             return this._items[key];
@@ -36,8 +40,10 @@ public sealed class SelfFillingDictionary<T> : RequiresBotReference, IDictionary
         {
             if (!this._items.ContainsKey(key) && key != 0)
             {
-                var t = new BaseSelfFillingListValue<T>(this.Bot, key);
-                this._items.Add(key, t.Convert(t));
+                if (_newValuePredicate is not null)
+                    this._items.Add(key, _newValuePredicate.Invoke(key));
+                else
+                    this._items.Add(key, default);
             }
 
             this._items[key] = value;
@@ -72,9 +78,7 @@ public sealed class SelfFillingDictionary<T> : RequiresBotReference, IDictionary
         => this._items.Remove(item.Key);
 
     public void CopyTo(KeyValuePair<ulong, T>[] array, int arrayIndex)
-    {
-        return;
-    }
+        => this._items.ToArray().CopyTo(array, arrayIndex);
 
     public bool Contains(KeyValuePair<ulong, T> item)
         => this._items.Contains(item);

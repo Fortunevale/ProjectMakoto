@@ -116,7 +116,7 @@ internal sealed class DiscordEventHandler : RequiresBotReference
         if (guild is not null)
         {
             if (!this.Bot.Guilds.ContainsKey(guild.Id))
-                this.Bot.Guilds.Add(guild.Id, new Guild(guild.Id, this.Bot));
+                this.Bot.Guilds.Add(guild.Id, new Guild(this.Bot, guild.Id));
 
             if (guild.Members is not null && guild.Members.Count > 0)
                 foreach (var b in guild.Members)

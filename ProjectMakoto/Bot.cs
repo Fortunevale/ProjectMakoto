@@ -122,8 +122,14 @@ public sealed class Bot
             {
                 await Util.Initializers.ConfigLoader.Load(this);
 
-                this.Users = new(this);
-                this.Guilds = new(this);
+                this.Users = new(this, (id) =>
+                {
+                    return new Entities.User(this, id);
+                });
+                this.Guilds = new(this, (id) =>
+                {
+                    return new Entities.Guild(this, id);
+                });
                 _ = await DatabaseClient.InitializeDatabase(this);
 
                 this.BumpReminder = new(this);

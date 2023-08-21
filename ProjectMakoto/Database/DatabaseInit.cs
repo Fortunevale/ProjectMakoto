@@ -37,7 +37,7 @@ internal sealed class DatabaseInit : RequiresBotReference
 
         foreach (var b in guilds)
         {
-            var DbGuild = new Guild(b.serverid, this.Bot);
+            var DbGuild = new Guild(this.Bot, b.serverid);
             this.Bot.Guilds.Add(b.serverid, DbGuild);
 
             DbGuild.PrefixSettings = new(this.Bot, DbGuild)

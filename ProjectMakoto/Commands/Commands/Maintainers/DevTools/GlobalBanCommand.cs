@@ -70,7 +70,7 @@ internal sealed class GlobalBanCommand : BaseCommand
             foreach (var b in ctx.Client.Guilds.OrderByDescending(x => x.Key == ctx.Guild.Id))
             {
                 if (!ctx.Bot.Guilds.ContainsKey(b.Key))
-                    ctx.Bot.Guilds.Add(b.Key, new Guild(b.Key, ctx.Bot));
+                    ctx.Bot.Guilds.Add(b.Key, new Guild(ctx.Bot, b.Key));
 
                 if (ctx.Bot.Guilds[b.Key].Join.AutoBanGlobalBans)
                 {
