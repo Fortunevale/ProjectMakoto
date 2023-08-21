@@ -95,7 +95,7 @@ internal sealed class SyncTasks
             foreach (var guild in e.Guilds)
             {
                 if (!bot.Guilds.ContainsKey(guild.Key))
-                    bot.Guilds.Add(guild.Key, new Guild(guild.Key, bot));
+                    bot.Guilds.Add(guild.Key, new Guild(bot, guild.Key));
 
                 if (bot.Guilds[guild.Key].BumpReminder.Enabled)
                 {

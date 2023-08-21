@@ -11,13 +11,12 @@ using ProjectMakoto.Entities.Guilds;
 
 namespace ProjectMakoto.Entities;
 
-public sealed class Guild : BaseSelfFillingListValue<Guild>
+public sealed class Guild : RequiresBotReference
 {
-    public override Guild Convert(BaseSelfFillingListValue<Guild> oldValue)
-        => new(oldValue.Id, oldValue.Bot);
-
-    public Guild(ulong serverId, Bot bot) : base(bot, serverId)
+    public Guild(Bot bot, ulong serverId) : base(bot)
     {
+        this.Id = serverId;
+
         this.TokenLeakDetection = new(bot, this);
         this.PhishingDetection = new(bot, this);
         this.BumpReminder = new(bot, this);
@@ -37,6 +36,8 @@ public sealed class Guild : BaseSelfFillingListValue<Guild>
 
         this.Members = new();
     }
+
+    internal ulong Id { get; set; }
 
     public TokenLeakDetectionSettings TokenLeakDetection { get; set; }
     public PhishingDetectionSettings PhishingDetection { get; set; }

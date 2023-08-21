@@ -11,15 +11,14 @@ using ProjectMakoto.Entities.Users;
 
 namespace ProjectMakoto.Entities;
 
-public sealed class User : BaseSelfFillingListValue<User>
+public sealed class User : RequiresBotReference
 {
-    public override User Convert(BaseSelfFillingListValue<User> oldValue)
-        => new(oldValue.Bot, oldValue.Id);
-
-    public User(Bot bot, ulong userId) : base(bot, userId)
+    public User(Bot bot, ulong userId) : base(bot)
     {
         if (bot.objectedUsers.Contains(userId))
             throw new InvalidOperationException($"User {userId} has objected to having their data processed.");
+
+        this.Id = userId;
 
         this.Cooldown = new(bot, this);
 
@@ -31,6 +30,8 @@ public sealed class User : BaseSelfFillingListValue<User>
         this.Translation = new(bot, this);
         this.TranslationReports = new(bot, this);
     }
+
+    internal ulong Id { get; set; }
 
     [JsonIgnore]
     public DataSettings Data { get; set; } = new();
