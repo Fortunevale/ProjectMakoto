@@ -24,7 +24,7 @@ internal sealed class AutoCrosspostCommand : BaseCommand
 
             foreach (var b in ctx.DbGuild.Crosspost.CrosspostChannels.ToList())
                 if (!ctx.Guild.Channels.ContainsKey(b))
-                    _ = ctx.DbGuild.Crosspost.CrosspostChannels.Remove(b);
+                    ctx.DbGuild.Crosspost.CrosspostChannels = ctx.DbGuild.Crosspost.CrosspostChannels.Remove(x => x.ToString(), b);
 
             string GetCurrentConfiguration(SharedCommandContext ctx)
             {
@@ -34,7 +34,7 @@ internal sealed class AutoCrosspostCommand : BaseCommand
 
                 return $"🤖 `{CommandKey.ExcludeBots.Get(ctx.DbUser).PadRight(pad)}`: {ctx.DbGuild.Crosspost.ExcludeBots.ToEmote(ctx.Bot)}\n" +
                        $"🕒 `{CommandKey.DelayBeforePosting.Get(ctx.DbUser).PadRight(pad)}`: `{TimeSpan.FromSeconds(ctx.DbGuild.Crosspost.DelayBeforePosting).GetHumanReadable()}`\n\n" +
-                       $"{(ctx.DbGuild.Crosspost.CrosspostChannels.Count != 0 ? string.Join("\n\n", ctx.DbGuild.Crosspost.CrosspostChannels.Select(x => $"<#{x}> `[#{ctx.Guild.GetChannel(x).Name}]`")) : CommandKey.NoCrosspostChannels.Get(ctx.DbUser).Build(true))}";
+                       $"{(ctx.DbGuild.Crosspost.CrosspostChannels.Length != 0 ? string.Join("\n\n", ctx.DbGuild.Crosspost.CrosspostChannels.Select(x => $"<#{x}> `[#{ctx.Guild.GetChannel(x).Name}]`")) : CommandKey.NoCrosspostChannels.Get(ctx.DbUser).Build(true))}";
             }
 
             var embed = new DiscordEmbedBuilder()
@@ -118,7 +118,7 @@ internal sealed class AutoCrosspostCommand : BaseCommand
             {
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                if (ctx.DbGuild.Crosspost.CrosspostChannels.Count >= 20)
+                if (ctx.DbGuild.Crosspost.CrosspostChannels.Length >= 20)
                 {
                     embed.Description = this.GetString(CommandKey.ChannelLimit, true, new TVar("Invite", ctx.Bot.status.DevelopmentServerInvite));
                     embed = embed.AsError(ctx, this.GetString(CommandKey.Title));
@@ -161,7 +161,7 @@ internal sealed class AutoCrosspostCommand : BaseCommand
                     return;
                 }
 
-                if (ctx.DbGuild.Crosspost.CrosspostChannels.Count >= 50)
+                if (ctx.DbGuild.Crosspost.CrosspostChannels.Length >= 50)
                 {
                     _ = await this.RespondOrEdit(embed.WithDescription(this.GetString(CommandKey.ChannelLimit, true, new TVar("Invite", ctx.Bot.status.DevelopmentServerInvite))).AsError(ctx, this.GetString(CommandKey.Title)));
                     await Task.Delay(5000);
@@ -170,7 +170,7 @@ internal sealed class AutoCrosspostCommand : BaseCommand
                 }
 
                 if (!ctx.DbGuild.Crosspost.CrosspostChannels.Contains(ChannelResult.Result.Id))
-                    ctx.DbGuild.Crosspost.CrosspostChannels.Add(ChannelResult.Result.Id);
+                    ctx.DbGuild.Crosspost.CrosspostChannels = ctx.DbGuild.Crosspost.CrosspostChannels.Add(ChannelResult.Result.Id);
 
                 await this.ExecuteCommand(ctx, arguments);
                 return;
@@ -180,7 +180,7 @@ internal sealed class AutoCrosspostCommand : BaseCommand
             {
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                if (ctx.DbGuild.Crosspost.CrosspostChannels.Count == 0)
+                if (ctx.DbGuild.Crosspost.CrosspostChannels.Length == 0)
                 {
                     _ = await this.RespondOrEdit(embed.WithDescription(this.GetString(CommandKey.NoCrosspostChannels, true)).AsError(ctx, this.GetString(CommandKey.Title)));
                     await Task.Delay(5000);
@@ -209,7 +209,7 @@ internal sealed class AutoCrosspostCommand : BaseCommand
                 var ChannelToRemove = Convert.ToUInt64(ChannelResult.Result);
 
                 if (ctx.DbGuild.Crosspost.CrosspostChannels.Contains(ChannelToRemove))
-                    _ = ctx.DbGuild.Crosspost.CrosspostChannels.Remove(ChannelToRemove);
+                    ctx.DbGuild.Crosspost.CrosspostChannels = ctx.DbGuild.Crosspost.CrosspostChannels.Remove(x => x.ToString(), ChannelToRemove);
 
                 await this.ExecuteCommand(ctx, arguments);
                 return;

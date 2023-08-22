@@ -59,7 +59,7 @@ internal sealed class LoadShareCommand : BaseCommand
             embed.Color = (ImportJson.PlaylistColor is "#FFFFFF" or null or "" ? EmbedColors.Info : new DiscordColor(ImportJson.PlaylistColor.IsValidHexColor()));
             embed.Description = $"{this.GetString(this.t.Commands.Music.Playlists.LoadShare.Found, true)}\n\n" +
                                 $"`{this.GetString(this.t.Commands.Music.Playlists.LoadShare.PlaylistName).PadRight(pad)}`: `{ImportJson.PlaylistName}`\n" +
-                                $"`{this.GetString(this.t.Commands.Music.Playlists.Tracks).PadRight(pad)}`: `{ImportJson.List.Count}`\n" +
+                                $"`{this.GetString(this.t.Commands.Music.Playlists.Tracks).PadRight(pad)}`: `{ImportJson.List.Length}`\n" +
                                 $"`{this.GetString(this.t.Commands.Music.Playlists.LoadShare.CreatedBy).PadRight(pad)}`: {user.Mention} `{user.GetUsernameWithIdentifier()} ({user.Id})`";
 
             DiscordButtonComponent Confirm = new(ButtonStyle.Success, Guid.NewGuid().ToString(), this.GetString(this.t.Commands.Music.Playlists.LoadShare.ImportButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📥")));
@@ -84,7 +84,7 @@ internal sealed class LoadShareCommand : BaseCommand
                     Description = this.GetString(this.t.Commands.Music.Playlists.LoadShare.Importing, true),
                 }.AsLoading(ctx, this.GetString(this.t.Commands.Music.Playlists.Title))));
 
-                if (ctx.DbUser.UserPlaylists.Count >= 10)
+                if (ctx.DbUser.UserPlaylists.Length >= 10)
                 {
                     _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
@@ -93,7 +93,7 @@ internal sealed class LoadShareCommand : BaseCommand
                     return;
                 }
 
-                ctx.DbUser.UserPlaylists.Add(ImportJson);
+                ctx.DbUser.UserPlaylists = ctx.DbUser.UserPlaylists.Add(ImportJson);
 
                 _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {

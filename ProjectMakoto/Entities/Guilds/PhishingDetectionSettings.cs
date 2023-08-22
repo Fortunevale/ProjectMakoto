@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Database.ColumnAttributes;
+
 namespace ProjectMakoto.Entities.Guilds;
 
 public sealed class PhishingDetectionSettings : RequiresParent<Guild>
@@ -15,73 +17,47 @@ public sealed class PhishingDetectionSettings : RequiresParent<Guild>
     {
     }
 
-    private bool _DetectPhishing { get; set; } = true;
+    [ColumnName("phishing_detect"), ColumnType(ColumnTypes.TinyInt)]
     public bool DetectPhishing
     {
-        get => this._DetectPhishing;
-        set
-        {
-            this._DetectPhishing = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "phishing_detect", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "phishing_detect", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "phishing_detect", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-
-    private bool _WarnOnRedirect { get; set; } = false;
+    [ColumnName("phishing_warnonredirect"), ColumnType(ColumnTypes.TinyInt)]
     public bool WarnOnRedirect
     {
-        get => this._WarnOnRedirect;
-        set
-        {
-            this._WarnOnRedirect = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "phishing_warnonredirect", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "phishing_warnonredirect", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "phishing_warnonredirect", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    private bool _AbuseIpDbReports { get; set; } = false;
+    [ColumnName("phishing_abuseipdb"), ColumnType(ColumnTypes.TinyInt)]
     public bool AbuseIpDbReports
     {
-        get => this._AbuseIpDbReports;
-        set
-        {
-            this._AbuseIpDbReports = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "phishing_abuseipdb", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "phishing_abuseipdb", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "phishing_abuseipdb", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-
-    private PhishingPunishmentType _PunishmentType { get; set; } = PhishingPunishmentType.Kick;
+    [ColumnName("phishing_type"), ColumnType(ColumnTypes.TinyInt), Default("2")]
     public PhishingPunishmentType PunishmentType
     {
-        get => this._PunishmentType;
-        set
-        {
-            this._PunishmentType = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "phishing_type", Convert.ToInt32(value), this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => (PhishingPunishmentType)this.Bot.DatabaseClient.GetValue<int>("guilds", "serverid", this.Parent.Id, "phishing_type", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "phishing_type", Convert.ToInt32(value), this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
 
-    private string _CustomPunishmentReason { get; set; } = "%R";
+    [ColumnName("phishing_reason"), ColumnType(ColumnTypes.Text), Collation("utf8_unicode_ci"), Default("%R")]
     public string CustomPunishmentReason
     {
-        get => this._CustomPunishmentReason;
-        set
-        {
-            this._CustomPunishmentReason = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "phishing_reason", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Parent.Id, "phishing_reason", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "phishing_reason", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
 
-    private TimeSpan _CustomPunishmentLength { get; set; } = TimeSpan.FromDays(14);
+    [ColumnName("phishing_reason"), ColumnType(ColumnTypes.Text), Collation("utf8_unicode_ci"), Default("1209600")]
     public TimeSpan CustomPunishmentLength
     {
-        get => this._CustomPunishmentLength;
-        set
-        {
-            this._CustomPunishmentLength = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "phishing_time", Convert.ToInt64(value.TotalSeconds), this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<TimeSpan>("guilds", "serverid", this.Parent.Id, "phishing_time", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "phishing_time", Convert.ToInt64(value.TotalSeconds), this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 }

@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Database.ColumnAttributes;
+
 namespace ProjectMakoto.Entities.Guilds;
 
 public sealed class BumpReminderSettings : RequiresParent<Guild>
@@ -15,109 +17,67 @@ public sealed class BumpReminderSettings : RequiresParent<Guild>
     {
     }
 
-    private bool _Enabled { get; set; } = false;
+    [ColumnName("bump_enabled"), ColumnType(ColumnTypes.TinyInt)]
     public bool Enabled
     {
-        get => this._Enabled;
-        set
-        {
-            this._Enabled = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "bump_enabled", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "bump_enabled", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "bump_enabled", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-
-    private ulong _RoleId { get; set; } = 0;
+    [ColumnName("bump_role"), ColumnType(ColumnTypes.BigInt)]
     public ulong RoleId
     {
-        get => this._RoleId;
-        set
-        {
-            this._RoleId = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "bump_role", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<ulong>("guilds", "serverid", this.Parent.Id, "bump_role", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "bump_role", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-
-    private ulong _ChannelId { get; set; } = 0;
+    [ColumnName("bump_channel"), ColumnType(ColumnTypes.BigInt)]
     public ulong ChannelId
     {
-        get => this._ChannelId;
-        set
-        {
-            this._ChannelId = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "bump_channel", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<ulong>("guilds", "serverid", this.Parent.Id, "bump_channel", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "bump_channel", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
 
-    private ulong _MessageId { get; set; } = 0;
+    [ColumnName("bump_message"), ColumnType(ColumnTypes.BigInt)]
     public ulong MessageId
     {
-        get => this._MessageId;
-        set
-        {
-            this._MessageId = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "bump_message", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<ulong>("guilds", "serverid", this.Parent.Id, "bump_message", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "bump_message", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-
-    private ulong _PersistentMessageId { get; set; } = 0;
+    [ColumnName("bump_persistent_msg"), ColumnType(ColumnTypes.BigInt)]
     public ulong PersistentMessageId
     {
-        get => this._PersistentMessageId;
-        set
-        {
-            this._PersistentMessageId = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "bump_persistent_msg", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<ulong>("guilds", "serverid", this.Parent.Id, "bump_persistent_msg", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "bump_persistent_msg", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-
-    private ulong _LastUserId { get; set; } = 0;
+    [ColumnName("bump_last_user"), ColumnType(ColumnTypes.BigInt)]
     public ulong LastUserId
     {
-        get => this._LastUserId;
-        set
-        {
-            this._LastUserId = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "bump_last_user", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<ulong>("guilds", "serverid", this.Parent.Id, "bump_last_user", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "bump_last_user", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-
-    private DateTime _LastBump { get; set; } = DateTime.MinValue;
+    [ColumnName("bump_last_time"), ColumnType(ColumnTypes.BigInt)]
     public DateTime LastBump
     {
-        get => this._LastBump;
-        set
-        {
-            this._LastBump = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "bump_last_time", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<DateTime>("guilds", "serverid", this.Parent.Id, "bump_last_time", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "bump_last_time", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-
-    private DateTime _LastReminder { get; set; } = DateTime.MinValue;
+    [ColumnName("bump_last_reminder"), ColumnType(ColumnTypes.BigInt)]
     public DateTime LastReminder
     {
-        get => this._LastReminder;
-        set
-        {
-            this._LastReminder = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "bump_last_reminder", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<DateTime>("guilds", "serverid", this.Parent.Id, "bump_last_reminder", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "bump_last_reminder", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    private int _BumpsMissed { get; set; } = 0;
+    [ColumnName("bump_last_reminder"), ColumnType(ColumnTypes.Int)]
     public int BumpsMissed
     {
-        get => this._BumpsMissed;
-        set
-        {
-            this._BumpsMissed = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "bump_missed", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<int>("guilds", "serverid", this.Parent.Id, "bump_missed", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "bump_missed", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 }

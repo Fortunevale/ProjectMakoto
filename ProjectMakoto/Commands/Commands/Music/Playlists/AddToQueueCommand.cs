@@ -52,7 +52,7 @@ internal sealed class AddToQueueCommand : BaseCommand
             {
                 Description = this.GetString(this.t.Commands.Music.Playlists.AddToQueue.Adding, true,
                 new TVar("Name", SelectedPlaylist.PlaylistName),
-                new TVar("", SelectedPlaylist.List.Count)),
+                new TVar("", SelectedPlaylist.List.Length)),
             }.AsLoading(ctx, this.GetString(this.t.Commands.Music.Playlists.Title)));
 
             ctx.DbGuild.MusicModule.SongQueue.AddRange(SelectedPlaylist.List.Select(x => new Lavalink.QueueInfo(x.Title, x.Url, x.Length.Value, ctx.Guild, ctx.User)));
@@ -60,10 +60,10 @@ internal sealed class AddToQueueCommand : BaseCommand
             _ = await this.RespondOrEdit(new DiscordEmbedBuilder
             {
                 Description = this.GetString(this.t.Commands.Music.Play.QueuedMultiple, true,
-                new TVar("Count", SelectedPlaylist.List.Count),
+                new TVar("Count", SelectedPlaylist.List.Length),
                 new TVar("Playlist", SelectedPlaylist.PlaylistName))
             }
-            .AddField(new DiscordEmbedField($"📜 {this.GetString(this.t.Commands.Music.Play.QueuePositions)}", $"{(ctx.DbGuild.MusicModule.SongQueue.Count - SelectedPlaylist.List.Count + 1)} - {ctx.DbGuild.MusicModule.SongQueue.Count}"))
+            .AddField(new DiscordEmbedField($"📜 {this.GetString(this.t.Commands.Music.Play.QueuePositions)}", $"{(ctx.DbGuild.MusicModule.SongQueue.Count - SelectedPlaylist.List.Length + 1)} - {ctx.DbGuild.MusicModule.SongQueue.Count}"))
             .AsSuccess(ctx, this.GetString(this.t.Commands.Music.Playlists.Title)));
         });
     }

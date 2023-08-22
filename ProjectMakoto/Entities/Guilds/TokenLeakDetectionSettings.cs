@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Database.ColumnAttributes;
+
 namespace ProjectMakoto.Entities.Guilds;
 
 public sealed class TokenLeakDetectionSettings : RequiresParent<Guild>
@@ -15,14 +17,10 @@ public sealed class TokenLeakDetectionSettings : RequiresParent<Guild>
     {
     }
 
-    private bool _DetectTokens { get; set; } = true;
+    [ColumnName("tokens_detect"), ColumnType(ColumnTypes.TinyInt)]
     public bool DetectTokens
     {
-        get => this._DetectTokens;
-        set
-        {
-            this._DetectTokens = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "tokens_detect", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "tokens_detect", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "tokens_detect", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 }

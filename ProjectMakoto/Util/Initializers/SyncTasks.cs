@@ -44,7 +44,7 @@ internal sealed class SyncTasks
 
                                     if (loadResult.LoadType != LavalinkLoadResultType.Track)
                                     {
-                                        _ = list.List.Remove(b);
+                                        list.List = list.List.Remove(x => x.Url, b);
                                         _logger.LogError("Failed to load video length for '{Url}'", b.Url);
                                         continue;
                                     }
@@ -60,9 +60,9 @@ internal sealed class SyncTasks
 
                     var userCache = new Dictionary<ulong, DiscordUser?>();
 
-                    if (user.Value.BlockedUsers.Count > 0)
+                    if (user.Value.BlockedUsers.Length > 0)
                     {
-                        for (var i = 0; i < user.Value.BlockedUsers.Count; i++)
+                        for (var i = 0; i < user.Value.BlockedUsers.Length; i++)
                         {
                             var b = user.Value.BlockedUsers[i];
 
@@ -80,7 +80,7 @@ internal sealed class SyncTasks
                             {
                                 _logger.LogDebug("Removing '{victim}' from '{owner}' blocklist", b, user.Value.Id);
                                 i--;
-                                _ = user.Value.BlockedUsers.Remove(b);
+                                user.Value.BlockedUsers = user.Value.BlockedUsers.Remove(x => x.ToString(), b);
                             }
                         }
                     }
@@ -106,7 +106,7 @@ internal sealed class SyncTasks
                 {
                     _ = Task.Run(async () =>
                     {
-                        for (var i = 0; i < bot.Guilds[guild.Key].Crosspost.CrosspostChannels.Count; i++)
+                        for (var i = 0; i < bot.Guilds[guild.Key].Crosspost.CrosspostChannels.Length; i++)
                         {
                             if (guild.Value is null)
                                 return;
@@ -368,6 +368,5 @@ internal sealed class SyncTasks
         runningTasks.Clear();
 
         _logger.LogInfo("Sync Tasks successfully finished for {startupTasksSuccess}/{GuildCount} guilds.", startupTasksSuccess, Guilds.Count);
-        _ = bot.DatabaseClient.FullSyncDatabase();
     }
 }

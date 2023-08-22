@@ -24,7 +24,7 @@ public sealed class InviteTrackerMember : RequiresParent<Member>
         set
         {
             this._UserId = value;
-            _ = this.Bot.DatabaseClient.UpdateValue(this.Parent.Parent.Id.ToString(), "userid", this.Parent.Id, "invite_user", value, this.Bot.DatabaseClient.guildDatabaseConnection);
+            _ = this.Bot.DatabaseClient.SetValue(this.Parent.Parent.Id.ToString(), "userid", this.Parent.Id, "invite_user", value, this.Bot.DatabaseClient.guildDatabaseConnection);
         }
     }
 
@@ -35,7 +35,7 @@ public sealed class InviteTrackerMember : RequiresParent<Member>
         set
         {
             this._Code = value;
-            _ = this.Bot.DatabaseClient.UpdateValue(this.Parent.Parent.Id.ToString(), "userid", this.Parent.Id, "invite_code", value, this.Bot.DatabaseClient.guildDatabaseConnection);
+            _ = this.Bot.DatabaseClient.SetValue(this.Parent.Parent.Id.ToString(), "userid", this.Parent.Id, "invite_code", value, this.Bot.DatabaseClient.guildDatabaseConnection);
         }
     }
 }

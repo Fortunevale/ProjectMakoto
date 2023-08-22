@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Database.ColumnAttributes;
+
 namespace ProjectMakoto.Entities.Users;
 
 public sealed class ScoreSaberSettings : RequiresParent<User>
@@ -15,14 +17,10 @@ public sealed class ScoreSaberSettings : RequiresParent<User>
     {
     }
 
-    private ulong _Id { get; set; } = 0;
+    [ColumnName("scoresaber_id"), ColumnType(ColumnTypes.BigInt)]
     public ulong Id
     {
-        get => this._Id;
-        set
-        {
-            this._Id = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "scoresaber_id", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<ulong>("users", "userid", this.Parent.Id, "scoresaber_id", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Parent.Id, "scoresaber_id", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 }

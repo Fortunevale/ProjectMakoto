@@ -24,7 +24,7 @@ public sealed class ExperienceMember : RequiresParent<Member>
         set
         {
             this._Last_Message = value;
-            _ = this.Bot.DatabaseClient.UpdateValue(this.Parent.Parent.Id.ToString(), "userid", this.Parent.Id, "experience_last_message", value, this.Bot.DatabaseClient.guildDatabaseConnection);
+            _ = this.Bot.DatabaseClient.SetValue(this.Parent.Parent.Id.ToString(), "userid", this.Parent.Id, "experience_last_message", value, this.Bot.DatabaseClient.guildDatabaseConnection);
         }
     }
 
@@ -35,7 +35,7 @@ public sealed class ExperienceMember : RequiresParent<Member>
         set
         {
             this._Points = value;
-            _ = this.Bot.DatabaseClient.UpdateValue(this.Parent.Parent.Id.ToString(), "userid", this.Parent.Id, "experience", value, this.Bot.DatabaseClient.guildDatabaseConnection);
+            _ = this.Bot.DatabaseClient.SetValue(this.Parent.Parent.Id.ToString(), "userid", this.Parent.Id, "experience", value, this.Bot.DatabaseClient.guildDatabaseConnection);
         }
     }
 
@@ -49,7 +49,7 @@ public sealed class ExperienceMember : RequiresParent<Member>
         set
         {
             this._Level = value;
-            _ = this.Bot.DatabaseClient.UpdateValue(this.Parent.Parent.Id.ToString(), "userid", this.Parent.Id, "experience_level", value, this.Bot.DatabaseClient.guildDatabaseConnection);
+            _ = this.Bot.DatabaseClient.SetValue(this.Parent.Parent.Id.ToString(), "userid", this.Parent.Id, "experience_level", value, this.Bot.DatabaseClient.guildDatabaseConnection);
         }
     }
 }

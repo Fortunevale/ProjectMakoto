@@ -7,32 +7,36 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Database.ColumnAttributes;
+
 namespace ProjectMakoto.Entities.Users;
 
 public sealed class ReminderSettings : RequiresParent<User>
 {
     public ReminderSettings(Bot bot, User parent) : base(bot, parent)
     {
-        this._ScheduledReminders.ItemsChanged += this.RemindersUpdated;
     }
 
-    ~ReminderSettings()
+    [ColumnName("reminders"), ColumnType(ColumnTypes.LongText), Collation("utf8_unicode_ci"), Default("[]")]
+    public ReminderItem[] ScheduledReminders
     {
-        this.ScheduledReminders.ItemsChanged -= this.RemindersUpdated;
+        get => JsonConvert.DeserializeObject<ReminderItem[]>(this.Bot.DatabaseClient.GetValue<string>("users", "userid", this.Parent.Id, "reminders", this.Bot.DatabaseClient.mainDatabaseConnection));
+        set
+        {
+            _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Parent.Id, "reminders", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);
+            this.RemindersUpdated();
+        }
     }
 
-    public ObservableList<ReminderItem> ScheduledReminders { get => this._ScheduledReminders; set { this._ScheduledReminders = value; this._ScheduledReminders.ItemsChanged += this.RemindersUpdated; } }
-    private ObservableList<ReminderItem> _ScheduledReminders { get; set; } = new();
-
-    private void RemindersUpdated(object? sender, ObservableListUpdate<ReminderItem> e)
+    private void RemindersUpdated()
     {
         _ = Task.Run(async () =>
         {
             while (!this.Bot.status.DiscordGuildDownloadCompleted)
                 await Task.Delay(1000);
 
-            if (this.ScheduledReminders.Count > 10)
-                this.ScheduledReminders.RemoveAt(0);
+            if (this.ScheduledReminders.Length > 10)
+                this.ScheduledReminders = this.ScheduledReminders.Take(10).ToArray();
 
             foreach (var b in this.ScheduledReminders.ToList())
                 if (!ScheduledTaskExtensions.GetScheduledTasks().ContainsTask("reminder", this.Parent.Id, b.UUID))
@@ -41,7 +45,7 @@ public sealed class ReminderSettings : RequiresParent<User>
                     {
                         var CommandKey = this.Bot.LoadedTranslations.Commands.Utility.Reminders;
 
-                        _ = this.ScheduledReminders.Remove(b);
+                        this.ScheduledReminders = this.ScheduledReminders.Remove(x => x.ToString(), b);
 
                         var user = await this.Bot.DiscordClient.Guilds.First<KeyValuePair<ulong, DiscordGuild>>(x => x.Value.Members.ContainsKey(this.Parent.Id)).Value.GetMemberAsync(this.Parent.Id);
 

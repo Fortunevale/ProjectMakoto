@@ -47,24 +47,6 @@ internal sealed class DatabaseHelper
             : $" ON DUPLICATE KEY UPDATE {string.Join(", ", typeof(TableDefinitions).GetNestedTypes().First(x => x.Name == propertyname).GetProperties().Select(x => $"{x.Name}=values({x.Name})"))}";
     }
 
-    public string GetUpdateValueCommand(string table, string columnKey, object rowKey, string columnToEdit, object newValue)
-    {
-        if (this._databaseClient.IsDisposed())
-            throw new Exception("DatabaseHelper is disposed");
-
-        if (newValue.GetType() == typeof(bool))
-            newValue = ((bool)newValue ? "1" : "0");
-
-        if (newValue.GetType() == typeof(DateTime))
-            newValue = ((DateTime)newValue).ToUniversalTime().Ticks;
-
-        var v = MySqlHelper.EscapeString(newValue.ToString());
-
-        return Regex.IsMatch(v, @"^(?=.*SELECT.*FROM)(?!.*(?:CREATE|DROP|UPDATE|INSERT|ALTER|DELETE|ATTACH|DETACH)).*$", RegexOptions.IgnoreCase)
-            ? throw new InvalidOperationException("Sql detected.")
-            : $"UPDATE `{table}` SET `{columnToEdit}`='{v}' WHERE `{columnKey}`='{rowKey}'";
-    }
-
     public async Task<IEnumerable<string>> ListTables(MySqlConnection connection)
     {
         if (this._databaseClient.IsDisposed())
@@ -125,7 +107,7 @@ internal sealed class DatabaseHelper
         var cmd = connection.CreateCommand();
         cmd.CommandText = $"DELETE FROM `{table}` WHERE {row_match}='{value}'";
         cmd.Connection = connection;
-        return this._databaseClient._queue.RunCommand(cmd);
+        return this._databaseClient.RunCommand(cmd);
     }
 
     public Task DropTable(MySqlConnection connection, string table)
@@ -136,7 +118,7 @@ internal sealed class DatabaseHelper
         var cmd = connection.CreateCommand();
         cmd.CommandText = $"DROP TABLE IF EXISTS `{table}`";
         cmd.Connection = connection;
-        return this._databaseClient._queue.RunCommand(cmd);
+        return this._databaseClient.RunCommand(cmd);
     }
 
     public async Task SelectDatabase(MySqlConnection connection, string databaseName, bool CreateIfNotExist = false)

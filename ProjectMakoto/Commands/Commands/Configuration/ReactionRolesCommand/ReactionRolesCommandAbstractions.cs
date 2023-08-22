@@ -22,13 +22,13 @@ internal sealed class ReactionRolesCommandAbstractions
         {
             if (!ctx.Guild.Channels.ContainsKey(b.Value.ChannelId))
             {
-                _ = ctx.DbGuild.ReactionRoles.Remove(b);
+                ctx.DbGuild.ReactionRoles = ctx.DbGuild.ReactionRoles.Remove(x => x.Key.ToString(), b);
                 continue;
             }
 
             if (!ctx.Guild.Roles.ContainsKey(b.Value.RoleId))
             {
-                _ = ctx.DbGuild.ReactionRoles.Remove(b);
+                ctx.DbGuild.ReactionRoles = ctx.DbGuild.ReactionRoles.Remove(x => x.Key.ToString(), b);
                 continue;
             }
 
@@ -45,21 +45,21 @@ internal sealed class ReactionRolesCommandAbstractions
                 {
                     messageCache.Add(b.Key, null);
 
-                    _ = ctx.DbGuild.ReactionRoles.Remove(b);
+                    ctx.DbGuild.ReactionRoles = ctx.DbGuild.ReactionRoles.Remove(x => x.Key.ToString(), b);
                     continue;
                 }
                 catch (DisCatSharp.Exceptions.UnauthorizedException)
                 {
                     messageCache.Add(b.Key, null);
 
-                    _ = ctx.DbGuild.ReactionRoles.Remove(b);
+                    ctx.DbGuild.ReactionRoles = ctx.DbGuild.ReactionRoles.Remove(x => x.Key.ToString(), b);
                     continue;
                 }
             }
 
             if (messageCache[b.Key] == null)
             {
-                _ = ctx.DbGuild.ReactionRoles.Remove(b);
+                ctx.DbGuild.ReactionRoles = ctx.DbGuild.ReactionRoles.Remove(x => x.Key.ToString(), b);
                 continue;
             }
 
@@ -71,7 +71,7 @@ internal sealed class ReactionRolesCommandAbstractions
                 {
                     if (x.IsFaulted)
                     {
-                        _ = ctx.DbGuild.ReactionRoles.Remove(b);
+                        ctx.DbGuild.ReactionRoles = ctx.DbGuild.ReactionRoles.Remove(x => x.Key.ToString(), b);
                     }
                 });
                 continue;

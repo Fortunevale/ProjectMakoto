@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Database.ColumnAttributes;
+
 namespace ProjectMakoto.Entities.Guilds;
 
 public sealed class CrosspostSettings : RequiresParent<Guild>
@@ -15,31 +17,39 @@ public sealed class CrosspostSettings : RequiresParent<Guild>
     {
     }
 
-    private int _DelayBeforePosting { get; set; } = 0;
+    [ColumnName("crosspostdelay"), ColumnType(ColumnTypes.Int)]
     public int DelayBeforePosting
     {
-        get => this._DelayBeforePosting;
-        set
-        {
-            this._DelayBeforePosting = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "crosspostdelay", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<int>("guilds", "serverid", this.Parent.Id, "crosspostdelay", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "crosspostdelay", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    private bool _ExcludeBots { get; set; } = false;
+    [ColumnName("crosspostdelay"), ColumnType(ColumnTypes.TinyInt)]
     public bool ExcludeBots
     {
-        get => this._ExcludeBots;
-        set
-        {
-            this._ExcludeBots = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "crosspostexcludebots", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "crosspostexcludebots", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "crosspostexcludebots", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    public List<ulong> CrosspostChannels { get; set; } = new();
+    [ColumnName("crosspostchannels"), ColumnType(ColumnTypes.LongText)]
+    public ulong[] CrosspostChannels
+    {
+        get => JsonConvert.DeserializeObject<ulong[]>(this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Parent.Id, "crosspostchannels", this.Bot.DatabaseClient.mainDatabaseConnection));
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "crosspostchannels", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
 
-    public Dictionary<ulong, CrosspostRatelimit> CrosspostRatelimits { get; set; } = new();
+    public CrosspostRatelimit[] CrosspostRatelimits
+    {
+        get => JsonConvert.DeserializeObject<CrosspostRatelimit[]>(this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Parent.Id, "crosspost_ratelimits", this.Bot.DatabaseClient.mainDatabaseConnection))
+            .Select(x =>
+            {
+                x.Bot = this.Bot;
+                x.Parent = this.Parent;
+
+                return x;
+            }).ToArray();
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "crosspost_ratelimits", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
 
     private bool QueueInitialized = false;
     private Dictionary<DiscordMessage, DiscordChannel> _queue = new();
@@ -71,10 +81,13 @@ public sealed class CrosspostSettings : RequiresParent<Guild>
 
             try
             {
-                if (!this.CrosspostRatelimits.ContainsKey(channel.Id))
+                if (!this.CrosspostRatelimits.Any(x => x.Id == channel.Id))
                 {
                     _logger.LogDebug("Initialized new crosspost ratelimit for '{Channel}'", channel.Id);
-                    this.CrosspostRatelimits.Add(channel.Id, new());
+                    this.CrosspostRatelimits = this.CrosspostRatelimits.Add(new()
+                    {
+                        Id = channel.Id,
+                    });
                 }
 
                 var r = this.CrosspostRatelimits[channel.Id];

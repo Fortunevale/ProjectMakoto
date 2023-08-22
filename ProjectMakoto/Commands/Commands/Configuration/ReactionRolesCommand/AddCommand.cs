@@ -156,7 +156,7 @@ internal sealed class AddCommand : BaseCommand
 
             embed.Author.IconUrl = ctx.Guild.IconUrl;
 
-            if (ctx.DbGuild.ReactionRoles.Count > 100)
+            if (ctx.DbGuild.ReactionRoles.Length > 100)
             {
                 embed.Description = this.GetString(CommandKey.ReactionRoleLimitReached, true);
                 _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, this.GetString(CommandKey.Title))));
@@ -186,7 +186,7 @@ internal sealed class AddCommand : BaseCommand
 
             await message.CreateReactionAsync(emoji_parameter);
 
-            ctx.DbGuild.ReactionRoles.Add(new KeyValuePair<ulong, ReactionRoleEntry>(message.Id, new()
+            ctx.DbGuild.ReactionRoles = ctx.DbGuild.ReactionRoles.Add(new KeyValuePair<ulong, ReactionRoleEntry>(message.Id, new()
             {
                 ChannelId = message.Channel.Id,
                 RoleId = role_parameter.Id,

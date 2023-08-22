@@ -26,7 +26,7 @@ public sealed class VcCreatorSettings : RequiresParent<Guild>
         get => this._Channel; set
         {
             this._Channel = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "vccreator_channelid", value, this.Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "vccreator_channelid", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
