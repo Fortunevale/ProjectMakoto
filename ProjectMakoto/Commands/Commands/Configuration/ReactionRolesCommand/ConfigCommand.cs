@@ -31,12 +31,12 @@ internal sealed class ConfigCommand : BaseCommand
 
             _ = await ReactionRolesCommandAbstractions.CheckForInvalid(ctx);
 
-            var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.AddNewReactionRole), (ctx.DbGuild.ReactionRoles.Count > 100), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
-            var RemoveButton = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), this.GetString(CommandKey.RemoveReactionRole), (ctx.DbGuild.ReactionRoles.Count == 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
+            var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.AddNewReactionRole), (ctx.DbGuild.ReactionRoles.Length > 100), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
+            var RemoveButton = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), this.GetString(CommandKey.RemoveReactionRole), (ctx.DbGuild.ReactionRoles.Length == 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = this.GetString(CommandKey.ReactionRoleCount, true, new TVar("Count", ctx.DbGuild.ReactionRoles.Count))
+                Description = this.GetString(CommandKey.ReactionRoleCount, true, new TVar("Count", ctx.DbGuild.ReactionRoles.Length))
             }.AsAwaitingInput(ctx, this.GetString(CommandKey.Title));
 
             _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
@@ -79,7 +79,7 @@ internal sealed class ConfigCommand : BaseCommand
                     }.AsAwaitingInput(ctx, this.GetString(CommandKey.Title));
 
 
-                    if (ctx.DbGuild.ReactionRoles.Count > 100)
+                    if (ctx.DbGuild.ReactionRoles.Length > 100)
                     {
                         action_embed.Description = this.GetString(CommandKey.ReactionRoleLimitReached, true);
                         _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
@@ -256,7 +256,7 @@ internal sealed class ConfigCommand : BaseCommand
                     {
                         _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        if (ctx.DbGuild.ReactionRoles.Count > 100)
+                        if (ctx.DbGuild.ReactionRoles.Length > 100)
                         {
                             action_embed.Description = this.GetString(CommandKey.ReactionRoleLimitReached, true);
                             _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
@@ -292,7 +292,7 @@ internal sealed class ConfigCommand : BaseCommand
                             return;
                         }
 
-                        ctx.DbGuild.ReactionRoles.Add(new KeyValuePair<ulong, ReactionRoleEntry>(selectedMessage.Id, new()
+                        ctx.DbGuild.ReactionRoles = ctx.DbGuild.ReactionRoles.Add(new KeyValuePair<ulong, ReactionRoleEntry>(selectedMessage.Id, new()
                         {
                             ChannelId = selectedMessage.Channel.Id,
                             RoleId = selectedRole.Id,
@@ -350,7 +350,7 @@ internal sealed class ConfigCommand : BaseCommand
 
                 var role = ctx.Guild.GetRole(obj.Value.RoleId);
 
-                _ = ctx.DbGuild.ReactionRoles.Remove(obj);
+                ctx.DbGuild.ReactionRoles = ctx.DbGuild.ReactionRoles.Remove(x => x.Key.ToString(), obj);
 
 
                 embed.Description = this.GetString(CommandKey.RemovedReactionRole, true,

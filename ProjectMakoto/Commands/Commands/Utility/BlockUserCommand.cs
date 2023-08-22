@@ -31,7 +31,7 @@ internal sealed class BlockUserCommand : BaseCommand
                 return;
             }
 
-            ctx.DbUser.BlockedUsers.Add(victim.Id);
+            ctx.DbUser.BlockedUsers = ctx.DbUser.BlockedUsers.Add(victim.Id);
 
             _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(CommandKey.Blocked, true, new TVar("User", victim.Mention))).AsSuccess(ctx));
         });

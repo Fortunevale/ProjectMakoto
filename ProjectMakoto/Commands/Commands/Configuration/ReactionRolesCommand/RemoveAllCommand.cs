@@ -73,7 +73,7 @@ internal sealed class RemoveAllCommand : BaseCommand
             }
 
             foreach (var b in ctx.DbGuild.ReactionRoles.Where(x => x.Key == message.Id).ToList())
-                _ = ctx.DbGuild.ReactionRoles.Remove(b);
+                ctx.DbGuild.ReactionRoles = ctx.DbGuild.ReactionRoles.Remove(x => x.Key.ToString(), b);
 
             _ = message.DeleteAllReactionsAsync();
 

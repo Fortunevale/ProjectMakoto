@@ -109,7 +109,7 @@ internal sealed class RemoveCommand : BaseCommand
             var reactionMessage = await channel.GetMessageAsync(obj.Key);
             _ = reactionMessage.DeleteReactionsEmojiAsync(obj.Value.GetEmoji(ctx.Client));
 
-            _ = ctx.DbGuild.ReactionRoles.Remove(obj);
+            ctx.DbGuild.ReactionRoles = ctx.DbGuild.ReactionRoles.Remove(x => x.Key.ToString(), obj);
 
             embed.Description = this.GetString(CommandKey.RemovedReactionRole, true,
                 new TVar("Role", role.Mention),

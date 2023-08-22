@@ -36,7 +36,7 @@ internal sealed class DeleteCommand : BaseCommand
                 Description = this.GetString(this.t.Commands.Music.Playlists.Delete.Deleting, true, new TVar("Name", SelectedPlaylist.PlaylistName)),
             }.AsLoading(ctx, this.GetString(this.t.Commands.Music.Playlists.Title))));
 
-            _ = ctx.DbUser.UserPlaylists.Remove(SelectedPlaylist);
+            ctx.DbUser.UserPlaylists = ctx.DbUser.UserPlaylists.Remove(x => x.PlaylistId, SelectedPlaylist);
 
             _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {

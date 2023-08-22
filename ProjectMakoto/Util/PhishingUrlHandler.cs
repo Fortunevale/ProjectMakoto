@@ -86,8 +86,6 @@ internal sealed class PhishingUrlHandler : RequiresBotReference
         {
             this.UpdateRunning = true;
 
-            await this.Bot.DatabaseClient.FullSyncDatabase();
-
             if (dropUrls.Count != 0)
                 foreach (var b in dropUrls)
                 {

@@ -25,7 +25,7 @@ internal sealed class UnblockUserCommand : BaseCommand
                 return;
             }
 
-            _ = ctx.DbUser.BlockedUsers.Remove(victim.Id);
+            ctx.DbUser.BlockedUsers = ctx.DbUser.BlockedUsers.Remove(x => x.ToString(), victim.Id);
 
             _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(CommandKey.Unblocked, true, new TVar("User", victim.Mention))).AsSuccess(ctx));
         });

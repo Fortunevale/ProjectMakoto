@@ -20,7 +20,7 @@ internal sealed class ImportCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForModerate(ctx))
                 return;
 
-            if (ctx.DbUser.UserPlaylists.Count >= 10)
+            if (ctx.DbUser.UserPlaylists.Length >= 10)
             {
                 _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
@@ -90,7 +90,7 @@ internal sealed class ImportCommand : BaseCommand
                 {
                     var playlistResult = loadResult.GetResultAs<LavalinkPlaylist>();
 
-                    if (ctx.DbUser.UserPlaylists.Count >= 10)
+                    if (ctx.DbUser.UserPlaylists.Length >= 10)
                     {
                         _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                         {
@@ -107,16 +107,16 @@ internal sealed class ImportCommand : BaseCommand
                     var v = new UserPlaylist
                     {
                         PlaylistName = playlistResult.Info.Name,
-                        List = playlistResult.Tracks.Select(x => new PlaylistEntry { Title = x.Info.Title, Url = x.Info.Uri.ToString(), Length = x.Info.Length }).Take(250).ToList()
+                        List = playlistResult.Tracks.Select(x => new PlaylistEntry { Title = x.Info.Title, Url = x.Info.Uri.ToString(), Length = x.Info.Length }).Take(250).ToArray()
                     };
 
-                    ctx.DbUser.UserPlaylists.Add(v);
+                    ctx.DbUser.UserPlaylists = ctx.DbUser.UserPlaylists.Add(v);
 
                     _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
                         Description = this.GetString(this.t.Commands.Music.Playlists.Import.Created, true,
                         new TVar("Name", v.PlaylistName),
-                        new TVar("Count", v.List.Count)),
+                        new TVar("Count", v.List.Length)),
                     }.AsSuccess(ctx, this.GetString(this.t.Commands.Music.Playlists.Title))));
                     await Task.Delay(5000);
                     return;
@@ -166,12 +166,12 @@ internal sealed class ImportCommand : BaseCommand
 
                     var ImportJson = JsonConvert.DeserializeObject<UserPlaylist>((rawJson is null or "null" or "" ? "[]" : rawJson), new JsonSerializerSettings() { MissingMemberHandling = MissingMemberHandling.Error });
 
-                    ImportJson.List = ImportJson.List.Where(x => RegexTemplates.Url.IsMatch(x.Url)).Select(x => new PlaylistEntry { Title = x.Title, Url = x.Url, Length = x.Length }).Take(250).ToList();
+                    ImportJson.List = ImportJson.List.Where(x => RegexTemplates.Url.IsMatch(x.Url)).Select(x => new PlaylistEntry { Title = x.Title, Url = x.Url, Length = x.Length }).Take(250).ToArray();
 
                     if (!ImportJson.List.Any())
                         throw new Exception();
 
-                    if (ctx.DbUser.UserPlaylists.Count >= 10)
+                    if (ctx.DbUser.UserPlaylists.Length >= 10)
                     {
                         _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                         {
@@ -187,13 +187,13 @@ internal sealed class ImportCommand : BaseCommand
                         PlaylistColor = ImportJson.PlaylistColor
                     };
 
-                    ctx.DbUser.UserPlaylists.Add(v);
+                    ctx.DbUser.UserPlaylists = ctx.DbUser.UserPlaylists.Add(v);
 
                     _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
                         Description = this.GetString(this.t.Commands.Music.Playlists.Import.Created, true,
                         new TVar("Name", v.PlaylistName),
-                        new TVar("Count", v.List.Count)),
+                        new TVar("Count", v.List.Length)),
                     }.AsSuccess(ctx, this.GetString(this.t.Commands.Music.Playlists.Title))));
                     await Task.Delay(5000);
                     return;

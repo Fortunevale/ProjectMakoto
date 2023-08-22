@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Database.ColumnAttributes;
+
 namespace ProjectMakoto.Entities.Guilds;
 
 public sealed class ExperienceSettings : RequiresParent<Guild>
@@ -15,27 +17,17 @@ public sealed class ExperienceSettings : RequiresParent<Guild>
     {
     }
 
-    private bool _UseExperience { get; set; } = false;
+    [ColumnName("experience_use"), ColumnType(ColumnTypes.TinyInt)]
     public bool UseExperience
     {
-        get => this._UseExperience;
-        set
-        {
-            this._UseExperience = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "experience_use", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "experience_use", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "experience_use", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-
-
-    private bool _BoostXpForBumpReminder { get; set; } = false;
+    [ColumnName("experience_boost_bumpreminder"), ColumnType(ColumnTypes.TinyInt)]
     public bool BoostXpForBumpReminder
     {
-        get => this._BoostXpForBumpReminder;
-        set
-        {
-            this._BoostXpForBumpReminder = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "experience_boost_bumpreminder", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "experience_boost_bumpreminder", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "experience_boost_bumpreminder", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 }

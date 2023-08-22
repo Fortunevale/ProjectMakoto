@@ -7,10 +7,12 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Database.ColumnAttributes;
 using ProjectMakoto.Entities.Users;
 
 namespace ProjectMakoto.Entities;
 
+[TableName("users")]
 public sealed class User : RequiresBotReference
 {
     public User(Bot bot, ulong userId) : base(bot)
@@ -29,26 +31,73 @@ public sealed class User : RequiresBotReference
         this.Reminders = new(bot, this);
         this.Translation = new(bot, this);
         this.TranslationReports = new(bot, this);
+        this.Data = new(bot, this);
     }
 
+    [ColumnName("userid"), ColumnType(ColumnTypes.BigInt), Primary]
     internal ulong Id { get; set; }
 
-    [JsonIgnore]
-    public DataSettings Data { get; set; } = new();
-
+    [ContainsValues]
     public UrlSubmissionSettings UrlSubmissions { get; set; }
+
+    [ContainsValues]
     public AfkStatus AfkStatus { get; set; }
+
+    [ContainsValues]
     public ScoreSaberSettings ScoreSaber { get; set; }
+
+    [ContainsValues]
     public ExperienceUserSettings ExperienceUser { get; set; }
+
+    [ContainsValues]
     public ReminderSettings Reminders { get; set; }
+
+    [ContainsValues]
     public TranslationSettings Translation { get; set; }
+
+    [ContainsValues]
     public TranslationReportSettings TranslationReports { get; set; }
 
-    public List<ulong> BlockedUsers { get; set; } = new();
-    public List<UserPlaylist> UserPlaylists { get; set; } = new();
+    [ContainsValues]
+    public DataSettings Data { get; set; }
 
-    public string? CurrentLocale { get; set; } = null;
-    public string? OverrideLocale { get; set; } = null;
+    [ColumnName("blocked_users"), ColumnType(ColumnTypes.LongText), Collation("utf8_unicode_ci"), Default("[]")]
+    public ulong[] BlockedUsers
+    {
+        get => JsonConvert.DeserializeObject<ulong[]>(this.Bot.DatabaseClient.GetValue<string>("users", "userid", this.Id, "blocked_users", this.Bot.DatabaseClient.mainDatabaseConnection));
+        set => this.Bot.DatabaseClient.SetValue("users", "userid", this.Id, "blocked_users", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
+
+    [ColumnName("playlists"), ColumnType(ColumnTypes.LongText), Collation("utf8_unicode_ci"), Default("[]")]
+    public UserPlaylist[] UserPlaylists
+    {
+        get
+        {
+            return JsonConvert.DeserializeObject<UserPlaylist[]>(this.Bot.DatabaseClient.GetValue<string>("users", "userid", this.Id, "playlists", this.Bot.DatabaseClient.mainDatabaseConnection))
+                .Select(x =>
+                {
+                    x.Bot = this.Bot;
+                    x.Parent = this;
+
+                    return x;
+                }).ToArray();
+        }
+        set => this.Bot.DatabaseClient.SetValue("users", "userid", this.Id, "playlists", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
+
+    [ColumnName("current_locale"), ColumnType(ColumnTypes.Text), Collation("utf8_unicode_ci"), Nullable]
+    public string? CurrentLocale
+    {
+        get => this.Bot.DatabaseClient.GetValue<string>("users", "userid", this.Id, "current_locale", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Id, "current_locale", value, this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
+
+    [ColumnName("override_locale"), ColumnType(ColumnTypes.Text), Collation("utf8_unicode_ci"), Nullable]
+    public string? OverrideLocale
+    {
+        get => this.Bot.DatabaseClient.GetValue<string>("users", "userid", this.Id, "override_locale", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Id, "override_locale", value, this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
 
     [JsonIgnore]
     public string? Locale

@@ -11,8 +11,51 @@ namespace ProjectMakoto.Entities.Guilds;
 
 public sealed class InviteTrackerCacheItem
 {
-    public ulong CreatorId { get; set; }
-    public string Code { get; set; }
+    [JsonIgnore]
+    public Bot Bot { get; set; }
 
-    public long Uses { get; set; }
+    [JsonIgnore]
+    public Guild Parent { get; set; }
+
+    private ulong _CreatorId { get; set; }
+    public ulong CreatorId
+    {
+        get => this._CreatorId;
+        set
+        {
+            this._CreatorId = value;
+            this.Update();
+        }
+    }
+
+
+    private string _Code { get; set; }
+    public string Code
+    {
+        get => this._Code;
+        set
+        {
+            this._Code = value;
+            this.Update();
+        }
+    }
+
+    private long _Uses { get; set; }
+    public long Uses
+    {
+        get => this._Uses;
+        set
+        {
+            this._Uses = value;
+            this.Update();
+        }
+    }
+
+    void Update()
+    {
+        if (this.Bot is null || this.Parent is null)
+            return;
+
+        this.Parent.InviteTracker.Cache = this.Parent.InviteTracker.Cache.Update(x => x.Code, this);
+    }
 }

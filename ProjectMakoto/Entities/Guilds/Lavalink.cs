@@ -30,7 +30,7 @@ public sealed class Lavalink : RequiresParent<Guild>
         set
         {
             this._ChannelId = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "lavalink_channel", value, this.Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "lavalink_channel", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -41,7 +41,7 @@ public sealed class Lavalink : RequiresParent<Guild>
         set
         {
             this._CurrentVideo = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "lavalink_currentvideo", value, this.Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "lavalink_currentvideo", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -52,7 +52,7 @@ public sealed class Lavalink : RequiresParent<Guild>
         set
         {
             this._CurrentVideoPosition = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "lavalink_currentposition", value, this.Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "lavalink_currentposition", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -63,7 +63,7 @@ public sealed class Lavalink : RequiresParent<Guild>
         set
         {
             this._Repeat = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "lavalink_repeat", value, this.Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "lavalink_repeat", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -74,7 +74,7 @@ public sealed class Lavalink : RequiresParent<Guild>
         set
         {
             this._Shuffle = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "lavalink_shuffle", value, this.Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "lavalink_shuffle", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -85,7 +85,7 @@ public sealed class Lavalink : RequiresParent<Guild>
         set
         {
             this._IsPaused = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "lavalink_paused", value, this.Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "lavalink_paused", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 

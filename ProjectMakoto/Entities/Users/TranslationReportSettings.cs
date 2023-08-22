@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Database.ColumnAttributes;
+
 namespace ProjectMakoto.Entities.Users;
 public class TranslationReportSettings : RequiresParent<User>
 {
@@ -14,37 +16,24 @@ public class TranslationReportSettings : RequiresParent<User>
     {
     }
 
-    private int _AcceptedTOS { get; set; } = 0;
+    [ColumnName("translationreport_accepted_tos"), ColumnType(ColumnTypes.TinyInt)]
     public int AcceptedTOS
     {
-        get => this._AcceptedTOS;
-        set
-        {
-            this._AcceptedTOS = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "translationreport_accepted_tos", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<int>("users", "userid", this.Parent.Id, "translationreport_accepted_tos", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Parent.Id, "translationreport_accepted_tos", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-
-    private DateTime _FirstRequestTime { get; set; } = DateTime.MinValue;
+    [ColumnName("translationreport_ratelimit_first"), ColumnType(ColumnTypes.BigInt)]
     public DateTime FirstRequestTime
     {
-        get => this._FirstRequestTime;
-        set
-        {
-            this._FirstRequestTime = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "translationreport_ratelimit_first", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<DateTime>("users", "userid", this.Parent.Id, "translationreport_ratelimit_first", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Parent.Id, "translationreport_ratelimit_first", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    private int _RequestCount { get; set; } = 0;
+    [ColumnName("translationreport_ratelimit_count"), ColumnType(ColumnTypes.BigInt)]
     public int RequestCount
     {
-        get => this._RequestCount;
-        set
-        {
-            this._RequestCount = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "translationreport_ratelimit_count", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<int>("users", "userid", this.Parent.Id, "translationreport_ratelimit_count", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Parent.Id, "translationreport_ratelimit_count", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 }

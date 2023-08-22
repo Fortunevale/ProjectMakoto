@@ -13,6 +13,18 @@ namespace ProjectMakoto.Util;
 
 internal static class GenericExtensions
 {
+    public static T[] Add<T>(this T[] array, T addObject)
+        => array.Append(addObject).ToArray();
+    
+    public static T[] AddRange<T>(this T[] array, IEnumerable<T> addObjects)
+        => array.Concat(addObjects).ToArray();
+
+    public static T[] Update<T>(this T[] array, Func<T, string> equalPredicate, T newObject)
+        => array.Where(x => equalPredicate.Invoke(x) != equalPredicate.Invoke(newObject)).Append(newObject).ToArray();
+    
+    public static T[] Remove<T>(this T[] array, Func<T, string> equalPredicate, T removeObject)
+        => array.Where(x => equalPredicate.Invoke(x) != equalPredicate.Invoke(removeObject)).ToArray();
+
     public static string TruncateWithIndication(this string value, int maxLength, string customString = "..")
     {
         return string.IsNullOrEmpty(value)

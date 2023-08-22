@@ -148,10 +148,6 @@ public sealed class Bot
 
                 this.GithubClient = new GitHubClient(new ProductHeaderValue("ProjectMakoto", this.status.RunningVersion));
                 this.GithubClient.Credentials = new Credentials(this.status.LoadedConfig.Secrets.Github.Token);
-
-                DatabaseInit _databaseInit = new(this);
-
-                await _databaseInit.LoadValuesFromDatabase();
             }
             catch (Exception ex)
             {
@@ -404,26 +400,6 @@ public sealed class Bot
             catch (Exception ex)
             {
                 _logger.LogError("Failed to close Discord Client gracefully.", ex);
-            }
-        }
-
-        if (this.status.DatabaseInitialized)
-        {
-            try
-            {
-                _logger.LogInfo("Flushing to database..");
-                await this.DatabaseClient.FullSyncDatabase(true);
-                _logger.LogDebug("Flushed to database.");
-
-                await Task.Delay(500);
-
-                _logger.LogInfo("Closing database..");
-                await this.DatabaseClient.Dispose();
-                _logger.LogDebug("Closed database.");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogFatal("Failed to close Database Client gracefully.", ex);
             }
         }
 

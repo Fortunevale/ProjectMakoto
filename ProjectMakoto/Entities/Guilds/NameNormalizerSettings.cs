@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Database.ColumnAttributes;
+
 namespace ProjectMakoto.Entities.Guilds;
 
 public sealed class NameNormalizerSettings : RequiresParent<Guild>
@@ -15,15 +17,11 @@ public sealed class NameNormalizerSettings : RequiresParent<Guild>
     {
     }
 
-    private bool _NameNormalizerEnabled { get; set; } = false;
+    [ColumnName("normalizenames"), ColumnType(ColumnTypes.TinyInt)]
     public bool NameNormalizerEnabled
     {
-        get => this._NameNormalizerEnabled;
-        set
-        {
-            this._NameNormalizerEnabled = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "normalizenames", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "normalizenames", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "normalizenames", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
     public bool NameNormalizerRunning = false;

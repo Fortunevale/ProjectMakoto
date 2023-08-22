@@ -25,13 +25,13 @@ internal sealed class LevelRewardsCommand : BaseCommand
                 var CommandKey = ctx.Bot.LoadedTranslations.Commands.Config.LevelRewards;
 
                 var str = "";
-                if (ctx.DbGuild.LevelRewards.Count != 0)
+                if (ctx.DbGuild.LevelRewards.Length != 0)
                 {
                     foreach (var b in ctx.DbGuild.LevelRewards.OrderBy(x => x.Level))
                     {
                         if (!ctx.Guild.Roles.ContainsKey(b.RoleId))
                         {
-                            _ = ctx.DbGuild.LevelRewards.Remove(b);
+                            ctx.DbGuild.LevelRewards = ctx.DbGuild.LevelRewards.Remove(x => x.RoleId.ToString(), b);
                             continue;
                         }
 
@@ -77,7 +77,7 @@ internal sealed class LevelRewardsCommand : BaseCommand
                 {
                     if (!ctx.Guild.Roles.ContainsKey(reward.RoleId))
                     {
-                        _ = ctx.DbGuild.LevelRewards.Remove(reward);
+                        ctx.DbGuild.LevelRewards = ctx.DbGuild.LevelRewards.Remove(x => x.RoleId.ToString(), reward);
                         continue;
                     }
 
@@ -334,7 +334,7 @@ internal sealed class LevelRewardsCommand : BaseCommand
                                         return;
                                     }
 
-                                    ctx.DbGuild.LevelRewards.Add(new()
+                                    ctx.DbGuild.LevelRewards = ctx.DbGuild.LevelRewards.Add(new()
                                     {
                                         Level = selectedLevel,
                                         RoleId = selectedRole.Id,
@@ -405,9 +405,9 @@ internal sealed class LevelRewardsCommand : BaseCommand
                         {
                             _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                            _ = ctx.DbGuild.LevelRewards.Remove(ctx.DbGuild.LevelRewards.First(x => x.RoleId == Convert.ToUInt64(selected)));
+                            ctx.DbGuild.LevelRewards = ctx.DbGuild.LevelRewards.Remove(x => x.RoleId.ToString(), ctx.DbGuild.LevelRewards.First(x => x.RoleId == Convert.ToUInt64(selected)));
 
-                            if (ctx.DbGuild.LevelRewards.Count == 0)
+                            if (ctx.DbGuild.LevelRewards.Length == 0)
                             {
                                 await this.ExecuteCommand(ctx, arguments);
                                 return;

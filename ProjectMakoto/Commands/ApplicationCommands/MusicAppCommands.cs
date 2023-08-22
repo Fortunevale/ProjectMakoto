@@ -118,7 +118,7 @@ public sealed class MusicAppCommands : ApplicationCommandsModule
                     var Queue = bot.Users[ctx.User.Id].UserPlaylists
                         .Where(x => x.PlaylistName.Contains(ctx.FocusedOption.Value.ToString(), StringComparison.InvariantCultureIgnoreCase)).Take(25);
 
-                    var options = Queue.Select(x => new DiscordApplicationCommandAutocompleteChoice($"{x.PlaylistName} ({x.List.Count} {bot.LoadedTranslations.Commands.Music.Playlists.Tracks.Get(bot.Users[ctx.User.Id]).Build()})", x.PlaylistId)).ToList();
+                    var options = Queue.Select(x => new DiscordApplicationCommandAutocompleteChoice($"{x.PlaylistName} ({x.List.Length} {bot.LoadedTranslations.Commands.Music.Playlists.Tracks.Get(bot.Users[ctx.User.Id]).Build()})", x.PlaylistId)).ToList();
                     return options.AsEnumerable();
                 }
                 catch (Exception ex)

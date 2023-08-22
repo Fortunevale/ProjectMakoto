@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Users;
+
 namespace ProjectMakoto.Events;
 internal sealed class AfkEvents : RequiresTranslation
 {
@@ -69,7 +71,7 @@ internal sealed class AfkEvents : RequiresTranslation
                 }
 
                 this.Bot.Users[e.Author.Id].AfkStatus.MessagesAmount = 0;
-                this.Bot.Users[e.Author.Id].AfkStatus.Messages = new();
+                this.Bot.Users[e.Author.Id].AfkStatus.Messages = Array.Empty<MessageDetails>();
             }
 
             var message = await e.Message.RespondAsync(embed);
@@ -94,9 +96,9 @@ internal sealed class AfkEvents : RequiresTranslation
                     if (this.Bot.Users[e.Author.Id].AfkStatus.LastMentionTrigger.AddSeconds(30) > DateTime.UtcNow)
                         return;
 
-                    if (this.Bot.Users[b.Id].AfkStatus.Messages.Count < 5)
+                    if (this.Bot.Users[b.Id].AfkStatus.Messages.Length < 5)
                     {
-                        this.Bot.Users[b.Id].AfkStatus.Messages.Add(new()
+                        this.Bot.Users[b.Id].AfkStatus.Messages = this.Bot.Users[b.Id].AfkStatus.Messages.Add(new()
                         {
                             AuthorId = e.Author.Id,
                             ChannelId = e.Channel.Id,

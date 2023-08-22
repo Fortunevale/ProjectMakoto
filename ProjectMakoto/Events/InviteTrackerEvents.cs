@@ -23,9 +23,9 @@ internal sealed class InviteTrackerEvents : RequiresTranslation
 
         var Invites = await guild.GetInvitesAsync();
 
-        bot.Guilds[guild.Id].InviteTracker.Cache = Invites.Select(x => new InviteTrackerCacheItem { Code = x.Code, CreatorId = x.Inviter?.Id ?? 0, Uses = x.Uses }).ToList();
+        bot.Guilds[guild.Id].InviteTracker.Cache = Invites.Select(x => new InviteTrackerCacheItem { Code = x.Code, CreatorId = x.Inviter?.Id ?? 0, Uses = x.Uses }).ToArray();
 
-        _logger.LogDebug("Fetched {Count} invites for {Guild}", bot.Guilds[guild.Id].InviteTracker.Cache.Count, guild.Id);
+        _logger.LogDebug("Fetched {Count} invites for {Guild}", bot.Guilds[guild.Id].InviteTracker.Cache.Length, guild.Id);
     }
 
 

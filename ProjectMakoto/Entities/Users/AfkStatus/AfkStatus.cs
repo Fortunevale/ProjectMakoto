@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Database.ColumnAttributes;
+
 namespace ProjectMakoto.Entities.Users;
 
 public sealed class AfkStatus : RequiresParent<User>
@@ -15,58 +17,32 @@ public sealed class AfkStatus : RequiresParent<User>
     {
     }
 
-    private string _Reason { get; set; } = "";
+    [ColumnName("afk_reason"), ColumnType(ColumnTypes.Text), Collation("utf8_unicode_ci"), Nullable]
     public string Reason
     {
-        get => this._Reason;
-        set
-        {
-            this._Reason = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "afk_reason", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<string>("users", "userid", this.Parent.Id, "afk_reason", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Parent.Id, "afk_reason", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-
-
-    private DateTime _TimeStamp { get; set; } = DateTime.UnixEpoch;
+    [ColumnName("afk_since"), ColumnType(ColumnTypes.BigInt)]
     public DateTime TimeStamp
     {
-        get => this._TimeStamp;
-        set
-        {
-            this._TimeStamp = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "afk_since", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<DateTime>("users", "userid", this.Parent.Id, "afk_since", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Parent.Id, "afk_since", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-
-    private long _MessagesAmount { get; set; } = 0;
+    [ColumnName("afk_pingamount"), ColumnType(ColumnTypes.BigInt)]
     public long MessagesAmount
     {
-        get => this._MessagesAmount;
-        set
-        {
-            this._MessagesAmount = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "afk_pingamount", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<long>("users", "userid", this.Parent.Id, "afk_pingamount", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Parent.Id, "afk_pingamount", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-
-
-    private List<MessageDetails> _Messages { get; set; } = new();
-    public List<MessageDetails> Messages
+    [ColumnName("afk_pings"), ColumnType(ColumnTypes.Text), Collation("utf8_unicode_ci"), Default("[]")]
+    public MessageDetails[] Messages
     {
-        get
-        {
-            this._Messages ??= new();
-
-            return this._Messages;
-        }
-
-        set
-        {
-            this._Messages = value;
-        }
+        get => JsonConvert.DeserializeObject<MessageDetails[]>(this.Bot.DatabaseClient.GetValue<string>("users", "userid", this.Parent.Id, "afk_pings", this.Bot.DatabaseClient.mainDatabaseConnection));
+        set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Parent.Id, "afk_pings", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
     [JsonIgnore]

@@ -14,11 +14,6 @@ namespace ProjectMakoto.Entities.Database;
 
 public sealed class TableDefinitions
 {
-    public sealed class writetester
-    {
-        [Primary][MaxValue(1)] public TinyInt aaa { get; set; }
-    }
-
     public sealed class scam_urls
     {
         [Primary]
@@ -97,71 +92,6 @@ public sealed class TableDefinitions
 
         public BigInt submitter { get; set; }
         public BigInt guild { get; set; }
-    }
-
-    public sealed class users
-    {
-        [Primary]
-        public BigInt userid { get; set; }
-
-        public BigInt scoresaber_id { get; set; }
-
-        public BigInt afk_since { get; set; }
-
-        [Collation("utf8_unicode_ci")]
-        public Text afk_reason { get; set; }
-
-        [Collation("utf8_unicode_ci")]
-        public Text afk_pings { get; set; }
-
-        public BigInt afk_pingamount { get; set; }
-
-        [MaxValue(1)]
-        public TinyInt experience_directmessageoptout { get; set; }
-
-        public TinyInt submission_accepted_tos { get; set; }
-
-        [Collation("utf8_unicode_ci")]
-        public LongText submission_accepted_submissions { get; set; }
-
-        public BigInt submission_last_datetime { get; set; }
-
-        [Collation("utf8_unicode_ci")]
-        public LongText blocked_users { get; set; }
-
-        [Collation("utf8_unicode_ci")]
-        public LongText playlists { get; set; }
-
-        [Collation("utf8_unicode_ci")]
-        public LongText reminders { get; set; }
-
-        [Collation("utf8_unicode_ci")]
-        public Text last_google_source { get; set; }
-
-        [Collation("utf8_unicode_ci")]
-        public Text last_google_target { get; set; }
-
-        [Collation("utf8_unicode_ci")]
-        public Text last_libretranslate_source { get; set; }
-
-        [Collation("utf8_unicode_ci")]
-        public Text last_libretranslate_target { get; set; }
-
-        [Collation("utf8_unicode_ci")]
-        public Text current_locale { get; set; }
-
-        [Collation("utf8_unicode_ci")]
-        public Text override_locale { get; set; }
-
-        [MaxValue(1)]
-        public TinyInt deletion_requested { get; set; }
-        public BigInt data_deletion_date { get; set; }
-
-        public BigInt last_data_request { get; set; }
-
-        public TinyInt translationreport_accepted_tos { get; set; }
-        public BigInt translationreport_ratelimit_first { get; set; }
-        public TinyInt translationreport_ratelimit_count { get; set; }
     }
 
     public sealed class guilds
@@ -382,21 +312,7 @@ public sealed class TableDefinitions
 
     public readonly static IReadOnlyList<Type> TableList = new List<Type>()
     {
-        typeof(writetester),
-
-        typeof(users),
-        typeof(guilds),
-
-        typeof(scam_urls),
-
-        typeof(banned_users),
-        typeof(banned_guilds),
-
-        typeof(globalbans),
-        typeof(globalnotes),
-
-        typeof(active_url_submissions),
-
-        typeof(objected_users),
+        typeof(User),
+        typeof(Guild)
     };
 }

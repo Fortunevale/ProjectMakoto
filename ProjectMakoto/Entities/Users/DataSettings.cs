@@ -7,10 +7,33 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Database.ColumnAttributes;
+
 namespace ProjectMakoto.Entities.Users;
-public sealed class DataSettings
+public sealed class DataSettings : RequiresParent<User>
 {
-    public DateTime LastDataRequest { get; set; } = DateTime.MinValue;
-    public bool DeletionRequested { get; set; } = false;
-    public DateTime DeletionRequestDate { get; set; } = DateTime.MinValue;
+    public DataSettings(Bot bot, User parent) : base(bot, parent)
+    {
+    }
+
+    [ColumnName("last_data_request"), ColumnType(ColumnTypes.BigInt)]
+    public DateTime LastDataRequest
+    {
+        get => this.Bot.DatabaseClient.GetValue<DateTime>("users", "userid", this.Parent.Id, "last_data_request", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Parent.Id, "last_data_request", value, this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
+
+    [ColumnName("deletion_requested"), ColumnType(ColumnTypes.TinyInt)]
+    public bool DeletionRequested
+    {
+        get => this.Bot.DatabaseClient.GetValue<bool>("users", "userid", this.Parent.Id, "deletion_requested", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => this.Bot.DatabaseClient.SetValue("users", "userid", this.Parent.Id, "deletion_requested", value, this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
+
+    [ColumnName("data_deletion_date"), ColumnType(ColumnTypes.BigInt)]
+    public DateTime DeletionRequestDate
+    {
+        get => this.Bot.DatabaseClient.GetValue<DateTime>("users", "userid", this.Parent.Id, "data_deletion_date", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => this.Bot.DatabaseClient.SetValue("users", "userid", this.Parent.Id, "data_deletion_date", value, this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
 }

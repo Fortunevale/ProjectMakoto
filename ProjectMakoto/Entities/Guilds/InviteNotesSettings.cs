@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Database.ColumnAttributes;
+
 namespace ProjectMakoto.Entities.Guilds;
 
 public sealed class InviteNotesSettings : RequiresParent<Guild>
@@ -15,5 +17,17 @@ public sealed class InviteNotesSettings : RequiresParent<Guild>
     {
     }
 
-    public Dictionary<string, InviteNotesDetails> Notes { get; set; } = new();
+    [ColumnName("invitenotes"), ColumnType(ColumnTypes.LongText)]
+    public InviteNotesDetails[] Notes
+    {
+        get => JsonConvert.DeserializeObject<InviteNotesDetails[]>(this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Parent.Id, "invitenotes", this.Bot.DatabaseClient.mainDatabaseConnection))
+            .Select(x =>
+            {
+                x.Bot = this.Bot;
+                x.Parent = this.Parent;
+
+                return x;
+            }).ToArray();
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "invitenotes", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
 }
