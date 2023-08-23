@@ -14,7 +14,7 @@ using ProjectMakoto.Entities.Database.ColumnTypes;
 
 namespace ProjectMakoto.Database;
 
-public sealed class DatabaseClient : RequiresBotReference
+internal sealed partial class DatabaseClient : RequiresBotReference
 {
     private DatabaseClient(Bot bot) : base(bot)
     {
@@ -29,6 +29,7 @@ public sealed class DatabaseClient : RequiresBotReference
                                            $"User Id={this.Bot.status.LoadedConfig.Secrets.Database.Username};" +
                                            $"Password={this.Bot.status.LoadedConfig.Secrets.Database.Password};" +
                                            $"Connection Timeout=60;" +
+                                           $"Connection Lifetime=30;" +
                                            $"Database={this.Bot.status.LoadedConfig.Secrets.Database.MainDatabaseName};");
             return conn;
         }
@@ -46,67 +47,67 @@ public sealed class DatabaseClient : RequiresBotReference
             return conn;
         }
     }
-    internal DatabaseHelper _helper { get; private set; }
-
-    private bool Disposed { get; set; } = false;
+    public bool Disposed { get; private set; } = false;
 
     internal static async Task<DatabaseClient> InitializeDatabase(Bot bot)
     {
         _logger.LogInfo("Connecting to database..");
 
         var databaseClient = new DatabaseClient(bot);
-        databaseClient._helper = new(databaseClient);
-
-        databaseClient.mainDatabaseConnection.Open();
-        databaseClient.guildDatabaseConnection.Open();
 
         try
         {
-            var remoteTables = await databaseClient._helper.ListTables(databaseClient.mainDatabaseConnection);
+            var remoteTables = databaseClient.ListTables(databaseClient.mainDatabaseConnection);
 
-            foreach (var internalTable in TableDefinitions.TableList)
+            foreach (var internalTable in new Type[]
+            {
+                typeof(User),
+                typeof(Guild),
+            })
             {
                 var tableName = internalTable.GetCustomAttribute<TableNameAttribute>().Name;
-                var propertyList = new List<PropertyInfo>();
+                var propertyList = databaseClient.GetValidProperties(internalTable);
 
-                void AddProperties(Type type)
+                string GetDefaultText((string ColumnName, ColumnTypes ColumnType, bool Primary, long? MaxValue, string? Collation, bool Nullable, string Default) columnInfo)
                 {
-                    foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
-                    {
-                        if (property.GetCustomAttribute<ColumnNameAttribute>() is null &&
-                            property.GetCustomAttribute<ColumnType>() is null &&
-                            property.GetCustomAttribute<MaxValueAttribute>() is null &&
-                            property.GetCustomAttribute<CollationAttribute>() is null &&
-                            property.GetCustomAttribute<NullableAttribute>() is null &&
-                            property.GetCustomAttribute<ContainsValuesAttribute>() is null)
-                            continue;
+                    var defaultText = string.Empty;
 
-                        propertyList.Add(property);
-
-                        if (property.GetCustomAttribute<ContainsValuesAttribute>() is not null)
+                    if (columnInfo.Default is not null)
+                        switch (columnInfo.ColumnType)
                         {
-                            AddProperties(property.PropertyType);
+                            case ColumnTypes.BigInt:
+                            case ColumnTypes.Int:
+                            case ColumnTypes.TinyInt:
+                                defaultText = $"{columnInfo.Default}";
+                                break;
+                            case ColumnTypes.LongText:
+                            case ColumnTypes.Text:
+                                defaultText = $"('{columnInfo.Default}')";
+                                break;
+                            case ColumnTypes.VarChar:
+                                defaultText = $"'{columnInfo.Default}'";
+                                break;
+                            default:
+                                break;
                         }
-                    }
-                }
 
-                AddProperties(internalTable);
+                    return defaultText;
+                }
 
                 string Build(PropertyInfo info)
                 {
-                    var columnName = info.GetCustomAttribute<ColumnNameAttribute>();
-                    var propertyType = info.GetCustomAttribute<ColumnType>();
-                    var maxValue = info.GetCustomAttribute<MaxValueAttribute>();
-                    var collation = info.GetCustomAttribute<CollationAttribute>();
-                    var nullable = info.GetCustomAttribute<NullableAttribute>();
+                    var columnInfo = databaseClient.GetPropertyInfo(info);
+                    var defaultText = GetDefaultText(columnInfo);
 
-                    if (columnName is null || propertyType is null)
-                        return string.Empty;
+                    if (!columnInfo.Nullable && columnInfo.Default is null)
+                        throw new InvalidOperationException("A column should be either nullable or have a default value.")
+                            .AddData("columnInfo", columnInfo);
 
-                    return $"`{columnName.Name}` {Enum.GetName(propertyType.Type).ToUpper()}" +
-                           $"{(maxValue is not null ? $"({maxValue.MaxValue})" : "")}" +
-                           $"{(collation is not null ? $" CHARACTER SET {collation.Collation[..collation.Collation.IndexOf("_")]} COLLATE {collation.Collation}" : "")}" +
-                           $"{(nullable is not null ? " NULL" : " NOT NULL")}";
+                    return $"`{columnInfo.ColumnName}` {Enum.GetName(columnInfo.ColumnType).ToUpper()}" +
+                           $"{(columnInfo.MaxValue is not null ? $"({columnInfo.MaxValue})" : "")}" +
+                           $"{(columnInfo.Collation is not null ? $" CHARACTER SET {columnInfo.Collation[..columnInfo.Collation.IndexOf("_")]} COLLATE {columnInfo.Collation}" : "")}" +
+                           $"{(columnInfo.Nullable ? " NULL" : " NOT NULL")}" +
+                           $"{(columnInfo.Default is not null ? $" DEFAULT {defaultText}" : "")}";
                 }
 
                 if (!remoteTables.Contains(tableName))
@@ -120,9 +121,9 @@ public sealed class DatabaseClient : RequiresBotReference
                                 return Build(x);
 
                             return string.Empty;
-                        }))} )" + 
+                        }).Where(x => !x.IsNullOrWhiteSpace()))}" + 
                         $"{(propertyList.Any(x => x.GetCustomAttribute<PrimaryAttribute>() is not null) ?
-                            $", PRIMARY KEY (`{propertyList.First(x => x.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _)).Name}`)" : "")}";
+                            $", PRIMARY KEY (`{databaseClient.GetPrimaryKey(internalTable).ColumnName}`)" : "")} )";
 
                     var cmd = databaseClient.mainDatabaseConnection.CreateCommand();
                     cmd.CommandText = sql;
@@ -132,19 +133,27 @@ public sealed class DatabaseClient : RequiresBotReference
                     _logger.LogInfo("Created table '{Name}'.", tableName);
                 }
 
-                var remoteColumns = await databaseClient._helper.ListColumns(databaseClient.mainDatabaseConnection, tableName);
+                var remoteColumns = databaseClient.ListColumns(tableName, databaseClient.mainDatabaseConnection);
 
                 foreach (var internalColumn in propertyList)
                 {
-                    var columnName = internalColumn.GetCustomAttribute<ColumnNameAttribute>()?.Name;
-                    var columnType = Enum.GetName(internalColumn.GetCustomAttribute<ColumnType>()?.Type ?? ColumnTypes.Unknown);
+                    (string ColumnName, ColumnTypes ColumnType, bool Primary, long? MaxValue, string? Collation, bool Nullable, string Default) columnInfo;
 
-                    if (columnName is null || columnType == "Unknown")
+                    try
+                    {
+                        columnInfo = databaseClient.GetPropertyInfo(internalColumn);
+                    }
+                    catch (Exception)
+                    {
+                        continue;
+                    }
+
+                    if (columnInfo.ColumnName is null || columnInfo.ColumnType == ColumnTypes.Unknown)
                         continue;
 
-                    if (!remoteColumns.ContainsKey(columnName.ToLower()))
+                    if (!remoteColumns.Any(x => x.Name.ToLower() == columnInfo.ColumnName.ToLower()))
                     {
-                        _logger.LogWarn("Missing column '{Column}' in '{Table}'. Creating..", columnName, tableName);
+                        _logger.LogWarn("Missing column '{Column}' in '{Table}'. Creating..", columnInfo.ColumnName, tableName);
                         var sql = $"ALTER TABLE `{tableName}` ADD {Build(internalColumn)}";
 
                         var cmd = databaseClient.mainDatabaseConnection.CreateCommand();
@@ -153,14 +162,21 @@ public sealed class DatabaseClient : RequiresBotReference
 
                         await databaseClient.RunCommand(cmd);
 
-                        _logger.LogInfo("Created column '{Column}' in '{Table}'.", columnName, tableName);
-                        remoteColumns = await databaseClient._helper.ListColumns(databaseClient.mainDatabaseConnection, tableName);
+                        _logger.LogInfo("Created column '{Column}' in '{Table}'.", columnInfo.ColumnName, tableName);
+                        remoteColumns = databaseClient.ListColumns(tableName, databaseClient.mainDatabaseConnection);
                     }
 
-                    if (remoteColumns[columnName].ToLower() != columnType.ToLower() + (internalColumn.TryGetCustomAttribute<MaxValueAttribute>(typeof(MaxValueAttribute), out var maxvalue) ? $"({maxvalue.MaxValue})" : ""))
+                    var remoteColumn = remoteColumns.First(x => x.Name == columnInfo.ColumnName);
+
+                    var typeMatches = remoteColumn.Type.ToLower() == columnInfo.ColumnType.GetName().ToLower() + (columnInfo.MaxValue is not null ? $"({columnInfo.MaxValue})" : "");
+                    var nullabilityMatches = remoteColumn.Nullable == columnInfo.Nullable;
+                    var defaultMatches = remoteColumn.Default == columnInfo.Default;
+
+                    if (!typeMatches || !nullabilityMatches || !defaultMatches)
                     {
-                        _logger.LogWarn("Wrong data type for column '{Column}' in '{Table}'", columnName, tableName);
-                        var sql = $"ALTER TABLE `{tableName}` CHANGE `{columnName}` {Build(internalColumn)}";
+                        _logger.LogWarn("Wrong data type for column '{Column}' in '{Table}'\nType: {TypeMatch}\nNullable: {NullableMatch}\nDefault: {Default}", 
+                            columnInfo.ColumnName, tableName, typeMatches, nullabilityMatches, defaultMatches);
+                        var sql = $"ALTER TABLE `{tableName}` CHANGE `{columnInfo.ColumnName}` {Build(internalColumn)}";
 
                         var cmd = databaseClient.mainDatabaseConnection.CreateCommand();
                         cmd.CommandText = sql;
@@ -168,23 +184,23 @@ public sealed class DatabaseClient : RequiresBotReference
 
                         await databaseClient.RunCommand(cmd);
 
-                        _logger.LogInfo("Changed column '{Column}' in '{Table}' to datatype '{NewDataType}'.", 
-                            columnName,
+                        _logger.LogInfo("Changed column '{Column}' in '{Table}' to datatype '{NewDataType}'.",
+                            columnInfo.ColumnName,
                             tableName,
                             Enum.GetName(internalColumn.GetCustomAttribute<ColumnType>().Type).ToUpper());
 
-                        remoteColumns = await databaseClient._helper.ListColumns(databaseClient.mainDatabaseConnection, tableName);
+                        remoteColumns = databaseClient.ListColumns(tableName, databaseClient.mainDatabaseConnection);
                     }
                 }
 
                 foreach (var remoteColumn in remoteColumns)
                 {
-                    if (!propertyList.Any(x => x.GetCustomAttribute<ColumnNameAttribute>()?.Name == remoteColumn.Key))
+                    if (!propertyList.Any(x => x.GetCustomAttribute<ColumnNameAttribute>()?.Name == remoteColumn.Name))
                     {
-                        _logger.LogWarn("Invalid column '{Column}' in '{Table}'", remoteColumn.Key, tableName);
+                        _logger.LogWarn("Invalid column '{Column}' in '{Table}'", remoteColumn.Name, tableName);
 
                         var cmd = databaseClient.mainDatabaseConnection.CreateCommand();
-                        cmd.CommandText = $"ALTER TABLE `{tableName}` DROP COLUMN `{remoteColumn.Key}`";
+                        cmd.CommandText = $"ALTER TABLE `{tableName}` DROP COLUMN `{remoteColumn.Name}`";
                         cmd.Connection = databaseClient.mainDatabaseConnection;
 
                         await databaseClient.RunCommand(cmd);
@@ -306,9 +322,15 @@ public sealed class DatabaseClient : RequiresBotReference
 
     public Task RunCommand(MySqlCommand cmd)
     {
+        if (this.Disposed)
+            throw new Exception("DatabaseClient is disposed");
+
         using (cmd.Connection)
         {
             cmd.Connection.Open();
+
+            _logger.LogDebug("Executing command on database '{database}': {command}", cmd.Connection.Database, cmd.CommandText);
+
             _ = cmd.ExecuteNonQuery();
 
             return Task.CompletedTask;
@@ -317,11 +339,14 @@ public sealed class DatabaseClient : RequiresBotReference
 
     public Task SetValue(string table, string columnKey, object columnValue, string columnToEdit, object newValue, MySqlConnection connection)
     {
+        if (this.Disposed)
+            throw new Exception("DatabaseClient is disposed");
+
         try
         {
             using (connection)
             {
-                if (table != "users")
+                if (table is not "users" and not "guilds")
                     return Task.CompletedTask;
 
                 connection.Open();
@@ -364,11 +389,14 @@ public sealed class DatabaseClient : RequiresBotReference
         }
     }
 
-    public ConcurrentDictionary<string, CacheItem> GetCache = new();
-    public record CacheItem(string item, DateTime CacheTime);
+    //public ConcurrentDictionary<string, CacheItem> GetCache = new();
+    //public record CacheItem(string item, DateTime CacheTime);
 
-    public T GetValue<T>(string table, string columnKey, object columnValue, string columnToGet, MySqlConnection connection)
+    public T GetValue<T>(string tableName, string columnKey, object columnValue, string columnToGet, MySqlConnection connection)
     {
+        if (this.Disposed)
+            throw new Exception("DatabaseClient is disposed");
+
         try
         {
             using (connection)
@@ -387,14 +415,14 @@ public sealed class DatabaseClient : RequiresBotReference
                     return (T)Convert.ChangeType(input, typeof(T));
                 }
 
-                if (GetCache.TryGetValue($"{table}-{columnKey}-{columnValue}-{columnToGet}", out var cacheItem) && cacheItem.CacheTime.GetTimespanSince() < TimeSpan.FromSeconds(1))
-                {
-                    return BuildReturnItem(cacheItem.item);
-                }
+                //if (GetCache.TryGetValue($"{tableName}-{columnKey}-{columnValue}-{columnToGet}", out var cacheItem) && cacheItem.CacheTime.GetTimespanSince() < TimeSpan.FromSeconds(1))
+                //{
+                //    return BuildReturnItem(cacheItem.item);
+                //}
 
                 connection.Open();
 
-                var command = new MySqlCommand($"SELECT `{columnToGet}` FROM `{table}` WHERE `{columnKey}` = '{columnValue}'", connection);
+                var command = new MySqlCommand($"SELECT `{columnToGet}` FROM `{tableName}` WHERE `{columnKey}` = '{columnValue}'", connection);
                 _logger.LogDebug("Getting value column '{columnToGet}' of '{ColumnKey}:{ColumnValue}'", columnToGet, columnKey, columnValue);
 
                 var reader = command.ExecuteReader();
@@ -414,7 +442,7 @@ public sealed class DatabaseClient : RequiresBotReference
 
                 reader.Close();
 
-                GetCache[$"{table}-{columnKey}-{columnValue}-{columnToGet}"] = new CacheItem(value, DateTime.UtcNow);
+                //GetCache[$"{tableName}-{columnKey}-{columnValue}-{columnToGet}"] = new CacheItem(value, DateTime.UtcNow);
 
                 return BuildReturnItem(value);
             }
@@ -426,14 +454,195 @@ public sealed class DatabaseClient : RequiresBotReference
         }
     }
 
-    public async Task Dispose()
+    public bool CreateRow(string tableName, Type type, object uniqueValue, MySqlConnection connection)
     {
-        this.Disposed = true;
-        await this.mainDatabaseConnection.CloseAsync();
+        if (this.RowExists(tableName, this.GetPrimaryKey(type).ColumnName, uniqueValue, connection))
+            return false;
+
+        var cmd = connection.CreateCommand();
+        cmd.CommandText = $"INSERT INTO `{tableName}` ( {string.Join(", ", this.GetValidProperties(type)
+            .Where(x =>
+            {
+                try
+                {
+                    var propInfo = this.GetPropertyInfo(x);
+                    return (!propInfo.Nullable) || propInfo.Primary;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            })
+            .Select(x =>
+            {
+                return $"{this.GetPropertyInfo(x).ColumnName}";
+            }))} ) VALUES ( {string.Join(", ", this.GetValidProperties(type)
+            .Where(x =>
+            {
+                try
+                {
+                    var propInfo = this.GetPropertyInfo(x);
+
+                    return (!propInfo.Nullable) || propInfo.Primary;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            })
+            .Select(x =>
+            {
+                return $"@{this.GetPropertyInfo(x).ColumnName}";
+            }))} )";
+
+        foreach (var property in this.GetValidProperties(type).Where(x =>
+            {
+                try
+                {
+                    var propInfo = this.GetPropertyInfo(x);
+
+                    return (!propInfo.Nullable) || propInfo.Primary;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }))
+        {
+            var value = this.GetPropertyInfo(property);
+
+            if (value.Primary)
+                _ = cmd.Parameters.AddWithValue($"@{value.ColumnName}", uniqueValue);
+            else
+                _ = cmd.Parameters.AddWithValue($"@{value.ColumnName}", value.Default ?? (property.PropertyType.IsValueType ? Activator.CreateInstance(property.PropertyType) : null));
+        }
+
+        cmd.Connection = connection;
+
+        _ = this.RunCommand(cmd);
+        return true;
     }
 
-    public bool IsDisposed()
+    public bool RowExists(string tableName, string columnKey, object columnValue, MySqlConnection connection)
     {
-        return this.Disposed;
+        if (this.Disposed)
+            throw new Exception("DatabaseClient is disposed");
+
+        using (connection)
+        {
+            connection.Open();
+
+            var Exists = false;
+            using (var reader = connection.ExecuteReader($"SELECT EXISTS(SELECT * FROM `{tableName}` WHERE `{columnKey}` = '{columnValue}')"))
+            {
+                while (reader.Read())
+                {
+                    Exists = reader.GetInt16(0) == 1;
+                }
+            }
+
+            _logger.LogDebug("Column exists: {tableName}:{columnKey} = {columnValue}:{Exists}", tableName, columnKey, columnValue, Exists);
+            return Exists;
+        }
+    }
+
+    public IEnumerable<string> ListTables(MySqlConnection connection)
+    {
+        if (this.Disposed)
+            throw new Exception("DatabaseClient is disposed");
+
+        try
+        {
+            using (connection)
+            {
+                connection.Open();
+
+                List<string> SavedTables = new();
+
+                using (var reader = connection.ExecuteReader($"SHOW TABLES"))
+                {
+                    while (reader.Read())
+                    {
+                        SavedTables.Add(reader.GetString(0));
+                    }
+                }
+
+                return SavedTables;
+            }
+        }
+        catch (Exception)
+        {
+            Thread.Sleep(1000);
+            return this.ListTables(connection);
+        }
+    }
+
+    public (string Name, string Type, bool Nullable, string Key, string? Default, string Extra)[] ListColumns(string tableName, MySqlConnection connection)
+    {
+        if (this.Disposed)
+            throw new Exception("DatabaseClient is disposed");
+
+        try
+        {
+            using (connection)
+            {
+                connection.Open();
+
+                List<(string Name, string Type, bool Nullable, string Key, string Default, string Extra)> Columns = new();
+
+                using (var reader = connection.ExecuteReader($"SHOW FIELDS FROM `{tableName}`"))
+                {
+                    while (reader.Read())
+                    {
+                        Columns.Add((reader.GetString(0), 
+                            reader.GetString(1), 
+                            (!reader.IsDBNull(2) ? reader.GetString(2) : "").ToLower() == "yes", 
+                            (!reader.IsDBNull(3) ? reader.GetString(3) : ""), 
+                            (!reader.IsDBNull(4) ? (reader.GetString(4).Contains("\\'") ? Regex.Match(reader.GetString(4), @"\\'(.*)\\'").Groups[1].Value : reader.GetString(4)) : null), 
+                            (!reader.IsDBNull(5) ? reader.GetString(5) : "")));
+                    }
+                }
+
+                return Columns.ToArray();
+            }
+        }
+        catch (Exception)
+        {
+            Thread.Sleep(1000);
+            return this.ListColumns(tableName, connection);
+        }
+    }
+
+    public Task DeleteRow(string tableName, string columnKey, string columnValue, MySqlConnection connection)
+    {
+        if (this.Disposed)
+            throw new Exception("DatabaseClient is disposed");
+
+        var cmd = connection.CreateCommand();
+        cmd.CommandText = $"DELETE FROM `{tableName}` WHERE {columnKey}='{columnValue}'";
+        cmd.Connection = connection;
+        return this.RunCommand(cmd);
+    }
+
+    public Task DropTable(string tableName, MySqlConnection connection)
+    {
+        if (this.Disposed)
+            throw new Exception("DatabaseClient is disposed");
+
+        var cmd = connection.CreateCommand();
+        cmd.CommandText = $"DROP TABLE IF EXISTS `{tableName}`";
+        cmd.Connection = connection;
+        return this.RunCommand(cmd);
+    }
+
+    public Task Dispose()
+    {
+        if (this.Disposed)
+            throw new Exception("DatabaseClient is disposed");
+
+        this.Disposed = true;
+        this.mainDatabaseConnection.Close();
+
+        return Task.CompletedTask;
     }
 }

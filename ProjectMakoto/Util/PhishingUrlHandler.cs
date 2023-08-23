@@ -89,7 +89,7 @@ internal sealed class PhishingUrlHandler : RequiresBotReference
             if (dropUrls.Count != 0)
                 foreach (var b in dropUrls)
                 {
-                    await this.Bot.DatabaseClient._helper.DeleteRow(this.Bot.DatabaseClient.mainDatabaseConnection, "scam_urls", "url", $"{b}");
+                    await this.Bot.DatabaseClient.DeleteRow("scam_urls", "url", $"{b}", this.Bot.DatabaseClient.mainDatabaseConnection);
 
                     _logger.LogDebug("Dropped '{host}' from table 'scam_urls'.", b);
                 }

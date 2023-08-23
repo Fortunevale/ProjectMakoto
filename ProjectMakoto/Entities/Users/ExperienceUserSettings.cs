@@ -17,7 +17,7 @@ public sealed class ExperienceUserSettings : RequiresParent<User>
     {
     }
 
-    [ColumnName("experience_directmessageoptout"), ColumnType(ColumnTypes.TinyInt)]
+    [ColumnName("experience_directmessageoptout"), ColumnType(ColumnTypes.TinyInt), Default("0")]
     public bool DirectMessageOptOut
     {
         get => this.Bot.DatabaseClient.GetValue<bool>("users", "userid", this.Parent.Id, "experience_directmessageoptout", this.Bot.DatabaseClient.mainDatabaseConnection);

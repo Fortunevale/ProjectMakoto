@@ -53,21 +53,21 @@ internal sealed class QueueCommand : BaseCommand
 
                 var TotalTimespan = TimeSpan.Zero;
 
-                for (var i = 0; i < ctx.DbGuild.MusicModule.SongQueue.Count; i++)
+                for (var i = 0; i < ctx.DbGuild.MusicModule.SongQueue.Length; i++)
                 {
                     TotalTimespan = TotalTimespan.Add(ctx.DbGuild.MusicModule.SongQueue[i].Length);
                 }
 
-                var Description = $"{this.GetString(this.t.Commands.Music.Queue.QueueCount, true, new TVar("Count", ctx.DbGuild.MusicModule.SongQueue.Count), new TVar("Timespan", TotalTimespan.GetHumanReadable())).Bold()}\n\n";
-                Description += $"{string.Join("\n", ctx.DbGuild.MusicModule.SongQueue.Skip(CurrentPage * 10).Take(10).Select(x => $"**{GetInt()}**. `{x.Length.GetShortHumanReadable(TimeFormat.HOURS)}` {this.GetString(this.t.Commands.Music.Queue.Track, new TVar("Video", $"[`{x.VideoTitle}`]({x.Url})"), new TVar("Requester", x.user.Mention))}"))}\n\n";
+                var Description = $"{this.GetString(this.t.Commands.Music.Queue.QueueCount, true, new TVar("Count", ctx.DbGuild.MusicModule.SongQueue.Length), new TVar("Timespan", TotalTimespan.GetHumanReadable())).Bold()}\n\n";
+                Description += $"{string.Join("\n", ctx.DbGuild.MusicModule.SongQueue.Skip(CurrentPage * 10).Take(10).Select(x => $"**{GetInt()}**. `{x.Length.GetShortHumanReadable(TimeFormat.HOURS)}` {this.GetString(this.t.Commands.Music.Queue.Track, new TVar("Video", $"[`{x.VideoTitle}`]({x.Url})"), new TVar("Requester", $"<@{x.UserId}>"))}"))}\n\n";
 
-                if (ctx.DbGuild.MusicModule.SongQueue.Count > 0)
-                    Description += $"`{this.GetString(this.t.Common.Page)} {CurrentPage + 1}/{Math.Ceiling(ctx.DbGuild.MusicModule.SongQueue.Count / 10.0)}`\n\n";
+                if (ctx.DbGuild.MusicModule.SongQueue.Length > 0)
+                    Description += $"`{this.GetString(this.t.Common.Page)} {CurrentPage + 1}/{Math.Ceiling(ctx.DbGuild.MusicModule.SongQueue.Length / 10.0)}`\n\n";
 
                 Description += $"`{this.GetString(this.t.Commands.Music.Queue.CurrentlyPlaying)}:` [`{(conn.Player.Track is not null ? conn.Player.Track.Info.Title : this.GetString(this.t.Commands.Music.Queue.NoSong))}`]({(conn.Player.Track is not null ? conn.Player.Track.Info.Uri.ToString() : "")})\n";
-                Description += $"{(ctx.DbGuild.MusicModule.Repeat ? "🔁" : ctx.Bot.status.LoadedConfig.Emojis.DisabledRepeat)}";
-                Description += $"{(ctx.DbGuild.MusicModule.Shuffle ? "🔀" : ctx.Bot.status.LoadedConfig.Emojis.DisabledShuffle)}";
-                Description += $" `|` {(ctx.DbGuild.MusicModule.IsPaused ? ctx.Bot.status.LoadedConfig.Emojis.Paused : $"{(conn.Player.Track is not null ? "▶" : ctx.Bot.status.LoadedConfig.Emojis.DisabledPlay)} ")}";
+                Description += $"{(ctx.DbGuild.MusicModule.Repeat ? "🔁".UnicodeToEmoji() : DiscordEmoji.FromGuildEmote(ctx.Client, ctx.Bot.status.LoadedConfig.Emojis.DisabledRepeat))}";
+                Description += $"{(ctx.DbGuild.MusicModule.Shuffle ? "🔀".UnicodeToEmoji() : DiscordEmoji.FromGuildEmote(ctx.Client, ctx.Bot.status.LoadedConfig.Emojis.DisabledShuffle))}";
+                Description += $" `|` {(ctx.DbGuild.MusicModule.IsPaused ? DiscordEmoji.FromGuildEmote(ctx.Client, ctx.Bot.status.LoadedConfig.Emojis.Paused) : $"{(conn.Player.Track is not null ? "▶".UnicodeToEmoji() : DiscordEmoji.FromGuildEmote(ctx.Client, ctx.Bot.status.LoadedConfig.Emojis.DisabledPlay))} ")}";
 
                 if (conn.CurrentTrack is not null)
                 {
@@ -78,7 +78,7 @@ internal sealed class QueueCommand : BaseCommand
                 if (CurrentPage <= 0)
                     PreviousPage = PreviousPage.Disable();
 
-                if ((CurrentPage * 10) + 10 >= ctx.DbGuild.MusicModule.SongQueue.Count)
+                if ((CurrentPage * 10) + 10 >= ctx.DbGuild.MusicModule.SongQueue.Length)
                     NextPage = NextPage.Disable();
 
                 _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder

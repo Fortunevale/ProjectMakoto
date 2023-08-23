@@ -21,7 +21,7 @@ internal sealed class BanCommand : BaseCommand
             var victim = (DiscordMember)arguments["victim"];
             var channel = ctx.Member.VoiceState?.Channel;
 
-            if (!ctx.DbGuild.VcCreator.CreatedChannels.ContainsKey(channel?.Id ?? 0))
+            if (!ctx.DbGuild.VcCreator.CreatedChannels.Any(x => x.ChannelId == (channel?.Id ?? 0)))
             {
                 _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Utility.VoiceChannelCreator.NotAVccChannel, true)).AsError(ctx));
                 return;
@@ -53,7 +53,7 @@ internal sealed class BanCommand : BaseCommand
                 return;
             }
 
-            ctx.DbGuild.VcCreator.CreatedChannels[channel.Id].BannedUsers.Add(victim.Id);
+            ctx.DbGuild.VcCreator.CreatedChannels[channel.Id].BannedUsers = ctx.DbGuild.VcCreator.CreatedChannels[channel.Id].BannedUsers.Add(victim.Id);
             await channel.AddOverwriteAsync(victim, deny: Permissions.UseVoice);
             await victim.DisconnectFromVoiceAsync();
             _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Utility.VoiceChannelCreator.Ban.VictimBanned, true, new TVar("User", victim.Mention))).AsError(ctx));

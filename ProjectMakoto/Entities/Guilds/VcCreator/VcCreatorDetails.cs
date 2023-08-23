@@ -11,12 +11,64 @@ namespace ProjectMakoto.Entities.Guilds;
 
 public sealed class VcCreatorDetails
 {
-    public ulong OwnerId { get; set; }
+    [JsonIgnore]
+    public Bot Bot { get; set; }
 
-    public List<ulong> BannedUsers { get; set; } = new();
+    [JsonIgnore]
+    public Guild Parent { get; set; }
 
-    public DateTime LastRename { get; set; } = DateTime.MinValue;
+    private ulong _ChannelId { get; set; }
+    public ulong ChannelId
+    {
+        get => this._ChannelId;
+        set
+        {
+            this._ChannelId = value;
+            this.Update();
+        }
+    }
+
+    private ulong _OwnerId { get; set; }
+    public ulong OwnerId
+    {
+        get => this._OwnerId;
+        set
+        {
+            this._OwnerId = value;
+            this.Update();
+        }
+    }
+
+    private ulong[] _BannedUsers { get; set; } = Array.Empty<ulong>();
+    public ulong[] BannedUsers
+    {
+        get => this._BannedUsers;
+        set
+        {
+            this._BannedUsers = value;
+            this.Update();
+        }
+    }
+
+    private DateTime _LastRename { get; set; } = DateTime.MinValue;
+    public DateTime LastRename
+    {
+        get => this._LastRename;
+        set
+        {
+            this._LastRename = value;
+            this.Update();
+        }
+    }
 
     [JsonIgnore]
     public bool EventsRegistered { get; set; } = false;
+
+    void Update()
+    {
+        if (this.Bot is null || this.Parent is null)
+            return;
+
+        this.Parent.VcCreator.CreatedChannels = this.Parent.VcCreator.CreatedChannels.Update(x => x.ChannelId.ToString(), this);
+    }
 }

@@ -22,6 +22,8 @@ public sealed class User : RequiresBotReference
 
         this.Id = userId;
 
+        _ = this.Bot.DatabaseClient.CreateRow("users", typeof(User), userId, this.Bot.DatabaseClient.mainDatabaseConnection);
+
         this.Cooldown = new(bot, this);
 
         this.UrlSubmissions = new(bot, this);
@@ -35,31 +37,31 @@ public sealed class User : RequiresBotReference
     }
 
     [ColumnName("userid"), ColumnType(ColumnTypes.BigInt), Primary]
-    internal ulong Id { get; set; }
+    internal ulong Id { get; init; }
 
     [ContainsValues]
-    public UrlSubmissionSettings UrlSubmissions { get; set; }
+    public UrlSubmissionSettings UrlSubmissions { get; init; }
 
     [ContainsValues]
-    public AfkStatus AfkStatus { get; set; }
+    public AfkStatus AfkStatus { get; init; }
 
     [ContainsValues]
-    public ScoreSaberSettings ScoreSaber { get; set; }
+    public ScoreSaberSettings ScoreSaber { get; init; }
 
     [ContainsValues]
-    public ExperienceUserSettings ExperienceUser { get; set; }
+    public ExperienceUserSettings ExperienceUser { get; init; }
 
     [ContainsValues]
-    public ReminderSettings Reminders { get; set; }
+    public ReminderSettings Reminders { get; init; }
 
     [ContainsValues]
-    public TranslationSettings Translation { get; set; }
+    public TranslationSettings Translation { get; init; }
 
     [ContainsValues]
-    public TranslationReportSettings TranslationReports { get; set; }
+    public TranslationReportSettings TranslationReports { get; init; }
 
     [ContainsValues]
-    public DataSettings Data { get; set; }
+    public DataSettings Data { get; init; }
 
     [ColumnName("blocked_users"), ColumnType(ColumnTypes.LongText), Collation("utf8_unicode_ci"), Default("[]")]
     public ulong[] BlockedUsers
@@ -104,7 +106,7 @@ public sealed class User : RequiresBotReference
         => this.OverrideLocale ?? this.CurrentLocale ?? "en";
 
     [JsonIgnore]
-    public Cooldown Cooldown { get; set; }
+    public Cooldown Cooldown { get; init; }
 
     [JsonIgnore]
     public DateTime LastSuccessful2FA { get; set; } = DateTime.MinValue;

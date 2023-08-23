@@ -201,7 +201,7 @@ internal sealed class ConfigCommand : BaseCommand
                             continue;
                         }
 
-                        if (ctx.DbGuild.ReactionRoles.Any(x => (x.Key == selectedMessage.Id && x.Value.EmojiName == emoji.GetUniqueDiscordName())))
+                        if (ctx.DbGuild.ReactionRoles.Any(x => (x.MessageId == selectedMessage.Id && x.EmojiName == emoji.GetUniqueDiscordName())))
                         {
                             action_embed.Description = this.GetString(CommandKey.EmojiAlreadyUsed, true);
                             _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
@@ -241,7 +241,7 @@ internal sealed class ConfigCommand : BaseCommand
                             throw RoleResult.Exception;
                         }
 
-                        if (ctx.DbGuild.ReactionRoles.Any(x => x.Value.RoleId == RoleResult.Result.Id))
+                        if (ctx.DbGuild.ReactionRoles.Any(x => x.RoleId == RoleResult.Result.Id))
                         {
                             action_embed.Description = this.GetString(CommandKey.RoleAlreadyUsed, true);
                             _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
@@ -265,7 +265,7 @@ internal sealed class ConfigCommand : BaseCommand
                             return;
                         }
 
-                        if (ctx.DbGuild.ReactionRoles.Any(x => x.Value.RoleId == selectedRole.Id))
+                        if (ctx.DbGuild.ReactionRoles.Any(x => x.RoleId == selectedRole.Id))
                         {
                             action_embed.Description = this.GetString(CommandKey.RoleAlreadyUsed, true);
                             _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
@@ -283,7 +283,7 @@ internal sealed class ConfigCommand : BaseCommand
                             return;
                         }
 
-                        if (ctx.DbGuild.ReactionRoles.Any(x => (x.Key == selectedMessage.Id && x.Value.EmojiName == selectedEmoji.GetUniqueDiscordName())))
+                        if (ctx.DbGuild.ReactionRoles.Any(x => (x.MessageId == selectedMessage.Id && x.EmojiName == selectedEmoji.GetUniqueDiscordName())))
                         {
                             action_embed.Description = this.GetString(CommandKey.EmojiAlreadyUsed, true);
                             _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
@@ -292,13 +292,14 @@ internal sealed class ConfigCommand : BaseCommand
                             return;
                         }
 
-                        ctx.DbGuild.ReactionRoles = ctx.DbGuild.ReactionRoles.Add(new KeyValuePair<ulong, ReactionRoleEntry>(selectedMessage.Id, new()
+                        ctx.DbGuild.ReactionRoles = ctx.DbGuild.ReactionRoles.Add(new()
                         {
                             ChannelId = selectedMessage.Channel.Id,
                             RoleId = selectedRole.Id,
                             EmojiId = selectedEmoji.Id,
-                            EmojiName = selectedEmoji.GetUniqueDiscordName()
-                        }));
+                            EmojiName = selectedEmoji.GetUniqueDiscordName(),
+                            MessageId = selectedMessage.Id
+                        });
 
                         await selectedMessage.CreateReactionAsync(selectedEmoji);
 
@@ -326,7 +327,7 @@ internal sealed class ConfigCommand : BaseCommand
             else if (e.GetCustomId() == RemoveButton.CustomId)
             {
                 var RoleResult = await this.PromptCustomSelection(ctx.DbGuild.ReactionRoles
-                    .Select(x => new DiscordStringSelectComponentOption($"@{ctx.Guild.GetRole(x.Value.RoleId).Name}", x.Value.UUID, $"in Channel #{ctx.Guild.GetChannel(x.Value.ChannelId).Name}", emoji: new DiscordComponentEmoji(x.Value.GetEmoji(ctx.Client)))).ToList());
+                    .Select(x => new DiscordStringSelectComponentOption($"@{ctx.Guild.GetRole(x.RoleId).Name}", x.UUID, $"in Channel #{ctx.Guild.GetChannel(x.ChannelId).Name}", emoji: new DiscordComponentEmoji(x.GetEmoji(ctx.Client)))).ToList());
 
                 if (RoleResult.TimedOut)
                 {
@@ -343,21 +344,21 @@ internal sealed class ConfigCommand : BaseCommand
                     throw RoleResult.Exception;
                 }
 
-                var obj = ctx.DbGuild.ReactionRoles.First(x => x.Value.UUID == RoleResult.Result);
+                var obj = ctx.DbGuild.ReactionRoles.First(x => x.UUID == RoleResult.Result);
 
-                if (ctx.Guild.GetChannel(obj.Value.ChannelId).TryGetMessage(obj.Key, out var reactionMessage))
-                    _ = reactionMessage.DeleteReactionsEmojiAsync(obj.Value.GetEmoji(ctx.Client));
+                if (ctx.Guild.GetChannel(obj.ChannelId).TryGetMessage(obj.MessageId, out var reactionMessage))
+                    _ = reactionMessage.DeleteReactionsEmojiAsync(obj.GetEmoji(ctx.Client));
 
-                var role = ctx.Guild.GetRole(obj.Value.RoleId);
+                var role = ctx.Guild.GetRole(obj.RoleId);
 
-                ctx.DbGuild.ReactionRoles = ctx.DbGuild.ReactionRoles.Remove(x => x.Key.ToString(), obj);
+                ctx.DbGuild.ReactionRoles = ctx.DbGuild.ReactionRoles.Remove(x => x.MessageId.ToString(), obj);
 
 
                 embed.Description = this.GetString(CommandKey.RemovedReactionRole, true,
                     new TVar("Role", role.Mention),
                     new TVar("User", reactionMessage?.Author.Mention ?? "`/`"),
                     new TVar("Channel", reactionMessage?.Channel.Mention ?? "`/`"),
-                    new TVar("Emoji", obj.Value.GetEmoji(ctx.Client)));
+                    new TVar("Emoji", obj.GetEmoji(ctx.Client)));
                 _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsSuccess(ctx, this.GetString(CommandKey.Title))));
                 await Task.Delay(5000);
                 await this.ExecuteCommand(ctx, arguments);

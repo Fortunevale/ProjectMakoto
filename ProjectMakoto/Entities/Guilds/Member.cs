@@ -7,6 +7,7 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Database.ColumnAttributes;
 using ProjectMakoto.Entities.Members;
 
 namespace ProjectMakoto.Entities.Guilds;
@@ -18,52 +19,44 @@ public sealed class Member : RequiresParent<Guild>
         this.InviteTracker = new(bot, this);
         this.Experience = new(bot, this);
         this.Id = key;
+
+        _ = this.Bot.DatabaseClient.CreateRow(this.Parent.Id.ToString(), typeof(Member), key, this.Bot.DatabaseClient.guildDatabaseConnection);
     }
 
+    [ColumnName("userid"), ColumnType(ColumnTypes.BigInt), Primary]
     internal ulong Id { get; set; }
 
-    private string _SavedNickname { get; set; } = "";
-    public string SavedNickname
+    [ColumnName("saved_nickname"), ColumnType(ColumnTypes.Text), Collation("utf8_unicode_ci"), Nullable]
+    public string? SavedNickname
     {
-        get => this._SavedNickname;
-        set
-        {
-            this._SavedNickname = value;
-            _ = this.Bot.DatabaseClient.SetValue(this.Parent.Id.ToString(), "userid", this.Id, "saved_nickname", value, this.Bot.DatabaseClient.guildDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<string>(this.Parent.Id.ToString(), "userid", this.Id, "saved_nickname", this.Bot.DatabaseClient.guildDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue(this.Parent.Id.ToString(), "userid", this.Id, "saved_nickname", value, this.Bot.DatabaseClient.guildDatabaseConnection);
     }
 
-
-
-    private DateTime _FirstJoinDate { get; set; } = DateTime.UnixEpoch;
+    [ColumnName("first_join"), ColumnType(ColumnTypes.BigInt), Default("0")]
     public DateTime FirstJoinDate
     {
-        get => this._FirstJoinDate;
-        set
-        {
-            this._FirstJoinDate = value;
-            _ = this.Bot.DatabaseClient.SetValue(this.Parent.Id.ToString(), "userid", this.Id, "first_join", value, this.Bot.DatabaseClient.guildDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<DateTime>(this.Parent.Id.ToString(), "userid", this.Id, "first_join", this.Bot.DatabaseClient.guildDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue(this.Parent.Id.ToString(), "userid", this.Id, "first_join", value, this.Bot.DatabaseClient.guildDatabaseConnection);
     }
 
-
-
-    private DateTime _LastLeaveDate { get; set; } = DateTime.UnixEpoch;
+    [ColumnName("last_leave"), ColumnType(ColumnTypes.BigInt), Default("0")]
     public DateTime LastLeaveDate
     {
-        get => this._LastLeaveDate;
-        set
-        {
-            this._LastLeaveDate = value;
-            _ = this.Bot.DatabaseClient.SetValue(this.Parent.Id.ToString(), "userid", this.Id, "last_leave", value, this.Bot.DatabaseClient.guildDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<DateTime>(this.Parent.Id.ToString(), "userid", this.Id, "last_leave", this.Bot.DatabaseClient.guildDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue(this.Parent.Id.ToString(), "userid", this.Id, "last_leave", value, this.Bot.DatabaseClient.guildDatabaseConnection);
     }
 
+    [ColumnName("roles"), ColumnType(ColumnTypes.Text), Collation("utf8_unicode_ci"), Default("[]")]
+    public MemberRole[] MemberRoles
+    {
+        get => JsonConvert.DeserializeObject<MemberRole[]>(this.Bot.DatabaseClient.GetValue<string>(this.Parent.Id.ToString(), "userid", this.Id, "roles", this.Bot.DatabaseClient.guildDatabaseConnection));
+        set => _ = this.Bot.DatabaseClient.SetValue(this.Parent.Id.ToString(), "userid", this.Id, "roles", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.guildDatabaseConnection);
+    }
 
+    [ContainsValues]
+    public InviteTrackerMember InviteTracker { get; init; }
 
-    public InviteTrackerMember InviteTracker { get; set; }
-
-    public ExperienceMember Experience { get; set; }
-
-    public List<MemberRole> MemberRoles { get; set; } = new();
+    [ContainsValues]
+    public ExperienceMember Experience { get; init; }
 }

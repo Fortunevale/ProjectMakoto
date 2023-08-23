@@ -50,4 +50,7 @@ public static class TaskWatcherExtensions
 
         return v == -1 ? callingFile : callingFile[v..];
     }
+
+    public static TaskAwaiter GetAwaiter(this TaskInfo info)
+        => info.Task.GetAwaiter();
 }

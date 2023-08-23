@@ -359,7 +359,7 @@ internal sealed class DisCatSharpExtensionsLoader
             {
                 try
                 {
-                    if (bot.DatabaseClient.IsDisposed())
+                    if (bot.DatabaseClient.Disposed)
                         return;
 
                     List<ulong> users = new();

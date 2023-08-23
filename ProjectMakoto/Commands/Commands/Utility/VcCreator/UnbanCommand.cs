@@ -21,7 +21,7 @@ internal sealed class UnbanCommand : BaseCommand
             var victim = (DiscordMember)arguments["victim"];
             var channel = ctx.Member.VoiceState?.Channel;
 
-            if (!ctx.DbGuild.VcCreator.CreatedChannels.ContainsKey(channel?.Id ?? 0))
+            if (!ctx.DbGuild.VcCreator.CreatedChannels.Any(x => x.ChannelId == (channel?.Id ?? 0)))
             {
                 _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Utility.VoiceChannelCreator.NotAVccChannel, true)).AsError(ctx));
                 return;
@@ -39,7 +39,7 @@ internal sealed class UnbanCommand : BaseCommand
                 return;
             }
 
-            _ = ctx.DbGuild.VcCreator.CreatedChannels[channel.Id].BannedUsers.Remove(victim.Id);
+            ctx.DbGuild.VcCreator.CreatedChannels[channel.Id].BannedUsers = ctx.DbGuild.VcCreator.CreatedChannels[channel.Id].BannedUsers.Remove(x => x.ToString(), victim.Id);
             await channel.AddOverwriteAsync(victim, deny: Permissions.None);
             _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Utility.VoiceChannelCreator.Unban.VictimUnbanned, true, new TVar("User", victim.Mention))).AsSuccess(ctx));
         });

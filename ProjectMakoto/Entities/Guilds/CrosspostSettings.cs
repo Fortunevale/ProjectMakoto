@@ -17,27 +17,28 @@ public sealed class CrosspostSettings : RequiresParent<Guild>
     {
     }
 
-    [ColumnName("crosspostdelay"), ColumnType(ColumnTypes.Int)]
+    [ColumnName("crosspostdelay"), ColumnType(ColumnTypes.Int), Default("5")]
     public int DelayBeforePosting
     {
         get => this.Bot.DatabaseClient.GetValue<int>("guilds", "serverid", this.Parent.Id, "crosspostdelay", this.Bot.DatabaseClient.mainDatabaseConnection);
         set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "crosspostdelay", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    [ColumnName("crosspostdelay"), ColumnType(ColumnTypes.TinyInt)]
+    [ColumnName("crosspostexcludebots"), ColumnType(ColumnTypes.TinyInt), Default("0")]
     public bool ExcludeBots
     {
         get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "crosspostexcludebots", this.Bot.DatabaseClient.mainDatabaseConnection);
         set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "crosspostexcludebots", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    [ColumnName("crosspostchannels"), ColumnType(ColumnTypes.LongText)]
+    [ColumnName("crosspostchannels"), ColumnType(ColumnTypes.LongText), Default("[]")]
     public ulong[] CrosspostChannels
     {
         get => JsonConvert.DeserializeObject<ulong[]>(this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Parent.Id, "crosspostchannels", this.Bot.DatabaseClient.mainDatabaseConnection));
         set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "crosspostchannels", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
+    [ColumnName("crosspost_ratelimits"), ColumnType(ColumnTypes.LongText), Default("[]")]
     public CrosspostRatelimit[] CrosspostRatelimits
     {
         get => JsonConvert.DeserializeObject<CrosspostRatelimit[]>(this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Parent.Id, "crosspost_ratelimits", this.Bot.DatabaseClient.mainDatabaseConnection))

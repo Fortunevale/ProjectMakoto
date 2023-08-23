@@ -17,14 +17,14 @@ public sealed class ExperienceSettings : RequiresParent<Guild>
     {
     }
 
-    [ColumnName("experience_use"), ColumnType(ColumnTypes.TinyInt)]
+    [ColumnName("experience_use"), ColumnType(ColumnTypes.TinyInt), Default("0")]
     public bool UseExperience
     {
         get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "experience_use", this.Bot.DatabaseClient.mainDatabaseConnection);
         set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "experience_use", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    [ColumnName("experience_boost_bumpreminder"), ColumnType(ColumnTypes.TinyInt)]
+    [ColumnName("experience_boost_bumpreminder"), ColumnType(ColumnTypes.TinyInt), Default("1")]
     public bool BoostXpForBumpReminder
     {
         get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "experience_boost_bumpreminder", this.Bot.DatabaseClient.mainDatabaseConnection);

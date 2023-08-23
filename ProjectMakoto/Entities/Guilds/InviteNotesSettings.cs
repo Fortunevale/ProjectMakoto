@@ -17,7 +17,7 @@ public sealed class InviteNotesSettings : RequiresParent<Guild>
     {
     }
 
-    [ColumnName("invitenotes"), ColumnType(ColumnTypes.LongText)]
+    [ColumnName("invitenotes"), ColumnType(ColumnTypes.LongText), Default("[]")]
     public InviteNotesDetails[] Notes
     {
         get => JsonConvert.DeserializeObject<InviteNotesDetails[]>(this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Parent.Id, "invitenotes", this.Bot.DatabaseClient.mainDatabaseConnection))

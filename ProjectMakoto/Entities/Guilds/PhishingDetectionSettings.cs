@@ -17,21 +17,21 @@ public sealed class PhishingDetectionSettings : RequiresParent<Guild>
     {
     }
 
-    [ColumnName("phishing_detect"), ColumnType(ColumnTypes.TinyInt)]
+    [ColumnName("phishing_detect"), ColumnType(ColumnTypes.TinyInt), Default("1")]
     public bool DetectPhishing
     {
         get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "phishing_detect", this.Bot.DatabaseClient.mainDatabaseConnection);
         set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "phishing_detect", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    [ColumnName("phishing_warnonredirect"), ColumnType(ColumnTypes.TinyInt)]
+    [ColumnName("phishing_warnonredirect"), ColumnType(ColumnTypes.TinyInt), Default("0")]
     public bool WarnOnRedirect
     {
         get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "phishing_warnonredirect", this.Bot.DatabaseClient.mainDatabaseConnection);
         set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "phishing_warnonredirect", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    [ColumnName("phishing_abuseipdb"), ColumnType(ColumnTypes.TinyInt)]
+    [ColumnName("phishing_abuseipdb"), ColumnType(ColumnTypes.TinyInt), Default("0")]
     public bool AbuseIpDbReports
     {
         get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "phishing_abuseipdb", this.Bot.DatabaseClient.mainDatabaseConnection);
@@ -54,7 +54,7 @@ public sealed class PhishingDetectionSettings : RequiresParent<Guild>
     }
 
 
-    [ColumnName("phishing_reason"), ColumnType(ColumnTypes.Text), Collation("utf8_unicode_ci"), Default("1209600")]
+    [ColumnName("phishing_time"), ColumnType(ColumnTypes.BigInt), Default("1209600")]
     public TimeSpan CustomPunishmentLength
     {
         get => this.Bot.DatabaseClient.GetValue<TimeSpan>("guilds", "serverid", this.Parent.Id, "phishing_time", this.Bot.DatabaseClient.mainDatabaseConnection);

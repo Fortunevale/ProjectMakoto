@@ -37,7 +37,7 @@ internal sealed class PhishingSubmissionEvents : RequiresBotReference
 
                 try
                 {
-                    await this.Bot.DatabaseClient._helper.DeleteRow(this.Bot.DatabaseClient.mainDatabaseConnection, "active_url_submissions", "messageid", $"{e.Message.Id}");
+                    await this.Bot.DatabaseClient.DeleteRow("active_url_submissions", "messageid", $"{e.Message.Id}", this.Bot.DatabaseClient.mainDatabaseConnection);
                 }
                 catch { }
 
@@ -58,7 +58,7 @@ internal sealed class PhishingSubmissionEvents : RequiresBotReference
 
                 try
                 {
-                    await this.Bot.DatabaseClient._helper.DeleteRow(this.Bot.DatabaseClient.mainDatabaseConnection, "active_url_submissions", "messageid", $"{e.Message.Id}");
+                    await this.Bot.DatabaseClient.DeleteRow("active_url_submissions", "messageid", $"{e.Message.Id}", this.Bot.DatabaseClient.mainDatabaseConnection);
                 }
                 catch { }
 
@@ -74,7 +74,7 @@ internal sealed class PhishingSubmissionEvents : RequiresBotReference
 
                 try
                 {
-                    await this.Bot.DatabaseClient._helper.DeleteRow(this.Bot.DatabaseClient.mainDatabaseConnection, "active_url_submissions", "messageid", $"{e.Message.Id}");
+                    await this.Bot.DatabaseClient.DeleteRow("active_url_submissions", "messageid", $"{e.Message.Id}", this.Bot.DatabaseClient.mainDatabaseConnection);
                 }
                 catch { }
 
@@ -92,7 +92,7 @@ internal sealed class PhishingSubmissionEvents : RequiresBotReference
 
                 try
                 {
-                    await this.Bot.DatabaseClient._helper.DeleteRow(this.Bot.DatabaseClient.mainDatabaseConnection, "active_url_submissions", "messageid", $"{e.Message.Id}");
+                    await this.Bot.DatabaseClient.DeleteRow("active_url_submissions", "messageid", $"{e.Message.Id}", this.Bot.DatabaseClient.mainDatabaseConnection);
                 }
                 catch { }
 

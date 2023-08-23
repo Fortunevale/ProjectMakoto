@@ -17,14 +17,14 @@ public sealed class InviteTrackerSettings : RequiresParent<Guild>
     {
     }
 
-    [ColumnName("invitetracker_enabled"), ColumnType(ColumnTypes.TinyInt)]
+    [ColumnName("invitetracker_enabled"), ColumnType(ColumnTypes.TinyInt), Default("1")]
     public bool Enabled
     {
         get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "invitetracker_enabled", this.Bot.DatabaseClient.mainDatabaseConnection);
         set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "invitetracker_enabled", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    [ColumnName("invitetracker_cache"), ColumnType(ColumnTypes.LongText)]
+    [ColumnName("invitetracker_cache"), ColumnType(ColumnTypes.LongText), Default("[]")]
     public InviteTrackerCacheItem[] Cache
     {
         get => JsonConvert.DeserializeObject<InviteTrackerCacheItem[]>(this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Parent.Id, "invitetracker_cache", this.Bot.DatabaseClient.mainDatabaseConnection))

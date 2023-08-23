@@ -24,14 +24,13 @@ public sealed class AfkStatus : RequiresParent<User>
         set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Parent.Id, "afk_reason", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    [ColumnName("afk_since"), ColumnType(ColumnTypes.BigInt)]
+    [ColumnName("afk_since"), ColumnType(ColumnTypes.BigInt), Default("0")]
     public DateTime TimeStamp
     {
         get => this.Bot.DatabaseClient.GetValue<DateTime>("users", "userid", this.Parent.Id, "afk_since", this.Bot.DatabaseClient.mainDatabaseConnection);
         set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Parent.Id, "afk_since", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
-
-    [ColumnName("afk_pingamount"), ColumnType(ColumnTypes.BigInt)]
+    [ColumnName("afk_pingamount"), ColumnType(ColumnTypes.BigInt), Default("0")]
     public long MessagesAmount
     {
         get => this.Bot.DatabaseClient.GetValue<long>("users", "userid", this.Parent.Id, "afk_pingamount", this.Bot.DatabaseClient.mainDatabaseConnection);
