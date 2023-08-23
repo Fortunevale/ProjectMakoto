@@ -63,14 +63,14 @@ public sealed class User : RequiresBotReference
     [ContainsValues]
     public DataSettings Data { get; init; }
 
-    [ColumnName("blocked_users"), ColumnType(ColumnTypes.LongText), Collation("utf8_unicode_ci"), Default("[]")]
+    [ColumnName("blocked_users"), ColumnType(ColumnTypes.LongText), Collation("utf8mb4_0900_ai_ci"), Default("[]")]
     public ulong[] BlockedUsers
     {
         get => JsonConvert.DeserializeObject<ulong[]>(this.Bot.DatabaseClient.GetValue<string>("users", "userid", this.Id, "blocked_users", this.Bot.DatabaseClient.mainDatabaseConnection));
         set => this.Bot.DatabaseClient.SetValue("users", "userid", this.Id, "blocked_users", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    [ColumnName("playlists"), ColumnType(ColumnTypes.LongText), Collation("utf8_unicode_ci"), Default("[]")]
+    [ColumnName("playlists"), ColumnType(ColumnTypes.LongText), Collation("utf8mb4_0900_ai_ci"), Default("[]")]
     public UserPlaylist[] UserPlaylists
     {
         get
@@ -87,14 +87,14 @@ public sealed class User : RequiresBotReference
         set => this.Bot.DatabaseClient.SetValue("users", "userid", this.Id, "playlists", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    [ColumnName("current_locale"), ColumnType(ColumnTypes.Text), Collation("utf8_unicode_ci"), Nullable]
+    [ColumnName("current_locale"), ColumnType(ColumnTypes.Text), Collation("utf8mb4_0900_ai_ci"), Nullable]
     public string? CurrentLocale
     {
         get => this.Bot.DatabaseClient.GetValue<string>("users", "userid", this.Id, "current_locale", this.Bot.DatabaseClient.mainDatabaseConnection);
         set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Id, "current_locale", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    [ColumnName("override_locale"), ColumnType(ColumnTypes.Text), Collation("utf8_unicode_ci"), Nullable]
+    [ColumnName("override_locale"), ColumnType(ColumnTypes.Text), Collation("utf8mb4_0900_ai_ci"), Nullable]
     public string? OverrideLocale
     {
         get => this.Bot.DatabaseClient.GetValue<string>("users", "userid", this.Id, "override_locale", this.Bot.DatabaseClient.mainDatabaseConnection);

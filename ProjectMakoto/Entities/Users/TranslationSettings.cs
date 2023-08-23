@@ -17,28 +17,28 @@ public sealed class TranslationSettings : RequiresParent<User>
     {
     }
 
-    [ColumnName("last_google_source"), ColumnType(ColumnTypes.Text), Collation("utf8_unicode_ci"), Nullable]
+    [ColumnName("last_google_source"), ColumnType(ColumnTypes.Text), Collation("utf8mb4_0900_ai_ci"), Nullable]
     public string LastGoogleSource
     {
         get => this.Bot.DatabaseClient.GetValue<string>("users", "userid", this.Parent.Id, "last_google_source", this.Bot.DatabaseClient.mainDatabaseConnection);
         set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Parent.Id, "last_google_source", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    [ColumnName("last_google_target"), ColumnType(ColumnTypes.Text), Collation("utf8_unicode_ci"), Nullable]
+    [ColumnName("last_google_target"), ColumnType(ColumnTypes.Text), Collation("utf8mb4_0900_ai_ci"), Nullable]
     public string LastGoogleTarget
     {
         get => this.Bot.DatabaseClient.GetValue<string>("users", "userid", this.Parent.Id, "last_google_target", this.Bot.DatabaseClient.mainDatabaseConnection);
         set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Parent.Id, "last_google_target", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    [ColumnName("last_libretranslate_source"), ColumnType(ColumnTypes.Text), Collation("utf8_unicode_ci"), Nullable]
+    [ColumnName("last_libretranslate_source"), ColumnType(ColumnTypes.Text), Collation("utf8mb4_0900_ai_ci"), Nullable]
     public string LastLibreTranslateSource
     {
         get => this.Bot.DatabaseClient.GetValue<string>("users", "userid", this.Parent.Id, "last_libretranslate_source", this.Bot.DatabaseClient.mainDatabaseConnection);
         set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Parent.Id, "last_libretranslate_source", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    [ColumnName("last_libretranslate_target"), ColumnType(ColumnTypes.Text), Collation("utf8_unicode_ci"), Nullable]
+    [ColumnName("last_libretranslate_target"), ColumnType(ColumnTypes.Text), Collation("utf8mb4_0900_ai_ci"), Nullable]
     public string LastLibreTranslateTarget
     {
         get => this.Bot.DatabaseClient.GetValue<string>("users", "userid", this.Parent.Id, "last_libretranslate_target", this.Bot.DatabaseClient.mainDatabaseConnection);
