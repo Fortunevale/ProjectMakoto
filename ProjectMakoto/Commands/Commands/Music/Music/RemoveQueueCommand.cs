@@ -49,11 +49,11 @@ internal sealed class RemoveQueueCommand : BaseCommand
             {
                 var Index = Convert.ToInt32(selection) - 1;
 
-                if (Index < 0 || Index >= ctx.DbGuild.MusicModule.SongQueue.Count)
+                if (Index < 0 || Index >= ctx.DbGuild.MusicModule.SongQueue.Length)
                 {
                     _ = await this.RespondOrEdit(embed: new DiscordEmbedBuilder
                     {
-                        Description = this.GetString(this.t.Commands.Music.RemoveQueue.OutOfRange, true, new TVar("Min", 1), new TVar("Max", ctx.DbGuild.MusicModule.SongQueue.Count)),
+                        Description = this.GetString(this.t.Commands.Music.RemoveQueue.OutOfRange, true, new TVar("Min", 1), new TVar("Max", ctx.DbGuild.MusicModule.SongQueue.Length)),
                     }.AsError(ctx));
                     return;
                 }
@@ -83,7 +83,7 @@ internal sealed class RemoveQueueCommand : BaseCommand
                 return;
             }
 
-            _ = ctx.DbGuild.MusicModule.SongQueue.Remove(info);
+            ctx.DbGuild.MusicModule.SongQueue = ctx.DbGuild.MusicModule.SongQueue.Remove(x => x.UUID, info);
 
             _ = await this.RespondOrEdit(embed: new DiscordEmbedBuilder
             {

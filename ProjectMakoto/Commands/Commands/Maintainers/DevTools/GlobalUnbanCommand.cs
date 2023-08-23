@@ -30,7 +30,7 @@ internal sealed class GlobalUnbanCommand : BaseCommand
             }
 
             _ = ctx.Bot.globalBans.Remove(victim.Id);
-            await ctx.Bot.DatabaseClient._helper.DeleteRow(ctx.Bot.DatabaseClient.mainDatabaseConnection, "globalbans", "id", $"{victim.Id}");
+            await ctx.Bot.DatabaseClient.DeleteRow("globalbans", "id", $"{victim.Id}", ctx.Bot.DatabaseClient.mainDatabaseConnection);
 
             var Success = 0;
             var Failed = 0;

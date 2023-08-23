@@ -32,7 +32,7 @@ public abstract class BaseCommand
         ctx.Transferred = true;
 
         if (await this.BasePreExecutionCheck())
-            await this.ExecuteCommand(this.ctx, arguments);
+            await this.ExecuteCommand(this.ctx, arguments).Add(ctx.Bot, this.ctx);
     }
 
     public async Task ExecuteCommand(CommandContext ctx, Bot _bot, Dictionary<string, object> arguments = null)
@@ -41,7 +41,7 @@ public abstract class BaseCommand
         this.t = _bot.LoadedTranslations;
 
         if (await this.BasePreExecutionCheck())
-            await this.ExecuteCommand(this.ctx, arguments);
+            await this.ExecuteCommand(this.ctx, arguments).Add(_bot, this.ctx);
     }
 
     public async Task ExecuteCommand(InteractionContext ctx, Bot _bot, Dictionary<string, object> arguments = null, bool Ephemeral = true, bool InitiateInteraction = true, bool InteractionInitiated = false)
@@ -63,7 +63,7 @@ public abstract class BaseCommand
                 this.ctx.RespondedToInitial = true;
 
             if (await this.BasePreExecutionCheck())
-                await this.ExecuteCommand(this.ctx, arguments);
+                await this.ExecuteCommand(this.ctx, arguments).Add(_bot, this.ctx);
         }).Add(_bot, this.ctx);
     }
 
@@ -111,7 +111,7 @@ public abstract class BaseCommand
                 });
 
             if (await this.BasePreExecutionCheck())
-                await this.ExecuteCommand(this.ctx, arguments);
+                await this.ExecuteCommand(this.ctx, arguments).Add(_bot, this.ctx);
         }).Add(_bot, this.ctx);
     }
 
@@ -134,7 +134,7 @@ public abstract class BaseCommand
                 this.ctx.RespondedToInitial = true;
 
             if (await this.BasePreExecutionCheck())
-                await this.ExecuteCommand(this.ctx, arguments);
+                await this.ExecuteCommand(this.ctx, arguments).Add(_bot, this.ctx);
         }).Add(_bot, this.ctx);
     }
 
@@ -157,7 +157,7 @@ public abstract class BaseCommand
                 this.ctx.RespondedToInitial = true;
 
             if (await this.BasePreExecutionCheck())
-                await this.ExecuteCommand(this.ctx, arguments);
+                await this.ExecuteCommand(this.ctx, arguments).Add(_bot, this.ctx);
         }).Add(_bot, ctx);
     }
 

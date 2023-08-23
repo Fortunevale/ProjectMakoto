@@ -17,7 +17,7 @@ public sealed class PollSettings : RequiresParent<Guild>
     {
     }
 
-    [ColumnName("polls"), ColumnType(ColumnTypes.LongText)]
+    [ColumnName("polls"), ColumnType(ColumnTypes.LongText), Default("[]")]
     public PollEntry[] RunningPolls
     {
         get => JsonConvert.DeserializeObject<PollEntry[]>(this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Parent.Id, "polls", this.Bot.DatabaseClient.mainDatabaseConnection));

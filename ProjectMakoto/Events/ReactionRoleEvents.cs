@@ -22,12 +22,12 @@ internal sealed class ReactionRoleEvents : RequiresTranslation
         if (e.Guild is null || e.Channel is null || e.Channel.IsPrivate)
             return;
 
-        if (this.Bot.Guilds[e.Guild.Id].ReactionRoles.Any(x => x.Key == e.Message.Id && x.Value.EmojiName == e.Emoji.GetUniqueDiscordName()))
+        if (this.Bot.Guilds[e.Guild.Id].ReactionRoles.Any(x => x.MessageId == e.Message.Id && x.EmojiName == e.Emoji.GetUniqueDiscordName()))
         {
-            var obj = this.Bot.Guilds[e.Guild.Id].ReactionRoles.First(x => x.Key == e.Message.Id && x.Value.EmojiName == e.Emoji.GetUniqueDiscordName());
+            var obj = this.Bot.Guilds[e.Guild.Id].ReactionRoles.First(x => x.MessageId == e.Message.Id && x.EmojiName == e.Emoji.GetUniqueDiscordName());
 
-            if (e.Guild.Roles.ContainsKey(obj.Value.RoleId) && e.User.Id != this.Bot.DiscordClient.CurrentUser.Id)
-                await (await e.User.ConvertToMember(e.Guild)).GrantRoleAsync(e.Guild.GetRole(obj.Value.RoleId));
+            if (e.Guild.Roles.ContainsKey(obj.RoleId) && e.User.Id != this.Bot.DiscordClient.CurrentUser.Id)
+                await (await e.User.ConvertToMember(e.Guild)).GrantRoleAsync(e.Guild.GetRole(obj.RoleId));
         }
     }
 
@@ -36,18 +36,18 @@ internal sealed class ReactionRoleEvents : RequiresTranslation
         if (e.Guild == null || e.Channel.IsPrivate)
             return;
 
-        if (this.Bot.Guilds[e.Guild.Id].ReactionRoles.Any<KeyValuePair<ulong, ReactionRoleEntry>>(x => x.Key == e.Message.Id && x.Value.EmojiName == e.Emoji.GetUniqueDiscordName()))
+        if (this.Bot.Guilds[e.Guild.Id].ReactionRoles.Any(x => x.MessageId == e.Message.Id && x.EmojiName == e.Emoji.GetUniqueDiscordName()))
         {
-            var obj = this.Bot.Guilds[e.Guild.Id].ReactionRoles.First<KeyValuePair<ulong, ReactionRoleEntry>>(x => x.Key == e.Message.Id && x.Value.EmojiName == e.Emoji.GetUniqueDiscordName());
+            var obj = this.Bot.Guilds[e.Guild.Id].ReactionRoles.First(x => x.MessageId == e.Message.Id && x.EmojiName == e.Emoji.GetUniqueDiscordName());
 
-            if (e.Guild.Roles.ContainsKey(obj.Value.RoleId) && e.User.Id != this.Bot.DiscordClient.CurrentUser.Id)
+            if (e.Guild.Roles.ContainsKey(obj.RoleId) && e.User.Id != this.Bot.DiscordClient.CurrentUser.Id)
             {
                 DiscordMember member;
 
                 try
                 { member = await e.User.ConvertToMember(e.Guild); }
                 catch (DisCatSharp.Exceptions.NotFoundException) { return; }
-                await member.RevokeRoleAsync(e.Guild.GetRole(obj.Value.RoleId));
+                await member.RevokeRoleAsync(e.Guild.GetRole(obj.RoleId));
             }
         }
     }

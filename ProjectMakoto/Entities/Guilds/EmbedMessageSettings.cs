@@ -17,14 +17,14 @@ public sealed class EmbedMessageSettings : RequiresParent<Guild>
     {
     }
 
-    [ColumnName("embed_messages"), ColumnType(ColumnTypes.TinyInt)]
+    [ColumnName("embed_messages"), ColumnType(ColumnTypes.TinyInt), Default("1")]
     public bool UseEmbedding
     {
         get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "embed_messages",  this.Bot.DatabaseClient.mainDatabaseConnection);
         set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "embed_messages", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    [ColumnName("embed_github"), ColumnType(ColumnTypes.TinyInt)]
+    [ColumnName("embed_github"), ColumnType(ColumnTypes.TinyInt), Default("1")]
     public bool UseGithubEmbedding
     {
         get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "embed_github", this.Bot.DatabaseClient.mainDatabaseConnection);

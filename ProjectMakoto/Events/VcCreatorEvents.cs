@@ -43,8 +43,9 @@ internal sealed class VcCreatorEvents : RequiresTranslation
                     name = name.Replace(b, new String('*', b.Length));
 
                 var newChannel = await e.Guild.CreateChannelAsync(name, ChannelType.Voice, e.After.Channel.Parent, default, null, 8);
-                this.Bot.Guilds[e.Guild.Id].VcCreator.CreatedChannels.Add(newChannel.Id, new()
+                this.Bot.Guilds[e.Guild.Id].VcCreator.CreatedChannels = this.Bot.Guilds[e.Guild.Id].VcCreator.CreatedChannels.Add(new()
                 {
+                    ChannelId = newChannel.Id,
                     OwnerId = member.Id
                 });
 

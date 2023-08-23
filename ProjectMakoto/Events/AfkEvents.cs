@@ -33,12 +33,12 @@ internal sealed class AfkEvents : RequiresTranslation
 
         var AfkKey = this.Bot.LoadedTranslations.Commands.Social.Afk;
 
-        if (this.Bot.Users[e.Author.Id].AfkStatus.TimeStamp != DateTime.UnixEpoch && this.Bot.Users[e.Author.Id].AfkStatus.LastMentionTrigger.AddSeconds(10) < DateTime.UtcNow)
+        if (this.Bot.Users[e.Author.Id].AfkStatus.TimeStamp != DateTime.MinValue && this.Bot.Users[e.Author.Id].AfkStatus.LastMentionTrigger.AddSeconds(10) < DateTime.UtcNow)
         {
             var cache = new DateTime().ToUniversalTime().AddTicks(this.Bot.Users[e.Author.Id].AfkStatus.TimeStamp.Ticks);
 
             this.Bot.Users[e.Author.Id].AfkStatus.Reason = "";
-            this.Bot.Users[e.Author.Id].AfkStatus.TimeStamp = DateTime.UnixEpoch;
+            this.Bot.Users[e.Author.Id].AfkStatus.TimeStamp = DateTime.MinValue;
 
             var embed = new DiscordEmbedBuilder
             {
@@ -91,7 +91,7 @@ internal sealed class AfkEvents : RequiresTranslation
                 if (b.Id == e.Author.Id)
                     continue;
 
-                if (this.Bot.Users[b.Id].AfkStatus.TimeStamp != DateTime.UnixEpoch)
+                if (this.Bot.Users[b.Id].AfkStatus.TimeStamp != DateTime.MinValue)
                 {
                     if (this.Bot.Users[e.Author.Id].AfkStatus.LastMentionTrigger.AddSeconds(30) > DateTime.UtcNow)
                         return;

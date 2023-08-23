@@ -7,6 +7,7 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Database.ColumnAttributes;
 using ProjectMakoto.Entities.Guilds;
 
 namespace ProjectMakoto.Entities.Members;
@@ -17,25 +18,17 @@ public sealed class InviteTrackerMember : RequiresParent<Member>
     {
     }
 
-    private ulong _UserId { get; set; } = 0;
+    [ColumnName("invite_user"), ColumnType(ColumnTypes.BigInt), Default("0")]
     public ulong UserId
     {
-        get => this._UserId;
-        set
-        {
-            this._UserId = value;
-            _ = this.Bot.DatabaseClient.SetValue(this.Parent.Parent.Id.ToString(), "userid", this.Parent.Id, "invite_user", value, this.Bot.DatabaseClient.guildDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<ulong>(this.Parent.Parent.Id.ToString(), "userid", this.Parent.Id, "invite_user", this.Bot.DatabaseClient.guildDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue(this.Parent.Parent.Id.ToString(), "userid", this.Parent.Id, "invite_user", value, this.Bot.DatabaseClient.guildDatabaseConnection);
     }
 
-    private string _Code { get; set; } = "";
+    [ColumnName("invite_code"), ColumnType(ColumnTypes.Text), Default("")]
     public string Code
     {
-        get => this._Code;
-        set
-        {
-            this._Code = value;
-            _ = this.Bot.DatabaseClient.SetValue(this.Parent.Parent.Id.ToString(), "userid", this.Parent.Id, "invite_code", value, this.Bot.DatabaseClient.guildDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<string>(this.Parent.Parent.Id.ToString(), "userid", this.Parent.Id, "invite_code", this.Bot.DatabaseClient.guildDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue(this.Parent.Parent.Id.ToString(), "userid", this.Parent.Id, "invite_code", value, this.Bot.DatabaseClient.guildDatabaseConnection);
     }
 }

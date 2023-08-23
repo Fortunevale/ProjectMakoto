@@ -24,4 +24,5 @@ public sealed class ReactionRoleEntry
 
     public ulong RoleId { get; set; }
     public ulong ChannelId { get; set; }
+    public ulong MessageId { get; set; }
 }

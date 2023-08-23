@@ -81,7 +81,7 @@ internal sealed class BumpReminderHandler: RequiresBotReference
             if (!Guild.Channels.ContainsKey(this.Bot.Guilds[ServerId].BumpReminder.ChannelId) || this.Bot.Guilds[ServerId].BumpReminder.BumpsMissed > 168)
             {
                 _logger.LogDebug("'{Guild}' hasn't bumped 169 times. Disabling bump reminder..", ServerId);
-                this.Bot.Guilds[ServerId].BumpReminder = new(this.Bot, this.Bot.Guilds[ServerId]);
+                this.Bot.Guilds[ServerId].BumpReminder.Reset();
                 return;
             }
 
@@ -102,7 +102,7 @@ internal sealed class BumpReminderHandler: RequiresBotReference
             }
             catch (CancelException ex)
             {
-                this.Bot.Guilds[ServerId].BumpReminder = new(this.Bot, this.Bot.Guilds[ServerId]);
+                this.Bot.Guilds[ServerId].BumpReminder.Reset();
                 _ = Channel.SendMessageAsync(new DiscordMessageBuilder().WithContent($":warning: `{this.tKey.BumpReminderDisabled.Get(this.Bot.Guilds[ServerId])} {ex.Message}`"));
                 return;
             }

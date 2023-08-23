@@ -17,7 +17,7 @@ public sealed class TokenLeakDetectionSettings : RequiresParent<Guild>
     {
     }
 
-    [ColumnName("tokens_detect"), ColumnType(ColumnTypes.TinyInt)]
+    [ColumnName("tokens_detect"), ColumnType(ColumnTypes.TinyInt), Default("1")]
     public bool DetectTokens
     {
         get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "tokens_detect", this.Bot.DatabaseClient.mainDatabaseConnection);

@@ -17,7 +17,7 @@ public sealed class NameNormalizerSettings : RequiresParent<Guild>
     {
     }
 
-    [ColumnName("normalizenames"), ColumnType(ColumnTypes.TinyInt)]
+    [ColumnName("normalizenames"), ColumnType(ColumnTypes.TinyInt), Default("0")]
     public bool NameNormalizerEnabled
     {
         get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "normalizenames", this.Bot.DatabaseClient.mainDatabaseConnection);

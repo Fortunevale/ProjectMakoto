@@ -16,7 +16,7 @@ public sealed class Bot
 {
     #region Clients
 
-    public DatabaseClient DatabaseClient { get; set; }
+    internal DatabaseClient DatabaseClient { get; set; }
 
     public DiscordClient DiscordClient { get; internal set; }
     internal LavalinkSession LavalinkSession;
@@ -355,7 +355,7 @@ public sealed class Bot
                 Environment.Exit((int)ExitCodes.ExitTasksTimeout);
         });
 
-        if (this.DatabaseClient.IsDisposed() || this.ExitCalled) // When the Database Client has been disposed, the Exit Call has already been made.
+        if (this.DatabaseClient.Disposed || this.ExitCalled) // When the Database Client has been disposed, the Exit Call has already been made.
             return;
 
         this.ExitCalled = true;
@@ -426,7 +426,7 @@ public sealed class Bot
                     _logger.LogInfo("Deleting profile of '{Key}'", b.Key);
 
                     _ = this.Users.Remove(b.Key);
-                    _ = this.DatabaseClient._helper.DeleteRow(this.DatabaseClient.mainDatabaseConnection, "users", "userid", $"{b.Key}").Add(this);
+                    _ = this.DatabaseClient.DeleteRow("users", "userid", $"{b.Key}", this.DatabaseClient.mainDatabaseConnection).Add(this);
                     this.objectedUsers.Add(b.Key);
                     foreach (var c in this.DiscordClient.Guilds.Where(x => x.Value.OwnerId == b.Key))
                     {

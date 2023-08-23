@@ -16,21 +16,21 @@ public class TranslationReportSettings : RequiresParent<User>
     {
     }
 
-    [ColumnName("translationreport_accepted_tos"), ColumnType(ColumnTypes.TinyInt)]
+    [ColumnName("translationreport_accepted_tos"), ColumnType(ColumnTypes.TinyInt), Default("0")]
     public int AcceptedTOS
     {
         get => this.Bot.DatabaseClient.GetValue<int>("users", "userid", this.Parent.Id, "translationreport_accepted_tos", this.Bot.DatabaseClient.mainDatabaseConnection);
         set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Parent.Id, "translationreport_accepted_tos", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    [ColumnName("translationreport_ratelimit_first"), ColumnType(ColumnTypes.BigInt)]
+    [ColumnName("translationreport_ratelimit_first"), ColumnType(ColumnTypes.BigInt), Default("0")]
     public DateTime FirstRequestTime
     {
         get => this.Bot.DatabaseClient.GetValue<DateTime>("users", "userid", this.Parent.Id, "translationreport_ratelimit_first", this.Bot.DatabaseClient.mainDatabaseConnection);
         set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Parent.Id, "translationreport_ratelimit_first", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    [ColumnName("translationreport_ratelimit_count"), ColumnType(ColumnTypes.BigInt)]
+    [ColumnName("translationreport_ratelimit_count"), ColumnType(ColumnTypes.BigInt), Default("0")]
     public int RequestCount
     {
         get => this.Bot.DatabaseClient.GetValue<int>("users", "userid", this.Parent.Id, "translationreport_ratelimit_count", this.Bot.DatabaseClient.mainDatabaseConnection);

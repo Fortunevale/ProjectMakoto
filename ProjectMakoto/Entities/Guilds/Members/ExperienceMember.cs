@@ -17,7 +17,7 @@ public sealed class ExperienceMember : RequiresParent<Member>
     {
     }
 
-    private DateTime _Last_Message { get; set; } = DateTime.UnixEpoch;
+    private DateTime _Last_Message { get; set; } = DateTime.MinValue;
     public DateTime Last_Message
     {
         get => this._Last_Message;

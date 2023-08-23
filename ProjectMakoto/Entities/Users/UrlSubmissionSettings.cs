@@ -17,14 +17,14 @@ public sealed class UrlSubmissionSettings : RequiresParent<User>
     {
     }
 
-    [ColumnName("submission_accepted_tos"), ColumnType(ColumnTypes.TinyInt)]
+    [ColumnName("submission_accepted_tos"), ColumnType(ColumnTypes.TinyInt), Default("0")]
     public int AcceptedTOS
     {
         get => this.Bot.DatabaseClient.GetValue<int>("users", "userid", this.Parent.Id, "submission_accepted_tos", this.Bot.DatabaseClient.mainDatabaseConnection);
         set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Parent.Id, "submission_accepted_tos", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    [ColumnName("submission_last_datetime"), ColumnType(ColumnTypes.BigInt)]
+    [ColumnName("submission_last_datetime"), ColumnType(ColumnTypes.BigInt), Default("0")]
     public DateTime LastTime
     {
         get => this.Bot.DatabaseClient.GetValue<DateTime>("users", "userid", this.Parent.Id, "submission_last_datetime", this.Bot.DatabaseClient.mainDatabaseConnection);

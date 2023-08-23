@@ -19,6 +19,8 @@ public sealed class Guild : RequiresBotReference
     {
         this.Id = serverId;
 
+        _ = this.Bot.DatabaseClient.CreateRow("guilds", typeof(Guild), serverId, this.Bot.DatabaseClient.mainDatabaseConnection);
+
         this.TokenLeakDetection = new(bot, this);
         this.PhishingDetection = new(bot, this);
         this.BumpReminder = new(bot, this);
@@ -43,64 +45,76 @@ public sealed class Guild : RequiresBotReference
     }
 
     [ColumnName("serverid"), ColumnType(ColumnTypes.BigInt), Primary]
-    internal ulong Id { get; set; }
+    internal ulong Id { get; init; }
 
     [ContainsValues]
-    public TokenLeakDetectionSettings TokenLeakDetection { get; set; }
+    public TokenLeakDetectionSettings TokenLeakDetection { get; init; }
 
     [ContainsValues]
-    public PhishingDetectionSettings PhishingDetection { get; set; }
+    public PhishingDetectionSettings PhishingDetection { get; init; }
 
     [ContainsValues]
-    public BumpReminderSettings BumpReminder { get; set; }
+    public BumpReminderSettings BumpReminder { get; init; }
 
     [ContainsValues]
-    public JoinSettings Join { get; set; }
+    public JoinSettings Join { get; init; }
 
     [ContainsValues]
-    public ExperienceSettings Experience { get; set; }
+    public ExperienceSettings Experience { get; init; }
 
     [ContainsValues]
-    public CrosspostSettings Crosspost { get; set; }
+    public CrosspostSettings Crosspost { get; init; }
 
     [ContainsValues]
-    public ActionLogSettings ActionLog { get; set; }
+    public ActionLogSettings ActionLog { get; init; }
 
     [ContainsValues]
-    public InVoiceTextPrivacySettings InVoiceTextPrivacy { get; set; }
+    public InVoiceTextPrivacySettings InVoiceTextPrivacy { get; init; }
 
     [ContainsValues]
-    public InviteTrackerSettings InviteTracker { get; set; }
+    public InviteTrackerSettings InviteTracker { get; init; }
 
     [ContainsValues]
-    public InviteNotesSettings InviteNotes { get; set; }
+    public InviteNotesSettings InviteNotes { get; init; }
 
     [ContainsValues]
-    public NameNormalizerSettings NameNormalizer { get; set; }
+    public NameNormalizerSettings NameNormalizer { get; init; }
 
     [ContainsValues]
-    public EmbedMessageSettings EmbedMessage { get; set; }
+    public EmbedMessageSettings EmbedMessage { get; init; }
 
     [ContainsValues]
-    public PollSettings Polls { get; set; }
+    public PollSettings Polls { get; init; }
 
     [ContainsValues]
-    public VcCreatorSettings VcCreator { get; set; } // todo
+    public VcCreatorSettings VcCreator { get; init; }
 
     [ContainsValues]
-    public PrefixSettings PrefixSettings { get; set; }  // todo
+    public PrefixSettings PrefixSettings { get; init; }
 
     [ContainsValues]
-    public Lavalink MusicModule { get; set; }  // todo
+    public Lavalink MusicModule { get; set; }
 
     [ColumnName("autounarchivelist"), ColumnType(ColumnTypes.LongText), Collation("utf8_unicode_ci"), Default("[]")]
-    public ulong[] AutoUnarchiveThreads { get; set; }
+    public ulong[] AutoUnarchiveThreads
+    {
+        get => JsonConvert.DeserializeObject<ulong[]>(this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Id, "autounarchivelist", this.Bot.DatabaseClient.mainDatabaseConnection));
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Id, "autounarchivelist", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
 
     [ColumnName("levelrewards"), ColumnType(ColumnTypes.LongText), Collation("utf8_unicode_ci"), Default("[]")]
-    public LevelRewardEntry[] LevelRewards { get; set; }
+    public LevelRewardEntry[] LevelRewards // todo
+    {
+        get => JsonConvert.DeserializeObject<LevelRewardEntry[]>(this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Id, "levelrewards", this.Bot.DatabaseClient.mainDatabaseConnection));
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Id, "levelrewards", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
 
-    [ColumnName("levelrewards"), ColumnType(ColumnTypes.LongText), Collation("utf8_unicode_ci"), Default("[]")]
-    public KeyValuePair<ulong, ReactionRoleEntry>[] ReactionRoles { get; set; }
+    [ColumnName("reactionroles"), ColumnType(ColumnTypes.LongText), Collation("utf8_unicode_ci"), Default("[]")]
+    public ReactionRoleEntry[] ReactionRoles
+    {
+        get => JsonConvert.DeserializeObject<ReactionRoleEntry[]>(this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Id, "reactionroles", this.Bot.DatabaseClient.mainDatabaseConnection));
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Id, "reactionroles", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
 
     [ColumnName("current_locale"), ColumnType(ColumnTypes.LongText), Collation("utf8_unicode_ci"), Nullable]
     public string? CurrentLocale
@@ -117,5 +131,5 @@ public sealed class Guild : RequiresBotReference
     }
 
 
-    public SelfFillingDictionary<Member> Members { get; set; }
+    public SelfFillingDictionary<Member> Members { get; init; }
 }

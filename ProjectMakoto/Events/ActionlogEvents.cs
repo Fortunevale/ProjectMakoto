@@ -25,7 +25,7 @@ internal sealed class ActionlogEvents : RequiresTranslation
 
         if (!guild.Channels.ContainsKey(this.Bot.Guilds[guild.Id].ActionLog.Channel))
         {
-            this.Bot.Guilds[guild.Id].ActionLog = new(this.Bot, this.Bot.Guilds[guild.Id]);
+            this.Bot.Guilds[guild.Id].ActionLog.Channel = 0;
             return false;
         }
 

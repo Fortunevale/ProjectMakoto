@@ -17,7 +17,7 @@ public sealed class ScoreSaberSettings : RequiresParent<User>
     {
     }
 
-    [ColumnName("scoresaber_id"), ColumnType(ColumnTypes.BigInt)]
+    [ColumnName("scoresaber_id"), ColumnType(ColumnTypes.BigInt), Default("0")]
     public ulong Id
     {
         get => this.Bot.DatabaseClient.GetValue<ulong>("users", "userid", this.Parent.Id, "scoresaber_id", this.Bot.DatabaseClient.mainDatabaseConnection);

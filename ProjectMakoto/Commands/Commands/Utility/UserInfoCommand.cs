@@ -52,7 +52,7 @@ internal sealed class UserInfoCommand : BaseCommand
             }
             else
             {
-                GenerateRoles = ctx.DbGuild.Members[victim.Id].MemberRoles.Count > 0
+                GenerateRoles = ctx.DbGuild.Members[victim.Id].MemberRoles.Length > 0
                     ? string.Join(", ", ctx.DbGuild.Members[victim.Id].MemberRoles.Where(x => ctx.Guild.Roles.ContainsKey(x.Id)).Select(x => $"{ctx.Guild.GetRole(x.Id).Mention}"))
                     : this.GetString(this.t.Commands.Utility.UserInfo.NoStoredRoles, true);
             }
@@ -80,7 +80,7 @@ internal sealed class UserInfoCommand : BaseCommand
                 {
                     Text = $"User-Id: {victim.Id}"
                 },
-                Description = $"{(bMember is null ? $"{(ctx.DbGuild.Members[victim.Id].FirstJoinDate == DateTime.UnixEpoch ? this.GetString(this.t.Commands.Utility.UserInfo.NeverJoined, true) : $"{(isBanned ? this.GetString(this.t.Commands.Utility.UserInfo.IsBanned, true) : this.GetString(this.t.Commands.Utility.UserInfo.JoinedBefore, true))}")}\n\n" : "")}" +
+                Description = $"{(bMember is null ? $"{(ctx.DbGuild.Members[victim.Id].FirstJoinDate == DateTime.MinValue ? this.GetString(this.t.Commands.Utility.UserInfo.NeverJoined, true) : $"{(isBanned ? this.GetString(this.t.Commands.Utility.UserInfo.IsBanned, true) : this.GetString(this.t.Commands.Utility.UserInfo.JoinedBefore, true))}")}\n\n" : "")}" +
                         $"{(ctx.Bot.globalBans.ContainsKey(victim.Id) ? $"💀 **{this.GetString(this.t.Commands.Utility.UserInfo.GlobalBanned, true)}**\n" : "")}" +
                         $"{(ctx.Bot.status.TeamOwner == victim.Id ? $"👑 **{this.GetString(this.t.Commands.Utility.UserInfo.BotOwner, true)}**\n" : "")}" +
                         $"{(ctx.Bot.status.TeamMembers.Contains(victim.Id) ? $"🔏 **{this.GetString(this.t.Commands.Utility.UserInfo.BotStaff, true)}**\n\n" : "")}" +
@@ -127,9 +127,9 @@ internal sealed class UserInfoCommand : BaseCommand
             if (bMember is not null)
                 _ = embed.AddField(new DiscordEmbedField(this.GetString(this.t.Commands.Utility.UserInfo.ServerJoinDate), $"{Formatter.Timestamp(bMember.JoinedAt, TimestampFormat.LongDateTime)}", true));
             else
-                _ = embed.AddField(new DiscordEmbedField(this.GetString(this.t.Commands.Utility.UserInfo.ServerLeaveDate), (ctx.DbGuild.Members[victim.Id].LastLeaveDate != DateTime.UnixEpoch ? $"{Formatter.Timestamp(ctx.DbGuild.Members[victim.Id].LastLeaveDate, TimestampFormat.LongDateTime)} ({Formatter.Timestamp(ctx.DbGuild.Members[victim.Id].LastLeaveDate)})" : this.GetString(this.t.Commands.Utility.UserInfo.NeverJoined, true)), true));
+                _ = embed.AddField(new DiscordEmbedField(this.GetString(this.t.Commands.Utility.UserInfo.ServerLeaveDate), (ctx.DbGuild.Members[victim.Id].LastLeaveDate != DateTime.MinValue ? $"{Formatter.Timestamp(ctx.DbGuild.Members[victim.Id].LastLeaveDate, TimestampFormat.LongDateTime)} ({Formatter.Timestamp(ctx.DbGuild.Members[victim.Id].LastLeaveDate)})" : this.GetString(this.t.Commands.Utility.UserInfo.NeverJoined, true)), true));
 
-            _ = embed.AddField(new DiscordEmbedField(this.GetString(this.t.Commands.Utility.UserInfo.FirstJoinDate), (ctx.DbGuild.Members[victim.Id].FirstJoinDate != DateTime.UnixEpoch ? $"{Formatter.Timestamp(ctx.DbGuild.Members[victim.Id].FirstJoinDate, TimestampFormat.LongDateTime)} ({Formatter.Timestamp(ctx.DbGuild.Members[victim.Id].FirstJoinDate)})" : this.GetString(this.t.Commands.Utility.UserInfo.NeverJoined, true)), true));
+            _ = embed.AddField(new DiscordEmbedField(this.GetString(this.t.Commands.Utility.UserInfo.FirstJoinDate), (ctx.DbGuild.Members[victim.Id].FirstJoinDate != DateTime.MinValue ? $"{Formatter.Timestamp(ctx.DbGuild.Members[victim.Id].FirstJoinDate, TimestampFormat.LongDateTime)} ({Formatter.Timestamp(ctx.DbGuild.Members[victim.Id].FirstJoinDate)})" : this.GetString(this.t.Commands.Utility.UserInfo.NeverJoined, true)), true));
 
             _ = embed.AddField(new DiscordEmbedField(this.GetString(this.t.Commands.Utility.UserInfo.AccountCreationDate), $"{Formatter.Timestamp(victim.CreationTimestamp, TimestampFormat.LongDateTime)}", true));
 
