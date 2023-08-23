@@ -16,7 +16,7 @@ public sealed class PrefixSettings : RequiresParent<Guild>
     {
     }
 
-    [ColumnName("prefix"), ColumnType(ColumnTypes.Text), Collation("utf8_unicode_ci"), Default(";;")]
+    [ColumnName("prefix"), ColumnType(ColumnTypes.Text), Collation("utf8mb4_0900_ai_ci"), Default(";;")]
     public string Prefix
     {
         get => this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Parent.Id, "prefix", this.Bot.DatabaseClient.mainDatabaseConnection);

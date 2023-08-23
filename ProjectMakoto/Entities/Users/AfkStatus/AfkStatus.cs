@@ -17,7 +17,7 @@ public sealed class AfkStatus : RequiresParent<User>
     {
     }
 
-    [ColumnName("afk_reason"), ColumnType(ColumnTypes.Text), Collation("utf8_unicode_ci"), Nullable]
+    [ColumnName("afk_reason"), ColumnType(ColumnTypes.Text), Collation("utf8mb4_0900_ai_ci"), Nullable]
     public string Reason
     {
         get => this.Bot.DatabaseClient.GetValue<string>("users", "userid", this.Parent.Id, "afk_reason", this.Bot.DatabaseClient.mainDatabaseConnection);
@@ -37,7 +37,7 @@ public sealed class AfkStatus : RequiresParent<User>
         set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Parent.Id, "afk_pingamount", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    [ColumnName("afk_pings"), ColumnType(ColumnTypes.Text), Collation("utf8_unicode_ci"), Default("[]")]
+    [ColumnName("afk_pings"), ColumnType(ColumnTypes.Text), Collation("utf8mb4_0900_ai_ci"), Default("[]")]
     public MessageDetails[] Messages
     {
         get => JsonConvert.DeserializeObject<MessageDetails[]>(this.Bot.DatabaseClient.GetValue<string>("users", "userid", this.Parent.Id, "afk_pings", this.Bot.DatabaseClient.mainDatabaseConnection));

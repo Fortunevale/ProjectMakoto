@@ -29,7 +29,7 @@ public sealed class VcCreatorSettings : RequiresParent<Guild>
         set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "vccreator_channelid", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    [ColumnName("vccreator_channellist"), ColumnType(ColumnTypes.LongText), Collation("utf8_unicode_ci"), Default("[]")]
+    [ColumnName("vccreator_channellist"), ColumnType(ColumnTypes.LongText), Collation("utf8mb4_0900_ai_ci"), Default("[]")]
     public VcCreatorDetails[] CreatedChannels
     {
         get => JsonConvert.DeserializeObject<VcCreatorDetails[]>(this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Parent.Id, "vccreator_channellist", this.Bot.DatabaseClient.mainDatabaseConnection));

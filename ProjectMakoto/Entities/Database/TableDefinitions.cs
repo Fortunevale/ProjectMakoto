@@ -17,11 +17,11 @@ public sealed class TableDefinitions
     public sealed class scam_urls
     {
         [Primary]
-        [Collation("utf8_unicode_ci")]
+        [Collation("utf8mb4_0900_ai_ci")]
         [MaxValue(500)]
         public VarChar url { get; set; }
 
-        [Collation("utf8_unicode_ci")]
+        [Collation("utf8mb4_0900_ai_ci")]
         public Text origin { get; set; }
 
         public BigInt submitter { get; set; }
@@ -38,7 +38,7 @@ public sealed class TableDefinitions
         [Primary]
         public BigInt id { get; set; }
 
-        [Collation("utf8_unicode_ci")]
+        [Collation("utf8mb4_0900_ai_ci")]
         public Text reason { get; set; }
 
         public BigInt moderator { get; set; }
@@ -51,7 +51,7 @@ public sealed class TableDefinitions
         [Primary]
         public BigInt id { get; set; }
 
-        [Collation("utf8_unicode_ci")]
+        [Collation("utf8mb4_0900_ai_ci")]
         public Text reason { get; set; }
 
         public BigInt moderator { get; set; }
@@ -64,7 +64,7 @@ public sealed class TableDefinitions
         [Primary]
         public BigInt id { get; set; }
 
-        [Collation("utf8_unicode_ci")]
+        [Collation("utf8mb4_0900_ai_ci")]
         public Text reason { get; set; }
 
         public BigInt moderator { get; set; }
@@ -77,7 +77,7 @@ public sealed class TableDefinitions
         [Primary]
         public BigInt id { get; set; }
 
-        [Collation("utf8_unicode_ci")]
+        [Collation("utf8mb4_0900_ai_ci")]
         public LongText notes { get; set; }
     }
 
@@ -86,7 +86,7 @@ public sealed class TableDefinitions
         [Primary]
         public BigInt messageid { get; set; }
 
-        [Collation("utf8_unicode_ci")]
+        [Collation("utf8mb4_0900_ai_ci")]
         [MaxValue(500)]
         public VarChar url { get; set; }
 

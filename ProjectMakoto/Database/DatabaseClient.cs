@@ -8,9 +8,8 @@
 // but WITHOUT ANY WARRANTY
 
 using System.Collections.Concurrent;
-using ProjectMakoto.Entities.Database;
 using ProjectMakoto.Entities.Database.ColumnAttributes;
-using ProjectMakoto.Entities.Database.ColumnTypes;
+using ProjectMakoto.Entities.Guilds;
 
 namespace ProjectMakoto.Database;
 
@@ -55,162 +54,179 @@ internal sealed partial class DatabaseClient : RequiresBotReference
 
         var databaseClient = new DatabaseClient(bot);
 
-        try
+        void AddColumn(MySqlConnection connection, string tableName, PropertyInfo internalColumn, (string ColumnName, ColumnTypes ColumnType, bool Primary, long? MaxValue, string? Collation, bool Nullable, string Default) columnInfo)
         {
-            var remoteTables = databaseClient.ListTables(databaseClient.mainDatabaseConnection);
+            var sql = $"ALTER TABLE `{tableName}` ADD {databaseClient.Build(internalColumn)}";
 
-            foreach (var internalTable in new Type[]
-            {
+            var cmd = connection.CreateCommand();
+            cmd.CommandText = sql;
+
+            _ = databaseClient.RunCommand(cmd);
+
+            _logger.LogInfo("Created column '{Column}' in '{Table}'.", columnInfo.ColumnName, tableName);
+        }
+
+        void ModifyColumn(MySqlConnection connection, string tableName, PropertyInfo internalColumn, (string ColumnName, ColumnTypes ColumnType, bool Primary, long? MaxValue, string? Collation, bool Nullable, string Default) columnInfo)
+        {
+            var sql = $"ALTER TABLE `{tableName}` CHANGE `{columnInfo.ColumnName}` {databaseClient.Build(internalColumn)}";
+
+            var cmd = connection.CreateCommand();
+            cmd.CommandText = sql;
+
+            _ = databaseClient.RunCommand(cmd);
+
+            _logger.LogInfo("Changed column '{Column}' in '{Table}' to datatype '{NewDataType}'.",
+                columnInfo.ColumnName,
+                tableName,
+                Enum.GetName(internalColumn.GetCustomAttribute<ColumnType>().Type).ToUpper());
+        }
+
+        void DropColumn(MySqlConnection connection, string tableName, string remoteColumn)
+        {
+            var cmd = connection.CreateCommand();
+            cmd.CommandText = $"ALTER TABLE `{tableName}` DROP COLUMN `{remoteColumn}`";
+
+            _ = databaseClient.RunCommand(cmd);
+        }
+
+        var remoteTables = databaseClient.ListTables(databaseClient.mainDatabaseConnection);
+
+        foreach (var internalTable in new Type[]
+        {
                 typeof(User),
                 typeof(Guild),
-            })
+        })
+        {
+            var tableName = internalTable.GetCustomAttribute<TableNameAttribute>().Name;
+            var propertyList = databaseClient.GetValidProperties(internalTable);
+
+            if (!remoteTables.Contains(tableName))
             {
-                var tableName = internalTable.GetCustomAttribute<TableNameAttribute>().Name;
-                var propertyList = databaseClient.GetValidProperties(internalTable);
+                _logger.LogWarn("Missing table '{Name}'. Creating..", tableName);
 
-                string GetDefaultText((string ColumnName, ColumnTypes ColumnType, bool Primary, long? MaxValue, string? Collation, bool Nullable, string Default) columnInfo)
+                _ = databaseClient.CreateTable(tableName, internalTable, databaseClient.mainDatabaseConnection);
+            }
+
+            var remoteColumns = databaseClient.ListColumns(tableName, databaseClient.mainDatabaseConnection);
+
+            foreach (var internalColumn in propertyList)
+            {
+                (string ColumnName, ColumnTypes ColumnType, bool Primary, long? MaxValue, string? Collation, bool Nullable, string Default) columnInfo;
+
+                try
                 {
-                    var defaultText = string.Empty;
-
-                    if (columnInfo.Default is not null)
-                        switch (columnInfo.ColumnType)
-                        {
-                            case ColumnTypes.BigInt:
-                            case ColumnTypes.Int:
-                            case ColumnTypes.TinyInt:
-                                defaultText = $"{columnInfo.Default}";
-                                break;
-                            case ColumnTypes.LongText:
-                            case ColumnTypes.Text:
-                                defaultText = $"('{columnInfo.Default}')";
-                                break;
-                            case ColumnTypes.VarChar:
-                                defaultText = $"'{columnInfo.Default}'";
-                                break;
-                            default:
-                                break;
-                        }
-
-                    return defaultText;
+                    columnInfo = databaseClient.GetPropertyInfo(internalColumn);
+                }
+                catch (Exception)
+                {
+                    continue;
                 }
 
-                string Build(PropertyInfo info)
+                if (columnInfo.ColumnName is null || columnInfo.ColumnType == ColumnTypes.Unknown)
+                    continue;
+
+                if (!remoteColumns.Any(x => x.Name.ToLower() == columnInfo.ColumnName.ToLower()))
                 {
-                    var columnInfo = databaseClient.GetPropertyInfo(info);
-                    var defaultText = GetDefaultText(columnInfo);
+                    _logger.LogWarn("Missing column '{Column}' in '{Table}'. Creating..", columnInfo.ColumnName, tableName);
 
-                    if (!columnInfo.Nullable && columnInfo.Default is null)
-                        throw new InvalidOperationException("A column should be either nullable or have a default value.")
-                            .AddData("columnInfo", columnInfo);
-
-                    return $"`{columnInfo.ColumnName}` {Enum.GetName(columnInfo.ColumnType).ToUpper()}" +
-                           $"{(columnInfo.MaxValue is not null ? $"({columnInfo.MaxValue})" : "")}" +
-                           $"{(columnInfo.Collation is not null ? $" CHARACTER SET {columnInfo.Collation[..columnInfo.Collation.IndexOf("_")]} COLLATE {columnInfo.Collation}" : "")}" +
-                           $"{(columnInfo.Nullable ? " NULL" : " NOT NULL")}" +
-                           $"{(columnInfo.Default is not null ? $" DEFAULT {defaultText}" : "")}";
+                    AddColumn(databaseClient.mainDatabaseConnection, tableName, internalColumn, columnInfo);
+                    remoteColumns = databaseClient.ListColumns(tableName, databaseClient.mainDatabaseConnection);
                 }
 
-                if (!remoteTables.Contains(tableName))
+                var remoteColumn = remoteColumns.First(x => x.Name == columnInfo.ColumnName);
+
+                var typeMatches = remoteColumn.Type.ToLower() == columnInfo.ColumnType.GetName().ToLower() + (columnInfo.MaxValue is not null ? $"({columnInfo.MaxValue})" : "");
+                var nullabilityMatches = remoteColumn.Nullable == columnInfo.Nullable;
+                var defaultMatches = remoteColumn.Default == columnInfo.Default;
+
+                if (!typeMatches || !nullabilityMatches || !defaultMatches)
                 {
-                    _logger.LogWarn("Missing table '{Name}'. Creating..", tableName);
+                    _logger.LogWarn("Wrong data type for column '{Column}' in '{Table}'\nType: {TypeMatch}\nNullable: {NullableMatch}\nDefault: {Default}",
+                        columnInfo.ColumnName, tableName, typeMatches, nullabilityMatches, defaultMatches);
 
-                    var sql = $"CREATE TABLE `{bot.status.LoadedConfig.Secrets.Database.MainDatabaseName}`.`{tableName}` " +
-                        $"( {string.Join(", ", propertyList.Select(x =>
-                        {
-                            if (x.GetCustomAttribute<ColumnNameAttribute>() is not null)
-                                return Build(x);
-
-                            return string.Empty;
-                        }).Where(x => !x.IsNullOrWhiteSpace()))}" + 
-                        $"{(propertyList.Any(x => x.GetCustomAttribute<PrimaryAttribute>() is not null) ?
-                            $", PRIMARY KEY (`{databaseClient.GetPrimaryKey(internalTable).ColumnName}`)" : "")} )";
-
-                    var cmd = databaseClient.mainDatabaseConnection.CreateCommand();
-                    cmd.CommandText = sql;
-                    cmd.Connection = databaseClient.mainDatabaseConnection;
-
-                    await databaseClient.RunCommand(cmd);
-                    _logger.LogInfo("Created table '{Name}'.", tableName);
+                    ModifyColumn(databaseClient.mainDatabaseConnection, tableName, internalColumn, columnInfo);
+                    remoteColumns = databaseClient.ListColumns(tableName, databaseClient.mainDatabaseConnection);
                 }
+            }
 
-                var remoteColumns = databaseClient.ListColumns(tableName, databaseClient.mainDatabaseConnection);
-
-                foreach (var internalColumn in propertyList)
+            foreach (var remoteColumn in remoteColumns)
+            {
+                if (!propertyList.Any(x => x.GetCustomAttribute<ColumnNameAttribute>()?.Name == remoteColumn.Name))
                 {
-                    (string ColumnName, ColumnTypes ColumnType, bool Primary, long? MaxValue, string? Collation, bool Nullable, string Default) columnInfo;
+                    _logger.LogWarn("Invalid column '{Column}' in '{Table}'", remoteColumn.Name, tableName);
 
-                    try
-                    {
-                        columnInfo = databaseClient.GetPropertyInfo(internalColumn);
-                    }
-                    catch (Exception)
-                    {
-                        continue;
-                    }
-
-                    if (columnInfo.ColumnName is null || columnInfo.ColumnType == ColumnTypes.Unknown)
-                        continue;
-
-                    if (!remoteColumns.Any(x => x.Name.ToLower() == columnInfo.ColumnName.ToLower()))
-                    {
-                        _logger.LogWarn("Missing column '{Column}' in '{Table}'. Creating..", columnInfo.ColumnName, tableName);
-                        var sql = $"ALTER TABLE `{tableName}` ADD {Build(internalColumn)}";
-
-                        var cmd = databaseClient.mainDatabaseConnection.CreateCommand();
-                        cmd.CommandText = sql;
-                        cmd.Connection = databaseClient.mainDatabaseConnection;
-
-                        await databaseClient.RunCommand(cmd);
-
-                        _logger.LogInfo("Created column '{Column}' in '{Table}'.", columnInfo.ColumnName, tableName);
-                        remoteColumns = databaseClient.ListColumns(tableName, databaseClient.mainDatabaseConnection);
-                    }
-
-                    var remoteColumn = remoteColumns.First(x => x.Name == columnInfo.ColumnName);
-
-                    var typeMatches = remoteColumn.Type.ToLower() == columnInfo.ColumnType.GetName().ToLower() + (columnInfo.MaxValue is not null ? $"({columnInfo.MaxValue})" : "");
-                    var nullabilityMatches = remoteColumn.Nullable == columnInfo.Nullable;
-                    var defaultMatches = remoteColumn.Default == columnInfo.Default;
-
-                    if (!typeMatches || !nullabilityMatches || !defaultMatches)
-                    {
-                        _logger.LogWarn("Wrong data type for column '{Column}' in '{Table}'\nType: {TypeMatch}\nNullable: {NullableMatch}\nDefault: {Default}", 
-                            columnInfo.ColumnName, tableName, typeMatches, nullabilityMatches, defaultMatches);
-                        var sql = $"ALTER TABLE `{tableName}` CHANGE `{columnInfo.ColumnName}` {Build(internalColumn)}";
-
-                        var cmd = databaseClient.mainDatabaseConnection.CreateCommand();
-                        cmd.CommandText = sql;
-                        cmd.Connection = databaseClient.mainDatabaseConnection;
-
-                        await databaseClient.RunCommand(cmd);
-
-                        _logger.LogInfo("Changed column '{Column}' in '{Table}' to datatype '{NewDataType}'.",
-                            columnInfo.ColumnName,
-                            tableName,
-                            Enum.GetName(internalColumn.GetCustomAttribute<ColumnType>().Type).ToUpper());
-
-                        remoteColumns = databaseClient.ListColumns(tableName, databaseClient.mainDatabaseConnection);
-                    }
-                }
-
-                foreach (var remoteColumn in remoteColumns)
-                {
-                    if (!propertyList.Any(x => x.GetCustomAttribute<ColumnNameAttribute>()?.Name == remoteColumn.Name))
-                    {
-                        _logger.LogWarn("Invalid column '{Column}' in '{Table}'", remoteColumn.Name, tableName);
-
-                        var cmd = databaseClient.mainDatabaseConnection.CreateCommand();
-                        cmd.CommandText = $"ALTER TABLE `{tableName}` DROP COLUMN `{remoteColumn.Name}`";
-                        cmd.Connection = databaseClient.mainDatabaseConnection;
-
-                        await databaseClient.RunCommand(cmd);
-                    }
+                    DropColumn(databaseClient.mainDatabaseConnection, tableName, remoteColumn.Name);
+                    remoteColumns = databaseClient.ListColumns(tableName, databaseClient.mainDatabaseConnection);
                 }
             }
         }
-        catch (Exception)
+
+
+        remoteTables = databaseClient.ListTables(databaseClient.guildDatabaseConnection);
+        foreach (var tableName in databaseClient.ListTables(databaseClient.guildDatabaseConnection).Where(x => x.IsDigitsOnly()))
         {
-            throw;
+            var internalTable = typeof(Member);
+            var propertyList = databaseClient.GetValidProperties(internalTable);
+
+            if (!remoteTables.Contains(tableName))
+            {
+                _logger.LogWarn("Missing table '{Name}'. Creating..", tableName);
+
+                _ = databaseClient.CreateTable(tableName, internalTable, databaseClient.guildDatabaseConnection);
+            }
+
+            var remoteColumns = databaseClient.ListColumns(tableName, databaseClient.guildDatabaseConnection);
+
+            foreach (var internalColumn in propertyList)
+            {
+                (string ColumnName, ColumnTypes ColumnType, bool Primary, long? MaxValue, string? Collation, bool Nullable, string Default) columnInfo;
+
+                try
+                {
+                    columnInfo = databaseClient.GetPropertyInfo(internalColumn);
+                }
+                catch (Exception)
+                {
+                    continue;
+                }
+
+                if (columnInfo.ColumnName is null || columnInfo.ColumnType == ColumnTypes.Unknown)
+                    continue;
+
+                if (!remoteColumns.Any(x => x.Name.ToLower() == columnInfo.ColumnName.ToLower()))
+                {
+                    _logger.LogWarn("Missing column '{Column}' in '{Table}'. Creating..", columnInfo.ColumnName, tableName);
+
+                    AddColumn(databaseClient.guildDatabaseConnection, tableName, internalColumn, columnInfo);
+                    remoteColumns = databaseClient.ListColumns(tableName, databaseClient.guildDatabaseConnection);
+                }
+
+                var remoteColumn = remoteColumns.First(x => x.Name == columnInfo.ColumnName);
+
+                var typeMatches = remoteColumn.Type.ToLower() == columnInfo.ColumnType.GetName().ToLower() + (columnInfo.MaxValue is not null ? $"({columnInfo.MaxValue})" : "");
+                var nullabilityMatches = remoteColumn.Nullable == columnInfo.Nullable;
+                var defaultMatches = remoteColumn.Default == columnInfo.Default;
+
+                if (!typeMatches || !nullabilityMatches || !defaultMatches)
+                {
+                    _logger.LogWarn("Wrong data type for column '{Column}' in '{Table}'\nType: {TypeMatch}\nNullable: {NullableMatch}\nDefault: {Default}",
+                        columnInfo.ColumnName, tableName, typeMatches, nullabilityMatches, defaultMatches);
+
+                    ModifyColumn(databaseClient.guildDatabaseConnection, tableName, internalColumn, columnInfo);
+                    remoteColumns = databaseClient.ListColumns(tableName, databaseClient.guildDatabaseConnection);
+                }
+            }
+
+            foreach (var remoteColumn in remoteColumns)
+            {
+                if (!propertyList.Any(x => x.GetCustomAttribute<ColumnNameAttribute>()?.Name == remoteColumn.Name))
+                {
+                    _logger.LogWarn("Invalid column '{Column}' in '{Table}'", remoteColumn.Name, tableName);
+
+                    DropColumn(databaseClient.guildDatabaseConnection, tableName, remoteColumn.Name);
+                    remoteColumns = databaseClient.ListColumns(tableName, databaseClient.guildDatabaseConnection);
+                }
+            }
         }
 
         //await databaseClient.CheckGuildTables();
@@ -220,106 +236,12 @@ internal sealed partial class DatabaseClient : RequiresBotReference
         return databaseClient;
     }
 
-    //internal async Task CheckGuildTables()
-    //{
-    //    IEnumerable<string> GuildTables;
-
-    //    var retries = 1;
-
-    //    while (true)
-    //    {
-    //        try
-    //        {
-    //            GuildTables = await this._helper.ListTables(this.guildDatabaseConnection);
-    //            break;
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            if (retries >= 3)
-    //            {
-    //                throw;
-    //            }
-
-    //            _logger.LogWarn("Failed to get a list of guild tables. Retrying in 1000ms.. ({current}/{max})", ex, retries, 3);
-    //            retries++;
-    //            await Task.Delay(1000);
-    //        }
-    //    }
-
-    //    foreach (var b in this.Bot.Guilds)
-    //    {
-    //        if (!GuildTables.Contains($"{b.Key}"))
-    //        {
-    //            _logger.LogWarn("Missing table '{Guild}'. Creating..", b.Key);
-    //            var sql = $"CREATE TABLE `{this.Bot.status.LoadedConfig.Secrets.Database.GuildDatabaseName}`.`{b.Key}` ( {string.Join(", ", typeof(TableDefinitions.guild_users).GetProperties().Select(x => $"`{x.Name}` {x.PropertyType.Name.ToUpper()}{(x.TryGetCustomAttribute<MaxValueAttribute>(typeof(MaxValueAttribute), out var maxvalue) ? $"({maxvalue.MaxValue})" : "")}{(x.TryGetCustomAttribute<CollationAttribute>(typeof(CollationAttribute), out var collation) ? $" CHARACTER SET {collation.Collation[..collation.Collation.IndexOf("_")]} COLLATE {collation.Collation}" : "")}{(x.TryGetCustomAttribute<NullableAttribute>(typeof(NullableAttribute), out _) ? " NULL" : " NOT NULL")}"))}{(typeof(TableDefinitions.guild_users).GetProperties().Any(x => x.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _)) ? $", PRIMARY KEY (`{typeof(TableDefinitions.guild_users).GetProperties().First(x => x.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _)).Name}`)" : "")})";
-
-    //            var cmd = this.guildDatabaseConnection.CreateCommand();
-    //            cmd.CommandText = sql;
-    //            cmd.Connection = this.guildDatabaseConnection;
-
-    //            await this.RunCommand(cmd);
-    //            _logger.LogInfo("Created table '{Guild}'.", b.Key);
-    //        }
-    //    }
-
-    //    GuildTables = await this._helper.ListTables(this.guildDatabaseConnection);
-
-    //    foreach (var b in GuildTables)
-    //    {
-    //        if (b != "writetester")
-    //        {
-    //            var Columns = await this._helper.ListColumns(this.guildDatabaseConnection, b);
-
-    //            foreach (var col in typeof(TableDefinitions.guild_users).GetProperties())
-    //            {
-    //                if (!Columns.ContainsKey(col.Name))
-    //                {
-    //                    _logger.LogWarn("Missing column '{Column}' in '{Table}'. Creating..", col.Name, b);
-    //                    var sql = $"ALTER TABLE `{b}` ADD `{col.Name}` {col.PropertyType.Name.ToUpper()}{(col.TryGetCustomAttribute<MaxValueAttribute>(typeof(MaxValueAttribute), out var maxvalue1) ? $"({maxvalue1.MaxValue})" : "")}{col.PropertyType.Name.ToUpper()}{(col.TryGetCustomAttribute<CollationAttribute>(typeof(CollationAttribute), out var collation) ? $" CHARACTER SET {collation.Collation[..collation.Collation.IndexOf("_")]} COLLATE {collation.Collation}" : "")}{(col.TryGetCustomAttribute<NullableAttribute>(typeof(NullableAttribute), out var nullable) ? " NULL" : " NOT NULL")}{(nullable is not null && col.TryGetCustomAttribute<DefaultAttribute>(typeof(DefaultAttribute), out var defaultv) ? $" DEFAULT '{defaultv.Default}'" : "")}{(col.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _) ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
-
-    //                    var cmd = this.guildDatabaseConnection.CreateCommand();
-    //                    cmd.CommandText = sql;
-    //                    cmd.Connection = this.guildDatabaseConnection;
-
-    //                    await this.RunCommand(cmd);
-
-    //                    _logger.LogInfo("Created column '{Column}' in '{Table}'.", col.Name, b);
-    //                    Columns = await this._helper.ListColumns(this.guildDatabaseConnection, b);
-    //                }
-
-    //                if (Columns[col.Name].ToLower() != col.PropertyType.Name.ToLower() + (col.TryGetCustomAttribute<MaxValueAttribute>(typeof(MaxValueAttribute), out var maxvalue) ? $"({maxvalue.MaxValue})" : ""))
-    //                {
-    //                    _logger.LogWarn("Wrong data type for column '{Column}' in '{Table}'", col.Name, b);
-    //                    var sql = $"ALTER TABLE `{b}` CHANGE `{col.Name}` `{col.Name}` {col.PropertyType.Name.ToUpper()}{(maxvalue is not null ? $"({maxvalue.MaxValue})" : "")}{(col.TryGetCustomAttribute<CollationAttribute>(typeof(CollationAttribute), out var collation) ? $" CHARACTER SET {collation.Collation[..collation.Collation.IndexOf("_")]} COLLATE {collation.Collation}" : "")}{(col.TryGetCustomAttribute<NullableAttribute>(typeof(NullableAttribute), out var nullable) ? " NULL" : " NOT NULL")}{(nullable is not null && col.TryGetCustomAttribute<DefaultAttribute>(typeof(DefaultAttribute), out var defaultv) ? $" DEFAULT '{defaultv.Default}'" : "")}{(col.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _) ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
-
-    //                    var cmd = this.guildDatabaseConnection.CreateCommand();
-    //                    cmd.CommandText = sql;
-    //                    cmd.Connection = this.guildDatabaseConnection;
-
-    //                    await this.RunCommand(cmd);
-
-    //                    _logger.LogInfo("Changed column '{Column}' in '{Table}' to datatype '{NewDataType}'.", col.Name, b, col.PropertyType.Name.ToUpper());
-    //                    Columns = await this._helper.ListColumns(this.guildDatabaseConnection, b);
-    //                }
-    //            }
-
-    //            foreach (var col in Columns)
-    //            {
-    //                if (!typeof(TableDefinitions.guild_users).GetProperties().Any(x => x.Name == col.Key))
-    //                {
-    //                    _logger.LogWarn("Invalid column '{Column}' in '{Table}'", col.Key, b);
-
-    //                    var cmd = this.guildDatabaseConnection.CreateCommand();
-    //                    cmd.CommandText = $"ALTER TABLE `{b}` DROP COLUMN `{col.Key}`";
-    //                    cmd.Connection = this.guildDatabaseConnection;
-
-    //                    await this.RunCommand(cmd);
-    //                }
-    //            }
-    //        }
-    //    }
-    //}
-
+    /// <summary>
+    /// Runs a command.
+    /// </summary>
+    /// <param name="cmd">The command to run.</param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
     public Task RunCommand(MySqlCommand cmd)
     {
         if (this.Disposed)
@@ -337,6 +259,18 @@ internal sealed partial class DatabaseClient : RequiresBotReference
         }
     }
 
+    /// <summary>
+    /// Sets a value in the database.
+    /// </summary>
+    /// <param name="table">The table to set the value in.</param>
+    /// <param name="columnKey">The unique column to look for.</param>
+    /// <param name="columnValue">The unique value to look for.</param>
+    /// <param name="columnToEdit">The column to edit.</param>
+    /// <param name="newValue">The new value.</param>
+    /// <param name="connection">The connection to use.</param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
+    /// <exception cref="InvalidOperationException"></exception>
     public Task SetValue(string table, string columnKey, object columnValue, string columnToEdit, object newValue, MySqlConnection connection)
     {
         if (this.Disposed)
@@ -346,9 +280,6 @@ internal sealed partial class DatabaseClient : RequiresBotReference
         {
             using (connection)
             {
-                if (table is not "users" and not "guilds")
-                    return Task.CompletedTask;
-
                 connection.Open();
 
                 if (newValue?.GetType() == typeof(bool))
@@ -379,6 +310,8 @@ internal sealed partial class DatabaseClient : RequiresBotReference
                         .AddData("newValue", newValue)
                         .AddData("connection", connection);
 
+                GetCache[$"{table}-{columnKey}-{columnValue}-{columnToEdit}"] = new CacheItem(null, DateTime.MinValue);
+
                 return Task.CompletedTask;
             }
         }
@@ -389,8 +322,8 @@ internal sealed partial class DatabaseClient : RequiresBotReference
         }
     }
 
-    //public ConcurrentDictionary<string, CacheItem> GetCache = new();
-    //public record CacheItem(string item, DateTime CacheTime);
+    public ConcurrentDictionary<string, CacheItem> GetCache = new();
+    public record CacheItem(string item, DateTime CacheTime);
 
     public T GetValue<T>(string tableName, string columnKey, object columnValue, string columnToGet, MySqlConnection connection)
     {
@@ -415,10 +348,12 @@ internal sealed partial class DatabaseClient : RequiresBotReference
                     return (T)Convert.ChangeType(input, typeof(T));
                 }
 
-                //if (GetCache.TryGetValue($"{tableName}-{columnKey}-{columnValue}-{columnToGet}", out var cacheItem) && cacheItem.CacheTime.GetTimespanSince() < TimeSpan.FromSeconds(1))
-                //{
-                //    return BuildReturnItem(cacheItem.item);
-                //}
+                if (GetCache.TryGetValue($"{tableName}-{columnKey}-{columnValue}-{columnToGet}", out var cacheItem) && cacheItem.CacheTime.GetTimespanSince() < TimeSpan.FromMilliseconds(2000))
+                {
+                    _logger.LogDebug("Getting cached value column '{columnToGet}' of '{ColumnKey}:{ColumnValue}'", columnToGet, columnKey, columnValue);
+
+                    return BuildReturnItem(cacheItem.item);
+                }
 
                 connection.Open();
 
@@ -442,7 +377,7 @@ internal sealed partial class DatabaseClient : RequiresBotReference
 
                 reader.Close();
 
-                //GetCache[$"{tableName}-{columnKey}-{columnValue}-{columnToGet}"] = new CacheItem(value, DateTime.UtcNow);
+                GetCache[$"{tableName}-{columnKey}-{columnValue}-{columnToGet}"] = new CacheItem(value, DateTime.UtcNow);
 
                 return BuildReturnItem(value);
             }
@@ -452,6 +387,33 @@ internal sealed partial class DatabaseClient : RequiresBotReference
             var newEx = new AggregateException("Failed to get value from database", ex);
             throw newEx;
         }
+    }
+
+    public bool CreateTable(string tableName, Type internalTable, MySqlConnection connection)
+    {
+        if (this.ListTables(connection).Contains(tableName))
+            return false;
+
+        var propertyList = this.GetValidProperties(internalTable);
+
+        var sql = $"CREATE TABLE `{connection.Database}`.`{tableName}` " +
+        $"( {string.Join(", ", propertyList.Select(x =>
+        {
+            if (x.GetCustomAttribute<ColumnNameAttribute>() is not null)
+                return this.Build(x);
+
+            return string.Empty;
+        }).Where(x => !x.IsNullOrWhiteSpace()))}" +
+        $"{(propertyList.Any(x => x.GetCustomAttribute<PrimaryAttribute>() is not null) ?
+            $", PRIMARY KEY (`{this.GetPrimaryKey(internalTable).ColumnName}`)" : "")} )";
+
+        var cmd = connection.CreateCommand();
+        cmd.CommandText = sql;
+
+        _ = this.RunCommand(cmd);
+        _logger.LogInfo("Created table '{Name}'.", tableName);
+
+        return true;
     }
 
     public bool CreateRow(string tableName, Type type, object uniqueValue, MySqlConnection connection)
@@ -644,5 +606,41 @@ internal sealed partial class DatabaseClient : RequiresBotReference
         this.mainDatabaseConnection.Close();
 
         return Task.CompletedTask;
+    }
+
+    private string Build(PropertyInfo info)
+    {
+        var columnInfo = this.GetPropertyInfo(info);
+
+        var defaultText = string.Empty;
+
+        if (columnInfo.Default is not null)
+            switch (columnInfo.ColumnType)
+            {
+                case ColumnTypes.BigInt:
+                case ColumnTypes.Int:
+                case ColumnTypes.TinyInt:
+                    defaultText = $"{columnInfo.Default}";
+                    break;
+                case ColumnTypes.LongText:
+                case ColumnTypes.Text:
+                    defaultText = $"('{columnInfo.Default}')";
+                    break;
+                case ColumnTypes.VarChar:
+                    defaultText = $"'{columnInfo.Default}'";
+                    break;
+                default:
+                    break;
+            }
+
+        if (!columnInfo.Nullable && columnInfo.Default is null && !columnInfo.Primary)
+            throw new InvalidOperationException("A column should be either nullable, have a default value or be the primary key.")
+                .AddData("columnInfo", columnInfo);
+
+        return $"`{columnInfo.ColumnName}` {Enum.GetName(columnInfo.ColumnType).ToUpper()}" +
+               $"{(columnInfo.MaxValue is not null ? $"({columnInfo.MaxValue})" : "")}" +
+               $"{(columnInfo.Collation is not null ? $" CHARACTER SET {columnInfo.Collation[..columnInfo.Collation.IndexOf("_")]} COLLATE {columnInfo.Collation}" : "")}" +
+               $"{(columnInfo.Nullable ? " NULL" : " NOT NULL")}" +
+               $"{(columnInfo.Default is not null ? $" DEFAULT {defaultText}" : "")}";
     }
 }
