@@ -7,6 +7,7 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 
 namespace ProjectMakoto.Entities;
@@ -23,7 +24,7 @@ public sealed class SelfFillingDictionary<T> : IDictionary<ulong, T>
     }
 
     private Func<ulong, T>? _newValuePredicate;
-    private Dictionary<ulong, T> _items = new();
+    private ConcurrentDictionary<ulong, T> _items = new();
 
     /// <summary>
     /// Gets a value from this dictionary, filling in values if not already present.
@@ -39,12 +40,12 @@ public sealed class SelfFillingDictionary<T> : IDictionary<ulong, T>
                 if (_newValuePredicate is not null)
                 {
                     _logger.LogTrace("Creating '{id}' of type '{type}'", key, typeof(T).Name);
-                    this._items.Add(key, _newValuePredicate.Invoke(key));
+                    this._items[key] = _newValuePredicate.Invoke(key);
                 }
                 else
                 {
                     _logger.LogWarn("Creating '{id}' of type '{type}' with default value", key, typeof(T).Name);
-                    this._items.Add(key, default);
+                    this._items[key] = default;
                 }
             }
 
@@ -58,12 +59,12 @@ public sealed class SelfFillingDictionary<T> : IDictionary<ulong, T>
                 if (_newValuePredicate is not null)
                 {
                     _logger.LogTrace("Creating '{id}' of type '{type}'", key, typeof(T).Name);
-                    this._items.Add(key, _newValuePredicate.Invoke(key));
+                    this._items[key] = _newValuePredicate.Invoke(key);
                 }
                 else
                 {
                     _logger.LogWarn("Creating '{id}' of type '{type}' with default value", key, typeof(T).Name);
-                    this._items.Add(key, default);
+                    this._items[key] = default;
                 }
             }
 
@@ -91,13 +92,13 @@ public sealed class SelfFillingDictionary<T> : IDictionary<ulong, T>
 
     /// <inheritdoc cref="Dictionary{TKey, TValue}.Add(TKey, TValue)"/>
     public void Add(ulong key, T value)
-        => this._items.Add(key, value);
+        => this._items[key] = value;
 
     /// <inheritdoc cref="Dictionary{TKey, TValue}.Add(TKey, TValue)"/>
     /// <param name="item">The item to add.</param>
     [Obsolete("Use .Add(TKey, TValue) instead.")]
     public void Add(KeyValuePair<ulong, T> item)
-        => this._items.Add(item.Key, item.Value);
+        => this.Add(item.Key, item.Value);
 
     /// <inheritdoc cref="Dictionary{TKey, TValue}.Clear"/>
     public void Clear()
@@ -105,13 +106,13 @@ public sealed class SelfFillingDictionary<T> : IDictionary<ulong, T>
 
     /// <inheritdoc cref="Dictionary{TKey, TValue}.Remove(TKey)"/>
     public bool Remove(ulong key)
-        => this._items.Remove(key);
+        => this._items.TryRemove(key, out _);
 
     /// <inheritdoc cref="Dictionary{TKey, TValue}.Remove(TKey)"/>
     /// <param name="item">The item to remove.</param>
     [Obsolete("Use .Remove(ulong) instead.")]
     public bool Remove(KeyValuePair<ulong, T> item)
-        => this._items.Remove(item.Key);
+        => this._items.TryRemove(item);
 
     /// <inheritdoc cref="Array.CopyTo"/>
     public void CopyTo(KeyValuePair<ulong, T>[] array, int arrayIndex)
