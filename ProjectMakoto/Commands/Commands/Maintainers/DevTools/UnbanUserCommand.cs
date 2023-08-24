@@ -26,7 +26,6 @@ internal sealed class UnbanUserCommand : BaseCommand
             }
 
             _ = ctx.Bot.bannedUsers.Remove(victim.Id);
-            await ctx.Bot.DatabaseClient.DeleteRow("banned_users", "id", $"{victim.Id}", ctx.Bot.DatabaseClient.mainDatabaseConnection);
             _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`'{victim.GetUsernameWithIdentifier()}' was unbanned from using the bot.`").AsSuccess(ctx));
         });
     }

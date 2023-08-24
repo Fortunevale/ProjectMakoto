@@ -1082,7 +1082,6 @@ public abstract class BaseCommand
 
     public void DeleteOrInvalidate()
     {
-        _ = this.RespondOrEdit($"✅ _{this.GetString(this.t.Commands.Common.InteractionFinished, true)}_");
         switch (this.ctx.CommandType)
         {
             case Enums.CommandType.ContextMenu:
@@ -1235,7 +1234,7 @@ public abstract class BaseCommand
     public void SendUserBanError(BanDetails entry)
         => _ = this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = this.GetString(this.t.Commands.Common.Errors.UserBan, true, new TVar("Reason", entry.Reason)),
+            Description = this.t.Commands.Common.Errors.UserBan.t["en"].Build(true, new TVar("Reason", entry.Reason)),
         }.AsError(this.ctx)));
 
     public void SendGuildBanError(BanDetails entry)

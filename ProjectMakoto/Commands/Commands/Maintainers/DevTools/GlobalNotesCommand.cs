@@ -25,7 +25,7 @@ internal sealed class GlobalNotesCommand : BaseCommand
             var ModeratorCache = new Dictionary<ulong, DiscordUser>();
 
             if (ctx.Bot.globalNotes.TryGetValue(victim.Id, out var globalNotes))
-                foreach (var b in globalNotes)
+                foreach (var b in globalNotes.Notes)
                 {
                     if (ModeratorCache.ContainsKey(b.Moderator))
                         continue;
@@ -45,8 +45,8 @@ internal sealed class GlobalNotesCommand : BaseCommand
 
             _ = await this.RespondOrEdit(new DiscordMessageBuilder()
                 .WithEmbed(new DiscordEmbedBuilder()
-                    .WithDescription($"{victim.Mention} `has {(ctx.Bot.globalNotes.TryGetValue(victim.Id, out var list) ? list.Count : 0)} global notes.`")
-                    .AddFields((list is not null ? list.Take(20).Select(x => new DiscordEmbedField("󠂪 󠂪", $"{x.Reason.FullSanitize()} - `{(ModeratorCache[x.Moderator] is null ? "Unknown#0000" : ModeratorCache[x.Moderator].GetUsernameWithIdentifier())}` {x.Timestamp.ToTimestamp()}")) : new List<DiscordEmbedField>())))
+                    .WithDescription($"{victim.Mention} `has {(ctx.Bot.globalNotes.TryGetValue(victim.Id, out var noteObj) ? noteObj.Notes.Length : 0)} global notes.`")
+                    .AddFields((noteObj is not null ? noteObj.Notes.Take(20).Select(x => new DiscordEmbedField("󠂪 󠂪", $"{x.Reason.FullSanitize()} - `{(ModeratorCache[x.Moderator] is null ? "Unknown#0000" : ModeratorCache[x.Moderator].GetUsernameWithIdentifier())}` {x.Timestamp.ToTimestamp()}")) : new List<DiscordEmbedField>())))
                 .AddComponents(new List<DiscordComponent> { AddButton, RemoveButton })
                 .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
 
@@ -80,13 +80,7 @@ internal sealed class GlobalNotesCommand : BaseCommand
 
                 var note = ModalResult.Result.Interaction.GetModalValueByCustomId("Note");
 
-                if (!ctx.Bot.globalNotes.TryGetValue(victim.Id, out var user))
-                {
-                    ctx.Bot.globalNotes.Add(victim.Id, new());
-                    user = ctx.Bot.globalNotes[victim.Id];
-                }
-
-                user.Add(new BanDetails { Moderator = ctx.User.Id, Reason = note });
+                ctx.Bot.globalNotes[victim.Id].Notes = ctx.Bot.globalNotes[victim.Id].Notes.Add(new GlobalNote.Note() { Moderator = ctx.User.Id, Reason = note });
 
                 await this.ExecuteCommand(ctx, arguments);
                 return;
@@ -95,7 +89,7 @@ internal sealed class GlobalNotesCommand : BaseCommand
             {
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                var SelectionResult = await this.PromptCustomSelection(ctx.Bot.globalNotes[victim.Id]
+                var SelectionResult = await this.PromptCustomSelection(ctx.Bot.globalNotes[victim.Id].Notes
                     .Select(x => new DiscordStringSelectComponentOption(x.Reason.TruncateWithIndication(100), x.Timestamp.Ticks.ToString(), $"Added by {(ModeratorCache[x.Moderator] is null ? "Unknown#0000" : ModeratorCache[x.Moderator].GetUsernameWithIdentifier())} {x.Timestamp.GetTimespanSince().GetHumanReadable()} ago")).ToList());
 
                 if (SelectionResult.TimedOut)
@@ -113,7 +107,7 @@ internal sealed class GlobalNotesCommand : BaseCommand
                     throw SelectionResult.Exception;
                 }
 
-                _ = ctx.Bot.globalNotes[victim.Id].Remove(ctx.Bot.globalNotes[victim.Id].First(x => x.Timestamp.Ticks.ToString() == SelectionResult.Result));
+                ctx.Bot.globalNotes[victim.Id].Notes = ctx.Bot.globalNotes[victim.Id].Notes.Remove(x => x.UUID, ctx.Bot.globalNotes[victim.Id].Notes.First(x => x.Timestamp.Ticks.ToString() == SelectionResult.Result));
                 await this.ExecuteCommand(ctx, arguments);
                 return;
             }

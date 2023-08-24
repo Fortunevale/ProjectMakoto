@@ -12,6 +12,7 @@ using ProjectMakoto.Entities.Members;
 
 namespace ProjectMakoto.Entities.Guilds;
 
+[TableName("-")]
 public sealed class Member : RequiresParent<Guild>
 {
     public Member(Bot bot, Guild guild, ulong key) : base(bot, guild)

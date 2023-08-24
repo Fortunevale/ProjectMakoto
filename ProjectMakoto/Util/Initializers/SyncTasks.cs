@@ -283,7 +283,7 @@ internal sealed class SyncTasks
                     bot.Guilds[guild.Key].Members[member.Id].SavedNickname = member.Nickname;
                 }
 
-                foreach (var databaseMember in bot.Guilds[guild.Key].Members.ToList())
+                foreach (var databaseMember in bot.Guilds[guild.Key].Members)
                 {
                     if (!guildMembers.Any(x => x.Id == databaseMember.Key))
                     {

@@ -26,9 +26,9 @@ internal sealed class PhishingSubmissionEvents : RequiresBotReference
 
             if (e.GetCustomId() == "accept_submission")
             {
-                this.Bot.PhishingHosts.Add(this.Bot.SubmittedHosts[e.Message.Id].Url, new PhishingUrlEntry
+                this.Bot.PhishingHosts.Add(this.Bot.SubmittedHosts[e.Message.Id].Url, new PhishingUrlEntry(this.Bot, this.Bot.SubmittedHosts[e.Message.Id].Url)
                 {
-                    Origin = new(),
+                    Origin = Array.Empty<string>(),
                     Submitter = this.Bot.SubmittedHosts[e.Message.Id].Submitter,
                     Url = this.Bot.SubmittedHosts[e.Message.Id].Url
                 });
@@ -42,15 +42,6 @@ internal sealed class PhishingSubmissionEvents : RequiresBotReference
                 catch { }
 
                 _ = e.Message.DeleteAsync();
-
-                try
-                {
-                    _ = new PhishingUrlHandler(this.Bot).UpdateDatabase(new());
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError("Failed to update database", ex);
-                }
             }
             else if (e.GetCustomId() == "deny_submission")
             {
@@ -66,7 +57,7 @@ internal sealed class PhishingSubmissionEvents : RequiresBotReference
             }
             else if (e.GetCustomId() == "ban_user")
             {
-                this.Bot.bannedUsers.Add(this.Bot.SubmittedHosts[e.Message.Id].Submitter, new BanDetails
+                this.Bot.bannedUsers.Add(this.Bot.SubmittedHosts[e.Message.Id].Submitter, new BanDetails(this.Bot, "banned_users", this.Bot.SubmittedHosts[e.Message.Id].Submitter)
                 {
                     Reason = "Too many invalid reported hosts | Manual ban",
                     Moderator = e.User.Id
@@ -84,7 +75,7 @@ internal sealed class PhishingSubmissionEvents : RequiresBotReference
             }
             else if (e.GetCustomId() == "ban_guild")
             {
-                this.Bot.bannedGuilds.Add(this.Bot.SubmittedHosts[e.Message.Id].GuildOrigin, new BanDetails
+                this.Bot.bannedGuilds.Add(this.Bot.SubmittedHosts[e.Message.Id].GuildOrigin, new BanDetails(this.Bot, "banned_guilds", this.Bot.SubmittedHosts[e.Message.Id].GuildOrigin)
                 {
                     Reason = "Too many invalid reported hosts | Manual ban",
                     Moderator = e.User.Id

@@ -93,9 +93,9 @@ internal sealed class UserInfoCommand : BaseCommand
                         $"\n**{(bMember is null ? $"{this.GetString(this.t.Commands.Utility.UserInfo.Roles)} ({this.GetString(this.t.Commands.Utility.UserInfo.Backup)})" : this.GetString(this.t.Commands.Utility.UserInfo.Roles))}**\n{GenerateRoles}"
             };
 
-            if (ctx.Bot.globalNotes.TryGetValue(victim.Id, out var globalNotes) && globalNotes.Any())
+            if (ctx.Bot.globalNotes.TryGetValue(victim.Id, out var globalNotes) && globalNotes.Notes.Any())
             {
-                _ = embed.AddField(new DiscordEmbedField(this.GetString(this.t.Commands.Utility.UserInfo.BotNotes), $"{string.Join("\n\n", ctx.Bot.globalNotes[victim.Id].Select(x => $"{x.Reason.FullSanitize()} - <@{x.Moderator}> {x.Timestamp.ToTimestamp()}"))}".TruncateWithIndication(512)));
+                _ = embed.AddField(new DiscordEmbedField(this.GetString(this.t.Commands.Utility.UserInfo.BotNotes), $"{string.Join("\n\n", ctx.Bot.globalNotes[victim.Id].Notes.Select(x => $"{x.Reason.FullSanitize()} - <@{x.Moderator}> {x.Timestamp.ToTimestamp()}"))}".TruncateWithIndication(512)));
             }
 
             if (ctx.Bot.globalBans.TryGetValue(victim.Id, out var globalBanDetails))
@@ -115,7 +115,7 @@ internal sealed class UserInfoCommand : BaseCommand
             if (ctx.DbGuild.InviteTracker.Enabled)
             {
                 _ = embed.AddField(new DiscordEmbedField(this.GetString(this.t.Commands.Utility.UserInfo.InvitedBy), $"{(ctx.DbGuild.Members[victim.Id].InviteTracker.Code.IsNullOrWhiteSpace() ? this.GetString(this.t.Commands.Utility.UserInfo.NoInviter, true) : $"<@{ctx.DbGuild.Members[victim.Id].InviteTracker.UserId}> (`{ctx.DbGuild.Members[victim.Id].InviteTracker.UserId}`)")}", true));
-                _ = embed.AddField(new DiscordEmbedField(this.GetString(this.t.Commands.Utility.UserInfo.UsersInvited), $"`{(ctx.DbGuild.Members.Where(b => b.Value.InviteTracker.UserId == victim.Id)).Count()}`", true));
+                _ = embed.AddField(new DiscordEmbedField(this.GetString(this.t.Commands.Utility.UserInfo.UsersInvited), $"`{(ctx.DbGuild.Members.Fetch().Where(b => b.Value.InviteTracker.UserId == victim.Id)).Count()}`", true));
 
                 if (!ctx.DbGuild.Members[victim.Id].InviteTracker.Code.IsNullOrWhiteSpace())
                 {

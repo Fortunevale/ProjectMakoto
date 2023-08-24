@@ -52,10 +52,10 @@ internal sealed class ActionlogEvents : RequiresTranslation
             .WithDescription($"**{this.tKey.User.Get(this.Bot.Guilds[e.Guild.Id]).Build()}**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`\n" +
                              $"**{this.tKey.AccountAge.Get(this.Bot.Guilds[e.Guild.Id]).Build()}**: {e.Member.CreationTimestamp.ToTimestamp()} ({e.Member.CreationTimestamp.ToTimestamp(TimestampFormat.LongDateTime)})");
 
-        if (this.Bot.globalNotes.TryGetValue(e.Member.Id, out var globalNote) && globalNote.Any())
+        if (this.Bot.globalNotes.TryGetValue(e.Member.Id, out var globalNote) && globalNote.Notes.Any())
         {
             _ = embed.AddField(new DiscordEmbedField(this.tKey.StaffNotes.Get(this.Bot.Guilds[e.Guild.Id]).Build(),
-                $"{string.Join("\n\n", globalNote.Select(x => $"{x.Reason.FullSanitize()} - <@{x.Moderator}> {x.Timestamp.ToTimestamp()}"))}".TruncateWithIndication(512)));
+                $"{string.Join("\n\n", globalNote.Notes.Select(x => $"{x.Reason.FullSanitize()} - <@{x.Moderator}> {x.Timestamp.ToTimestamp()}"))}".TruncateWithIndication(512)));
         }
 
         var message = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));

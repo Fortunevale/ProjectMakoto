@@ -39,7 +39,7 @@ public sealed class Guild : RequiresBotReference
         this.VcCreator = new(bot, this);
         this.PrefixSettings = new(bot, this);
 
-        this.Members = new((id) =>
+        this.Members = new(this.Bot.DatabaseClient, serverId.ToString(), "userid", true, (id) =>
         {
             return new Member(bot, this, id);
         });
@@ -132,5 +132,5 @@ public sealed class Guild : RequiresBotReference
     }
 
 
-    public SelfFillingDictionary<Member> Members { get; init; }
+    public SelfFillingDatabaseDictionary<Member> Members { get; init; }
 }

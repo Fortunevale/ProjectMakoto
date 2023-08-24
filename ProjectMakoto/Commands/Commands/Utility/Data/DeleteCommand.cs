@@ -48,7 +48,6 @@ internal sealed class DeleteCommand : BaseCommand
                     try
                     {
                         _ = ctx.Bot.objectedUsers.Remove(ctx.User.Id);
-                        await ctx.Bot.DatabaseClient.DeleteRow("objected_users", "id", $"{ctx.User.Id}", ctx.Bot.DatabaseClient.mainDatabaseConnection);
                     }
                     catch (Exception ex)
                     {

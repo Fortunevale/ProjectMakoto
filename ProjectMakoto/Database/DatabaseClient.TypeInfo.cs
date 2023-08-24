@@ -10,7 +10,7 @@
 using ProjectMakoto.Entities.Database.ColumnAttributes;
 
 namespace ProjectMakoto.Database;
-internal partial class DatabaseClient
+partial class DatabaseClient
 {
     /// <summary>
     /// Gets the name of this table.
@@ -18,7 +18,7 @@ internal partial class DatabaseClient
     /// <param name="type">The type to get the table name for.</param>
     /// <returns>The name of the table.</returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public string GetTableName(Type type) 
+    internal string GetTableName(Type type) 
         => type.GetCustomAttribute<TableNameAttribute>()?.Name ?? throw new InvalidOperationException("Type is not a table").AddData("info", type);
 
     /// <summary>
@@ -26,7 +26,7 @@ internal partial class DatabaseClient
     /// </summary>
     /// <param name="type">The type to get the valid properties from.</param>
     /// <returns>An array of valid <see cref="PropertyInfo"/>s.</returns>
-    public PropertyInfo[] GetValidProperties(Type type)
+    internal PropertyInfo[] GetValidProperties(Type type)
     {
         var propertyList = new List<PropertyInfo>();
 
@@ -65,7 +65,7 @@ internal partial class DatabaseClient
     /// <param name="info">The property to get the information for.</param>
     /// <returns>All values that are backed by this property.</returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public (string ColumnName, ColumnTypes ColumnType, bool Primary, long? MaxValue, string? Collation, bool Nullable, string Default) GetPropertyInfo(PropertyInfo info) 
+    internal (string ColumnName, ColumnTypes ColumnType, bool Primary, long? MaxValue, string? Collation, bool Nullable, string Default) GetPropertyInfo(PropertyInfo info) 
         => (info.GetCustomAttribute<ColumnNameAttribute>()?.Name ?? throw new InvalidOperationException("Not a valid column.").AddData("info", info),
             info.GetCustomAttribute<ColumnType>()?.Type ?? throw new InvalidOperationException("Not a valid column.").AddData("info", info),
             info.GetCustomAttribute<PrimaryAttribute>()?.Primary ?? false,
@@ -74,6 +74,6 @@ internal partial class DatabaseClient
             info.GetCustomAttribute<NullableAttribute>()?.Nullable ?? false,
             info.GetCustomAttribute<DefaultAttribute>()?.Default);
 
-    public (string ColumnName, ColumnTypes ColumnType, bool Primary, long? MaxValue, string? Collation, bool Nullable, string Default) GetPrimaryKey(Type type)
+    internal (string ColumnName, ColumnTypes ColumnType, bool Primary, long? MaxValue, string? Collation, bool Nullable, string Default) GetPrimaryKey(Type type)
         => this.GetPropertyInfo(this.GetValidProperties(type).First(x => this.GetPropertyInfo(x).Primary));
 }

@@ -29,7 +29,7 @@ internal sealed class BanGuildCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot.bannedGuilds.Add(guild, new() { Reason = reason, Moderator = ctx.User.Id });
+            ctx.Bot.bannedGuilds.Add(guild, new(ctx.Bot, "banned_guilds", guild) { Reason = reason, Moderator = ctx.User.Id });
 
             foreach (var b in ctx.Client.Guilds.Where(x => x.Key == guild))
             {
