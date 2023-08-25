@@ -49,7 +49,7 @@ public abstract class BaseCommand
         this.ctx = new SharedCommandContext(this, ctx, _bot);
         this.t = _bot.LoadedTranslations;
 
-        _ = Task.Run(async () =>
+        await Task.Run(async () =>
         {
             if (InitiateInteraction)
                 await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
@@ -72,7 +72,7 @@ public abstract class BaseCommand
         this.ctx = new SharedCommandContext(this, ctx, _bot);
         this.t = _bot.LoadedTranslations;
 
-        _ = Task.Run(async () =>
+        await Task.Run(async () =>
         {
             this.ctx.RespondedToInitial = false;
 
@@ -120,7 +120,7 @@ public abstract class BaseCommand
         this.ctx = new SharedCommandContext(this, ctx, _bot);
         this.t = _bot.LoadedTranslations;
 
-        _ = Task.Run(async () =>
+        await Task.Run(async () =>
         {
             if (InitiateInteraction)
                 await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
@@ -143,7 +143,7 @@ public abstract class BaseCommand
         this.ctx = new SharedCommandContext(this, ctx, client, commandName, _bot);
         this.t = _bot.LoadedTranslations;
 
-        _ = Task.Run(async () =>
+        await Task.Run(async () =>
         {
             if (InitiateInteraction)
                 await ctx.Interaction.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()

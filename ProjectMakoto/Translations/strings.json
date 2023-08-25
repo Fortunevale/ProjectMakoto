@@ -4396,6 +4396,18 @@
         "NoSong": {
           "en": "No song is playing",
           "de": "Kein Lied spielt"
+        },
+        "Shuffle": {
+          "en": "Shuffle",
+          "de": "Mischen"
+        },
+        "Repeat": {
+          "en": "Repeat",
+          "de": "Wiederholen"
+        },
+        "Play": {
+          "en": "Play",
+          "de": "Wiedergabe"
         }
       },
       "Join": {

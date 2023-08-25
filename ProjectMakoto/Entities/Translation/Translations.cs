@@ -823,6 +823,9 @@ public sealed class Translations
             public queue Queue;
             public sealed class queue
             {
+                public SingleTranslationKey Play;
+                public SingleTranslationKey Repeat;
+                public SingleTranslationKey Shuffle;
                 public SingleTranslationKey NoSong;
                 public SingleTranslationKey CurrentlyPlaying;
                 public SingleTranslationKey Track;

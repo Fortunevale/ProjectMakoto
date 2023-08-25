@@ -49,6 +49,10 @@ internal sealed class QueueCommand : BaseCommand
                 DiscordButtonComponent NextPage = new(ButtonStyle.Primary, "NextPage", this.GetString(this.t.Common.NextPage), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
                 DiscordButtonComponent PreviousPage = new(ButtonStyle.Primary, "PreviousPage", this.GetString(this.t.Common.PreviousPage), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
 
+                DiscordButtonComponent PlayPause = new(ButtonStyle.Secondary, "Playback", this.GetString(this.t.Commands.Music.Queue.Play), conn.Player.Track is null, (ctx.DbGuild.MusicModule.IsPaused ? DiscordEmoji.FromGuildEmote(ctx.Client, ctx.Bot.status.LoadedConfig.Emojis.Paused) : (conn.Player.Track is not null ? "▶".UnicodeToEmoji() : DiscordEmoji.FromGuildEmote(ctx.Client, ctx.Bot.status.LoadedConfig.Emojis.DisabledPlay))).ToComponent());
+                DiscordButtonComponent Repeat = new(ButtonStyle.Secondary, "Repeat", this.GetString(this.t.Commands.Music.Queue.Repeat), conn.Player.Track is null, (ctx.DbGuild.MusicModule.Repeat ? "🔁".UnicodeToEmoji() : DiscordEmoji.FromGuildEmote(ctx.Client, ctx.Bot.status.LoadedConfig.Emojis.DisabledRepeat)).ToComponent());
+                DiscordButtonComponent Shuffle = new(ButtonStyle.Secondary, "Shuffle", this.GetString(this.t.Commands.Music.Queue.Shuffle), conn.Player.Track is null, (ctx.DbGuild.MusicModule.Shuffle ? "🔀".UnicodeToEmoji() : DiscordEmoji.FromGuildEmote(ctx.Client, ctx.Bot.status.LoadedConfig.Emojis.DisabledShuffle)).ToComponent());
+
                 LastInt = CurrentPage * 10;
 
                 var TotalTimespan = TimeSpan.Zero;
@@ -84,20 +88,32 @@ internal sealed class QueueCommand : BaseCommand
                 _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Description = Description
-                }.AsInfo(ctx)).AddComponents(Refresh).AddComponents(new List<DiscordComponent> { PreviousPage, NextPage }));
+                }.AsInfo(ctx))
+                .AddComponents(PreviousPage, NextPage, Refresh)
+                .AddComponents(PlayPause, Repeat, Shuffle));
 
                 return;
             }
 
             await UpdateMessage();
 
-            _ = Task.Delay(120000).ContinueWith(x =>
+            var sw = Stopwatch.StartNew();
+            _ = Task.Run(async () =>
             {
-                if (x.IsCompletedSuccessfully)
+                while (sw.ElapsedMilliseconds < 120000)
                 {
-                    ctx.Client.ComponentInteractionCreated -= RunInteraction;
-                    this.ModifyToTimedOut();
+                    await UpdateMessage();
+                    Thread.Sleep(10000);
                 }
+            });
+
+            _ = Task.Run(() =>
+            {
+                while (sw.ElapsedMilliseconds < 120000)
+                    Thread.Sleep(1000);
+
+                ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                this.ModifyToTimedOut();
             });
 
             ctx.Client.ComponentInteractionCreated += RunInteraction;
@@ -107,23 +123,50 @@ internal sealed class QueueCommand : BaseCommand
                 {
                     if (e.Message?.Id == ctx.ResponseMessage.Id && e.User.Id == ctx.User.Id)
                     {
-                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        sw.Restart();
 
                         switch (e.GetCustomId())
                         {
+                            case "Playback":
+                            {
+                                await new Music.PauseCommand().ExecuteCommand(e, s, "pause", ctx.Bot).Add(ctx.Bot);
+
+                                await UpdateMessage();
+                                break;
+                            }
+                            case "Repeat":
+                            {
+                                await new Music.RepeatCommand().ExecuteCommand(e, s, "repeat", ctx.Bot).Add(ctx.Bot);
+
+                                await UpdateMessage();
+                                break;
+                            }
+                            case "Shuffle":
+                            {
+                                await new Music.ShuffleCommand().ExecuteCommand(e, s, "shuffle", ctx.Bot).Add(ctx.Bot);
+
+                                await UpdateMessage();
+                                break;
+                            }
                             case "Refresh":
                             {
+                                _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
                                 await UpdateMessage();
                                 break;
                             }
                             case "NextPage":
                             {
+                                _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
                                 CurrentPage++;
                                 await UpdateMessage();
                                 break;
                             }
                             case "PreviousPage":
                             {
+                                _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
                                 CurrentPage--;
                                 await UpdateMessage();
                                 break;
