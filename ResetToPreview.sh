@@ -7,12 +7,12 @@ sleep 1
 echo "Resetting dev branch in 1 seconds.."
 sleep 1
 echo "Resetting dev branch.."
-echo "Pulling main branch.."
-git checkout main
-git pull origin main
+echo "Pulling preview branch.."
+git checkout preview
+git pull origin preview
 echo "Hard resetting dev branch.."
 git checkout dev
-git reset --hard origin/main
+git reset --hard origin/preview
 echo "Pushing reset branch.."
 git push --force
 sleep 1
