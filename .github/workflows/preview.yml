@@ -1,0 +1,89 @@
+name: Deploy to Preview Server
+on: 
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions: write-all
+
+jobs:
+  secretscan:
+    name: Scan for Secrets
+    runs-on: self-hosted
+    steps:
+    - name: Checkout Actions Repository
+      uses: actions/checkout@v3
+
+    - name: Secret Scan
+      uses: max/secret-scan@master
+      with:
+        exclude_path: 'SecretsIgnore.txt'
+  spellcheck:
+    name: Spell Check with Typos
+    runs-on: self-hosted
+    steps:
+    - name: Checkout Actions Repository
+      uses: actions/checkout@v3
+
+    - name: Check spelling
+      uses: crate-ci/typos@master
+
+  build:
+    name: Build Project and Upload to Server
+    runs-on: self-hosted
+    needs: [secretscan, spellcheck]
+    steps:
+      - name: Cleanup
+        run: rm -rf ProjectMakotoPreview/
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_TOKEN }}
+          known_hosts: ${{ secrets.SSH_KNOWN_HOST }}
+      - name: Setup .NET Core SDK 7.x
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.x'
+      - name: "Clone Repository"
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          path: ProjectMakotoPreview
+          token: ${{ secrets.Access_token }}
+      - name: Remove TranslationSourceGenerator from Build
+        run: dotnet sln remove ../TranslationSourceGenerator/TranslationSourceGenerator.csproj
+        working-directory: ProjectMakotoPreview/ProjectMakoto/
+      - name: Install Dependencies
+        run: dotnet restore
+        working-directory: ProjectMakotoPreview/ProjectMakoto/
+      - name: Build Makoto
+        run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained --output "build" --property:PublishDir="build"
+        working-directory: ProjectMakotoPreview/ProjectMakoto/
+      - name: Create Version File
+        run: git rev-parse --short HEAD > "ProjectMakotoPreview/build/LatestGitPush.cfg" && git branch --show-current >> ProjectMakotoPreview/build/LatestGitPush.cfg && echo $(date +%d.%m.%y) >> ProjectMakotoPreview/build/LatestGitPush.cfg && echo $(date +%H:%M:%S,00) >> ProjectMakotoPreview/build/LatestGitPush.cfg
+        working-directory: ProjectMakotoPreview/
+      - name: Deploy to Preview Server
+        run: rsync -avz --delete --force -e "ssh -p ${{ secrets.SSH_PORT }}" . ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_SERVER }}:/home/${{ secrets.SSH_USERNAME }}/Bots/latestProjectIchigoPreview/
+        working-directory: ProjectMakotoPreview/ProjectMakoto/build/
+      - name: Send Update Signal to Preview Client
+        run: ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_SERVER }} -p ${{ secrets.SSH_PORT }} touch /home/${{ secrets.SSH_USERNAME }}/Bots/ProjectIchigoPreview/updated
+      - name: Create Zip File from Build
+        run: zip -r Release.zip build
+        working-directory: ProjectMakotoPreview/ProjectMakoto/
+      - name: Truncate String
+        uses: 2428392/gh-truncate-string-action@v1.2.0
+        id: truncatedString
+        with:
+          stringToTruncate: ${{ github.sha }}
+          maxLength: 10
+      - name: Create Release
+        uses: ncipollo/release-action@v1.12.0
+        with:
+          artifacts: "ProjectMakotoPreview/ProjectMakoto/Release.zip"
+          generateReleaseNotes: true
+          prerelease: true
+          tag: ${{ steps.truncatedString.outputs.string }}
+          commit: ${{ github.sha }}
+      - name: Cleanup
+        run: rm -rf ProjectMakotoPreview/
+        if: always()

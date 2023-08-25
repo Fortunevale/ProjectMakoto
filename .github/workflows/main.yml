@@ -59,7 +59,7 @@ jobs:
         with:
           artifacts: "ProjectMakoto/ProjectMakoto/Release.zip"
           generateReleaseNotes: true
-          prerelease: true
+          prerelease: false
           tag: ${{ steps.truncatedString.outputs.string }}
           commit: ${{ github.sha }}
       - name: Cleanup
