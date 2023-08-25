@@ -18,8 +18,7 @@ public sealed class PhishingUrlEntry : RequiresBotReference
             throw new ArgumentNullException(nameof(Url));
 
         if (!this.Bot.PhishingHosts.ContainsKey(Url))
-            if (!this.Bot.DatabaseClient.CreateRow("scam_urls", typeof(PhishingUrlEntry), Url, this.Bot.DatabaseClient.mainDatabaseConnection))
-                throw new Exception("Failed to create new row");
+            _ = this.Bot.DatabaseClient.CreateRow("scam_urls", typeof(PhishingUrlEntry), Url, this.Bot.DatabaseClient.mainDatabaseConnection);
 
         this.Url = Url;
     }

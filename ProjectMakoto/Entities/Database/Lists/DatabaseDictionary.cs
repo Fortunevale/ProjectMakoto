@@ -91,8 +91,8 @@ public class DatabaseDictionary<T1, T2>
     /// <exception cref="ArgumentException">Thrown if the key failed to create or already exists.</exception>
     public void Add(T1 key, T2 value)
     {
-        if (!this._client.CreateRow(this._tableName, typeof(T2), key, this._connection))
-            throw new ArgumentException("Failed to create key or key already exists.").AddData("key", key).AddData("value", value);
+        if (!this.Keys.Contains(key))
+            _ = this._client.CreateRow(this._tableName, typeof(T2), key, this._connection);
 
         this._items[key] = value;
     }
@@ -113,8 +113,9 @@ public class DatabaseDictionary<T1, T2>
     /// <returns>Whether the key was removed.</returns>
     public bool Remove(T1 key)
     {
-        if (!this._items.Remove(key, out _))
-            return false;
+        if (this._items.ContainsKey(key))
+            if (!this._items.Remove(key, out _))
+                return false;
 
         return this.Try(() => { _ = this._client.DeleteRow(this._tableName, this._primaryKey, key.ToString(), this._connection); });
     }

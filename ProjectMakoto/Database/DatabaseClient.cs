@@ -449,16 +449,17 @@ public sealed partial class DatabaseClient : RequiresBotReference
         return true;
     }
 
-    internal bool CreateRow(string tableName, Type type, object uniqueValue, MySqlConnectionInformation connectionInfo)
+    internal Task CreateRow(string tableName, Type type, object uniqueValue, MySqlConnectionInformation connectionInfo)
     {
         if (this.Disposed)
             throw new Exception("DatabaseClient is disposed");
 
         using (var connection = connectionInfo.CreateConnection())
         {
-            var value1 = this.GetPrimaryKey(type);
-            if (this.RowExists(tableName, value1.ColumnName, uniqueValue, connectionInfo))
-                return false;
+            var primaryColumn = this.GetPrimaryKey(type);
+
+            if (this.RowExists(tableName, primaryColumn.ColumnName, uniqueValue, connectionInfo))
+                return Task.CompletedTask;
 
             var cmd = connection.CreateCommand();
             cmd.CommandText = $"INSERT INTO `{tableName}` ( {string.Join(", ", this.GetValidProperties(type)
@@ -519,8 +520,9 @@ public sealed partial class DatabaseClient : RequiresBotReference
             }
 
             _ = this.RunCommand(cmd);
-            GetCache[$"{tableName}-{value1.ColumnName}-{uniqueValue}-exists"] = new CacheItem(string.Empty, DateTime.MinValue);
-            return true; 
+            GetCache[$"{tableName}-{primaryColumn.ColumnName}-keys"] = new CacheItem(null, DateTime.MinValue);
+            GetCache[$"{tableName}-{primaryColumn.ColumnName}-{uniqueValue}-exists"] = new CacheItem(null, DateTime.MinValue);
+            return Task.CompletedTask; 
         }
     }
 
@@ -603,7 +605,7 @@ public sealed partial class DatabaseClient : RequiresBotReference
         if (this.Disposed)
             throw new Exception("DatabaseClient is disposed");
 
-        if (GetCache.TryGetValue($"{tableName}-{columnKey}-{columnValue}-exists", out var cacheItem) && (bool)cacheItem.item && cacheItem.CacheTime.GetTimespanSince() < TimeSpan.FromMilliseconds(1000))
+        if (GetCache.TryGetValue($"{tableName}-{columnKey}-{columnValue}-exists", out var cacheItem) && cacheItem.CacheTime.GetTimespanSince() < TimeSpan.FromMilliseconds(1000) && (bool)cacheItem.item)
         {
             return true;
         }
