@@ -35,7 +35,7 @@ public class DatabaseList<T1>
     private string _primaryKey;
     private bool _useGuildConnection;
 
-    private MySqlConnection _connection
+    private DatabaseClient.MySqlConnectionInformation _connection
         => this._useGuildConnection ? this._client.guildDatabaseConnection : this._client.mainDatabaseConnection;
 
     private List<T1> _items = new();
@@ -104,7 +104,7 @@ public class DatabaseList<T1>
 
     
     /// <summary>
-    /// Retreives a linq compatible read-only list.
+    /// Retrieves a linq compatible read-only list.
     /// </summary>
     /// <returns></returns>
     public IReadOnlyList<T1> Fetch()

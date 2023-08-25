@@ -42,7 +42,7 @@ public class DatabaseDictionary<T1, T2>
     private string _primaryKey;
     private bool _useGuildConnection;
 
-    private MySqlConnection _connection
+    private DatabaseClient.MySqlConnectionInformation _connection
         => this._useGuildConnection ? this._client.guildDatabaseConnection : this._client.mainDatabaseConnection;
 
     private ConcurrentDictionary<T1, T2> _items = new();
@@ -56,7 +56,7 @@ public class DatabaseDictionary<T1, T2>
     {
         get
         {
-            if (!this._client.RowExists(this._tableName, this._primaryKey, key, this._connection))
+            if (!this.ContainsKey(key))
                 throw new NullReferenceException($"Could not find {this._primaryKey}:{key} in {this._tableName}");
 
             if (!this._items.ContainsKey(key))
@@ -125,7 +125,7 @@ public class DatabaseDictionary<T1, T2>
     /// <param name="key">The key to check for.</param>
     /// <returns>Whether the key exists in the database.</returns>
     public bool ContainsKey(T1 key)
-        => this._client.RowExists(this._tableName, this._primaryKey, key.ToString(), this._connection);
+        => this.Keys.Contains(key);
 
     /// <summary>
     /// Gets the enumerator.
@@ -155,22 +155,31 @@ public class DatabaseDictionary<T1, T2>
     }
 
     /// <summary>
-    /// Retreives a linq compatible read-only list.
+    /// Retrieves a linq compatible read-only list.
     /// </summary>
     /// <returns></returns>
     public IReadOnlyDictionary<T1, T2> Fetch()
-        => this.Keys.ToDictionary(x => x, y =>
+    {
+        foreach (var b in this.Keys)
         {
-            if (!this._items.ContainsKey(y))
+            if (!this._items.ContainsKey(b))
             {
                 if (_newValuePredicate is not null)
-                    this._items[y] = _newValuePredicate.Invoke(y);
+                    this._items[b] = _newValuePredicate.Invoke(b);
                 else
-                    this._items[y] = default;
+                    this._items[b] = default;
             }
+        }
 
-            return this._items[y];
-        });
+        foreach (var b in this._items)
+        {
+            if (!this.Keys.Contains(b.Key))
+                while (!this._items.Remove(b.Key, out _))
+                    Thread.Sleep(1);
+        }
+
+        return _items.AsReadOnly();
+    }
 
     private bool Try(Action action)
     {
