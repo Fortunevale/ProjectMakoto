@@ -46,7 +46,7 @@ internal sealed class LeaderboardCommand : BaseCommand
 
             var currentuserplacement = 0;
 
-            foreach (var b in ctx.DbGuild.Members.OrderByDescending(x => x.Value.Experience.Points))
+            foreach (var b in ctx.DbGuild.Members.Fetch().OrderByDescending(x => x.Value.Experience.Points))
             {
                 currentuserplacement++;
                 if (b.Key == ctx.User.Id)
@@ -57,7 +57,7 @@ internal sealed class LeaderboardCommand : BaseCommand
 
             List<KeyValuePair<string, string>> Board = new();
 
-            foreach (var b in ctx.DbGuild.Members.OrderByDescending(x => x.Value.Experience.Points))
+            foreach (var b in ctx.DbGuild.Members.Fetch().OrderByDescending(x => x.Value.Experience.Points))
             {
                 try
                 {

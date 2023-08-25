@@ -20,58 +20,58 @@ internal sealed class ReactionRolesCommandAbstractions
 
         foreach (var b in ctx.DbGuild.ReactionRoles.ToList())
         {
-            if (!ctx.Guild.Channels.ContainsKey(b.Value.ChannelId))
+            if (!ctx.Guild.Channels.ContainsKey(b.ChannelId))
             {
-                _ = ctx.DbGuild.ReactionRoles.Remove(b);
+                ctx.DbGuild.ReactionRoles = ctx.DbGuild.ReactionRoles.Remove(x => x.MessageId.ToString(), b);
                 continue;
             }
 
-            if (!ctx.Guild.Roles.ContainsKey(b.Value.RoleId))
+            if (!ctx.Guild.Roles.ContainsKey(b.RoleId))
             {
-                _ = ctx.DbGuild.ReactionRoles.Remove(b);
+                ctx.DbGuild.ReactionRoles = ctx.DbGuild.ReactionRoles.Remove(x => x.MessageId.ToString(), b);
                 continue;
             }
 
-            var channel = ctx.Guild.GetChannel(b.Value.ChannelId);
+            var channel = ctx.Guild.GetChannel(b.ChannelId);
 
-            if (!messageCache.ContainsKey(b.Key))
+            if (!messageCache.ContainsKey(b.MessageId))
             {
                 try
                 {
-                    var requested_msg = await channel.GetMessageAsync(b.Key);
-                    messageCache.Add(b.Key, requested_msg);
+                    var requested_msg = await channel.GetMessageAsync(b.MessageId);
+                    messageCache.Add(b.MessageId, requested_msg);
                 }
                 catch (DisCatSharp.Exceptions.NotFoundException)
                 {
-                    messageCache.Add(b.Key, null);
+                    messageCache.Add(b.MessageId, null);
 
-                    _ = ctx.DbGuild.ReactionRoles.Remove(b);
+                    ctx.DbGuild.ReactionRoles = ctx.DbGuild.ReactionRoles.Remove(x => x.MessageId.ToString(), b);
                     continue;
                 }
                 catch (DisCatSharp.Exceptions.UnauthorizedException)
                 {
-                    messageCache.Add(b.Key, null);
+                    messageCache.Add(b.MessageId, null);
 
-                    _ = ctx.DbGuild.ReactionRoles.Remove(b);
+                    ctx.DbGuild.ReactionRoles = ctx.DbGuild.ReactionRoles.Remove(x => x.MessageId.ToString(), b);
                     continue;
                 }
             }
 
-            if (messageCache[b.Key] == null)
+            if (messageCache[b.MessageId] == null)
             {
-                _ = ctx.DbGuild.ReactionRoles.Remove(b);
+                ctx.DbGuild.ReactionRoles = ctx.DbGuild.ReactionRoles.Remove(x => x.MessageId.ToString(), b);
                 continue;
             }
 
-            var msg = messageCache[b.Key];
+            var msg = messageCache[b.MessageId  ];
 
-            if (!msg.Reactions.Any(x => x.Emoji.Id == b.Value.EmojiId && x.Emoji.GetUniqueDiscordName() == b.Value.EmojiName && x.IsMe))
+            if (!msg.Reactions.Any(x => x.Emoji.Id == b.EmojiId && x.Emoji.GetUniqueDiscordName() == b.EmojiName && x.IsMe))
             {
-                _ = msg.CreateReactionAsync(b.Value.GetEmoji(ctx.Client)).ContinueWith(x =>
+                _ = msg.CreateReactionAsync(b.GetEmoji(ctx.Client)).ContinueWith(x =>
                 {
                     if (x.IsFaulted)
                     {
-                        _ = ctx.DbGuild.ReactionRoles.Remove(b);
+                        ctx.DbGuild.ReactionRoles = ctx.DbGuild.ReactionRoles.Remove(x => x.MessageId.ToString(), b);
                     }
                 });
                 continue;

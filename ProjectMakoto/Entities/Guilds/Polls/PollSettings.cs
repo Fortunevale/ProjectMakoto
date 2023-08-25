@@ -7,31 +7,35 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Database.ColumnAttributes;
+
 namespace ProjectMakoto.Entities.Guilds;
 
 public sealed class PollSettings : RequiresParent<Guild>
 {
     public PollSettings(Bot bot, Guild parent) : base(bot, parent)
     {
-        this._RunningPolls.ItemsChanged += this.RunningPollsUpdatedAsync;
     }
 
-    ~PollSettings()
+    [ColumnName("polls"), ColumnType(ColumnTypes.LongText), Default("[]")]
+    public PollEntry[] RunningPolls
     {
-        this._RunningPolls.ItemsChanged -= this.RunningPollsUpdatedAsync;
+        get => JsonConvert.DeserializeObject<PollEntry[]>(this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Parent.Id, "polls", this.Bot.DatabaseClient.mainDatabaseConnection));
+        set
+        {
+            _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "polls", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);
+            this.RunningPollsUpdatedAsync();
+        }
     }
 
-    public ObservableList<PollEntry> RunningPolls { get => this._RunningPolls; set { this._RunningPolls = value; this._RunningPolls.ItemsChanged += this.RunningPollsUpdatedAsync; } }
-    private ObservableList<PollEntry> _RunningPolls { get; set; } = new();
-
-    private void RunningPollsUpdatedAsync(object? sender, ObservableListUpdate<PollEntry> e)
+    private void RunningPollsUpdatedAsync()
     {
         _ = Task.Run(async () =>
         {
             var CommandKey = this.Bot.LoadedTranslations.Commands.Moderation.Poll;
 
-            while (this.RunningPolls.Count > 10)
-                this.RunningPolls.RemoveAt(0);
+            while (this.RunningPolls.Length > 10)
+                this.RunningPolls = this.RunningPolls.Take(10).ToArray();
 
             while (!this.Bot.status.DiscordGuildDownloadCompleted)
                 await Task.Delay(1000);
@@ -69,10 +73,10 @@ public sealed class PollSettings : RequiresParent<Guild>
                                         return;
                                     }
                                     _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
-                                    _ = this.RunningPolls.Remove(b);
+                                    this.RunningPolls = this.RunningPolls.Remove(x => x.SelectUUID, b);
                                     b.DueTime = DateTime.UtcNow;
                                     await Task.Delay(5000);
-                                    this.RunningPolls.Add(b);
+                                    this.RunningPolls = this.RunningPolls.Add(b);
                                     cancellationTokenSource.Cancel();
                                     _ = e.Interaction.EditOriginalResponseAsync(new DiscordWebhookBuilder().WithContent($"✅ {CommandKey.PollEnded.Get(this.Bot.Users[e.User.Id]).Build(true)}"));
                                 }
@@ -89,7 +93,7 @@ public sealed class PollSettings : RequiresParent<Guild>
                                 this.Bot.DiscordClient.ComponentInteractionCreated -= VoteHandling;
                                 this.Bot.DiscordClient.MessageDeleted -= MessageDeletionHandling;
                                 this.Bot.DiscordClient.ChannelDeleted -= ChannelDeletionHandling;
-                                _ = this.RunningPolls.Remove(b);
+                                this.RunningPolls = this.RunningPolls.Remove(x => x.SelectUUID, b);
                             }
                         }).Add(this.Bot);
                     }
@@ -103,7 +107,7 @@ public sealed class PollSettings : RequiresParent<Guild>
                                 this.Bot.DiscordClient.ComponentInteractionCreated -= VoteHandling;
                                 this.Bot.DiscordClient.MessageDeleted -= MessageDeletionHandling;
                                 this.Bot.DiscordClient.ChannelDeleted -= ChannelDeletionHandling;
-                                _ = this.RunningPolls.Remove(b);
+                                this.RunningPolls = this.RunningPolls.Remove(x => x.SelectUUID, b);
                             }
                         }).Add(this.Bot);
                     }
@@ -118,7 +122,7 @@ public sealed class PollSettings : RequiresParent<Guild>
                         this.Bot.DiscordClient.MessageDeleted -= MessageDeletionHandling;
                         this.Bot.DiscordClient.ChannelDeleted -= ChannelDeletionHandling;
 
-                        _ = this.RunningPolls.Remove(b);
+                        this.RunningPolls = this.RunningPolls.Remove(x => x.SelectUUID, b);
 
                         var channel = await this.Bot.DiscordClient.GetChannelAsync(b.ChannelId);
                         var message = await channel.GetMessageAsync(b.MessageId, true);

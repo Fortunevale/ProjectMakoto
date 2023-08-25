@@ -30,7 +30,6 @@ internal sealed class GlobalUnbanCommand : BaseCommand
             }
 
             _ = ctx.Bot.globalBans.Remove(victim.Id);
-            await ctx.Bot.DatabaseClient._helper.DeleteRow(ctx.Bot.DatabaseClient.mainDatabaseConnection, "globalbans", "id", $"{victim.Id}");
 
             var Success = 0;
             var Failed = 0;
@@ -44,7 +43,7 @@ internal sealed class GlobalUnbanCommand : BaseCommand
                 foreach (var b in ctx.Client.Guilds.OrderByDescending(x => x.Key == ctx.Guild.Id))
                 {
                     if (!ctx.Bot.Guilds.ContainsKey(b.Key))
-                        ctx.Bot.Guilds.Add(b.Key, new Guild(b.Key, ctx.Bot));
+                        ctx.Bot.Guilds.Add(b.Key, new Guild(ctx.Bot, b.Key));
 
                     if (ctx.Bot.Guilds[b.Key].Join.AutoBanGlobalBans)
                     {

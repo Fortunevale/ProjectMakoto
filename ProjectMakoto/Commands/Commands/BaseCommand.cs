@@ -32,7 +32,7 @@ public abstract class BaseCommand
         ctx.Transferred = true;
 
         if (await this.BasePreExecutionCheck())
-            await this.ExecuteCommand(this.ctx, arguments);
+            await this.ExecuteCommand(this.ctx, arguments).Add(ctx.Bot, this.ctx);
     }
 
     public async Task ExecuteCommand(CommandContext ctx, Bot _bot, Dictionary<string, object> arguments = null)
@@ -41,7 +41,7 @@ public abstract class BaseCommand
         this.t = _bot.LoadedTranslations;
 
         if (await this.BasePreExecutionCheck())
-            await this.ExecuteCommand(this.ctx, arguments);
+            await this.ExecuteCommand(this.ctx, arguments).Add(_bot, this.ctx);
     }
 
     public async Task ExecuteCommand(InteractionContext ctx, Bot _bot, Dictionary<string, object> arguments = null, bool Ephemeral = true, bool InitiateInteraction = true, bool InteractionInitiated = false)
@@ -49,7 +49,7 @@ public abstract class BaseCommand
         this.ctx = new SharedCommandContext(this, ctx, _bot);
         this.t = _bot.LoadedTranslations;
 
-        _ = Task.Run(async () =>
+        await Task.Run(async () =>
         {
             if (InitiateInteraction)
                 await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
@@ -63,7 +63,7 @@ public abstract class BaseCommand
                 this.ctx.RespondedToInitial = true;
 
             if (await this.BasePreExecutionCheck())
-                await this.ExecuteCommand(this.ctx, arguments);
+                await this.ExecuteCommand(this.ctx, arguments).Add(_bot, this.ctx);
         }).Add(_bot, this.ctx);
     }
 
@@ -72,7 +72,7 @@ public abstract class BaseCommand
         this.ctx = new SharedCommandContext(this, ctx, _bot);
         this.t = _bot.LoadedTranslations;
 
-        _ = Task.Run(async () =>
+        await Task.Run(async () =>
         {
             this.ctx.RespondedToInitial = false;
 
@@ -111,7 +111,7 @@ public abstract class BaseCommand
                 });
 
             if (await this.BasePreExecutionCheck())
-                await this.ExecuteCommand(this.ctx, arguments);
+                await this.ExecuteCommand(this.ctx, arguments).Add(_bot, this.ctx);
         }).Add(_bot, this.ctx);
     }
 
@@ -120,7 +120,7 @@ public abstract class BaseCommand
         this.ctx = new SharedCommandContext(this, ctx, _bot);
         this.t = _bot.LoadedTranslations;
 
-        _ = Task.Run(async () =>
+        await Task.Run(async () =>
         {
             if (InitiateInteraction)
                 await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
@@ -134,7 +134,7 @@ public abstract class BaseCommand
                 this.ctx.RespondedToInitial = true;
 
             if (await this.BasePreExecutionCheck())
-                await this.ExecuteCommand(this.ctx, arguments);
+                await this.ExecuteCommand(this.ctx, arguments).Add(_bot, this.ctx);
         }).Add(_bot, this.ctx);
     }
 
@@ -143,7 +143,7 @@ public abstract class BaseCommand
         this.ctx = new SharedCommandContext(this, ctx, client, commandName, _bot);
         this.t = _bot.LoadedTranslations;
 
-        _ = Task.Run(async () =>
+        await Task.Run(async () =>
         {
             if (InitiateInteraction)
                 await ctx.Interaction.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
@@ -157,7 +157,7 @@ public abstract class BaseCommand
                 this.ctx.RespondedToInitial = true;
 
             if (await this.BasePreExecutionCheck())
-                await this.ExecuteCommand(this.ctx, arguments);
+                await this.ExecuteCommand(this.ctx, arguments).Add(_bot, this.ctx);
         }).Add(_bot, ctx);
     }
 
@@ -1082,7 +1082,6 @@ public abstract class BaseCommand
 
     public void DeleteOrInvalidate()
     {
-        _ = this.RespondOrEdit($"✅ _{this.GetString(this.t.Commands.Common.InteractionFinished, true)}_");
         switch (this.ctx.CommandType)
         {
             case Enums.CommandType.ContextMenu:
@@ -1235,7 +1234,7 @@ public abstract class BaseCommand
     public void SendUserBanError(BanDetails entry)
         => _ = this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = this.GetString(this.t.Commands.Common.Errors.UserBan, true, new TVar("Reason", entry.Reason)),
+            Description = this.t.Commands.Common.Errors.UserBan.t["en"].Build(true, new TVar("Reason", entry.Reason)),
         }.AsError(this.ctx)));
 
     public void SendGuildBanError(BanDetails entry)

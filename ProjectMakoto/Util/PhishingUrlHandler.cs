@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using System.Net.Http.Headers;
+
 namespace ProjectMakoto.Util;
 
 internal sealed class PhishingUrlHandler : RequiresBotReference
@@ -17,104 +19,65 @@ internal sealed class PhishingUrlHandler : RequiresBotReference
 
     public async Task UpdatePhishingUrlDatabase()
     {
-        _ = new Func<Task>(async () =>
-        {
-            _ = this.UpdatePhishingUrlDatabase();
-        }).CreateScheduledTask(DateTime.UtcNow.AddMinutes(30));
-
-        var urls = await this.GetUrls();
-
-        var DatabaseUpdated = false;
-
-        foreach (var b in urls)
-        {
-            if (!this.Bot.PhishingHosts.ContainsKey(b.Url))
-            {
-                DatabaseUpdated = true;
-                this.Bot.PhishingHosts.Add(b.Url, b);
-                continue;
-            }
-
-            if (this.Bot.PhishingHosts.ContainsKey(b.Url))
-            {
-                if (this.Bot.PhishingHosts[b.Url].Origin.Count != b.Origin.Count)
-                {
-                    DatabaseUpdated = true;
-                    this.Bot.PhishingHosts[b.Url].Origin = b.Origin;
-                    this.Bot.PhishingHosts[b.Url].Submitter = b.Submitter;
-                    continue;
-                }
-            }
-        }
-
-        List<string> dropUrls = new();
-
-        if (this.Bot.PhishingHosts.Any(x => x.Value.Origin.Count != 0 && x.Value.Submitter != 0 && !urls.Any(y => y.Url == x.Value.Url)))
-            foreach (var b in this.Bot.PhishingHosts.Where(x => x.Value.Origin.Count != 0 && x.Value.Submitter != 0 && !urls.Any(y => y.Url == x.Value.Url)).ToList())
-            {
-                DatabaseUpdated = true;
-                _ = this.Bot.PhishingHosts.Remove(b.Key);
-                dropUrls.Add(b.Key);
-            }
-
-        GC.Collect();
-
-        if (!DatabaseUpdated)
-            return;
-
         try
         {
-            await this.UpdateDatabase(dropUrls);
+            _ = new Func<Task>(async () =>
+            {
+                _ = this.UpdatePhishingUrlDatabase();
+            }).CreateScheduledTask(DateTime.UtcNow.AddMinutes(30));
+
+            var urls = await this.GetUrls();
+            var listFailed = false;
+
+            foreach (var (Url, Origins, ListFailed) in urls.GroupBy(x => x.Url).First())
+            {
+                if (ListFailed)
+                    listFailed = true;
+
+                if (!this.Bot.PhishingHosts.ContainsKey(Url))
+                {
+                    this.Bot.PhishingHosts.Add(Url, new PhishingUrlEntry(this.Bot, Url)
+                    {
+                        Url = Url,
+                        Origin = Origins
+                    });
+                    continue;
+                }
+
+                if (this.Bot.PhishingHosts.ContainsKey(Url))
+                {
+                    if (this.Bot.PhishingHosts[Url].Origin?.Length != Origins.Length)
+                    {
+                        this.Bot.PhishingHosts[Url].Origin = Origins;
+                        continue;
+                    }
+                }
+            }
+
+            if (!listFailed)
+                foreach (var b in this.Bot.PhishingHosts)
+                {
+                    if (b.Value.Submitter != 0)
+                        continue;
+
+                    if (!urls.Any(x => x.Url == b.Key))
+                        _ = this.Bot.PhishingHosts.Remove(b.Key);
+                }
+
+            urls.Clear();
+            GC.Collect();
         }
         catch (Exception ex)
         {
-            _logger.LogError("Failed to update database", ex);
+            _logger.LogError("Failed to update Phishing Urls", ex);
         }
     }
 
-    private bool UpdateRunning = false;
-
-    public async Task UpdateDatabase(List<string> dropUrls)
-    {
-        if (this.UpdateRunning)
-        {
-            _logger.LogWarn("A database update is already running, cancelling");
-            return;
-        }
-
-        try
-        {
-            this.UpdateRunning = true;
-
-            await this.Bot.DatabaseClient.FullSyncDatabase();
-
-            if (dropUrls.Count != 0)
-                foreach (var b in dropUrls)
-                {
-                    await this.Bot.DatabaseClient._helper.DeleteRow(this.Bot.DatabaseClient.mainDatabaseConnection, "scam_urls", "url", $"{b}");
-
-                    _logger.LogDebug("Dropped '{host}' from table 'scam_urls'.", b);
-                }
-        }
-        catch (Exception)
-        {
-            GC.Collect();
-            this.UpdateRunning = false;
-            throw;
-        }
-        finally
-        {
-            await Task.Delay(1000);
-            GC.Collect();
-        }
-
-        this.UpdateRunning = false;
-    }
-
-    private async Task<List<PhishingUrlEntry>> GetUrls()
+    private async Task<List<(string Url, string[] Origins, bool ListFailed)>> GetUrls()
     {
         List<string> WhitelistedDomains = new();
         Dictionary<string, List<string>> SanitizedMatches = new();
+        var listFailed = false;
 
         foreach (var url in new string[]
         {
@@ -143,7 +106,8 @@ internal sealed class PhishingUrlHandler : RequiresBotReference
             }
             catch (Exception ex)
             {
-                throw new Exception($"An exception occurred while trying to download URLs from '{url}'", ex);
+                listFailed = true;
+                _logger.LogError("An exception occurred while trying to download URLs from '{url}'", ex, url);
             }
         }
 
@@ -164,17 +128,19 @@ internal sealed class PhishingUrlHandler : RequiresBotReference
         }
         catch (Exception ex) { throw new Exception($"Failed to remove whitelisted domains from blacklist", ex); }
 
-        return SanitizedMatches.Select(x => new PhishingUrlEntry
-        {
-            Url = x.Key,
-            Origin = x.Value,
-            Submitter = 0
-        }).ToList();
+        return SanitizedMatches.Select(x => (x.Key, x.Value.ToArray(), listFailed)).ToList();
     }
 
     private async Task<List<string>> DownloadList(string url)
     {
         HttpClient client = new();
+
+        var productValue = new ProductInfoHeaderValue("ProjectMakoto", this.Bot.status.RunningVersion);
+        var commentValue = new ProductInfoHeaderValue("(+https://fortunevale.de)");
+
+        client.DefaultRequestHeaders.UserAgent.Add(productValue);
+        client.DefaultRequestHeaders.UserAgent.Add(commentValue);
+
         var urls = await client.GetStringAsync(url);
 
         return urls.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries)

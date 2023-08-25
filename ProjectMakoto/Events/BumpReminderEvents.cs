@@ -20,7 +20,7 @@ internal sealed class BumpReminderEvents : RequiresTranslation
 
     internal async Task MessageCreated(DiscordClient sender, MessageCreateEventArgs e)
     {
-        if (e.Guild is null || e.Channel is null || e.Channel.IsPrivate || !this.Bot.Guilds[e.Guild.Id].BumpReminder.Enabled || e.Channel.Id != this.Bot.Guilds[e.Guild.Id].BumpReminder.ChannelId)
+        if (e.Guild is null || e.Channel is null || e.Channel.IsPrivate || this.Bot.Guilds[e.Guild.Id].BumpReminder.ChannelId == 0 || e.Channel.Id != this.Bot.Guilds[e.Guild.Id].BumpReminder.ChannelId)
             return;
 
         var bUser = await sender.GetUserAsync(this.Bot.Guilds[e.Guild.Id].BumpReminder.LastUserId);
@@ -109,7 +109,7 @@ internal sealed class BumpReminderEvents : RequiresTranslation
 
     internal async Task MessageDeleted(DiscordClient sender, MessageDeleteEventArgs e)
     {
-        if (e.Guild == null || e.Channel.IsPrivate || !this.Bot.Guilds[e.Guild.Id].BumpReminder.Enabled || e.Channel.Id != this.Bot.Guilds[e.Guild.Id].BumpReminder.ChannelId)
+        if (e.Guild == null || e.Channel.IsPrivate || this.Bot.Guilds[e.Guild.Id].BumpReminder.ChannelId == 0 || e.Channel.Id != this.Bot.Guilds[e.Guild.Id].BumpReminder.ChannelId)
             return;
 
         if (e.Message.Id == this.Bot.Guilds[e.Guild.Id].BumpReminder.PersistentMessageId)
@@ -122,7 +122,7 @@ internal sealed class BumpReminderEvents : RequiresTranslation
 
     internal async Task ReactionAdded(DiscordClient sender, MessageReactionAddEventArgs e)
     {
-        if (e.Guild == null || e.Channel.IsPrivate || !this.Bot.Guilds[e.Guild.Id].BumpReminder.Enabled || e.Channel.Id != this.Bot.Guilds[e.Guild.Id].BumpReminder.ChannelId)
+        if (e.Guild == null || e.Channel.IsPrivate || this.Bot.Guilds[e.Guild.Id].BumpReminder.ChannelId == 0 || e.Channel.Id != this.Bot.Guilds[e.Guild.Id].BumpReminder.ChannelId)
             return;
 
         if (e.Message.Id == this.Bot.Guilds[e.Guild.Id].BumpReminder.MessageId && e.Emoji.ToString() == "✅")
@@ -135,7 +135,7 @@ internal sealed class BumpReminderEvents : RequiresTranslation
 
     internal async Task ReactionRemoved(DiscordClient sender, MessageReactionRemoveEventArgs e)
     {
-        if (e.Guild == null || e.Channel.IsPrivate || !this.Bot.Guilds[e.Guild.Id].BumpReminder.Enabled || e.Channel.Id != this.Bot.Guilds[e.Guild.Id].BumpReminder.ChannelId)
+        if (e.Guild == null || e.Channel.IsPrivate || this.Bot.Guilds[e.Guild.Id].BumpReminder.ChannelId == 0 || e.Channel.Id != this.Bot.Guilds[e.Guild.Id].BumpReminder.ChannelId)
             return;
 
         if (e.Message.Id == this.Bot.Guilds[e.Guild.Id].BumpReminder.MessageId && e.Emoji.ToString() == "✅")

@@ -21,8 +21,6 @@ public sealed class Status
     public bool DiscordGuildDownloadCompleted { get; internal set; } = false;
     public bool DiscordCommandsRegistered { get; internal set; } = false;
     public bool LavalinkInitialized { get; internal set; } = false;
-    public bool DatabaseInitialized { get; internal set; } = false;
-    public bool DatabaseInitialLoadCompleted { get; internal set; } = false;
 
     public ulong TeamOwner { get; internal set; } = new();
     public IReadOnlyList<ulong> TeamMembers

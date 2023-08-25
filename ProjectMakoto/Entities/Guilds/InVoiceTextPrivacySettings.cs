@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Database.ColumnAttributes;
+
 namespace ProjectMakoto.Entities.Guilds;
 
 public sealed class InVoiceTextPrivacySettings : RequiresParent<Guild>
@@ -15,25 +17,17 @@ public sealed class InVoiceTextPrivacySettings : RequiresParent<Guild>
     {
     }
 
-    private bool _ClearTextEnabled { get; set; } = false;
+    [ColumnName("vc_privacy_clear"), ColumnType(ColumnTypes.TinyInt), Default("0")]
     public bool ClearTextEnabled
     {
-        get => this._ClearTextEnabled;
-        set
-        {
-            this._ClearTextEnabled = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "vc_privacy_clear", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "vc_privacy_clear", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "vc_privacy_clear", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    private bool _SetPermissionsEnabled { get; set; } = false;
+    [ColumnName("vc_privacy_perms"), ColumnType(ColumnTypes.TinyInt), Default("0")]
     public bool SetPermissionsEnabled
     {
-        get => this._SetPermissionsEnabled;
-        set
-        {
-            this._SetPermissionsEnabled = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "vc_privacy_perms", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "vc_privacy_perms", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "vc_privacy_perms", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 }

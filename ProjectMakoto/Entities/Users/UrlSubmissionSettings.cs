@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Database.ColumnAttributes;
+
 namespace ProjectMakoto.Entities.Users;
 
 public sealed class UrlSubmissionSettings : RequiresParent<User>
@@ -15,29 +17,17 @@ public sealed class UrlSubmissionSettings : RequiresParent<User>
     {
     }
 
-    private int _AcceptedTOS { get; set; } = 0;
+    [ColumnName("submission_accepted_tos"), ColumnType(ColumnTypes.TinyInt), Default("0")]
     public int AcceptedTOS
     {
-        get => this._AcceptedTOS;
-        set
-        {
-            this._AcceptedTOS = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "submission_accepted_tos", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<int>("users", "userid", this.Parent.Id, "submission_accepted_tos", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Parent.Id, "submission_accepted_tos", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-
-    private DateTime _LastTime { get; set; } = DateTime.MinValue;
+    [ColumnName("submission_last_datetime"), ColumnType(ColumnTypes.BigInt), Default("0")]
     public DateTime LastTime
     {
-        get => this._LastTime;
-        set
-        {
-            this._LastTime = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "submission_last_datetime", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<DateTime>("users", "userid", this.Parent.Id, "submission_last_datetime", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Parent.Id, "submission_last_datetime", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
-
-
-    public List<string> AcceptedSubmissions { get; set; } = new();
 }

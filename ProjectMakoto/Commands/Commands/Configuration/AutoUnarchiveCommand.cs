@@ -24,7 +24,7 @@ internal sealed class AutoUnarchiveCommand : BaseCommand
                 foreach (var b in ctx.DbGuild.AutoUnarchiveThreads.ToList())
                 {
                     if (!ctx.Guild.Channels.ContainsKey(b))
-                        _ = ctx.DbGuild.AutoUnarchiveThreads.Remove(b);
+                        ctx.DbGuild.AutoUnarchiveThreads = ctx.DbGuild.AutoUnarchiveThreads.Remove(x => x.ToString(), b);
                 }
 
                 return $"{(ctx.DbGuild.AutoUnarchiveThreads.Any() ? string.Join("\n", ctx.DbGuild.AutoUnarchiveThreads.Select(x => $"{ctx.Guild.GetChannel(x).Mention} [`#{ctx.Guild.GetChannel(x).Name}`] (`{x}`)")) : ctx.Bot.LoadedTranslations.Commands.Config.AutoUnarchive.NoChannels.Get(ctx.DbUser).Build(true))}";
@@ -87,7 +87,7 @@ internal sealed class AutoUnarchiveCommand : BaseCommand
                 }
 
                 if (!ctx.DbGuild.AutoUnarchiveThreads.Contains(ChannelResult.Result.Id))
-                    ctx.DbGuild.AutoUnarchiveThreads.Add(ChannelResult.Result.Id);
+                    ctx.DbGuild.AutoUnarchiveThreads = ctx.DbGuild.AutoUnarchiveThreads.Add(ChannelResult.Result.Id);
 
                 await this.ExecuteCommand(ctx, arguments);
                 return;
@@ -115,7 +115,7 @@ internal sealed class AutoUnarchiveCommand : BaseCommand
                 var ChannelToRemove = Convert.ToUInt64(ChannelResult.Result);
 
                 if (ctx.DbGuild.AutoUnarchiveThreads.Contains(ChannelToRemove))
-                    _ = ctx.DbGuild.AutoUnarchiveThreads.Remove(ChannelToRemove);
+                    ctx.DbGuild.AutoUnarchiveThreads = ctx.DbGuild.AutoUnarchiveThreads.Remove(x => x.ToString(), ChannelToRemove);
 
                 await this.ExecuteCommand(ctx, arguments);
                 return;

@@ -1,4 +1,4 @@
-// Project Makoto
+﻿// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -7,9 +7,15 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-namespace ProjectMakoto.Entities.Database.ColumnTypes;
+namespace ProjectMakoto.Entities.Database.ColumnAttributes;
 
-public abstract class BaseColumn
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+public sealed class TableNameAttribute : Attribute
 {
-    public abstract object GetValue();
+    public readonly string Name;
+
+    public TableNameAttribute(string Name)
+    {
+        this.Name = Name;
+    }
 }

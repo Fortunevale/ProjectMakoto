@@ -16,7 +16,7 @@ public sealed class Bot
 {
     #region Clients
 
-    public DatabaseClient DatabaseClient { get; set; }
+    internal DatabaseClient DatabaseClient { get; set; }
 
     public DiscordClient DiscordClient { get; internal set; }
     internal LavalinkSession LavalinkSession;
@@ -52,26 +52,27 @@ public sealed class Bot
     internal BumpReminderHandler BumpReminder { get; set; }
     internal ExperienceHandler ExperienceHandler { get; set; }
     public TaskWatcher Watcher { get; internal set; } = new();
-    internal Dictionary<string, PhishingUrlEntry> PhishingHosts = new();
-    internal Dictionary<ulong, SubmittedUrlEntry> SubmittedHosts = new();
+
+    internal DatabaseDictionary<string, PhishingUrlEntry> PhishingHosts { get; set; }
+    internal DatabaseDictionary<ulong, SubmittedUrlEntry> SubmittedHosts { get; set; }
 
     #endregion Util
 
 
     #region Bans
 
-    internal List<ulong> objectedUsers = new();
-    internal Dictionary<ulong, BanDetails> bannedUsers = new();
-    internal Dictionary<ulong, BanDetails> bannedGuilds = new();
+    internal DatabaseList<ulong> objectedUsers { get; set; }
+    internal DatabaseDictionary<ulong, BanDetails> bannedUsers { get; set; }
+    internal DatabaseDictionary<ulong, BanDetails> bannedGuilds { get; set; }
 
-    internal Dictionary<ulong, BanDetails> globalBans = new();
-    internal Dictionary<ulong, List<BanDetails>> globalNotes = new();
+    internal DatabaseDictionary<ulong, BanDetails> globalBans { get; set; }
+    internal SelfFillingDatabaseDictionary<GlobalNote> globalNotes { get; set; }
 
     #endregion Bans
 
     public Status status = new();
-    internal SelfFillingDictionary<Entities.Guild> Guilds = null;
-    internal SelfFillingDictionary<Entities.User> Users = null;
+    internal SelfFillingDatabaseDictionary<Entities.Guild> Guilds = null;
+    internal SelfFillingDatabaseDictionary<Entities.User> Users = null;
 
     internal string RawFetchedPrivacyPolicy = "";
     internal string Prefix { get; private set; } = ";;";
@@ -114,38 +115,76 @@ public sealed class Bot
                 Environment.CurrentDirectory,
                 Regex.Replace(Environment.CommandLine, @"(--token \S*)", ""));
 
-        UniversalExtensions.LoadAllReferencedAssemblies(AppDomain.CurrentDomain);
+        _ = Task.Run(() =>
+        {
+            UniversalExtensions.LoadAllReferencedAssemblies(AppDomain.CurrentDomain);
+        });
 
         var loadDatabase = Task.Run(async () =>
         {
             try
             {
                 await Util.Initializers.ConfigLoader.Load(this);
-
-                this.Users = new(this);
-                this.Guilds = new(this);
-                _ = await DatabaseClient.InitializeDatabase(this);
-
-                this.BumpReminder = new(this);
-
                 this.ScoreSaberClient = new ScoreSaberClient(this);
                 this.TranslationClient = new GoogleTranslateClient(this);
                 this.ThreadJoinClient = new ThreadJoinClient();
-
-                await Util.Initializers.ListLoader.Load(this);
-                await Util.Initializers.TranslationLoader.Load(this);
-                await Util.Initializers.PluginLoader.LoadPlugins(this);
-
                 this.MonitorClient = new MonitorClient(this);
                 this.AbuseIpDbClient = new AbuseIpDbClient(this);
                 this.TokenInvalidator = new TokenInvalidatorRepository(this);
+                this.GithubClient = new GitHubClient(new ProductHeaderValue("ProjectMakoto", this.status.RunningVersion))
+                {
+                    Credentials = new Credentials(this.status.LoadedConfig.Secrets.Github.Token)
+                };
 
-                this.GithubClient = new GitHubClient(new ProductHeaderValue("ProjectMakoto", this.status.RunningVersion));
-                this.GithubClient.Credentials = new Credentials(this.status.LoadedConfig.Secrets.Github.Token);
+                await Task.WhenAll(DatabaseClient.InitializeDatabase(this),
+                                   Util.Initializers.ListLoader.Load(this), 
+                                   Util.Initializers.TranslationLoader.Load(this), 
+                                   Util.Initializers.PluginLoader.LoadPlugins(this));
 
-                DatabaseInit _databaseInit = new(this);
+                this.objectedUsers = new(this.DatabaseClient, "objected_users", "id", false);
 
-                await _databaseInit.LoadValuesFromDatabase();
+                this.PhishingHosts = new(this.DatabaseClient, "scam_urls", "url", false, (id) =>
+                {
+                    return new PhishingUrlEntry(this, id);
+                });
+                
+                this.SubmittedHosts = new(this.DatabaseClient, "active_url_submissions", "messageid", false, (id) =>
+                {
+                    return new SubmittedUrlEntry(this, id);
+                });
+                //this.PhishingHosts = new();
+
+                this.Users = new(this.DatabaseClient, "users", "userid", false, (id) =>
+                {
+                    return new Entities.User(this, id);
+                });
+
+                this.Guilds = new(this.DatabaseClient, "guilds", "serverid", false, (id) =>
+                {
+                    return new Entities.Guild(this, id);
+                });
+                
+                this.globalNotes = new(this.DatabaseClient, "guilds", "id", false, (id) =>
+                {
+                    return new Entities.GlobalNote(this, id);
+                });
+
+                this.bannedUsers = new(this.DatabaseClient, "banned_users", "id", false, (id) =>
+                {
+                    return new BanDetails(this, "banned_users", id);
+                });
+
+                this.bannedGuilds = new(this.DatabaseClient, "banned_guilds", "id", false, (id) =>
+                {
+                    return new BanDetails(this, "banned_guilds", id);
+                });
+                
+                this.globalBans = new(this.DatabaseClient, "globalbans", "id", false, (id) =>
+                {
+                    return new BanDetails(this, "globalbans", id);
+                });
+
+                this.BumpReminder = new(this);
             }
             catch (Exception ex)
             {
@@ -175,7 +214,7 @@ public sealed class Bot
 
             _logger.LogInfo("Connecting and authenticating with Discord..");
             await this.DiscordClient.ConnectAsync();
-            await Task.Delay(10000);
+            await Task.Delay(2000);
             _logger.LogInfo("Connected and authenticated with Discord as {User}.", this.DiscordClient.CurrentUser.GetUsernameWithIdentifier());
 
             this.status.DiscordInitialized = true;
@@ -253,17 +292,13 @@ public sealed class Bot
 
         AppDomain.CurrentDomain.ProcessExit += delegate
         {
-#pragma warning disable AsyncFixer02 // Long-running or blocking operations inside an async method
             this.ExitApplication(true).Wait();
-#pragma warning restore AsyncFixer02 // Long-running or blocking operations inside an async method
         };
 
         Console.CancelKeyPress += delegate
         {
             _logger.LogInfo("Exiting, please wait..");
-#pragma warning disable AsyncFixer02 // Long-running or blocking operations inside an async method
             this.ExitApplication().Wait();
-#pragma warning restore AsyncFixer02 // Long-running or blocking operations inside an async method
         };
 
 
@@ -353,7 +388,7 @@ public sealed class Bot
                 Environment.Exit((int)ExitCodes.ExitTasksTimeout);
         });
 
-        if (this.DatabaseClient.IsDisposed() || this.ExitCalled) // When the Database Client has been disposed, the Exit Call has already been made.
+        if (this.DatabaseClient.Disposed || this.ExitCalled) // When the Database Client has been disposed, the Exit Call has already been made.
             return;
 
         this.ExitCalled = true;
@@ -362,8 +397,15 @@ public sealed class Bot
 
         foreach (var b in this.Plugins)
         {
-            _logger.LogInfo("Shutting down '{0}'..", b.Value.Name);
-            await b.Value.Shutdown();
+            try
+            {
+                _logger.LogInfo("Shutting down '{0}'..", b.Value.Name);
+                await b.Value.Shutdown();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed to shutdown", ex, b.Value.Name);
+            }
         }
 
         if (this.status.DiscordInitialized && !Immediate)
@@ -401,26 +443,6 @@ public sealed class Bot
             }
         }
 
-        if (this.status.DatabaseInitialized)
-        {
-            try
-            {
-                _logger.LogInfo("Flushing to database..");
-                await this.DatabaseClient.FullSyncDatabase(true);
-                _logger.LogDebug("Flushed to database.");
-
-                await Task.Delay(500);
-
-                _logger.LogInfo("Closing database..");
-                await this.DatabaseClient.Dispose();
-                _logger.LogDebug("Closed database.");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogFatal("Failed to close Database Client gracefully.", ex);
-            }
-        }
-
         await Task.Delay(500);
         _logger.LogInfo("Goodbye!");
 
@@ -444,7 +466,6 @@ public sealed class Bot
                     _logger.LogInfo("Deleting profile of '{Key}'", b.Key);
 
                     _ = this.Users.Remove(b.Key);
-                    _ = this.DatabaseClient._helper.DeleteRow(this.DatabaseClient.mainDatabaseConnection, "users", "userid", $"{b.Key}").Add(this);
                     this.objectedUsers.Add(b.Key);
                     foreach (var c in this.DiscordClient.Guilds.Where(x => x.Value.OwnerId == b.Key))
                     {

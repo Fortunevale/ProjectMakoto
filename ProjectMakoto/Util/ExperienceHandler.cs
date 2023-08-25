@@ -115,7 +115,7 @@ internal sealed class ExperienceHandler : RequiresTranslation
                     {
                         if (!guild.Roles.ContainsKey(reward.RoleId))
                         {
-                            _ = this.Bot.Guilds[guild.Id].LevelRewards.Remove(reward);
+                            this.Bot.Guilds[guild.Id].LevelRewards = this.Bot.Guilds[guild.Id].LevelRewards.Remove(x => x.RoleId.ToString(), reward);
                             continue;
                         }
 

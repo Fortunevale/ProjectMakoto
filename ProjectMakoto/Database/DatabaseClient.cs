@@ -7,646 +7,779 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-using ProjectMakoto.Entities.Database;
+using System.Collections.Concurrent;
 using ProjectMakoto.Entities.Database.ColumnAttributes;
-using ProjectMakoto.Entities.Database.ColumnTypes;
+using ProjectMakoto.Entities.Guilds;
 
 namespace ProjectMakoto.Database;
 
-public sealed class DatabaseClient : RequiresBotReference
+public sealed partial class DatabaseClient : RequiresBotReference
 {
     private DatabaseClient(Bot bot) : base(bot)
     {
     }
 
-    internal MySqlConnection mainDatabaseConnection { get; set; }
-    internal MySqlConnection guildDatabaseConnection { get; set; }
-    internal DatabaseHelper _helper { get; private set; }
-    internal DatabaseQueue _queue { get; private set; }
+    public class MySqlConnectionInformation
+    {
+        public Func<MySqlConnection> CreateConnection { get; set; }
+    }
 
-    private bool Disposed { get; set; } = false;
+    internal MySqlConnectionInformation mainDatabaseConnection;
+    internal MySqlConnectionInformation guildDatabaseConnection;
+
+    public bool Disposed { get; private set; } = false;
 
     internal static async Task<DatabaseClient> InitializeDatabase(Bot bot)
     {
         _logger.LogInfo("Connecting to database..");
 
-        var databaseClient = new DatabaseClient(bot)
+        var databaseClient = new DatabaseClient(bot);
+
+        databaseClient.mainDatabaseConnection = new()
         {
-            mainDatabaseConnection = new MySqlConnection($"Server={bot.status.LoadedConfig.Secrets.Database.Host};Port={bot.status.LoadedConfig.Secrets.Database.Port};User Id={bot.status.LoadedConfig.Secrets.Database.Username};Password={bot.status.LoadedConfig.Secrets.Database.Password};Connection Timeout=60;Database={bot.status.LoadedConfig.Secrets.Database.MainDatabaseName};"),
-            guildDatabaseConnection = new MySqlConnection($"Server={bot.status.LoadedConfig.Secrets.Database.Host};Port={bot.status.LoadedConfig.Secrets.Database.Port};User Id={bot.status.LoadedConfig.Secrets.Database.Username};Password={bot.status.LoadedConfig.Secrets.Database.Password};Connection Timeout=60;Database={bot.status.LoadedConfig.Secrets.Database.GuildDatabaseName};")
-        };
-        databaseClient._helper = new(databaseClient);
-        databaseClient._queue = new(bot);
-
-        databaseClient.mainDatabaseConnection.Open();
-        databaseClient.guildDatabaseConnection.Open();
-
-        try
-        {
-            var remoteTables = await databaseClient._helper.ListTables(databaseClient.mainDatabaseConnection);
-
-            foreach (var internalTable in TableDefinitions.TableList)
+            CreateConnection = () =>
             {
-                if (!remoteTables.Contains(internalTable.Name))
+                var conn = new MySqlConnection($"Server={bot.status.LoadedConfig.Secrets.Database.Host};" +
+                                               $"Port={bot.status.LoadedConfig.Secrets.Database.Port};" +
+                                               $"User Id={bot.status.LoadedConfig.Secrets.Database.Username};" +
+                                               $"Password={bot.status.LoadedConfig.Secrets.Database.Password};" +
+                                               $"Connection Timeout=60;" +
+                                               $"Connection Lifetime=30;" +
+                                               $"Database={bot.status.LoadedConfig.Secrets.Database.MainDatabaseName};");
+                return conn;
+            }
+        };
+        
+        databaseClient.guildDatabaseConnection = new()
+        {
+            CreateConnection = () =>
+            {
+                var conn = new MySqlConnection($"Server={bot.status.LoadedConfig.Secrets.Database.Host};" +
+                                               $"Port={bot.status.LoadedConfig.Secrets.Database.Port};" +
+                                               $"User Id={bot.status.LoadedConfig.Secrets.Database.Username};" +
+                                               $"Password={bot.status.LoadedConfig.Secrets.Database.Password};" +
+                                               $"Connection Timeout=60;" +
+                                               $"Connection Lifetime=30;" +
+                                               $"Database={bot.status.LoadedConfig.Secrets.Database.GuildDatabaseName};");
+                return conn;
+            }
+        };
+
+        void AddColumn(MySqlConnectionInformation connectionInfo, string tableName, PropertyInfo internalColumn, (string ColumnName, ColumnTypes ColumnType, bool Primary, long? MaxValue, string? Collation, bool Nullable, string Default) columnInfo)
+        {
+            using (var connection = connectionInfo.CreateConnection())
+            {
+                var sql = $"ALTER TABLE `{tableName}` ADD {databaseClient.Build(internalColumn)}";
+
+                var cmd = connection.CreateCommand();
+                cmd.CommandText = sql;
+
+                _ = databaseClient.RunCommand(cmd);
+
+                _logger.LogInfo("Created column '{Column}' in '{Table}'.", columnInfo.ColumnName, tableName); 
+            }
+        }
+
+        void ModifyColumn(MySqlConnectionInformation connectionInfo, string tableName, PropertyInfo internalColumn, (string ColumnName, ColumnTypes ColumnType, bool Primary, long? MaxValue, string? Collation, bool Nullable, string Default) columnInfo)
+        {
+            using (var connection = connectionInfo.CreateConnection())
+            {
+                var sql = $"ALTER TABLE `{tableName}` CHANGE `{columnInfo.ColumnName}` {databaseClient.Build(internalColumn)}";
+
+                var cmd = connection.CreateCommand();
+                cmd.CommandText = sql;
+
+                _ = databaseClient.RunCommand(cmd);
+
+                _logger.LogInfo("Changed column '{Column}' in '{Table}' to datatype '{NewDataType}'.",
+                    columnInfo.ColumnName,
+                    tableName,
+                    Enum.GetName(internalColumn.GetCustomAttribute<ColumnType>().Type).ToUpper()); 
+            }
+        }
+
+        void DropColumn(MySqlConnectionInformation connectionInfo, string tableName, string remoteColumn)
+        {
+            using (var connection = connectionInfo.CreateConnection())
+            {
+                var cmd = connection.CreateCommand();
+                cmd.CommandText = $"ALTER TABLE `{tableName}` DROP COLUMN `{remoteColumn}`";
+
+                _ = databaseClient.RunCommand(cmd); 
+            }
+        }
+
+        var remoteTables = databaseClient.ListTables(databaseClient.mainDatabaseConnection);
+
+        foreach (var keyValue in new KeyValuePair<Type, string>[]
+        {
+            new KeyValuePair<Type, string>(typeof(User), ""),
+            new KeyValuePair<Type, string>(typeof(Guild), ""),
+            new KeyValuePair<Type, string>(typeof(PhishingUrlEntry), ""),
+            new KeyValuePair<Type, string>(typeof(SubmittedUrlEntry), ""),
+            new KeyValuePair<Type, string>(typeof(GlobalNote), ""),
+            new KeyValuePair<Type, string>(typeof(BanDetails), "banned_guilds"),
+            new KeyValuePair<Type, string>(typeof(BanDetails), "banned_users"),
+            new KeyValuePair<Type, string>(typeof(BanDetails), "globalbans"),
+        })
+        {
+            var internalTable = keyValue.Key;
+            var tableName = keyValue.Value.IsNullOrWhiteSpace() ? internalTable.GetCustomAttribute<TableNameAttribute>().Name : keyValue.Value;
+            var propertyList = databaseClient.GetValidProperties(internalTable);
+
+            if (!remoteTables.Contains(tableName))
+            {
+                _logger.LogWarn("Missing table '{Name}'. Creating..", tableName);
+
+                _ = databaseClient.CreateTable(tableName, internalTable, databaseClient.mainDatabaseConnection);
+            }
+
+            var remoteColumns = databaseClient.ListColumns(tableName, databaseClient.mainDatabaseConnection);
+
+            foreach (var internalColumn in propertyList)
+            {
+                (string ColumnName, ColumnTypes ColumnType, bool Primary, long? MaxValue, string? Collation, bool Nullable, string Default) columnInfo;
+
+                try
                 {
-                    _logger.LogWarn("Missing table '{Name}'. Creating..", internalTable.Name);
-                    var sql = $"CREATE TABLE `{bot.status.LoadedConfig.Secrets.Database.MainDatabaseName}`.`{internalTable.Name}` ( {string.Join(", ", internalTable.GetProperties().Select(x => $"`{x.Name}` {x.PropertyType.Name.ToUpper()}{(x.TryGetCustomAttribute<MaxValueAttribute>(typeof(MaxValueAttribute), out var maxvalue) ? $"({maxvalue.MaxValue})" : "")}{(x.TryGetCustomAttribute<CollationAttribute>(typeof(CollationAttribute), out var collation) ? $" CHARACTER SET {collation.Collation[..collation.Collation.IndexOf("_")]} COLLATE {collation.Collation}" : "")}{(x.TryGetCustomAttribute<NullableAttribute>(typeof(NullableAttribute), out _) ? " NULL" : " NOT NULL")}"))}{(internalTable.GetProperties().Any(x => x.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _)) ? $", PRIMARY KEY (`{internalTable.GetProperties().First(x => x.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _)).Name}`)" : "")})";
-
-                    var cmd = databaseClient.mainDatabaseConnection.CreateCommand();
-                    cmd.CommandText = sql;
-                    cmd.Connection = databaseClient.mainDatabaseConnection;
-
-                    await databaseClient._queue.RunCommand(cmd);
-                    _logger.LogInfo("Created table '{Name}'.", internalTable.Name);
+                    columnInfo = databaseClient.GetPropertyInfo(internalColumn);
+                }
+                catch (Exception)
+                {
+                    continue;
                 }
 
-                var remoteColumns = await databaseClient._helper.ListColumns(databaseClient.mainDatabaseConnection, internalTable.Name);
+                if (columnInfo.ColumnName is null || columnInfo.ColumnType == ColumnTypes.Unknown)
+                    continue;
 
-                foreach (var internalColumn in internalTable.GetProperties())
+                if (!remoteColumns.Any(x => x.Name.ToLower() == columnInfo.ColumnName.ToLower()))
                 {
-                    if (!remoteColumns.ContainsKey(internalColumn.Name.ToLower()))
-                    {
-                        _logger.LogWarn("Missing column '{Column}' in '{Table}'. Creating..", internalColumn.Name, internalTable.Name);
-                        var sql = $"ALTER TABLE `{internalTable.Name}` ADD `{internalColumn.Name}` {internalColumn.PropertyType.Name.ToUpper()}{(internalColumn.TryGetCustomAttribute<MaxValueAttribute>(typeof(MaxValueAttribute), out var maxvalue1) ? $"({maxvalue1.MaxValue})" : "")}{(internalColumn.TryGetCustomAttribute<CollationAttribute>(typeof(CollationAttribute), out var collation) ? $" CHARACTER SET {collation.Collation[..collation.Collation.IndexOf("_")]} COLLATE {collation.Collation}" : "")}{(internalColumn.TryGetCustomAttribute<NullableAttribute>(typeof(NullableAttribute), out var nullable) ? " NULL" : " NOT NULL")}{(nullable is not null && internalColumn.TryGetCustomAttribute<DefaultAttribute>(typeof(DefaultAttribute), out var defaultv) ? $" DEFAULT '{defaultv.Default}'" : "")}{(internalColumn.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _) ? $", ADD PRIMARY KEY (`{internalColumn.Name}`)" : "")}";
+                    _logger.LogWarn("Missing column '{Column}' in '{Table}'. Creating..", columnInfo.ColumnName, tableName);
 
-                        var cmd = databaseClient.mainDatabaseConnection.CreateCommand();
-                        cmd.CommandText = sql;
-                        cmd.Connection = databaseClient.mainDatabaseConnection;
-
-                        await databaseClient._queue.RunCommand(cmd);
-
-                        _logger.LogInfo("Created column '{Column}' in '{Table}'.", internalColumn.Name, internalTable.Name);
-                        remoteColumns = await databaseClient._helper.ListColumns(databaseClient.mainDatabaseConnection, internalTable.Name);
-                    }
-
-                    if (remoteColumns[internalColumn.Name].ToLower() != internalColumn.PropertyType.Name.ToLower() + (internalColumn.TryGetCustomAttribute<MaxValueAttribute>(typeof(MaxValueAttribute), out var maxvalue) ? $"({maxvalue.MaxValue})" : ""))
-                    {
-                        _logger.LogWarn("Wrong data type for column '{Column}' in '{Table}'", internalColumn.Name, internalTable.Name);
-                        var sql = $"ALTER TABLE `{internalTable.Name}` CHANGE `{internalColumn.Name}` `{internalColumn.Name}` {internalColumn.PropertyType.Name.ToUpper()}{(maxvalue is not null ? $"({maxvalue.MaxValue})" : "")}{(internalColumn.TryGetCustomAttribute<CollationAttribute>(typeof(CollationAttribute), out var collation) ? $" CHARACTER SET {collation.Collation[..collation.Collation.IndexOf("_")]} COLLATE {collation.Collation}" : "")}{(internalColumn.TryGetCustomAttribute<NullableAttribute>(typeof(NullableAttribute), out var nullable) ? " NULL" : " NOT NULL")}{(nullable is not null && internalColumn.TryGetCustomAttribute<DefaultAttribute>(typeof(DefaultAttribute), out var defaultv) ? $" DEFAULT '{defaultv.Default}'" : "")}{(internalColumn.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _) ? $", ADD PRIMARY KEY (`{internalColumn.Name}`)" : "")}";
-
-                        var cmd = databaseClient.mainDatabaseConnection.CreateCommand();
-                        cmd.CommandText = sql;
-                        cmd.Connection = databaseClient.mainDatabaseConnection;
-
-                        await databaseClient._queue.RunCommand(cmd);
-
-                        _logger.LogInfo("Changed column '{Column}' in '{Table}' to datatype '{NewDataType}'.", internalColumn.Name, internalTable.Name, internalColumn.PropertyType.Name.ToUpper());
-                        remoteColumns = await databaseClient._helper.ListColumns(databaseClient.mainDatabaseConnection, internalTable.Name);
-                    }
+                    AddColumn(databaseClient.mainDatabaseConnection, tableName, internalColumn, columnInfo);
+                    remoteColumns = databaseClient.ListColumns(tableName, databaseClient.mainDatabaseConnection);
                 }
 
-                foreach (var remoteColumn in remoteColumns)
+                var remoteColumn = remoteColumns.First(x => x.Name == columnInfo.ColumnName);
+
+                var typeMatches = remoteColumn.Type.ToLower() == columnInfo.ColumnType.GetName().ToLower() + (columnInfo.MaxValue is not null ? $"({columnInfo.MaxValue})" : "");
+                var nullabilityMatches = remoteColumn.Nullable == columnInfo.Nullable;
+                var defaultMatches = remoteColumn.Default == columnInfo.Default;
+
+                if (!typeMatches || !nullabilityMatches || !defaultMatches)
                 {
-                    if (!internalTable.GetProperties().Any(x => x.Name == remoteColumn.Key))
-                    {
-                        _logger.LogWarn("Invalid column '{Column}' in '{Table}'", remoteColumn.Key, internalTable.Name);
+                    _logger.LogWarn("Wrong data type for column '{Column}' in '{Table}'\nType: {TypeMatch}\nNullable: {NullableMatch}\nDefault: {Default}",
+                        columnInfo.ColumnName, tableName, typeMatches, nullabilityMatches, defaultMatches);
 
-                        var cmd = databaseClient.mainDatabaseConnection.CreateCommand();
-                        cmd.CommandText = $"ALTER TABLE `{internalTable.Name}` DROP COLUMN `{remoteColumn.Key}`";
-                        cmd.Connection = databaseClient.mainDatabaseConnection;
+                    ModifyColumn(databaseClient.mainDatabaseConnection, tableName, internalColumn, columnInfo);
+                    remoteColumns = databaseClient.ListColumns(tableName, databaseClient.mainDatabaseConnection);
+                }
+            }
 
-                        await databaseClient._queue.RunCommand(cmd);
-                    }
+            foreach (var remoteColumn in remoteColumns)
+            {
+                if (!propertyList.Any(x => x.GetCustomAttribute<ColumnNameAttribute>()?.Name == remoteColumn.Name))
+                {
+                    _logger.LogWarn("Invalid column '{Column}' in '{Table}'", remoteColumn.Name, tableName);
+
+                    DropColumn(databaseClient.mainDatabaseConnection, tableName, remoteColumn.Name);
+                    remoteColumns = databaseClient.ListColumns(tableName, databaseClient.mainDatabaseConnection);
                 }
             }
         }
-        catch (Exception)
+
+
+        remoteTables = databaseClient.ListTables(databaseClient.guildDatabaseConnection);
+        foreach (var tableName in databaseClient.ListTables(databaseClient.guildDatabaseConnection).Where(x => x.IsDigitsOnly()))
         {
-            throw;
+            var internalTable = typeof(Member);
+            var propertyList = databaseClient.GetValidProperties(internalTable);
+
+            if (!remoteTables.Contains(tableName))
+            {
+                _logger.LogWarn("Missing table '{Name}'. Creating..", tableName);
+
+                _ = databaseClient.CreateTable(tableName, internalTable, databaseClient.guildDatabaseConnection);
+            }
+
+            var remoteColumns = databaseClient.ListColumns(tableName, databaseClient.guildDatabaseConnection);
+
+            foreach (var internalColumn in propertyList)
+            {
+                (string ColumnName, ColumnTypes ColumnType, bool Primary, long? MaxValue, string? Collation, bool Nullable, string Default) columnInfo;
+
+                try
+                {
+                    columnInfo = databaseClient.GetPropertyInfo(internalColumn);
+                }
+                catch (Exception)
+                {
+                    continue;
+                }
+
+                if (columnInfo.ColumnName is null || columnInfo.ColumnType == ColumnTypes.Unknown)
+                    continue;
+
+                if (!remoteColumns.Any(x => x.Name.ToLower() == columnInfo.ColumnName.ToLower()))
+                {
+                    _logger.LogWarn("Missing column '{Column}' in '{Table}'. Creating..", columnInfo.ColumnName, tableName);
+
+                    AddColumn(databaseClient.guildDatabaseConnection, tableName, internalColumn, columnInfo);
+                    remoteColumns = databaseClient.ListColumns(tableName, databaseClient.guildDatabaseConnection);
+                }
+
+                var remoteColumn = remoteColumns.First(x => x.Name == columnInfo.ColumnName);
+
+                var typeMatches = remoteColumn.Type.ToLower() == columnInfo.ColumnType.GetName().ToLower() + (columnInfo.MaxValue is not null ? $"({columnInfo.MaxValue})" : "");
+                var nullabilityMatches = remoteColumn.Nullable == columnInfo.Nullable;
+                var defaultMatches = remoteColumn.Default == columnInfo.Default;
+
+                if (!typeMatches || !nullabilityMatches || !defaultMatches)
+                {
+                    _logger.LogWarn("Wrong data type for column '{Column}' in '{Table}'\nType: {TypeMatch}\nNullable: {NullableMatch}\nDefault: {Default}",
+                        columnInfo.ColumnName, tableName, typeMatches, nullabilityMatches, defaultMatches);
+
+                    ModifyColumn(databaseClient.guildDatabaseConnection, tableName, internalColumn, columnInfo);
+                    remoteColumns = databaseClient.ListColumns(tableName, databaseClient.guildDatabaseConnection);
+                }
+            }
+
+            foreach (var remoteColumn in remoteColumns)
+            {
+                if (!propertyList.Any(x => x.GetCustomAttribute<ColumnNameAttribute>()?.Name == remoteColumn.Name))
+                {
+                    _logger.LogWarn("Invalid column '{Column}' in '{Table}'", remoteColumn.Name, tableName);
+
+                    DropColumn(databaseClient.guildDatabaseConnection, tableName, remoteColumn.Name);
+                    remoteColumns = databaseClient.ListColumns(tableName, databaseClient.guildDatabaseConnection);
+                }
+            }
         }
 
-        await databaseClient.CheckGuildTables();
-
-        _ = new Func<Task>(async () =>
-        {
-            _ = databaseClient.CheckDatabaseConnection(databaseClient.mainDatabaseConnection);
-            await Task.Delay(10000);
-            _ = databaseClient.CheckDatabaseConnection(databaseClient.guildDatabaseConnection);
-        }).CreateScheduledTask(DateTime.UtcNow.AddSeconds(10), "database-connection-watcher");
+        //await databaseClient.CheckGuildTables();
 
         bot.DatabaseClient = databaseClient;
-        bot.status.DatabaseInitialized = true;
         _logger.LogInfo("Connected to database.");
         return databaseClient;
     }
 
-    internal async Task CheckGuildTables()
+    /// <summary>
+    /// Runs a command.
+    /// </summary>
+    /// <param name="cmd">The command to run.</param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
+    internal Task RunCommand(MySqlCommand cmd)
     {
-        while (this._queue.QueueCount != 0)
-            await Task.Delay(500);
+        if (this.Disposed)
+            throw new Exception("DatabaseClient is disposed");
 
-        IEnumerable<string> GuildTables;
-
-        var retries = 1;
-
-        while (true)
+        using (cmd.Connection)
         {
-            try
-            {
-                GuildTables = await this._helper.ListTables(this.guildDatabaseConnection);
-                break;
-            }
-            catch (Exception ex)
-            {
-                if (retries >= 3)
-                {
-                    throw;
-                }
+            cmd.Connection.Open();
 
-                _logger.LogWarn("Failed to get a list of guild tables. Retrying in 1000ms.. ({current}/{max})", ex, retries, 3);
-                retries++;
-                await Task.Delay(1000);
-            }
-        }
+            _logger.LogTrace("Executing command on database '{database}': {command}", cmd.Connection.Database, cmd.CommandText.Truncate(300));
 
-        foreach (var b in this.Bot.Guilds)
-        {
-            if (!GuildTables.Contains($"{b.Key}"))
-            {
-                _logger.LogWarn("Missing table '{Guild}'. Creating..", b.Key);
-                var sql = $"CREATE TABLE `{this.Bot.status.LoadedConfig.Secrets.Database.GuildDatabaseName}`.`{b.Key}` ( {string.Join(", ", typeof(TableDefinitions.guild_users).GetProperties().Select(x => $"`{x.Name}` {x.PropertyType.Name.ToUpper()}{(x.TryGetCustomAttribute<MaxValueAttribute>(typeof(MaxValueAttribute), out var maxvalue) ? $"({maxvalue.MaxValue})" : "")}{(x.TryGetCustomAttribute<CollationAttribute>(typeof(CollationAttribute), out var collation) ? $" CHARACTER SET {collation.Collation[..collation.Collation.IndexOf("_")]} COLLATE {collation.Collation}" : "")}{(x.TryGetCustomAttribute<NullableAttribute>(typeof(NullableAttribute), out _) ? " NULL" : " NOT NULL")}"))}{(typeof(TableDefinitions.guild_users).GetProperties().Any(x => x.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _)) ? $", PRIMARY KEY (`{typeof(TableDefinitions.guild_users).GetProperties().First(x => x.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _)).Name}`)" : "")})";
+            _ = cmd.ExecuteNonQuery();
 
-                var cmd = this.guildDatabaseConnection.CreateCommand();
-                cmd.CommandText = sql;
-                cmd.Connection = this.guildDatabaseConnection;
-
-                await this._queue.RunCommand(cmd);
-                _logger.LogInfo("Created table '{Guild}'.", b.Key);
-            }
-        }
-
-        GuildTables = await this._helper.ListTables(this.guildDatabaseConnection);
-
-        foreach (var b in GuildTables)
-        {
-            if (b != "writetester")
-            {
-                var Columns = await this._helper.ListColumns(this.guildDatabaseConnection, b);
-
-                foreach (var col in typeof(TableDefinitions.guild_users).GetProperties())
-                {
-                    if (!Columns.ContainsKey(col.Name))
-                    {
-                        _logger.LogWarn("Missing column '{Column}' in '{Table}'. Creating..", col.Name, b);
-                        var sql = $"ALTER TABLE `{b}` ADD `{col.Name}` {col.PropertyType.Name.ToUpper()}{(col.TryGetCustomAttribute<MaxValueAttribute>(typeof(MaxValueAttribute), out var maxvalue1) ? $"({maxvalue1.MaxValue})" : "")}{col.PropertyType.Name.ToUpper()}{(col.TryGetCustomAttribute<CollationAttribute>(typeof(CollationAttribute), out var collation) ? $" CHARACTER SET {collation.Collation[..collation.Collation.IndexOf("_")]} COLLATE {collation.Collation}" : "")}{(col.TryGetCustomAttribute<NullableAttribute>(typeof(NullableAttribute), out var nullable) ? " NULL" : " NOT NULL")}{(nullable is not null && col.TryGetCustomAttribute<DefaultAttribute>(typeof(DefaultAttribute), out var defaultv) ? $" DEFAULT '{defaultv.Default}'" : "")}{(col.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _) ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
-
-                        var cmd = this.guildDatabaseConnection.CreateCommand();
-                        cmd.CommandText = sql;
-                        cmd.Connection = this.guildDatabaseConnection;
-
-                        await this._queue.RunCommand(cmd);
-
-                        _logger.LogInfo("Created column '{Column}' in '{Table}'.", col.Name, b);
-                        Columns = await this._helper.ListColumns(this.guildDatabaseConnection, b);
-                    }
-
-                    if (Columns[col.Name].ToLower() != col.PropertyType.Name.ToLower() + (col.TryGetCustomAttribute<MaxValueAttribute>(typeof(MaxValueAttribute), out var maxvalue) ? $"({maxvalue.MaxValue})" : ""))
-                    {
-                        _logger.LogWarn("Wrong data type for column '{Column}' in '{Table}'", col.Name, b);
-                        var sql = $"ALTER TABLE `{b}` CHANGE `{col.Name}` `{col.Name}` {col.PropertyType.Name.ToUpper()}{(maxvalue is not null ? $"({maxvalue.MaxValue})" : "")}{(col.TryGetCustomAttribute<CollationAttribute>(typeof(CollationAttribute), out var collation) ? $" CHARACTER SET {collation.Collation[..collation.Collation.IndexOf("_")]} COLLATE {collation.Collation}" : "")}{(col.TryGetCustomAttribute<NullableAttribute>(typeof(NullableAttribute), out var nullable) ? " NULL" : " NOT NULL")}{(nullable is not null && col.TryGetCustomAttribute<DefaultAttribute>(typeof(DefaultAttribute), out var defaultv) ? $" DEFAULT '{defaultv.Default}'" : "")}{(col.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _) ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
-
-                        var cmd = this.guildDatabaseConnection.CreateCommand();
-                        cmd.CommandText = sql;
-                        cmd.Connection = this.guildDatabaseConnection;
-
-                        await this._queue.RunCommand(cmd);
-
-                        _logger.LogInfo("Changed column '{Column}' in '{Table}' to datatype '{NewDataType}'.", col.Name, b, col.PropertyType.Name.ToUpper());
-                        Columns = await this._helper.ListColumns(this.guildDatabaseConnection, b);
-                    }
-                }
-
-                foreach (var col in Columns)
-                {
-                    if (!typeof(TableDefinitions.guild_users).GetProperties().Any(x => x.Name == col.Key))
-                    {
-                        _logger.LogWarn("Invalid column '{Column}' in '{Table}'", col.Key, b);
-
-                        var cmd = this.guildDatabaseConnection.CreateCommand();
-                        cmd.CommandText = $"ALTER TABLE `{b}` DROP COLUMN `{col.Key}`";
-                        cmd.Connection = this.guildDatabaseConnection;
-
-                        await this._queue.RunCommand(cmd);
-                    }
-                }
-            }
+            return Task.CompletedTask;
         }
     }
 
-    private async Task CheckDatabaseConnection(MySqlConnection connection)
+    /// <summary>
+    /// Sets a value in the database.
+    /// </summary>
+    /// <param name="table">The table to set the value in.</param>
+    /// <param name="columnKey">The unique column to look for.</param>
+    /// <param name="columnValue">The unique value to look for.</param>
+    /// <param name="columnToEdit">The column to edit.</param>
+    /// <param name="newValue">The new value.</param>
+    /// <param name="connection">The connection to use.</param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
+    /// <exception cref="InvalidOperationException"></exception>
+    internal Task SetValue(string table, string columnKey, object columnValue, string columnToEdit, object newValue, MySqlConnectionInformation connectionInfo)
     {
-        _ = new Func<Task>(async () =>
-        {
-            await this.CheckDatabaseConnection(connection);
-        }).CreateScheduledTask(DateTime.UtcNow.AddSeconds(120), "database-connection-watcher");
-
         if (this.Disposed)
-            return;
-
-        while (this._queue.QueueCount > 0)
-            await Task.Delay(100);
-
-        if (!await this._queue.RunPing(connection))
-        {
-            try
-            {
-                _logger.LogWarn("Pinging the database failed, attempting reconnect.");
-                connection.Open();
-                _logger.LogInfo("Reconnected to database.");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogFatal("Reconnecting to the database failed. Cannot sync changes to database", ex);
-                return;
-            }
-        }
+            throw new Exception("DatabaseClient is disposed");
 
         try
         {
-            var cmd = connection.CreateCommand();
-            cmd.CommandText = this._helper.GetSaveCommand("writetester");
+            using (var connection = connectionInfo.CreateConnection())
+            {
+                connection.Open();
 
-            cmd.CommandText += this._helper.GetValueCommand("writetester", 1);
+                if (newValue?.GetType() == typeof(bool))
+                    newValue = (bool)newValue ? "1" : "0";
 
-            _ = cmd.Parameters.AddWithValue($"aaa1", 1);
+                if (newValue?.GetType() == typeof(DateTime))
+                    newValue = ((DateTime)newValue).ToUniversalTime().Ticks;
+                
+                if (newValue?.GetType() == typeof(TimeSpan))
+                    newValue = ((TimeSpan)newValue).TotalSeconds;
 
-            cmd.CommandText = cmd.CommandText[..(cmd.CommandText.Length - 2)];
-            cmd.CommandText += this._helper.GetOverwriteCommand("writetester");
+                string? v;
 
-            cmd.Connection = connection;
-            await this._queue.RunCommand(cmd);
+                if (newValue is null)
+                    v = null;
+                else
+                    v = MySqlHelper.EscapeString(newValue?.ToString());
 
-            await this._helper.DeleteRow(connection, "writetester", "aaa", "1");
+                var v1 = new MySqlCommand(Regex.IsMatch(v ?? " ", @"^(?=.*SELECT.*FROM)(?!.*(?:CREATE|DROP|UPDATE|INSERT|ALTER|DELETE|ATTACH|DETACH)).*$", RegexOptions.IgnoreCase)
+                                        ? throw new InvalidOperationException("Sql detected.")
+                                        : $"UPDATE `{table}` SET `{columnToEdit}`={(v is not null ? $"'{v}'" : "NULL")} WHERE `{columnKey}`='{columnValue}'", connection).ExecuteNonQuery();
+
+                if (v1 != 1)
+                    throw new InvalidOperationException($"Affected more or less than 1 row: {v1} rows affected")
+                        .AddData("table", table)
+                        .AddData("columnKey", columnKey)
+                        .AddData("columnValue", columnValue)
+                        .AddData("columnToEdit", columnToEdit)
+                        .AddData("newValue", newValue)
+                        .AddData("newValueEscaped", v)
+                        .AddData("connection", connection);
+
+                GetCache[$"{table}-{columnKey}-{columnValue}-{columnToEdit}"] = new CacheItem(null, DateTime.MinValue);
+
+                return Task.CompletedTask;
+            }
         }
         catch (Exception ex)
         {
-            try
-            {
-                _logger.LogWarn("Creating a test value in database failed, reconnecting to database", ex);
-                connection.Close();
-                connection.Open();
-                _logger.LogInfo("Reconnected to database.");
-            }
-            catch (Exception ex1)
-            {
-                _logger.LogFatal("Reconnecting to the database failed. Cannot sync changes to database", ex1);
-                return;
-            }
+            var newEx = new AggregateException("Failed to update value in database", ex);
+            throw newEx;
         }
     }
 
-    private bool RunningFullSync = false;
-    private CancellationTokenSource FullSyncCancel = new();
-    private DateTimeOffset LastFullSync = DateTimeOffset.MinValue;
+    internal ConcurrentDictionary<string, CacheItem> GetCache = new();
+    internal record CacheItem(object item, DateTime CacheTime);
 
-    public async Task FullSyncDatabase(bool Important = false)
+    internal T GetValue<T>(string tableName, string columnKey, object columnValue, string columnToGet, MySqlConnectionInformation connectionInfo)
     {
         if (this.Disposed)
-            throw new Exception("DatabaseHelper is disposed");
+            throw new Exception("DatabaseClient is disposed");
 
-        if (Important && this.RunningFullSync)
+        T BuildReturnItem(object input)
         {
-            this.FullSyncCancel.Cancel();
-            while (this.RunningFullSync)
-                await Task.Delay(100);
+            if (typeof(T) == typeof(bool))
+                return (Convert.ToInt16(input) == 1) is T t ? t : throw new Exception("Impossible Exception.");
+
+            if (typeof(T) == typeof(DateTime))
+                return new DateTime(Convert.ToInt64(input), DateTimeKind.Utc) is T t ? t : throw new Exception("Impossible Exception.");
+
+            if (typeof(T) == typeof(TimeSpan))
+                return TimeSpan.FromSeconds(Convert.ToInt64(input)) is T t ? t : throw new Exception("Impossible Exception.");
+
+            return (T)Convert.ChangeType(input, typeof(T));
         }
 
-        if (!Important && this.LastFullSync.GetTimespanSince() < TimeSpan.FromMinutes(20))
-            return;
-
-        this.LastFullSync = DateTimeOffset.UtcNow;
-
-        if (this.RunningFullSync)
-            return;
-
-        bool IsCancellationRequested()
+        try
         {
-            if (this.FullSyncCancel.IsCancellationRequested)
+            if (GetCache.TryGetValue($"{tableName}-{columnKey}-{columnValue}-{columnToGet}", out var cacheItem) && cacheItem.CacheTime.GetTimespanSince() < TimeSpan.FromMilliseconds(2000))
             {
-                this.RunningFullSync = false;
-                this.FullSyncCancel = new();
-                return true;
+                return BuildReturnItem(cacheItem.item);
             }
 
-            return false;
-        }
-
-        this.RunningFullSync = true;
-
-        _logger.LogDebug("Running full database sync..");
-
-        if (this.mainDatabaseConnection == null || this.guildDatabaseConnection == null)
-        {
-            throw new NullReferenceException($"Could not update database entries");
-        }
-
-        List<Task> updateTasks = new();
-
-        async Task SyncTable(MySqlConnection conn, string table, IReadOnlyList<object> DatabaseInserts, string? propertyname = null)
-        {
-            if (IsCancellationRequested())
-                return;
-
-            propertyname ??= table;
-
-            if (!DatabaseInserts.Any())
-                return;
-
-            foreach (var chunk in DatabaseInserts.Chunk(3000))
+            using (var connection = connectionInfo.CreateConnection())
             {
-                _logger.LogDebug("Writing to table {table}/{propertyname} with {chunk} inserts", table, propertyname, chunk.Length);
+                connection.Open();
 
-                var cmd = conn.CreateCommand();
-                cmd.CommandText = this._helper.GetSaveCommand(table, propertyname);
+                var command = new MySqlCommand($"SELECT `{columnToGet}` FROM `{tableName}` WHERE `{columnKey}` = '{columnValue}'", connection);
 
-                for (var i = 0; i < chunk.Length; i++)
+                var reader = command.ExecuteReader();
+
+                string? value = null;
+                if (!reader.HasRows)
+                    return default;
+
+                while (reader.Read())
                 {
-                    var b = chunk[i];
-                    var properties = b.GetType().GetProperties();
+                    if (reader.IsDBNull(0))
+                        break;
 
-                    cmd.CommandText += this._helper.GetValueCommand(propertyname, i);
-                    for (var i1 = 0; i1 < properties.Length; i1++)
-                    {
-                        var prop = properties[i1];
-
-                        _ = cmd.Parameters.AddWithValue($"{prop.Name}{i}", ((BaseColumn)prop.GetValue(b)).GetValue());
-                    }
-                    properties = null;
+                    value = reader.GetString(0);
+                    break;
                 }
 
-                cmd.CommandText = cmd.CommandText[..(cmd.CommandText.Length - 2)];
-                cmd.CommandText += this._helper.GetOverwriteCommand(propertyname);
+                reader.Close();
 
-                cmd.Connection = conn;
-                await this._queue.RunCommand(cmd, QueuePriority.Critical);
-                cmd.Dispose();
-                cmd = null;
-                GC.Collect();
+                GetCache[$"{tableName}-{columnKey}-keys"] = new CacheItem(null, DateTime.MinValue);
+                GetCache[$"{tableName}-{columnKey}-{columnValue}-{columnToGet}"] = new CacheItem(value, DateTime.UtcNow);
+
+                return BuildReturnItem(value);
+            }
+        }
+        catch (Exception ex)
+        {
+            var newEx = new AggregateException("Failed to get value from database", ex);
+            throw newEx;
+        }
+    }
+
+    internal bool CreateTable(string tableName, Type internalTable, MySqlConnectionInformation connectionInfo)
+    {
+        if (this.Disposed)
+            throw new Exception("DatabaseClient is disposed");
+
+        if (this.ListTables(connectionInfo).Contains(tableName))
+            return false;
+
+        using (var connection = connectionInfo.CreateConnection())
+        {
+            var propertyList = this.GetValidProperties(internalTable);
+
+            var sql = $"CREATE TABLE `{connection.Database}`.`{tableName}` " +
+            $"( {string.Join(", ", propertyList.Select(x =>
+            {
+                if (x.GetCustomAttribute<ColumnNameAttribute>() is not null)
+                    return this.Build(x);
+
+                return string.Empty;
+            }).Where(x => !x.IsNullOrWhiteSpace()))}" +
+            $"{(propertyList.Any(x => x.GetCustomAttribute<PrimaryAttribute>() is not null) ?
+                $", PRIMARY KEY (`{this.GetPrimaryKey(internalTable).ColumnName}`)" : "")} )";
+
+            var cmd = connection.CreateCommand();
+            cmd.CommandText = sql;
+
+            _ = this.RunCommand(cmd);
+            _logger.LogInfo("Created table '{Name}'.", tableName); 
+        }
+
+        return true;
+    }
+
+    internal Task CreateRow(string tableName, Type type, object uniqueValue, MySqlConnectionInformation connectionInfo)
+    {
+        if (this.Disposed)
+            throw new Exception("DatabaseClient is disposed");
+
+        using (var connection = connectionInfo.CreateConnection())
+        {
+            var primaryColumn = this.GetPrimaryKey(type);
+
+            if (this.RowExists(tableName, primaryColumn.ColumnName, uniqueValue, connectionInfo))
+                return Task.CompletedTask;
+
+            var cmd = connection.CreateCommand();
+            cmd.CommandText = $"INSERT INTO `{tableName}` ( {string.Join(", ", this.GetValidProperties(type)
+                .Where(x =>
+                {
+                    try
+                    {
+                        var propInfo = this.GetPropertyInfo(x);
+                        return (!propInfo.Nullable) || propInfo.Primary;
+                    }
+                    catch (Exception)
+                    {
+                        return false;
+                    }
+                })
+                .Select(x =>
+                {
+                    return $"{this.GetPropertyInfo(x).ColumnName}";
+                }))} ) VALUES ( {string.Join(", ", this.GetValidProperties(type)
+                .Where(x =>
+                {
+                    try
+                    {
+                        var propInfo = this.GetPropertyInfo(x);
+
+                        return (!propInfo.Nullable) || propInfo.Primary;
+                    }
+                    catch (Exception)
+                    {
+                        return false;
+                    }
+                })
+                .Select(x =>
+                {
+                    return $"@{this.GetPropertyInfo(x).ColumnName}";
+                }))} )";
+
+            foreach (var property in this.GetValidProperties(type).Where(x =>
+                {
+                    try
+                    {
+                        var propInfo = this.GetPropertyInfo(x);
+
+                        return (!propInfo.Nullable) || propInfo.Primary;
+                    }
+                    catch (Exception)
+                    {
+                        return false;
+                    }
+                }))
+            {
+                var value = this.GetPropertyInfo(property);
+
+                if (value.Primary)
+                    _ = cmd.Parameters.AddWithValue($"@{value.ColumnName}", uniqueValue);
+                else
+                    _ = cmd.Parameters.AddWithValue($"@{value.ColumnName}", value.Default ?? (property.PropertyType.IsValueType ? Activator.CreateInstance(property.PropertyType) : null));
             }
 
-            DatabaseInserts = null;
-            GC.Collect();
+            _ = this.RunCommand(cmd);
+            GetCache[$"{tableName}-{primaryColumn.ColumnName}-keys"] = new CacheItem(null, DateTime.MinValue);
+            GetCache[$"{tableName}-{primaryColumn.ColumnName}-{uniqueValue}-exists"] = new CacheItem(null, DateTime.MinValue);
+            return Task.CompletedTask; 
         }
+    }
 
-        lock (this.Bot.Guilds)
+    internal bool CreateRow(string tableName, string key, object value, MySqlConnectionInformation connectionInfo)
+    {
+        if (this.Disposed)
+            throw new Exception("DatabaseClient is disposed");
+
+        using (var connection = connectionInfo.CreateConnection())
         {
-            updateTasks.Add(SyncTable(this.mainDatabaseConnection, "guilds", this.Bot.Guilds.Select(x => new TableDefinitions.guilds
+            if (this.RowExists(tableName, key, value, connectionInfo))
+                return false;
+
+            var cmd = connection.CreateCommand();
+            cmd.CommandText = $"INSERT INTO `{tableName}` ( {key} ) VALUES ( @value )";
+            _ = cmd.Parameters.AddWithValue($"@value", value);
+
+            _ = this.RunCommand(cmd);
+
+            GetCache[$"{tableName}-{key}-keys"] = new CacheItem(null, DateTime.MinValue);
+            GetCache[$"{tableName}-{key}-{value}-exists"] = new CacheItem(null, DateTime.MinValue);
+
+            return true; 
+        }
+    }
+
+    internal long GetRowCount(string tableName, MySqlConnectionInformation connectionInfo)
+    {
+        if (this.Disposed)
+            throw new Exception("DatabaseClient is disposed");
+
+        using (var connection = connectionInfo.CreateConnection())
+        {
+            connection.Open();
+
+            var Count = 0L;
+            using (var reader = connection.ExecuteReader($"SELECT COUNT(*) FROM `{tableName}`"))
             {
-                serverid = x.Key,
-
-                current_locale = x.Value.CurrentLocale,
-                override_locale = x.Value.OverrideLocale,
-
-                prefix = x.Value.PrefixSettings.Prefix,
-                prefix_disabled = x.Value.PrefixSettings.PrefixDisabled,
-
-                experience_use = x.Value.Experience.UseExperience,
-                experience_boost_bumpreminder = x.Value.Experience.BoostXpForBumpReminder,
-
-                auto_assign_role_id = x.Value.Join.AutoAssignRoleId,
-                joinlog_channel_id = x.Value.Join.JoinlogChannelId,
-                autoban_global_ban = x.Value.Join.AutoBanGlobalBans,
-                reapplyroles = x.Value.Join.ReApplyRoles,
-                reapplynickname = x.Value.Join.ReApplyNickname,
-
-                tokens_detect = x.Value.TokenLeakDetection.DetectTokens,
-
-                phishing_detect = x.Value.PhishingDetection.DetectPhishing,
-                phishing_warnonredirect = x.Value.PhishingDetection.AbuseIpDbReports,
-                phishing_abuseipdb = x.Value.PhishingDetection.WarnOnRedirect,
-                phishing_type = Convert.ToInt32(x.Value.PhishingDetection.PunishmentType),
-                phishing_reason = x.Value.PhishingDetection.CustomPunishmentReason,
-                phishing_time = Convert.ToInt64(x.Value.PhishingDetection.CustomPunishmentLength.TotalSeconds),
-
-                bump_enabled = x.Value.BumpReminder.Enabled,
-                bump_role = x.Value.BumpReminder.RoleId,
-                bump_channel = x.Value.BumpReminder.ChannelId,
-                bump_last_reminder = x.Value.BumpReminder.LastReminder.ToUniversalTime().Ticks,
-                bump_last_time = x.Value.BumpReminder.LastBump.ToUniversalTime().Ticks,
-                bump_last_user = x.Value.BumpReminder.LastUserId,
-                bump_message = x.Value.BumpReminder.MessageId,
-                bump_persistent_msg = x.Value.BumpReminder.PersistentMessageId,
-                bump_missed = x.Value.BumpReminder.BumpsMissed,
-
-                levelrewards = JsonConvert.SerializeObject(x.Value.LevelRewards),
-                auditlogcache = JsonConvert.SerializeObject(x.Value.ActionLog.ProcessedAuditLogs),
-
-                crosspostchannels = JsonConvert.SerializeObject(x.Value.Crosspost.CrosspostChannels),
-                crosspostdelay = x.Value.Crosspost.DelayBeforePosting,
-                crosspostexcludebots = x.Value.Crosspost.ExcludeBots,
-                crosspost_ratelimits = JsonConvert.SerializeObject(x.Value.Crosspost.CrosspostRatelimits),
-
-                reactionroles = JsonConvert.SerializeObject(x.Value.ReactionRoles),
-
-                actionlog_channel = x.Value.ActionLog.Channel,
-                actionlog_attempt_further_detail = x.Value.ActionLog.AttemptGettingMoreDetails,
-                actionlog_log_members_modified = x.Value.ActionLog.MembersModified,
-                actionlog_log_member_modified = x.Value.ActionLog.MemberModified,
-                actionlog_log_memberprofile_modified = x.Value.ActionLog.MemberProfileModified,
-                actionlog_log_message_deleted = x.Value.ActionLog.MessageDeleted,
-                actionlog_log_message_updated = x.Value.ActionLog.MessageModified,
-                actionlog_log_roles_modified = x.Value.ActionLog.RolesModified,
-                actionlog_log_banlist_modified = x.Value.ActionLog.BanlistModified,
-                actionlog_log_guild_modified = x.Value.ActionLog.GuildModified,
-                actionlog_log_invites_modified = x.Value.ActionLog.InvitesModified,
-                actionlog_log_voice_state = x.Value.ActionLog.VoiceStateUpdated,
-                actionlog_log_channels_modified = x.Value.ActionLog.ChannelsModified,
-
-                vc_privacy_clear = x.Value.InVoiceTextPrivacy.ClearTextEnabled,
-                vc_privacy_perms = x.Value.InVoiceTextPrivacy.SetPermissionsEnabled,
-
-                invitetracker_enabled = x.Value.InviteTracker.Enabled,
-                invitetracker_cache = JsonConvert.SerializeObject(x.Value.InviteTracker.Cache),
-                invitenotes = JsonConvert.SerializeObject(x.Value.InviteNotes.Notes),
-
-                autounarchivelist = JsonConvert.SerializeObject(x.Value.AutoUnarchiveThreads),
-
-                normalizenames = x.Value.NameNormalizer.NameNormalizerEnabled,
-
-                embed_messages = x.Value.EmbedMessage.UseEmbedding,
-                embed_github = x.Value.EmbedMessage.UseGithubEmbedding,
-
-                lavalink_channel = x.Value.MusicModule.ChannelId,
-                lavalink_currentposition = x.Value.MusicModule.CurrentVideoPosition,
-                lavalink_currentvideo = x.Value.MusicModule.CurrentVideo,
-                lavalink_paused = x.Value.MusicModule.IsPaused,
-                lavalink_shuffle = x.Value.MusicModule.Shuffle,
-                lavalink_repeat = x.Value.MusicModule.Repeat,
-                lavalink_queue = JsonConvert.SerializeObject(x.Value.MusicModule.SongQueue),
-
-                polls = JsonConvert.SerializeObject(x.Value.Polls.RunningPolls),
-
-                vccreator_channelid = x.Value.VcCreator.Channel,
-                vccreator_channellist = JsonConvert.SerializeObject(x.Value.VcCreator.CreatedChannels),
-            }).ToList()));
-        }
-
-        lock (this.Bot.objectedUsers)
-        {
-            updateTasks.Add(SyncTable(this.mainDatabaseConnection, "objected_users", this.Bot.objectedUsers.Select(x => new TableDefinitions.objected_users
-            {
-                id = x
-            }).ToList()));
-        }
-
-        lock (this.Bot.Users)
-        {
-            updateTasks.Add(SyncTable(this.mainDatabaseConnection, "users", this.Bot.Users.Select(x => new TableDefinitions.users
-            {
-                userid = x.Key,
-                afk_since = x.Value.AfkStatus.TimeStamp.ToUniversalTime().Ticks,
-                afk_reason = x.Value.AfkStatus.Reason,
-                afk_pings = JsonConvert.SerializeObject(x.Value.AfkStatus.Messages),
-                afk_pingamount = x.Value.AfkStatus.MessagesAmount,
-                experience_directmessageoptout = x.Value.ExperienceUser.DirectMessageOptOut,
-                submission_accepted_tos = x.Value.UrlSubmissions.AcceptedTOS,
-                submission_accepted_submissions = JsonConvert.SerializeObject(x.Value.UrlSubmissions.AcceptedSubmissions),
-                playlists = JsonConvert.SerializeObject(x.Value.UserPlaylists),
-                reminders = JsonConvert.SerializeObject(x.Value.Reminders.ScheduledReminders),
-                submission_last_datetime = x.Value.UrlSubmissions.LastTime.Ticks,
-                scoresaber_id = x.Value.ScoreSaber.Id,
-                last_google_source = x.Value.Translation.LastGoogleSource,
-                last_google_target = x.Value.Translation.LastGoogleTarget,
-                last_libretranslate_source = x.Value.Translation.LastLibreTranslateSource,
-                last_libretranslate_target = x.Value.Translation.LastLibreTranslateTarget,
-                current_locale = x.Value.CurrentLocale,
-                override_locale = x.Value.OverrideLocale,
-                data_deletion_date = x.Value.Data.DeletionRequestDate.Ticks,
-                deletion_requested = x.Value.Data.DeletionRequested,
-                last_data_request = x.Value.Data.LastDataRequest.Ticks,
-                blocked_users = JsonConvert.SerializeObject(x.Value.BlockedUsers),
-                translationreport_accepted_tos = x.Value.TranslationReports.AcceptedTOS,
-                translationreport_ratelimit_first = x.Value.TranslationReports.FirstRequestTime.Ticks,
-                translationreport_ratelimit_count = x.Value.TranslationReports.RequestCount,
-            }).ToList()));
-        }
-
-        lock (this.Bot.bannedUsers)
-        {
-            updateTasks.Add(SyncTable(this.mainDatabaseConnection, "banned_users", this.Bot.bannedUsers.Select(x => new TableDefinitions.banned_users
-            {
-                id = x.Key,
-                reason = x.Value.Reason,
-                moderator = x.Value.Moderator,
-                timestamp = x.Value.Timestamp.Ticks
-            }).ToList()));
-        }
-
-        lock (this.Bot.bannedGuilds)
-        {
-            updateTasks.Add(SyncTable(this.mainDatabaseConnection, "banned_guilds", this.Bot.bannedGuilds.Select(x => new TableDefinitions.banned_guilds
-            {
-                id = x.Key,
-                reason = x.Value.Reason,
-                moderator = x.Value.Moderator,
-                timestamp = x.Value.Timestamp.Ticks
-            }).ToList()));
-        }
-
-        lock (this.Bot.globalBans)
-        {
-            updateTasks.Add(SyncTable(this.mainDatabaseConnection, "globalbans", this.Bot.globalBans.Select(x => new TableDefinitions.globalbans
-            {
-                id = x.Key,
-                reason = x.Value.Reason,
-                moderator = x.Value.Moderator,
-                timestamp = x.Value.Timestamp.Ticks
-            }).ToList()));
-        }
-
-        lock (this.Bot.globalNotes)
-        {
-            updateTasks.Add(SyncTable(this.mainDatabaseConnection, "globalnotes", this.Bot.globalNotes.Select(x => new TableDefinitions.globalnotes
-            {
-                id = x.Key,
-                notes = JsonConvert.SerializeObject(x.Value),
-            }).ToList()));
-        }
-
-        lock (this.Bot.SubmittedHosts)
-        {
-            updateTasks.Add(SyncTable(this.mainDatabaseConnection, "active_url_submissions", this.Bot.SubmittedHosts.Select(x => new TableDefinitions.active_url_submissions
-            {
-                messageid = x.Key,
-                url = x.Value.Url,
-                submitter = x.Value.Submitter,
-                guild = x.Value.GuildOrigin
-            }).ToList()));
-        }
-
-        var check = this.CheckGuildTables();
-        try
-        { _ = check.Add(this.Bot); await check.WaitAsync(TimeSpan.FromSeconds(120)); }
-        catch { }
-
-        lock (this.Bot.Guilds)
-        {
-            foreach (var guild in this.Bot.Guilds)
-                updateTasks.Add(SyncTable(this.guildDatabaseConnection, $"{guild.Key}", guild.Value.Members.Select(x => new TableDefinitions.guild_users
+                while (reader.Read())
                 {
-                    userid = x.Key,
+                    Count = reader.GetInt64(0);
+                }
+            }
 
-                    experience = x.Value.Experience.Points,
-                    experience_level = x.Value.Experience.Level,
-                    experience_last_message = x.Value.Experience.Last_Message.ToUniversalTime().Ticks,
-                    first_join = x.Value.FirstJoinDate.ToUniversalTime().Ticks,
-                    last_leave = x.Value.LastLeaveDate.ToUniversalTime().Ticks,
-                    roles = JsonConvert.SerializeObject(x.Value.MemberRoles),
-                    saved_nickname = x.Value.SavedNickname,
-                    invite_code = x.Value.InviteTracker.Code,
-                    invite_user = x.Value.InviteTracker.UserId,
-                }).ToList(), "guild_users"));
+            return Count;
+        }
+    }
+
+    internal T[] GetRowKeys<T>(string tableName, string columnKey, MySqlConnectionInformation connectionInfo)
+    {
+        if (this.Disposed)
+            throw new Exception("DatabaseClient is disposed");
+
+        if (GetCache.TryGetValue($"{tableName}-{columnKey}-keys", out var cacheItem) && cacheItem.CacheTime.GetTimespanSince() < TimeSpan.FromMilliseconds(1000))
+        {
+            return (T[])cacheItem.item;
         }
 
-        lock (this.Bot.PhishingHosts)
+        using (var connection = connectionInfo.CreateConnection())
         {
-            updateTasks.Add(SyncTable(this.mainDatabaseConnection, "scam_urls", this.Bot.PhishingHosts.Select(x => new TableDefinitions.scam_urls
+            connection.Open();
+
+            var rows = new List<T>();
+            using (var reader = connection.ExecuteReader($"SELECT `{columnKey}` FROM `{tableName}`"))
             {
-                url = x.Value.Url,
-                origin = JsonConvert.SerializeObject(x.Value.Origin),
-                submitter = x.Value.Submitter
-            }).ToList()));
+                while (reader.Read())
+                {
+                    rows.Add((T)Convert.ChangeType(reader.GetString(0), typeof(T)));
+                }
+            }
+
+            var ts = rows.ToArray();
+            GetCache[$"{tableName}-{columnKey}-keys"] = new CacheItem(ts, DateTime.UtcNow);
+            return ts;
         }
-
-        while (updateTasks.Any(x => !x.IsCompleted))
-            await Task.Delay(100);
-
-        this.RunningFullSync = false;
-        _logger.LogInfo("Full database sync completed.");
-
-        await Task.Delay(1000);
-        GC.Collect();
     }
 
-    public async Task UpdateValue(string table, string columnKey, object rowKey, string columnToEdit, object newValue, MySqlConnection connection)
+    internal bool RowExists(string tableName, string columnKey, object columnValue, MySqlConnectionInformation connectionInfo)
     {
-        if (!this.Bot.status.DatabaseInitialLoadCompleted)
-            return;
+        if (this.Disposed)
+            throw new Exception("DatabaseClient is disposed");
 
-        _ = this._queue.RunCommand(new MySqlCommand(this._helper.GetUpdateValueCommand(table, columnKey, rowKey, columnToEdit, newValue), connection), QueuePriority.Low).Add(this.Bot);
-        return;
-    }
-
-    public async Task Dispose()
-    {
-        foreach (var b in ScheduledTaskExtensions.GetScheduledTasks().Where(x => x.CustomData?.ToString() == "database-connection-watcher"))
-            b.Delete();
-
-        var timeout = 0;
-
-        while (timeout < 30 && this._queue.QueueCount != 0)
+        if (GetCache.TryGetValue($"{tableName}-{columnKey}-{columnValue}-exists", out var cacheItem) && cacheItem.CacheTime.GetTimespanSince() < TimeSpan.FromMilliseconds(1000) && (bool)cacheItem.item)
         {
-            timeout++;
-            await Task.Delay(1000);
+            return true;
         }
+
+        using (var connection = connectionInfo.CreateConnection())
+        {
+            connection.Open();
+
+            var Exists = false;
+            using (var reader = connection.ExecuteReader($"SELECT EXISTS(SELECT 1 FROM `{tableName}` WHERE `{columnKey}` = '{columnValue}')"))
+            {
+                while (reader.Read())
+                {
+                    Exists = reader.GetInt16(0) >= 1;
+                }
+            }
+
+            //_logger.LogDebug("Column exists: {tableName}:{columnKey} = {columnValue}:{Exists}", tableName, columnKey, columnValue, Exists);
+            GetCache[$"{tableName}-{columnKey}-{columnValue}-exists"] = new CacheItem(Exists, DateTime.UtcNow);
+            return Exists;
+        }
+    }
+
+    internal IEnumerable<string> ListTables(MySqlConnectionInformation connectionInfo)
+    {
+        if (this.Disposed)
+            throw new Exception("DatabaseClient is disposed");
+
+        try
+        {
+            using (var connection = connectionInfo.CreateConnection())
+            {
+                connection.Open();
+
+                List<string> SavedTables = new();
+
+                using (var reader = connection.ExecuteReader($"SHOW TABLES"))
+                {
+                    while (reader.Read())
+                    {
+                        SavedTables.Add(reader.GetString(0));
+                    }
+                }
+
+                return SavedTables;
+            }
+        }
+        catch (Exception)
+        {
+            Thread.Sleep(1000);
+            return this.ListTables(connectionInfo);
+        }
+    }
+
+    internal (string Name, string Type, bool Nullable, string Key, string? Default, string Extra)[] ListColumns(string tableName, MySqlConnectionInformation connectionInfo)
+    {
+        if (this.Disposed)
+            throw new Exception("DatabaseClient is disposed");
+
+        try
+        {
+            using (var connection = connectionInfo.CreateConnection())
+            {
+                connection.Open();
+
+                List<(string Name, string Type, bool Nullable, string Key, string Default, string Extra)> Columns = new();
+
+                using (var reader = connection.ExecuteReader($"SHOW FIELDS FROM `{tableName}`"))
+                {
+                    while (reader.Read())
+                    {
+                        Columns.Add((reader.GetString(0), 
+                            reader.GetString(1), 
+                            (!reader.IsDBNull(2) ? reader.GetString(2) : "").ToLower() == "yes", 
+                            (!reader.IsDBNull(3) ? reader.GetString(3) : ""), 
+                            (!reader.IsDBNull(4) ? (reader.GetString(4).Contains("\\'") ? Regex.Match(reader.GetString(4), @"\\'(.*)\\'").Groups[1].Value : reader.GetString(4)) : null), 
+                            (!reader.IsDBNull(5) ? reader.GetString(5) : "")));
+                    }
+                }
+
+                return Columns.ToArray();
+            }
+        }
+        catch (Exception)
+        {
+            Thread.Sleep(1000);
+            return this.ListColumns(tableName, connectionInfo);
+        }
+    }
+
+    internal Task DeleteRow(string tableName, string columnKey, string columnValue, MySqlConnectionInformation connectionInfo)
+    {
+        if (this.Disposed)
+            throw new Exception("DatabaseClient is disposed");
+
+        using (var connection = connectionInfo.CreateConnection())
+        {
+            var cmd = connection.CreateCommand();
+            cmd.CommandText = $"DELETE FROM `{tableName}` WHERE {columnKey}='{columnValue}'";
+            cmd.Connection = connection;
+            return this.RunCommand(cmd); 
+        }
+    }
+    
+    internal Task ClearRows(string tableName, MySqlConnectionInformation connectionInfo)
+    {
+        if (this.Disposed)
+            throw new Exception("DatabaseClient is disposed");
+
+        using (var connection = connectionInfo.CreateConnection())
+        {
+            var cmd = connection.CreateCommand();
+            cmd.CommandText = $"TRUNCATE `{tableName}`";
+            cmd.Connection = connection;
+            return this.RunCommand(cmd); 
+        }
+    }
+
+    internal Task DropTable(string tableName, MySqlConnectionInformation connectionInfo)
+    {
+        if (this.Disposed)
+            throw new Exception("DatabaseClient is disposed");
+
+        using (var connection = connectionInfo.CreateConnection())
+        {
+            var cmd = connection.CreateCommand();
+            cmd.CommandText = $"DROP TABLE IF EXISTS `{tableName}`";
+            cmd.Connection = connection;
+            return this.RunCommand(cmd); 
+        }
+    }
+
+    internal Task Dispose()
+    {
+        if (this.Disposed)
+            throw new Exception("DatabaseClient is disposed");
 
         this.Disposed = true;
-
-        await this.mainDatabaseConnection.CloseAsync();
+        return Task.CompletedTask;
     }
 
-    public bool IsDisposed()
+    private string Build(PropertyInfo info)
     {
-        return this.Disposed;
+        var columnInfo = this.GetPropertyInfo(info);
+
+        var defaultText = string.Empty;
+
+        if (columnInfo.Default is not null)
+            switch (columnInfo.ColumnType)
+            {
+                case ColumnTypes.BigInt:
+                case ColumnTypes.Int:
+                case ColumnTypes.TinyInt:
+                    defaultText = $"{columnInfo.Default}";
+                    break;
+                case ColumnTypes.LongText:
+                case ColumnTypes.Text:
+                    defaultText = $"('{columnInfo.Default}')";
+                    break;
+                case ColumnTypes.VarChar:
+                    defaultText = $"'{columnInfo.Default}'";
+                    break;
+                default:
+                    break;
+            }
+
+        if (!columnInfo.Nullable && columnInfo.Default is null && !columnInfo.Primary)
+            throw new InvalidOperationException("A column should be either nullable, have a default value or be the primary key.")
+                .AddData("columnInfo", columnInfo);
+
+        return $"`{columnInfo.ColumnName}` {Enum.GetName(columnInfo.ColumnType).ToUpper()}" +
+               $"{(columnInfo.MaxValue is not null ? $"({columnInfo.MaxValue})" : "")}" +
+               $"{(columnInfo.Collation is not null ? $" CHARACTER SET {columnInfo.Collation[..columnInfo.Collation.IndexOf("_")]} COLLATE {columnInfo.Collation}" : "")}" +
+               $"{(columnInfo.Nullable ? " NULL" : " NOT NULL")}" +
+               $"{(columnInfo.Default is not null ? $" DEFAULT {defaultText}" : "")}";
     }
 }

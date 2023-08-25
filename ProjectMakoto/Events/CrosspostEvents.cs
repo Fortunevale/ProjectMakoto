@@ -22,7 +22,7 @@ internal sealed class CrosspostEvents : RequiresTranslation
 
         foreach (var b in this.Bot.Guilds[e.Guild.Id].Crosspost.CrosspostChannels.ToList())
             if (!e.Guild.Channels.ContainsKey(b))
-                _ = this.Bot.Guilds[e.Guild.Id].Crosspost.CrosspostChannels.Remove(b);
+                this.Bot.Guilds[e.Guild.Id].Crosspost.CrosspostChannels = this.Bot.Guilds[e.Guild.Id].Crosspost.CrosspostChannels.Remove(x => x.ToString(), b);
 
         if (!this.Bot.Guilds[e.Guild.Id].Crosspost.CrosspostChannels.Contains(e.Channel.Id))
             return;

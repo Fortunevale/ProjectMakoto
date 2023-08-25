@@ -46,7 +46,7 @@ internal sealed class ClearQueueCommand : BaseCommand
 
             if (ctx.DbGuild.MusicModule.collectedClearQueueVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
             {
-                ctx.DbGuild.MusicModule.SongQueue.Clear();
+                ctx.DbGuild.MusicModule.SongQueue = Array.Empty<Entities.Guilds.Lavalink.QueueInfo>();
                 ctx.DbGuild.MusicModule.collectedClearQueueVotes.Clear();
 
                 _ = await this.RespondOrEdit(embed: new DiscordEmbedBuilder
@@ -105,7 +105,7 @@ internal sealed class ClearQueueCommand : BaseCommand
 
                         if (ctx.DbGuild.MusicModule.collectedClearQueueVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
                         {
-                            ctx.DbGuild.MusicModule.SongQueue.Clear();
+                            ctx.DbGuild.MusicModule.SongQueue = Array.Empty<Entities.Guilds.Lavalink.QueueInfo>();
                             ctx.DbGuild.MusicModule.collectedClearQueueVotes.Clear();
 
                             _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder

@@ -71,7 +71,7 @@ internal sealed class TokenLeakEvents : RequiresTranslation
 
             var owner = this.Bot.status.LoadedConfig.Secrets.Github.TokenLeakRepoOwner;
             var repo = this.Bot.status.LoadedConfig.Secrets.Github.TokenLeakRepo;
-            var seconds = (long)DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds;
+            var seconds = (long)DateTime.UtcNow.Subtract(DateTime.MinValue).TotalSeconds;
 
             if (this.Bot.TokenInvalidator.SearchForString(token.Value).Item1)
             {

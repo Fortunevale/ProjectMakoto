@@ -75,7 +75,8 @@ internal sealed class GuildInfoCommand : BaseCommand
                                   $"> {(!guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressRoleSubbscriptionPurchaseNotificationReplies)).ToPillEmote(ctx.Bot)} **{this.GetString(this.t.Commands.Utility.GuildInfo.SystemMessagesRoleSticker)}**\n" +
                                   $"> {(!guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressGuildReminderNotifications)).ToPillEmote(ctx.Bot)} **{this.GetString(this.t.Commands.Utility.GuildInfo.SystemMessagesSetupTips)}**\n"));
 
-                _ = embed.AddField(new DiscordEmbedField(this.GetString(this.t.Commands.Utility.GuildInfo.GuildFeatures), $"{string.Join(", ", guild.RawFeatures.Select(x => $"`{string.Join(" ", x.Replace("_", " ").ToLower().Split(" ").Select(x => x.FirstLetterToUpper()))}`"))}"));
+                if (guild.RawFeatures.Count > 0)
+                    _ = embed.AddField(new DiscordEmbedField(this.GetString(this.t.Commands.Utility.GuildInfo.GuildFeatures), $"{string.Join(", ", guild.RawFeatures.Select(x => $"`{string.Join(" ", x.Replace("_", " ").ToLower().Split(" ").Select(x => x.FirstLetterToUpper()))}`"))}"));
 
                 var builder = new DiscordMessageBuilder().WithEmbed(embed);
 

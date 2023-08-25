@@ -95,27 +95,27 @@ internal sealed class RemoveCommand : BaseCommand
                 }
             }
 
-            if (!ctx.DbGuild.ReactionRoles.Any(x => x.Key == message.Id && x.Value.EmojiName == emoji_parameter.GetUniqueDiscordName()))
+            if (!ctx.DbGuild.ReactionRoles.Any(x => x.MessageId == message.Id && x.EmojiName == emoji_parameter.GetUniqueDiscordName()))
             {
                 embed.Description = this.GetString(CommandKey.NoReactionRoleFound);
                 _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, this.GetString(CommandKey.Title))));
                 return;
             }
 
-            var obj = ctx.DbGuild.ReactionRoles.First(x => x.Key == message.Id && x.Value.EmojiName == emoji_parameter.GetUniqueDiscordName());
+            var obj = ctx.DbGuild.ReactionRoles.First(x => x.MessageId == message.Id && x.EmojiName == emoji_parameter.GetUniqueDiscordName());
 
-            var role = ctx.Guild.GetRole(obj.Value.RoleId);
-            var channel = ctx.Guild.GetChannel(obj.Value.ChannelId);
-            var reactionMessage = await channel.GetMessageAsync(obj.Key);
-            _ = reactionMessage.DeleteReactionsEmojiAsync(obj.Value.GetEmoji(ctx.Client));
+            var role = ctx.Guild.GetRole(obj.RoleId);
+            var channel = ctx.Guild.GetChannel(obj.ChannelId);
+            var reactionMessage = await channel.GetMessageAsync(obj.MessageId);
+            _ = reactionMessage.DeleteReactionsEmojiAsync(obj.GetEmoji(ctx.Client));
 
-            _ = ctx.DbGuild.ReactionRoles.Remove(obj);
+            ctx.DbGuild.ReactionRoles = ctx.DbGuild.ReactionRoles.Remove(x => x.MessageId.ToString(), obj);
 
             embed.Description = this.GetString(CommandKey.RemovedReactionRole, true,
                 new TVar("Role", role.Mention),
                 new TVar("User", reactionMessage?.Author.Mention ?? "`/`"),
                 new TVar("Channel", reactionMessage?.Channel.Mention ?? "`/`"),
-                new TVar("Emoji", obj.Value.GetEmoji(ctx.Client)));
+                new TVar("Emoji", obj.GetEmoji(ctx.Client)));
             _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsSuccess(ctx, this.GetString(CommandKey.Title))));
         });
     }

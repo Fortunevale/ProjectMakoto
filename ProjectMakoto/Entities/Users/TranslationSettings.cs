@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Database.ColumnAttributes;
+
 namespace ProjectMakoto.Entities.Users;
 
 public sealed class TranslationSettings : RequiresParent<User>
@@ -15,48 +17,31 @@ public sealed class TranslationSettings : RequiresParent<User>
     {
     }
 
-    private string _LastGoogleSource { get; set; } = "";
+    [ColumnName("last_google_source"), ColumnType(ColumnTypes.Text), Collation("utf8mb4_0900_ai_ci"), Nullable]
     public string LastGoogleSource
     {
-        get => this._LastGoogleSource;
-        set
-        {
-            this._LastGoogleSource = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "last_google_source", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<string>("users", "userid", this.Parent.Id, "last_google_source", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Parent.Id, "last_google_source", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    private string _LastGoogleTarget { get; set; } = "";
+    [ColumnName("last_google_target"), ColumnType(ColumnTypes.Text), Collation("utf8mb4_0900_ai_ci"), Nullable]
     public string LastGoogleTarget
     {
-        get => this._LastGoogleTarget;
-        set
-        {
-            this._LastGoogleTarget = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "last_google_target", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<string>("users", "userid", this.Parent.Id, "last_google_target", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Parent.Id, "last_google_target", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-
-    private string _LastLibreTranslateSource { get; set; } = "";
+    [ColumnName("last_libretranslate_source"), ColumnType(ColumnTypes.Text), Collation("utf8mb4_0900_ai_ci"), Nullable]
     public string LastLibreTranslateSource
     {
-        get => this._LastLibreTranslateSource;
-        set
-        {
-            this._LastLibreTranslateSource = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "last_libretranslate_source", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<string>("users", "userid", this.Parent.Id, "last_libretranslate_source", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Parent.Id, "last_libretranslate_source", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    private string _LastLibreTranslateTarget { get; set; } = "";
+    [ColumnName("last_libretranslate_target"), ColumnType(ColumnTypes.Text), Collation("utf8mb4_0900_ai_ci"), Nullable]
     public string LastLibreTranslateTarget
     {
-        get => this._LastLibreTranslateTarget;
-        set
-        {
-            this._LastLibreTranslateTarget = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "last_libretranslate_target", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<string>("users", "userid", this.Parent.Id, "last_libretranslate_target", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Parent.Id, "last_libretranslate_target", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 }

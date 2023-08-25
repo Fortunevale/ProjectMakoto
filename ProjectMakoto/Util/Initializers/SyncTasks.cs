@@ -44,7 +44,7 @@ internal sealed class SyncTasks
 
                                     if (loadResult.LoadType != LavalinkLoadResultType.Track)
                                     {
-                                        _ = list.List.Remove(b);
+                                        list.List = list.List.Remove(x => x.Url, b);
                                         _logger.LogError("Failed to load video length for '{Url}'", b.Url);
                                         continue;
                                     }
@@ -54,6 +54,33 @@ internal sealed class SyncTasks
                                 }
 
                                 b.Length = VideoLengthCache[b.Url];
+                            }
+                        }
+                    }
+
+                    var userCache = new Dictionary<ulong, DiscordUser?>();
+
+                    if (user.Value.BlockedUsers.Length > 0)
+                    {
+                        for (var i = 0; i < user.Value.BlockedUsers.Length; i++)
+                        {
+                            var b = user.Value.BlockedUsers[i];
+
+                            if (!userCache.TryGetValue(b, out var victim))
+                            {
+                                if (bot.DiscordClient.TryGetUser(b, out var fetched))
+                                    userCache.Add(b, fetched);
+                                else
+                                    userCache.Add(b, null);
+
+                                victim = userCache[b];
+                            }
+
+                            if (victim is null || victim.Id == bot.DiscordClient.CurrentUser.Id || victim.Id == user.Key || victim.IsBot || (victim.Flags?.HasFlag(UserFlags.Staff) ?? false))
+                            {
+                                _logger.LogDebug("Removing '{victim}' from '{owner}' blocklist", b, user.Value.Id);
+                                i--;
+                                user.Value.BlockedUsers = user.Value.BlockedUsers.Remove(x => x.ToString(), b);
                             }
                         }
                     }
@@ -68,9 +95,9 @@ internal sealed class SyncTasks
             foreach (var guild in e.Guilds)
             {
                 if (!bot.Guilds.ContainsKey(guild.Key))
-                    bot.Guilds.Add(guild.Key, new Guild(guild.Key, bot));
+                    bot.Guilds.Add(guild.Key, new Guild(bot, guild.Key));
 
-                if (bot.Guilds[guild.Key].BumpReminder.Enabled)
+                if (bot.Guilds[guild.Key].BumpReminder.ChannelId != 0)
                 {
                     bot.BumpReminder.ScheduleBump(sender, guild.Key);
                 }
@@ -79,7 +106,7 @@ internal sealed class SyncTasks
                 {
                     _ = Task.Run(async () =>
                     {
-                        for (var i = 0; i < bot.Guilds[guild.Key].Crosspost.CrosspostChannels.Count; i++)
+                        for (var i = 0; i < bot.Guilds[guild.Key].Crosspost.CrosspostChannels.Length; i++)
                         {
                             if (guild.Value is null)
                                 return;
@@ -122,12 +149,8 @@ internal sealed class SyncTasks
                 _logger.LogError("Failed to run sync tasks", ex);
             }
 
-            List<DiscordUser> UserCache = new();
-
-            await Task.Delay(5000);
-
             while (!bot.status.LavalinkInitialized)
-                await Task.Delay(1000);
+                await Task.Delay(500);
 
             foreach (var guild in e.Guilds)
             {
@@ -148,23 +171,13 @@ internal sealed class SyncTasks
                             if (!channel.Users.Where(x => !x.IsBot).Any())
                                 throw new Exception("Channel empty");
 
-                            if (bot.Guilds[guild.Key].MusicModule.SongQueue.Count > 0)
+                            if (bot.Guilds[guild.Key].MusicModule.SongQueue.Length > 0)
                             {
-                                for (var i = 0; i < bot.Guilds[guild.Key].MusicModule.SongQueue.Count; i++)
+                                for (var i = 0; i < bot.Guilds[guild.Key].MusicModule.SongQueue.Length; i++)
                                 {
                                     var b = bot.Guilds[guild.Key].MusicModule.SongQueue[i];
 
                                     _logger.LogDebug("Fixing queue info for '{Url}'", b.Url);
-
-                                    b.guild = guild.Value;
-
-                                    if (!UserCache.Any(x => x.Id == b.UserId))
-                                    {
-                                        _logger.LogDebug("Fetching user '{UserId}'", b.UserId);
-                                        UserCache.Add(await bot.DiscordClient.GetUserAsync(b.UserId));
-                                    }
-
-                                    b.user = UserCache.First(x => x.Id == b.UserId);
                                 }
                             }
 
@@ -193,7 +206,7 @@ internal sealed class SyncTasks
 
                             _ = await conn.PlayAsync(loadResult.GetResultAs<LavalinkTrack>());
 
-                            await Task.Delay(2000);
+                            await Task.Delay(1000);
                             _ = await conn.SeekAsync(TimeSpan.FromSeconds(bot.Guilds[guild.Key].MusicModule.CurrentVideoPosition));
 
                             bot.Guilds[guild.Key].MusicModule.QueueHandler(bot, bot.DiscordClient, node, conn);
@@ -202,7 +215,7 @@ internal sealed class SyncTasks
                     catch (Exception ex)
                     {
                         _logger.LogError("An exception occurred while trying to continue music playback for '{guild}'", ex, guild.Key);
-                        bot.Guilds[guild.Key].MusicModule = new(bot, bot.Guilds[guild.Key]);
+                        bot.Guilds[guild.Key].MusicModule.Reset();
                     }
                 });
 
@@ -253,31 +266,28 @@ internal sealed class SyncTasks
 
                 foreach (var member in guildMembers)
                 {
-                    if (!bot.Guilds[guild.Key].Members.ContainsKey(member.Id))
-                        bot.Guilds[guild.Key].Members.Add(member.Id, new(bot, bot.Guilds[guild.Key], member.Id));
-
                     bot.ExperienceHandler.CheckExperience(member.Id, guild.Value);
 
-                    if (bot.Guilds[guild.Key].Members[member.Id].FirstJoinDate == DateTime.UnixEpoch)
+                    if (bot.Guilds[guild.Key].Members[member.Id].FirstJoinDate == DateTime.MinValue)
                         bot.Guilds[guild.Key].Members[member.Id].FirstJoinDate = member.JoinedAt.UtcDateTime;
 
-                    if (bot.Guilds[guild.Key].Members[member.Id].LastLeaveDate != DateTime.UnixEpoch)
-                        bot.Guilds[guild.Key].Members[member.Id].LastLeaveDate = DateTime.UnixEpoch;
+                    if (bot.Guilds[guild.Key].Members[member.Id].LastLeaveDate != DateTime.MinValue)
+                        bot.Guilds[guild.Key].Members[member.Id].LastLeaveDate = DateTime.MinValue;
 
                     bot.Guilds[guild.Key].Members[member.Id].MemberRoles = member.Roles.Select(x => new MemberRole()
                     {
                         Id = x.Id,
                         Name = x.Name,
-                    }).ToList();
+                    }).ToArray();
 
                     bot.Guilds[guild.Key].Members[member.Id].SavedNickname = member.Nickname;
                 }
 
-                foreach (var databaseMember in bot.Guilds[guild.Key].Members.ToList())
+                foreach (var databaseMember in bot.Guilds[guild.Key].Members)
                 {
                     if (!guildMembers.Any(x => x.Id == databaseMember.Key))
                     {
-                        if (bot.Guilds[guild.Key].Members[databaseMember.Key].LastLeaveDate == DateTime.UnixEpoch)
+                        if (bot.Guilds[guild.Key].Members[databaseMember.Key].LastLeaveDate == DateTime.MinValue)
                             bot.Guilds[guild.Key].Members[databaseMember.Key].LastLeaveDate = DateTime.UtcNow;
                     }
                 }
@@ -287,8 +297,8 @@ internal sealed class SyncTasks
                     if (!bot.Guilds[guild.Key].Members.ContainsKey(banEntry.User.Id))
                         continue;
 
-                    if (bot.Guilds[guild.Key].Members[banEntry.User.Id].MemberRoles.Count > 0)
-                        bot.Guilds[guild.Key].Members[banEntry.User.Id].MemberRoles.Clear();
+                    if (bot.Guilds[guild.Key].Members[banEntry.User.Id].MemberRoles.Length > 0)
+                        bot.Guilds[guild.Key].Members[banEntry.User.Id].MemberRoles = Array.Empty<MemberRole>();
 
                     if (bot.Guilds[guild.Key].Members[banEntry.User.Id].SavedNickname != "")
                         bot.Guilds[guild.Key].Members[banEntry.User.Id].SavedNickname = "";
@@ -344,6 +354,5 @@ internal sealed class SyncTasks
         runningTasks.Clear();
 
         _logger.LogInfo("Sync Tasks successfully finished for {startupTasksSuccess}/{GuildCount} guilds.", startupTasksSuccess, Guilds.Count);
-        _ = bot.DatabaseClient.FullSyncDatabase();
     }
 }

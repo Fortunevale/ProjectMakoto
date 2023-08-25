@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Database.ColumnAttributes;
+
 namespace ProjectMakoto.Entities.Guilds;
 
 public sealed class EmbedMessageSettings : RequiresParent<Guild>
@@ -15,25 +17,17 @@ public sealed class EmbedMessageSettings : RequiresParent<Guild>
     {
     }
 
-    private bool _UseEmbedding { get; set; } = false;
+    [ColumnName("embed_messages"), ColumnType(ColumnTypes.TinyInt), Default("1")]
     public bool UseEmbedding
     {
-        get => this._UseEmbedding;
-        set
-        {
-            this._UseEmbedding = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "embed_messages", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "embed_messages",  this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "embed_messages", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    private bool _UseGithubEmbedding { get; set; } = false;
+    [ColumnName("embed_github"), ColumnType(ColumnTypes.TinyInt), Default("1")]
     public bool UseGithubEmbedding
     {
-        get => this._UseGithubEmbedding;
-        set
-        {
-            this._UseGithubEmbedding = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "embed_github", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "embed_github", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "embed_github", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 }

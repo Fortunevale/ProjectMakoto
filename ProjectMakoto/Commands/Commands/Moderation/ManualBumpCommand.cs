@@ -19,7 +19,7 @@ internal sealed class ManualBumpCommand : BaseCommand
         {
             var CommandKey = this.t.Commands.Moderation.ManualBump;
 
-            if (!ctx.DbGuild.BumpReminder.Enabled)
+            if (ctx.DbGuild.BumpReminder.ChannelId == 0)
             {
                 _ = this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(CommandKey.NotSetUp, true)).AsError(ctx));
                 return;
