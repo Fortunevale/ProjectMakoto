@@ -60,7 +60,7 @@ jobs:
         run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained --output "build" --property:PublishDir="build"
         working-directory: ProjectMakotoPreview/ProjectMakoto/
       - name: Create Version File
-        run: git rev-parse --short HEAD > "ProjectMakotoPreview/build/LatestGitPush.cfg" && git branch --show-current >> ProjectMakotoPreview/build/LatestGitPush.cfg && echo $(date +%d.%m.%y) >> ProjectMakotoPreview/build/LatestGitPush.cfg && echo $(date +%H:%M:%S,00) >> ProjectMakotoPreview/build/LatestGitPush.cfg
+        run: git rev-parse --short HEAD > "ProjectMakoto/build/LatestGitPush.cfg" && git branch --show-current >> ProjectMakoto/build/LatestGitPush.cfg && echo $(date +%d.%m.%y) >> ProjectMakoto/build/LatestGitPush.cfg && echo $(date +%H:%M:%S,00) >> ProjectMakoto/build/LatestGitPush.cfg
         working-directory: ProjectMakotoPreview/
       - name: Deploy to Preview Server
         run: rsync -avz --delete --force -e "ssh -p ${{ secrets.SSH_PORT }}" . ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_SERVER }}:/home/${{ secrets.SSH_USERNAME }}/Bots/latestProjectIchigoPreview/
