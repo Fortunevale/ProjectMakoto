@@ -8,7 +8,12 @@
 // but WITHOUT ANY WARRANTY
 
 using Octokit;
+using GenHTTP.Engine;
+using GenHTTP.Modules.IO;
+using GenHTTP.Modules.Practices;
 using ProjectMakoto.Entities.Plugins.Commands;
+using GenHTTP.Api.Infrastructure;
+using GenHTTP.Modules.StaticWebsites;
 
 namespace ProjectMakoto;
 
@@ -28,6 +33,8 @@ public sealed class Bot
     public MonitorClient MonitorClient { get; internal set; }
     public TokenInvalidatorRepository TokenInvalidator { get; internal set; }
     internal GitHubClient GithubClient { get; set; }
+
+    internal IServerHost WebServer { get; set; }
 
     #endregion Clients
 
@@ -140,6 +147,15 @@ public sealed class Bot
                                    Util.Initializers.ListLoader.Load(this), 
                                    Util.Initializers.TranslationLoader.Load(this), 
                                    Util.Initializers.PluginLoader.LoadPlugins(this));
+
+                _ = Directory.CreateDirectory("WebServer");
+
+                this.WebServer = Host.Create()
+                                    .Port(this.status.LoadedConfig.WebServer.Port)
+                                    .Console()
+                                    .Defaults(true, false, false, true, false, false)
+                                    .Handler(StaticWebsite.From(ResourceTree.FromDirectory("WebServer")))
+                                    .Start();
 
                 this.objectedUsers = new(this.DatabaseClient, "objected_users", "id", false);
 
@@ -399,6 +415,8 @@ public sealed class Bot
         this.ExitCalled = true;
 
         _logger.LogInfo("Preparing to shut down Makoto..");
+
+        _ = this.WebServer.Stop();
 
         foreach (var b in this.Plugins)
         {

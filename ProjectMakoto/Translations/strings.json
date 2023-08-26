@@ -6263,8 +6263,12 @@
         "de": "Mehrere Nachrichten gelöscht"
       },
       "CheckAttachedFileForDeletedMessages": {
-        "en": "Check the attached file to view the deleted messages",
-        "de": "Überprüfe die angehängte Datei, um die gelöschten Nachrichten anzuzeigen"
+        "en": "To view the messages, click the button below or download the attached file and view it in your browser.",
+        "de": "Um die gelöschten Dateien anzuzeigen, klicke den Knopf unter der Nachricht oder lade dir die angehängte Datei herunter und öffne sie mit deinem Browser."
+      },
+      "AffectedUsers": {
+        "en": "Affected Users",
+        "de": "Betroffene Benutzer"
       },
       "MessageUpdated": {
         "en": "Message updated",
