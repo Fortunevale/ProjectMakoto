@@ -256,7 +256,38 @@ public sealed partial class DatabaseClient : RequiresBotReference
             }
         }
 
-        //await databaseClient.CheckGuildTables();
+        if (bot.status.MigrationRequired)
+        {
+            foreach (var b in bot.Guilds.Keys)
+            {
+                bot.Guilds[b].VcCreator.CreatedChannels = JsonConvert.DeserializeObject<List<KeyValuePair<ulong, DatabaseMigration.VcCreatorChannelList>>>(
+                    databaseClient.GetValue<string>("guilds", "serverid", b, "vccreator_channellist", databaseClient.mainDatabaseConnection))
+                    .Select(x => new VcCreatorDetails
+                    {
+                        ChannelId = x.Key,
+                        OwnerId = x.Value.OwnerId,
+                        BannedUsers = x.Value.BannedUsers,
+                        LastRename = x.Value.LastRename,
+
+                        Bot = bot,
+                        Parent = bot.Guilds[b],
+                    }).ToArray();
+
+                bot.Guilds[b].ReactionRoles = JsonConvert.DeserializeObject<Dictionary<ulong, DatabaseMigration.ReactionRoles>>(
+                    databaseClient.GetValue<string>("guilds", "serverid", b, "reactionroles", databaseClient.mainDatabaseConnection))
+                    .Select(x => new ReactionRoleEntry
+                    {
+                        ChannelId = x.Value.ChannelId,
+                        EmojiId = x.Value.EmojiId,
+                        EmojiName = x.Value.EmojiName,
+                        MessageId = x.Key,
+                        RoleId = x.Value.RoleId,
+                        UUID = x.Value.UUID
+                    }).ToArray();
+
+                await databaseClient.SetValue("guilds", "serverid", b, "crosspost_ratelimits", "[]", databaseClient.mainDatabaseConnection);
+            }
+        }
 
         bot.DatabaseClient = databaseClient;
         _logger.LogInfo("Connected to database.");
