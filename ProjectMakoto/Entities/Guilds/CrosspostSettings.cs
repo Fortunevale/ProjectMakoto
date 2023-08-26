@@ -67,7 +67,7 @@ public sealed class CrosspostSettings : RequiresParent<Guild>
 
             try
             {
-                while (!this._queue.IsNotNullAndNotEmpty())
+                while (this._queue.Count == 0)
                     await Task.Delay(1000);
 
                 var keyValuePair = this._queue.First();
@@ -91,13 +91,13 @@ public sealed class CrosspostSettings : RequiresParent<Guild>
                     });
                 }
 
-                var r = this.CrosspostRatelimits[channel.Id];
+                var r = this.CrosspostRatelimits.First(x => x.Id == channel.Id);
 
                 _logger.LogDebug("Crosspost Ratelimit '{Channel}': First: {First}; Remaining: {Remaining}", channel.Id, r.FirstPost, r.PostsRemaining);
 
                 async Task Crosspost()
                 {
-                    if (message.Flags.HasValue && message.Flags.Value.HasMessageFlag(MessageFlags.Crossposted))
+                    if (message.Flags?.HasMessageFlag(MessageFlags.Crossposted) ?? false)
                         return;
 
                     r.PostsRemaining--;
