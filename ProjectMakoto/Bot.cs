@@ -164,7 +164,7 @@ public sealed class Bot
                     return new Entities.Guild(this, id);
                 });
                 
-                this.globalNotes = new(this.DatabaseClient, "guilds", "id", false, (id) =>
+                this.globalNotes = new(this.DatabaseClient, "globalnotes", "id", false, (id) =>
                 {
                     return new Entities.GlobalNote(this, id);
                 });
