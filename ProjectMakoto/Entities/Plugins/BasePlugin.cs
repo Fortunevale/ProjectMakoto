@@ -107,6 +107,7 @@ public abstract class BasePlugin
         return;
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter")]
     public void EnableCommandTranslations(ApplicationCommandsTranslationContext ctx)
     {
         return;

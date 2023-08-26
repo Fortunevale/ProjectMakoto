@@ -125,7 +125,7 @@ public sealed class TaskWatcher
                                         .WithDescription(sctx.BaseCommand.GetString(sctx.t.Commands.Common.Errors.UnhandledException, true, 
                                             new TVar("Message", $"```diff\n-{(Exception?.Message?.SanitizeForCode() ?? "No message captured.")}\n```"),
                                             new TVar("Timestamp", DateTime.UtcNow.AddSeconds(11).ToTimestamp())))
-                                        .AsBotError(sctx)))
+                                        .AsError(sctx)))
                                 .ContinueWith(x =>
                                 {
                                     if (!x.IsCompletedSuccessfully)

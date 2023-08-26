@@ -22,12 +22,12 @@ internal sealed class Disenroll2FAUserCommand : BaseCommand
 
             if (!ctx.Client.CheckTwoFactorEnrollmentFor(victim.Id))
             {
-                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{victim.GetUsernameWithIdentifier()} is not enrolled in Two Factor Authentication.`").AsBotError(ctx));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{victim.GetUsernameWithIdentifier()} is not enrolled in Two Factor Authentication.`").AsError(ctx));
                 return;
             }
 
             ctx.Client.DisenrollTwoFactor(victim.Id);
-            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Two Factor Authentication removed for {victim.GetUsername()}.`").AsBotSuccess(ctx));
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Two Factor Authentication removed for {victim.GetUsername()}.`").AsSuccess(ctx));
         });
     }
 }

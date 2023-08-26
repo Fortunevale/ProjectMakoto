@@ -23,7 +23,7 @@ internal sealed class InfoCommand : BaseCommand
                 _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                 {
                     Description = this.GetString(this.t.Commands.Utility.Data.Policy.NoPolicy, true, new TVar("Bot", ctx.CurrentUser.GetUsername())),
-                }.AsBotError(ctx));
+                }.AsError(ctx));
                 return;
             }
 

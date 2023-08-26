@@ -8,9 +8,9 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Commands;
-internal sealed class SocialCommandAbstractions
+internal static class SocialCommandAbstractions
 {
-    static HttpClient httpClient = null;
+    private static HttpClient httpClient = null;
 
     internal static async Task<Tuple<string, string>> GetGif(Bot bot, string action)
     {

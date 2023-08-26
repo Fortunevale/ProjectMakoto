@@ -23,6 +23,7 @@ internal class InvalidCallException : Exception
     
     public InvalidCallException(string? message, string stackTrace) : base(message)
     {
+        this.StackTrace = stackTrace;
     }
 
     public InvalidCallException(string? message, Exception? innerException) : base(message, innerException)

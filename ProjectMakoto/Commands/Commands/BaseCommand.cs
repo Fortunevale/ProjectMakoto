@@ -82,7 +82,7 @@ public abstract class BaseCommand
                     _ = ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AddEmbed(new DiscordEmbedBuilder()
                     {
                         Description = "`Please enroll in Two Factor Authentication via 'Enroll2FA'.`"
-                    }.AsBotError(this.ctx)).AsEphemeral());
+                    }.AsError(this.ctx)).AsEphemeral());
                     return;
                 }
                 else
@@ -410,7 +410,7 @@ public abstract class BaseCommand
         => this.GetString(key, false, false, vars);
 
     public string GetString(MultiTranslationKey key, bool Code = false, params TVar[] vars)
-        => this.GetString(key, true, false, vars);
+        => this.GetString(key, Code, false, vars);
 
     public string GetString(MultiTranslationKey key, bool Code = false, bool UseBoldMarker = false, params TVar[] vars)
         => key.Get(this.ctx.DbUser).Build(Code, UseBoldMarker, vars.Concat(this.GetDefaultVars()).ToArray());
@@ -921,7 +921,7 @@ public abstract class BaseCommand
         if (MaxTime.Value.TotalDays >= 1)
             _ = modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "days", this.GetString(this.t.Commands.Common.Prompts.TimespanDays).Build(new TVar("Max", ((int)MaxTime.Value.TotalDays))), "0", 1, 3, true, $"{DefaultTime.Value.Days}"));
 
-        var ModalResult = await this.PromptModalWithRetry(interaction, modal, false);
+        var ModalResult = await this.PromptModalWithRetry(interaction, modal, ResetToOriginalEmbed, timeOutOverride);
 
         if (ModalResult.TimedOut)
         {
@@ -979,7 +979,7 @@ public abstract class BaseCommand
         _ = modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "year", this.GetString(this.t.Commands.Common.Prompts.DateTimeYear), this.GetString(this.t.Commands.Common.Prompts.DateTimeYear), 1, 4, true, $"{DateTime.UtcNow.Year}"));
 
 
-        var ModalResult = await this.PromptModalWithRetry(interaction, modal, false);
+        var ModalResult = await this.PromptModalWithRetry(interaction, modal, ResetToOriginalEmbed, timeOutOverride);
 
         if (ModalResult.TimedOut)
         {

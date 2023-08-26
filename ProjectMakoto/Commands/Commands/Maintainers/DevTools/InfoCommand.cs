@@ -20,7 +20,7 @@ internal sealed class InfoCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForModerate(ctx))
                 return;
 
-            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Fetching system details..`").AsBotLoading(ctx));
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Fetching system details..`").AsLoading(ctx));
 
             var currentSystemStats = await ctx.Bot.MonitorClient.GetCurrent();
             var history = ctx.Bot.MonitorClient.GetHistory();
@@ -76,20 +76,20 @@ internal sealed class InfoCommand : BaseCommand
                 .AddField(new DiscordEmbedField("Bot uptime", $"`{Math.Round((DateTime.UtcNow - ctx.Bot.status.startupTime).TotalHours, 2)} hours`"))
                 .AddField(new DiscordEmbedField("Discord API Latency", $"`{ctx.Client.Ping}ms`"))
                 .AddField(new DiscordEmbedField("Server uptime", $"`{(ServerUptime.IsNullOrWhiteSpace() ? "Currently unavailable" : ServerUptime)}`"))
-                .AsBotInfo(ctx).WithFooter().WithTimestamp(null);
+                .AsInfo(ctx).WithFooter().WithTimestamp(null);
 
             var cpuEmbed1 = new DiscordEmbedBuilder().WithTitle("CPU").WithDescription($"`Load        `: `{currentSystemStats.Cpu.Load.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`\n" +
                                                                                        $"`  (15m avg.)`: `{history.Reverse().Take(45).Select(x => x.Value.Cpu.Load).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`\n" +
                                                                                        $"`  (30m avg.)`: `{history.Reverse().Take(90).Select(x => x.Value.Cpu.Load).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`\n" +
-                                                                                       $"`  (60m avg.)`: `{history.Reverse().Take(180).Select(x => x.Value.Cpu.Load).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`").AsBotLoading(ctx).WithFooter().WithTimestamp(null).WithAuthor();
+                                                                                       $"`  (60m avg.)`: `{history.Reverse().Take(180).Select(x => x.Value.Cpu.Load).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`").AsLoading(ctx).WithFooter().WithTimestamp(null).WithAuthor();
 
             var cpuEmbed2 = new DiscordEmbedBuilder().WithDescription($"`Temperature `: `{currentSystemStats.Cpu.Temperature.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n" +
                                                                       $"`  (15m avg.)`: `{history.Reverse().Take(45).Select(x => x.Value.Cpu.Temperature).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n" +
                                                                       $"`  (30m avg.)`: `{history.Reverse().Take(90).Select(x => x.Value.Cpu.Temperature).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n" +
-                                                                      $"`  (60m avg.)`: `{history.Reverse().Take(180).Select(x => x.Value.Cpu.Temperature).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n").AsBotInfo(ctx).WithFooter().WithTimestamp(null).WithAuthor();
+                                                                      $"`  (60m avg.)`: `{history.Reverse().Take(180).Select(x => x.Value.Cpu.Temperature).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n").AsInfo(ctx).WithFooter().WithTimestamp(null).WithAuthor();
 
 
-            var memoryEmbed = new DiscordEmbedBuilder().WithTitle("Memory").WithDescription($"`Usage`: `{currentSystemStats.Memory.Used.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}/{currentSystemStats.Memory.Total.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} MB`").AsBotLoading(ctx);
+            var memoryEmbed = new DiscordEmbedBuilder().WithTitle("Memory").WithDescription($"`Usage`: `{currentSystemStats.Memory.Used.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}/{currentSystemStats.Memory.Total.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} MB`").AsLoading(ctx);
 
             _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(new List<DiscordEmbed>() { miscEmbed, cpuEmbed1, memoryEmbed }));
 
@@ -155,7 +155,7 @@ internal sealed class InfoCommand : BaseCommand
             }
             finally
             {
-                _ = cpuEmbed1.AsBotInfo(ctx).WithFooter().WithTimestamp(null).WithAuthor();
+                _ = cpuEmbed1.AsInfo(ctx).WithFooter().WithTimestamp(null).WithAuthor();
             }
 
             if (currentSystemStats.Cpu.Temperature != 0)
@@ -282,7 +282,7 @@ internal sealed class InfoCommand : BaseCommand
             }
             finally
             {
-                _ = memoryEmbed.AsBotInfo(ctx).WithAuthor();
+                _ = memoryEmbed.AsInfo(ctx).WithAuthor();
             }
 
             var list = new List<DiscordEmbed>();

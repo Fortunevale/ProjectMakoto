@@ -113,7 +113,7 @@ public static class TranslationUtil
 
             var y = x;
 
-            if (y.StartsWith("**"))
+            if (y.StartsWith("**") && UseBoldMarker)
             {
                 boldLine = true;
                 y = y.Remove(0, 2);

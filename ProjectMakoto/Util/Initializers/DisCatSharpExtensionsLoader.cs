@@ -10,9 +10,9 @@
 using Microsoft.Extensions.Logging;
 
 namespace ProjectMakoto.Util.Initializers;
-internal sealed class DisCatSharpExtensionsLoader
+internal static class DisCatSharpExtensionsLoader
 {
-    public static async Task Load(Bot bot, string[] args)
+    public static async Task Load(Bot bot)
     {
         if (bot.status.LoadedConfig.Secrets.Discord.Token.Length <= 0)
         {

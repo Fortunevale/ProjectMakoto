@@ -15,12 +15,6 @@ dotnet_diagnostic.IDE1006.severity = silent
 # IDE0044: Add readonly modifier
 dotnet_diagnostic.IDE0044.severity = silent
 
-# IDE0060: Remove unused parameter
-dotnet_diagnostic.IDE0060.severity = silent
-
-# IDE0052: Remove unread private members
-dotnet_diagnostic.IDE0052.severity = silent
-
 # IDE0017: Simplify object initialization
 dotnet_diagnostic.CS8981.severity = silent
 dotnet_diagnostic.IDE0017.severity = silent
@@ -111,3 +105,6 @@ dotnet_style_prefer_simplified_boolean_expressions = true:suggestion
 dotnet_style_prefer_conditional_expression_over_assignment = true:silent
 dotnet_style_prefer_conditional_expression_over_return = true:silent
 file_header_template = Project Makoto\nCopyright (C) 2023  Fortunevale\nThis program is free software: you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation, either version 3 of the License, or\n(at your option) any later version.\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\nYou should have received a copy of the GNU General Public License\nalong with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# IDE0060: Remove unused parameter
+dotnet_diagnostic.IDE0060.severity = silent

@@ -210,7 +210,7 @@ public sealed class Bot
                 }
             });
 
-            await Util.Initializers.DisCatSharpExtensionsLoader.Load(this, args);
+            await Util.Initializers.DisCatSharpExtensionsLoader.Load(this);
 
             _logger.LogInfo("Connecting and authenticating with Discord..");
             await this.DiscordClient.ConnectAsync();
