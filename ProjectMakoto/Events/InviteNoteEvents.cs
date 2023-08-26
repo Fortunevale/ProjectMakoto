@@ -19,7 +19,8 @@ internal sealed class InviteNoteEvents : RequiresTranslation
 
     internal async Task InviteDeleted(DiscordClient sender, InviteDeleteEventArgs e)
     {
-        this.Bot.Guilds[e.Guild.Id].InviteNotes.Notes = this.Bot.Guilds[e.Guild.Id].InviteNotes.Notes
-            .Remove(x => x.Invite, this.Bot.Guilds[e.Guild.Id].InviteNotes.Notes.First(x => x.Invite == e.Invite.Code));
+        if (this.Bot.Guilds[e.Guild.Id].InviteNotes.Notes.Any(x => x.Invite == e.Invite.Code))
+            this.Bot.Guilds[e.Guild.Id].InviteNotes.Notes = this.Bot.Guilds[e.Guild.Id].InviteNotes.Notes
+                .Remove(x => x.Invite, this.Bot.Guilds[e.Guild.Id].InviteNotes.Notes.First(x => x.Invite == e.Invite.Code));
     }
 }
