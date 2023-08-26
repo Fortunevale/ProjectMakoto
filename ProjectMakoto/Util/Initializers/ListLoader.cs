@@ -8,7 +8,7 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Util.Initializers;
-internal sealed class ListLoader
+internal static class ListLoader
 {
     public static async Task Load(Bot bot)
     {

@@ -54,7 +54,7 @@ internal sealed class UserBlockEvents : RequiresTranslation
                 _ = joiningMember.SendMessageAsync(new DiscordEmbedBuilder()
                     .WithDescription(this.t.Commands.Social.BlockedByVictim.Get(joiningMember.GetDbEntry(this.Bot))
                         .Build(true, new TVar("User", membersWithBlocks.First().Mention)))
-                    .AsBotError(new SharedCommandContext()
+                    .AsError(new SharedCommandContext()
                     {
                         Bot = this.Bot,
                         User = e.User,
@@ -75,7 +75,7 @@ internal sealed class UserBlockEvents : RequiresTranslation
                 _ = joiningMember.SendMessageAsync(new DiscordEmbedBuilder()
                     .WithDescription(this.t.Commands.Social.BlockedVictim.Get(joiningMember.GetDbEntry(this.Bot))
                         .Build(true, new TVar("User", $"<@{this.Bot.Users[e.User.Id].BlockedUsers.First(blockedId => e.Channel.Users.Any(user => user.Id == blockedId))}>")))
-                    .AsBotError(new SharedCommandContext()
+                    .AsError(new SharedCommandContext()
                     {
                         Bot = this.Bot,
                         User = e.User,

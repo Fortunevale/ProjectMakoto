@@ -13,19 +13,7 @@ internal static class PreMadeEmbedsExtensions
 {
     public static DiscordEmbedBuilder AsLoading(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
     {
-        b.Author = ctx.Channel?.IsPrivate ?? false ? MakeDefaultBotAuthor(ctx.Client, CustomText) : MakeDefaultAuthor(ctx.Guild, CustomText);
-        b.Author.IconUrl = StatusIndicatorIcons.Loading;
-
-        b.Color = EmbedColors.Processing;
-        b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
-        b.Timestamp = DateTime.UtcNow;
-
-        return b;
-    }
-
-    public static DiscordEmbedBuilder AsBotLoading(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
-    {
-        b.Author = MakeDefaultBotAuthor(ctx.Client, CustomText);
+        b.Author = MakeDefaultAuthor(ctx.Client, CustomText);
         b.Author.IconUrl = StatusIndicatorIcons.Loading;
 
         b.Color = EmbedColors.Processing;
@@ -37,18 +25,7 @@ internal static class PreMadeEmbedsExtensions
 
     public static DiscordEmbedBuilder AsInfo(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
     {
-        b.Author = ctx.Channel?.IsPrivate ?? false ? MakeDefaultBotAuthor(ctx.Client, CustomText) : MakeDefaultAuthor(ctx.Guild, CustomText);
-
-        b.Color = EmbedColors.Info;
-        b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
-        b.Timestamp = DateTime.UtcNow;
-
-        return b;
-    }
-
-    public static DiscordEmbedBuilder AsBotInfo(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
-    {
-        b.Author = MakeDefaultBotAuthor(ctx.Client, CustomText);
+        b.Author = MakeDefaultAuthor(ctx.Client, CustomText);
 
         b.Color = EmbedColors.Info;
         b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
@@ -59,18 +36,7 @@ internal static class PreMadeEmbedsExtensions
 
     public static DiscordEmbedBuilder AsAwaitingInput(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
     {
-        b.Author = ctx.Channel?.IsPrivate ?? false ? MakeDefaultBotAuthor(ctx.Client, CustomText) : MakeDefaultAuthor(ctx.Guild, CustomText);
-
-        b.Color = EmbedColors.AwaitingInput;
-        b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
-        b.Timestamp = DateTime.UtcNow;
-
-        return b;
-    }
-
-    public static DiscordEmbedBuilder AsBotAwaitingInput(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
-    {
-        b.Author = MakeDefaultBotAuthor(ctx.Client, CustomText);
+        b.Author = MakeDefaultAuthor(ctx.Client, CustomText);
 
         b.Color = EmbedColors.AwaitingInput;
         b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
@@ -81,19 +47,7 @@ internal static class PreMadeEmbedsExtensions
 
     public static DiscordEmbedBuilder AsError(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
     {
-        b.Author = ctx.Channel?.IsPrivate ?? false ? MakeDefaultBotAuthor(ctx.Client, CustomText) : MakeDefaultAuthor(ctx.Guild, CustomText);
-        b.Author.IconUrl = StatusIndicatorIcons.Error;
-
-        b.Color = EmbedColors.Error;
-        b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
-        b.Timestamp = DateTime.UtcNow;
-
-        return b;
-    }
-
-    public static DiscordEmbedBuilder AsBotError(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
-    {
-        b.Author = MakeDefaultBotAuthor(ctx.Client, CustomText);
+        b.Author = MakeDefaultAuthor(ctx.Client, CustomText);
         b.Author.IconUrl = StatusIndicatorIcons.Error;
 
         b.Color = EmbedColors.Error;
@@ -105,19 +59,7 @@ internal static class PreMadeEmbedsExtensions
 
     public static DiscordEmbedBuilder AsWarning(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
     {
-        b.Author = ctx.Channel?.IsPrivate ?? false ? MakeDefaultBotAuthor(ctx.Client, CustomText) : MakeDefaultAuthor(ctx.Guild, CustomText);
-        b.Author.IconUrl = StatusIndicatorIcons.Warning;
-
-        b.Color = EmbedColors.Warning;
-        b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
-        b.Timestamp = DateTime.UtcNow;
-
-        return b;
-    }
-
-    public static DiscordEmbedBuilder AsBotWarning(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
-    {
-        b.Author = MakeDefaultBotAuthor(ctx.Client, CustomText);
+        b.Author = MakeDefaultAuthor(ctx.Client, CustomText);
         b.Author.IconUrl = StatusIndicatorIcons.Warning;
 
         b.Color = EmbedColors.Warning;
@@ -129,7 +71,7 @@ internal static class PreMadeEmbedsExtensions
 
     public static DiscordEmbedBuilder AsSuccess(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
     {
-        b.Author = ctx.Channel?.IsPrivate ?? false ? MakeDefaultBotAuthor(ctx.Client, CustomText) : MakeDefaultAuthor(ctx.Guild, CustomText);
+        b.Author = MakeDefaultAuthor(ctx.Client, CustomText);
         b.Author.IconUrl = StatusIndicatorIcons.Success;
 
         b.Color = EmbedColors.Success;
@@ -139,27 +81,9 @@ internal static class PreMadeEmbedsExtensions
         return b;
     }
 
-    public static DiscordEmbedBuilder AsBotSuccess(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
+    public static DiscordEmbedBuilder.EmbedAuthor MakeDefaultAuthor(DiscordClient client, string CustomText = "") => new()
     {
-        b.Author = MakeDefaultBotAuthor(ctx.Client, CustomText);
-        b.Author.IconUrl = StatusIndicatorIcons.Success;
-
-        b.Color = EmbedColors.Success;
-        b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
-        b.Timestamp = DateTime.UtcNow;
-
-        return b;
-    }
-
-    public static DiscordEmbedBuilder.EmbedAuthor MakeDefaultAuthor(DiscordGuild guild, string CustomText = "") => new()
-    {
-        Name = $"{(CustomText.IsNullOrWhiteSpace() ? "" : $"{CustomText} • ")}{guild.Name}",
-        IconUrl = (guild.IconHash.IsNullOrWhiteSpace() ? AuditLogIcons.QuestionMark : guild.IconUrl)
-    };
-
-    public static DiscordEmbedBuilder.EmbedAuthor MakeDefaultBotAuthor(DiscordClient client, string CustomText = "") => new()
-    {
-        Name = client.CurrentUser.GetUsername(),
+        Name = $"{(CustomText.IsNullOrWhiteSpace() ? "" : $"{CustomText} • ")}{client.CurrentUser.GetUsername()}",
         IconUrl = client.CurrentUser.AvatarUrl
     };
 
@@ -176,32 +100,6 @@ internal static class PreMadeEmbedsExtensions
             IconUrl = (!customIcon.IsNullOrWhiteSpace() ? customIcon : ctx.User.AvatarUrl),
             Text = $"{((Bot)ctx.Services.GetService(typeof(Bot))).LoadedTranslations.Commands.Common.UsedByFooter.Get(ctx.User).Build(new TVar("User", ctx.User.GetUsernameWithIdentifier()))}{(string.IsNullOrEmpty(addText) ? "" : $" • {addText}")}"
         };
-
-    public static async Task<DiscordMessage> SendCommandGroupHelp(this IReadOnlyList<Command> cmds, CommandContext ctx, string CustomText = "", string CustomImageUrl = "", string CustomParentName = "")
-    {
-        var embed = new DiscordEmbedBuilder
-        {
-            Author = new DiscordEmbedBuilder.EmbedAuthor
-            {
-                IconUrl = ctx.Guild.IconUrl,
-                Name = $"{(CustomParentName.IsNullOrWhiteSpace() ? cmds[0].Parent.Name.FirstLetterToUpper() : CustomParentName)} Command Help • {ctx.Guild.Name}"
-            },
-            Description = $"{string.Join("\n", cmds.Select(x => $"`{ctx.Prefix}{x.Parent.Name} {x.GenerateUsage()}` - _{x.Description}{x.Aliases.GenerateAliases()}_"))}\n\nArguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n**Do not include the brackets when using commands, they're merely an indicator for requirement.**",
-            Footer = ctx.GenerateUsedByFooter(),
-            Timestamp = DateTime.UtcNow,
-            Color = EmbedColors.Info
-        };
-
-        if (!string.IsNullOrWhiteSpace(CustomText))
-            embed.Description += CustomText;
-
-        if (!string.IsNullOrWhiteSpace(CustomImageUrl))
-            embed.ImageUrl += CustomImageUrl;
-
-        var msg = await ctx.Channel.SendMessageAsync(embed: embed, content: ctx.User.Mention);
-
-        return msg;
-    }
 
     public static async Task<DiscordMessage> SendSyntaxError(this CommandContext ctx, string CustomArguments = "")
     {
@@ -265,48 +163,4 @@ internal static class PreMadeEmbedsExtensions
         }
         return Usage.SanitizeForCode();
     }
-
-    public static string GenerateUsage(this DiscordApplicationCommand cmd, string? locale = null)
-    {
-        var Usage = cmd.NameLocalizations?.Localizations?.TryGetValue(locale ?? "-", out var localizedName) ?? false ? localizedName : cmd.Name;
-
-        if (cmd.Options.Count > 0)
-        {
-            foreach (var b in cmd.Options.Where(x => x.Type is not ApplicationCommandOptionType.SubCommand and not ApplicationCommandOptionType.SubCommandGroup))
-            {
-                var localizedUsage = b.NameLocalizations?.Localizations?.TryGetValue(locale ?? "-", out var localizedOption) ?? false ? localizedOption : b.Name;
-
-                Usage += " ";
-
-                if (!b.Required)
-                    Usage += $"[{localizedUsage}]";
-                else
-                    Usage += $"<{localizedUsage}>";
-            }
-        }
-        return Usage.SanitizeForCode();
-    }
-
-    public static string GenerateUsage(this DiscordApplicationCommandOption cmd, string? locale = null)
-    {
-        var Usage = cmd.NameLocalizations?.Localizations?.TryGetValue(locale ?? "-", out var localizedName) ?? false ? localizedName : cmd.Name;
-
-        if (cmd.Options?.Count > 0)
-        {
-            foreach (var b in cmd.Options.Where(x => x.Type is not ApplicationCommandOptionType.SubCommand and not ApplicationCommandOptionType.SubCommandGroup))
-            {
-                var localizedUsage = b.NameLocalizations?.Localizations?.TryGetValue(locale ?? "-", out var localizedOption) ?? false ? localizedOption : b.Name;
-
-                Usage += " ";
-
-                if (!b.Required)
-                    Usage += $"[{localizedUsage}]";
-                else
-                    Usage += $"<{localizedUsage}>";
-            }
-        }
-        return Usage.SanitizeForCode();
-    }
-
-    public static string GenerateAliases(this IReadOnlyList<string> aliases) => $"{(aliases.Count > 0 ? $" (Aliases: `{string.Join("`, `", aliases)}`)" : "")}";
 }

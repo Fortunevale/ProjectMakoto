@@ -180,6 +180,7 @@ public sealed class Translations
             public SingleTranslationKey PreviousContent;
             public SingleTranslationKey Message;
             public SingleTranslationKey MessageUpdated;
+            public SingleTranslationKey AffectedUsers;
             public SingleTranslationKey CheckAttachedFileForDeletedMessages;
             public SingleTranslationKey MultipleMessagesDeleted;
             public SingleTranslationKey UserSwitchedVoiceChannel;

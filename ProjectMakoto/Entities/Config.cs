@@ -36,6 +36,7 @@ public sealed class Config
 
     public string SupportServerInvite = "";
 
+    public WebServerConfig WebServer = new();
     public DiscordConfig Discord = new();
     public ChannelsConfig Channels = new();
     public EmojiConfig Emojis = new();
@@ -45,6 +46,12 @@ public sealed class Config
 
     public Dictionary<string, PluginInfo> PluginCache = new();
     public Dictionary<string, object> PluginData = new();
+
+    public sealed class WebServerConfig
+    {
+        public string UrlPrefix = string.Empty;
+        public ushort Port = 7878;
+    }
 
     public sealed class DiscordConfig
     {

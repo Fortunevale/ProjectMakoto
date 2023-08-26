@@ -12,7 +12,7 @@ using ProjectMakoto.Enums.ScoreSaber;
 
 namespace ProjectMakoto.Commands;
 
-internal sealed class ScoreSaberCommandAbstractions
+internal static class ScoreSaberCommandAbstractions
 {
     internal static async Task SendScoreSaberProfile(SharedCommandContext ctx, string id = "", bool AddLinkButton = true)
     {

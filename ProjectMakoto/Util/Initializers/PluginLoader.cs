@@ -14,7 +14,7 @@ using Microsoft.CodeAnalysis.Emit;
 using ProjectMakoto.Entities.Plugins.Commands;
 
 namespace ProjectMakoto.Util.Initializers;
-internal sealed class PluginLoader
+internal static class PluginLoader
 {
     private static string CachedUsings = "";
 

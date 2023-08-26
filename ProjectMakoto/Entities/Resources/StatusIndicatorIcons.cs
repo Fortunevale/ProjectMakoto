@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-internal sealed class StatusIndicatorIcons
+internal static class StatusIndicatorIcons
 {
     public static readonly string Loading = "https://media.discordapp.net/attachments/1005430437952356423/1006676441343201370/Loading.gif";
     public static readonly string Success = "https://media.discordapp.net/attachments/1005430437952356423/1006676420770136114/CheckMark_Icon.png";

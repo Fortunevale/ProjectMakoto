@@ -65,7 +65,6 @@ internal sealed class PhishingUrlHandler : RequiresBotReference
                 }
 
             urls.Clear();
-            GC.Collect();
         }
         catch (Exception ex)
         {

@@ -10,7 +10,7 @@
 using ProjectMakoto.Entities.Members;
 
 namespace ProjectMakoto.Util.Initializers;
-internal sealed class SyncTasks
+internal static class SyncTasks
 {
     internal static async Task GuildDownloadCompleted(Bot bot, DiscordClient sender, GuildDownloadCompletedEventArgs e)
     {

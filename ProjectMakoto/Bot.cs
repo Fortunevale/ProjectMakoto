@@ -8,7 +8,12 @@
 // but WITHOUT ANY WARRANTY
 
 using Octokit;
+using GenHTTP.Engine;
+using GenHTTP.Modules.IO;
+using GenHTTP.Modules.Practices;
 using ProjectMakoto.Entities.Plugins.Commands;
+using GenHTTP.Api.Infrastructure;
+using GenHTTP.Modules.StaticWebsites;
 
 namespace ProjectMakoto;
 
@@ -28,6 +33,8 @@ public sealed class Bot
     public MonitorClient MonitorClient { get; internal set; }
     public TokenInvalidatorRepository TokenInvalidator { get; internal set; }
     internal GitHubClient GithubClient { get; set; }
+
+    internal IServerHost WebServer { get; set; }
 
     #endregion Clients
 
@@ -141,6 +148,15 @@ public sealed class Bot
                                    Util.Initializers.TranslationLoader.Load(this), 
                                    Util.Initializers.PluginLoader.LoadPlugins(this));
 
+                _ = Directory.CreateDirectory("WebServer");
+
+                this.WebServer = Host.Create()
+                                    .Port(this.status.LoadedConfig.WebServer.Port)
+                                    .Console()
+                                    .Defaults(true, false, false, true, false, false)
+                                    .Handler(StaticWebsite.From(ResourceTree.FromDirectory("WebServer")))
+                                    .Start();
+
                 this.objectedUsers = new(this.DatabaseClient, "objected_users", "id", false);
 
                 this.PhishingHosts = new(this.DatabaseClient, "scam_urls", "url", false, (id) =>
@@ -164,7 +180,7 @@ public sealed class Bot
                     return new Entities.Guild(this, id);
                 });
                 
-                this.globalNotes = new(this.DatabaseClient, "guilds", "id", false, (id) =>
+                this.globalNotes = new(this.DatabaseClient, "globalnotes", "id", false, (id) =>
                 {
                     return new Entities.GlobalNote(this, id);
                 });
@@ -210,7 +226,7 @@ public sealed class Bot
                 }
             });
 
-            await Util.Initializers.DisCatSharpExtensionsLoader.Load(this, args);
+            await Util.Initializers.DisCatSharpExtensionsLoader.Load(this);
 
             _logger.LogInfo("Connecting and authenticating with Discord..");
             await this.DiscordClient.ConnectAsync();
@@ -230,6 +246,11 @@ public sealed class Bot
             {
                 if (this.status.LoadedConfig.DontModify.LastStartedVersion == this.status.RunningVersion)
                     return;
+
+                if (this.status.LoadedConfig.DontModify.LastStartedVersion == "8e5f2b2")
+                {
+                    this.status.MigrationRequired = true;
+                }
 
                 this.status.LoadedConfig.DontModify.LastStartedVersion = this.status.RunningVersion;
                 this.status.LoadedConfig.Save();
@@ -394,6 +415,8 @@ public sealed class Bot
         this.ExitCalled = true;
 
         _logger.LogInfo("Preparing to shut down Makoto..");
+
+        _ = this.WebServer.Stop();
 
         foreach (var b in this.Plugins)
         {

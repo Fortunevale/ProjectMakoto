@@ -35,6 +35,6 @@ internal class GlobalNote : RequiresBotReference
         public string UUID { get; set; } = Guid.NewGuid().ToString();
         public string Reason { get; set; }
         public ulong Moderator { get; set; }
-        public DateTime Timestamp { get; set; }
+        public DateTime Timestamp { get; set; } = DateTime.UtcNow;
     }
 }

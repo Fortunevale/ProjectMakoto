@@ -158,7 +158,7 @@ internal sealed class HelpCommand : BaseCommand
 
             var Fields = Commands.PrepareEmbedFields();
 
-            var discordEmbeds = Fields.PrepareEmbeds(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Utility.Help.Disclaimer)).AsBotInfo(ctx), true);
+            var discordEmbeds = Fields.PrepareEmbeds(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Utility.Help.Disclaimer)).AsInfo(ctx), true);
 
             var Page = 0;
 

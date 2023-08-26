@@ -228,12 +228,24 @@ internal sealed class ActionlogEvents : RequiresTranslation
         if (!await this.ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.MessageDeleted)
             return;
 
+        IEnumerable<string> affectedUsers = Array.Empty<string>();
+
+        try
+        {
+            affectedUsers = e.Messages.Where(x => x.Author is not null)
+                                        .Select(x => x.Author)
+                                        .GroupBy(x => x.Id).Select(x => x.First())
+                                        .Where(x => x is not null)
+                                        .Select(x => x?.Mention);
+        } catch { }
+
         var embed = new DiscordEmbedBuilder()
             .WithAuthor(this.tKey.MultipleMessagesDeleted.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.MessageDeleted)
             .WithColor(EmbedColors.Error)
             .WithTimestamp(DateTime.UtcNow)
             .WithDescription($"**{this.tKey.Channel.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Channel.Mention} `[{e.Channel.GetIcon()}{e.Channel.Name}]`\n" +
-                             $"{this.tKey.CheckAttachedFileForDeletedMessages.Get(this.Bot.Guilds[e.Guild.Id]).Build(true)}");
+                             $"{this.tKey.CheckAttachedFileForDeletedMessages.Get(this.Bot.Guilds[e.Guild.Id]).Build(true)}\n\n" +
+                             $"**{this.tKey.AffectedUsers.Get(this.Bot.Guilds[e.Guild.Id])}**: {(affectedUsers.Any() ? string.Join(", ", affectedUsers) : "`-`")}");
 
         string FileName;
         string Messages;
@@ -242,6 +254,9 @@ internal sealed class ActionlogEvents : RequiresTranslation
         {
             FileName = $"{Guid.NewGuid()}.html";
             Messages = e.Messages.GenerateHtmlFromMessages(this.Bot);
+
+            _ = Directory.CreateDirectory($"WebServer/{e.Guild.Id}/DeletedMessages");
+            File.WriteAllText($"WebServer/{e.Guild.Id}/DeletedMessages/{FileName}", Messages);
         }
         catch (Exception ex)
         {
@@ -264,7 +279,11 @@ internal sealed class ActionlogEvents : RequiresTranslation
             return;
 
         using (var fileStream = new MemoryStream(Encoding.UTF8.GetBytes(Messages)))
-            _ = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed).WithFile(FileName, fileStream));
+        {
+            _ = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed).WithFile(FileName, fileStream)
+                .AddComponents(new DiscordLinkButtonComponent($"{this.Bot.status.LoadedConfig.WebServer.UrlPrefix}/{e.Guild.Id}/DeletedMessages/{FileName}", "Open in Browser",
+                this.Bot.status.LoadedConfig.WebServer.UrlPrefix.IsNullOrWhiteSpace())));
+        }
     }
 
     internal async Task MessageUpdated(DiscordClient sender, MessageUpdateEventArgs e)

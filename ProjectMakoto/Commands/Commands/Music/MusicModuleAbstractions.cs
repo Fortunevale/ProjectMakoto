@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal sealed class MusicModuleAbstractions
+internal static class MusicModuleAbstractions
 {
     public static async Task<(List<LavalinkTrack> Tracks, LavalinkTrackLoadingResult oriResult, bool Continue)> GetLoadResult(SharedCommandContext ctx, string searchQuery)
     {
