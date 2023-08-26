@@ -1267,7 +1267,7 @@ public abstract class BaseCommand
         => _ = this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
             Description = $"📩 {this.GetString(this.t.Commands.Common.Errors.DirectMessage, true)}",
-            ImageUrl = (this.ctx.User.Presence.ClientStatus.Mobile.HasValue ? "https://cdn.discordapp.com/attachments/712761268393738301/867143225868681226/1q3uUtPAUU_4.gif" : "https://cdn.discordapp.com/attachments/712761268393738301/867133233984569364/1q3uUtPAUU_1.gif")
+            ImageUrl = (this.ctx.User.Presence.ClientStatus.Mobile.HasValue ? "https://cdn.discordapp.com/attachments/1005430437952356423/1144961395515998238/34rhz83ghtzu3ght.gif" : "https://cdn.discordapp.com/attachments/1005430437952356423/1144964670197862400/et2grtzu2ghrzi52.gif")
         }.AsError(this.ctx)));
 
     public void SendDmRedirect()
