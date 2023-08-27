@@ -20,7 +20,7 @@ public sealed class Guild : RequiresBotReference
         this.Id = serverId;
 
         _ = this.Bot.DatabaseClient.CreateRow("guilds", typeof(Guild), serverId, this.Bot.DatabaseClient.mainDatabaseConnection);
-        _ = this.Bot.DatabaseClient.CreateTable(serverId.ToString(), typeof(Guild), this.Bot.DatabaseClient.guildDatabaseConnection);
+        _ = this.Bot.DatabaseClient.CreateTable(serverId.ToString(), typeof(Member), this.Bot.DatabaseClient.guildDatabaseConnection);
 
         this.TokenLeakDetection = new(bot, this);
         this.PhishingDetection = new(bot, this);
