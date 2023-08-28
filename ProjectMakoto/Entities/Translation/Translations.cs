@@ -1453,6 +1453,8 @@ public sealed class Translations
                 public SingleTranslationKey DateTimeHour;
                 public SingleTranslationKey DateTimeMinute;
                 public SingleTranslationKey SelectADateTime;
+                public SingleTranslationKey ManuallyDefineTimespan;
+                public SingleTranslationKey CurrentTimespan;
                 public SingleTranslationKey TimespanDays;
                 public SingleTranslationKey TimespanHours;
                 public SingleTranslationKey TimespanMinutes;

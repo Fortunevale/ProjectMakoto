@@ -79,7 +79,7 @@ internal sealed class AutoCrosspostCommand : BaseCommand
             else if (Button.GetCustomId() == SetDelayButton.CustomId)
             {
 
-                var ModalResult = await this.PromptModalForTimeSpan(Button.Result.Interaction, TimeSpan.FromMinutes(5), TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(ctx.DbGuild.Crosspost.DelayBeforePosting), false);
+                var ModalResult = await this.PromptForTimeSpan(Button.Result.Interaction, TimeSpan.FromMinutes(5), TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(ctx.DbGuild.Crosspost.DelayBeforePosting), false);
 
                 if (ModalResult.TimedOut)
                 {

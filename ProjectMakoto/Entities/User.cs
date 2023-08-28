@@ -100,6 +100,13 @@ public sealed class User : RequiresBotReference
         get => this.Bot.DatabaseClient.GetValue<string>("users", "userid", this.Id, "override_locale", this.Bot.DatabaseClient.mainDatabaseConnection);
         set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Id, "override_locale", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
+    
+    [ColumnName("timezone"), ColumnType(ColumnTypes.Text), Collation("utf8mb4_0900_ai_ci"), Nullable]
+    public string? Timezone
+    {
+        get => this.Bot.DatabaseClient.GetValue<string>("users", "userid", this.Id, "timezone", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Id, "timezone", value, this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
 
     [JsonIgnore]
     public string? Locale

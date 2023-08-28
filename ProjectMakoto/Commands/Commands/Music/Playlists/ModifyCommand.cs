@@ -70,7 +70,7 @@ internal sealed class ModifyCommand : BaseCommand
                 }
 
                 var Description = $"**`{this.GetString(this.t.Commands.Music.Playlists.Modify.CurrentTrackCount, new TVar("Count", SelectedPlaylist.List.Length), new TVar("Timespan", TotalTimespan.GetHumanReadable()))}`**\n\n";
-                Description += $"{string.Join("\n", CurrentTracks.Select(x => $"**{GetInt()}**. `{x.Length.Value.GetShortHumanReadable(TimeFormat.HOURS)}` {this.GetString(this.t.Commands.Music.Playlists.Modify.Track, new TVar("Track", $"**[`{x.Title}`]({x.Url})**"), new TVar("Timestamp", Formatter.Timestamp(x.AddedTime)))}"))}";
+                Description += $"{string.Join("\n", CurrentTracks.Select(x => $"**{GetInt()}**. `{x.Length.Value.GetShortHumanReadable(TimeFormat.Hours)}` {this.GetString(this.t.Commands.Music.Playlists.Modify.Track, new TVar("Track", $"**[`{x.Title}`]({x.Url})**"), new TVar("Timestamp", Formatter.Timestamp(x.AddedTime)))}"))}";
 
                 if (SelectedPlaylist.List.Length > 0)
                     Description += $"\n\n`{this.GetString(this.t.Common.Page)} {CurrentPage + 1}/{Math.Ceiling(SelectedPlaylist.List.Length / 10.0)}`";

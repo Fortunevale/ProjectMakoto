@@ -94,7 +94,7 @@ internal sealed class PlayCommand : BaseCommand
 
                 _ = embed.AddField(new DiscordEmbedField($"📜 {this.GetString(this.t.Commands.Music.Play.QueuePosition)}", $"{ctx.DbGuild.MusicModule.SongQueue.Length}", true));
                 _ = embed.AddField(new DiscordEmbedField($"🔼 {this.GetString(this.t.Commands.Music.Play.Uploader)}", $"{track.Info.Author}", true));
-                _ = embed.AddField(new DiscordEmbedField($"🕒 {this.GetString(this.t.Commands.Music.Play.Duration)}", $"{track.Info.Length.GetHumanReadable(TimeFormat.MINUTES)}", true));
+                _ = embed.AddField(new DiscordEmbedField($"🕒 {this.GetString(this.t.Commands.Music.Play.Duration)}", $"{track.Info.Length.GetHumanReadable(TimeFormat.Minutes)}", true));
 
                 _ = embed.AsSuccess(ctx);
                 _ = await ctx.BaseCommand.RespondOrEdit(embed.Build());

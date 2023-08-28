@@ -63,7 +63,7 @@ internal sealed class QueueCommand : BaseCommand
                 }
 
                 var Description = $"{this.GetString(this.t.Commands.Music.Queue.QueueCount, true, new TVar("Count", ctx.DbGuild.MusicModule.SongQueue.Length), new TVar("Timespan", TotalTimespan.GetHumanReadable())).Bold()}\n\n";
-                Description += $"{string.Join("\n", ctx.DbGuild.MusicModule.SongQueue.Skip(CurrentPage * 10).Take(10).Select(x => $"**{GetInt()}**. `{x.Length.GetShortHumanReadable(TimeFormat.HOURS)}` {this.GetString(this.t.Commands.Music.Queue.Track, new TVar("Video", $"[`{x.VideoTitle}`]({x.Url})"), new TVar("Requester", $"<@{x.UserId}>"))}"))}\n\n";
+                Description += $"{string.Join("\n", ctx.DbGuild.MusicModule.SongQueue.Skip(CurrentPage * 10).Take(10).Select(x => $"**{GetInt()}**. `{x.Length.GetShortHumanReadable(TimeFormat.Hours)}` {this.GetString(this.t.Commands.Music.Queue.Track, new TVar("Video", $"[`{x.VideoTitle}`]({x.Url})"), new TVar("Requester", $"<@{x.UserId}>"))}"))}\n\n";
 
                 if (ctx.DbGuild.MusicModule.SongQueue.Length > 0)
                     Description += $"`{this.GetString(this.t.Common.Page)} {CurrentPage + 1}/{Math.Ceiling(ctx.DbGuild.MusicModule.SongQueue.Length / 10.0)}`\n\n";
@@ -75,7 +75,7 @@ internal sealed class QueueCommand : BaseCommand
 
                 if (conn.CurrentTrack is not null)
                 {
-                    Description += $"`[{((long)Math.Round(conn.Player.PlayerState.Position.TotalSeconds, 0)).GetShortHumanReadable(TimeFormat.MINUTES)}/{((long)Math.Round(conn.Player.Track.Info.Length.TotalSeconds, 0)).GetShortHumanReadable(TimeFormat.MINUTES)}]` ";
+                    Description += $"`[{((long)Math.Round(conn.Player.PlayerState.Position.TotalSeconds, 0)).GetShortHumanReadable(TimeFormat.Minutes)}/{((long)Math.Round(conn.Player.Track.Info.Length.TotalSeconds, 0)).GetShortHumanReadable(TimeFormat.Minutes)}]` ";
                     Description += $"`{StringTools.GenerateASCIIProgressbar(Math.Round(conn.Player.PlayerState.Position.TotalSeconds, 0), Math.Round(conn.Player.Track.Info.Length.TotalSeconds, 0))}`";
                 }
 

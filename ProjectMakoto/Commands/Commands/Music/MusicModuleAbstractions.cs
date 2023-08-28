@@ -133,7 +133,7 @@ internal static class MusicModuleAbstractions
             _ = await ctx.BaseCommand.RespondOrEdit(embed.Build());
 
             var UriResult = await ctx.BaseCommand.PromptCustomSelection(searchResults
-                .Select(x => new DiscordStringSelectComponentOption(x.Info.Title.TruncateWithIndication(100), x.Info.Uri.ToString(), $"🔼 {x.Info.Author} | 🕒 {x.Info.Length.GetHumanReadable(TimeFormat.MINUTES)}")).ToList());
+                .Select(x => new DiscordStringSelectComponentOption(x.Info.Title.TruncateWithIndication(100), x.Info.Uri.ToString(), $"🔼 {x.Info.Author} | 🕒 {x.Info.Length.GetHumanReadable(TimeFormat.Minutes)}")).ToList());
 
             if (UriResult.TimedOut)
             {

@@ -29,7 +29,7 @@ internal sealed class PhishingCommand : BaseCommand
                        $"{EmojiTemplates.GetAbuseIpDb(ctx.Bot)} `{this.GetString(CommandKey.AbuseIpDbReports).PadRight(pad)}` : {ctx.DbGuild.PhishingDetection.AbuseIpDbReports.ToEmote(ctx.Bot)}\n" +
                        $"🔨 `{this.GetString(CommandKey.PunishmentType).PadRight(pad)}` : `{GetTypeString(ctx.DbGuild.PhishingDetection.PunishmentType)}`\n" +
                        $"💬 `{this.GetString(CommandKey.CustomPunishmentReason).PadRight(pad)}` : `{ctx.DbGuild.PhishingDetection.CustomPunishmentReason}`\n" +
-                       $"🕒 `{this.GetString(CommandKey.CustomTimeoutLength).PadRight(pad)}` : `{ctx.DbGuild.PhishingDetection.CustomPunishmentLength.GetHumanReadable()}`";
+                       $"🕒 `{this.GetString(CommandKey.CustomTimeoutLength).PadRight(pad)}` : `{ctx.DbGuild.PhishingDetection.CustomPunishmentLength.GetHumanReadable(TimeFormat.Days, TranslationUtil.GetTranslatedHumanReadableConfig(ctx.DbUser, ctx.Bot))}`";
             }
 
             string GetTypeString(PhishingPunishmentType type)
@@ -195,7 +195,7 @@ internal sealed class PhishingCommand : BaseCommand
                 }
 
 
-                var ModalResult = await this.PromptModalForTimeSpan(Button.Result.Interaction, TimeSpan.FromDays(28), TimeSpan.FromSeconds(10), ctx.DbGuild.PhishingDetection.CustomPunishmentLength, false);
+                var ModalResult = await this.PromptForTimeSpan(Button.Result.Interaction, TimeSpan.FromDays(28), TimeSpan.FromSeconds(10), ctx.DbGuild.PhishingDetection.CustomPunishmentLength, false);
 
                 if (ModalResult.TimedOut)
                 {

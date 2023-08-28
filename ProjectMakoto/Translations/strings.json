@@ -2561,6 +2561,14 @@
           "en": "Days  (max. {Max})",
           "de": "Tage  (max. {Max})"
         },
+        "CurrentTimespan": {
+          "en": "Current Timespan",
+          "de": "Aktuell-gewählte Zeitspanne"
+        },
+        "ManuallyDefineTimespan": {
+          "en": "Manually define Timespan",
+          "de": "Zeitspanne manuell auswählen"
+        },
         "SelectADateTime": {
           "en": "Select a date and time",
           "de": "Ein Datum auswählen"
