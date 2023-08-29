@@ -126,7 +126,10 @@ public class DatabaseDictionary<T1, T2>
     /// <param name="key">The key to check for.</param>
     /// <returns>Whether the key exists in the database.</returns>
     public bool ContainsKey(T1 key)
-        => this.Keys.Contains(key);
+    {
+        var set = new HashSet<T1>(this.Keys);
+        return set.Contains(key);
+    }
 
     /// <summary>
     /// Gets the enumerator.
@@ -161,6 +164,14 @@ public class DatabaseDictionary<T1, T2>
     /// <returns></returns>
     public IReadOnlyDictionary<T1, T2> Fetch()
     {
+        var set = new HashSet<T1>(this.Keys);
+        foreach (var b in this._items)
+        {
+            if (!set.Contains(b.Key))
+                while (!this._items.Remove(b.Key, out _))
+                    Thread.Sleep(1);
+        }
+
         foreach (var b in this.Keys)
         {
             if (!this._items.ContainsKey(b))
@@ -170,14 +181,6 @@ public class DatabaseDictionary<T1, T2>
                 else
                     this._items[b] = default;
             }
-        }
-
-        var set = new HashSet<T1>(this.Keys);
-        foreach (var b in this._items)
-        {
-            if (set.Contains(b.Key))
-                while (!this._items.Remove(b.Key, out _))
-                    Thread.Sleep(1);
         }
 
         return _items.AsReadOnly();
