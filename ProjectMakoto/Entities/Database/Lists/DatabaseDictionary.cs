@@ -74,7 +74,7 @@ public class DatabaseDictionary<T1, T2>
     /// <summary>
     /// Gets a list of all keys.
     /// </summary>
-    public ICollection<T1> Keys
+    public T1[] Keys
         => this._client.GetRowKeys<T1>(this._tableName, this._primaryKey, this._connection);
 
     /// <summary>
@@ -172,9 +172,10 @@ public class DatabaseDictionary<T1, T2>
             }
         }
 
+        var set = new HashSet<T1>(this.Keys);
         foreach (var b in this._items)
         {
-            if (!this.Keys.Contains(b.Key))
+            if (set.Contains(b.Key))
                 while (!this._items.Remove(b.Key, out _))
                     Thread.Sleep(1);
         }
