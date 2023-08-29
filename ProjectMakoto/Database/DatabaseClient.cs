@@ -737,6 +737,8 @@ public sealed partial class DatabaseClient : RequiresBotReference
             var cmd = connection.CreateCommand();
             cmd.CommandText = $"DELETE FROM `{tableName}` WHERE {columnKey}='{columnValue}'";
             cmd.Connection = connection;
+
+            GetCache[$"{tableName}-{columnKey}-keys"] = new CacheItem(null, DateTime.MinValue);
             return this.RunCommand(cmd); 
         }
     }
@@ -751,6 +753,10 @@ public sealed partial class DatabaseClient : RequiresBotReference
             var cmd = connection.CreateCommand();
             cmd.CommandText = $"TRUNCATE `{tableName}`";
             cmd.Connection = connection;
+
+            foreach (var b in GetCache.Where(x => x.Key.StartsWith(tableName)))
+                GetCache[b.Key] = new CacheItem(null, DateTime.MinValue);
+
             return this.RunCommand(cmd); 
         }
     }
