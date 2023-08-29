@@ -362,18 +362,7 @@ internal static class DisCatSharpExtensionsLoader
                     if (bot.DatabaseClient.Disposed)
                         return;
 
-                    List<ulong> users = new();
-
-                    foreach (var b in bot.Guilds)
-                        foreach (var c in b.Value.Members)
-                            if (!users.Contains(c.Key))
-                                users.Add(c.Key);
-
-                    foreach (var b in bot.Users)
-                        if (!users.Contains(b.Key))
-                            users.Add(b.Key);
-
-                    await bot.DiscordClient.UpdateStatusAsync(activity: new DiscordActivity($"{bot.DiscordClient.Guilds.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} guilds | Up for {Math.Round((DateTime.UtcNow - bot.status.startupTime).TotalHours, 2).ToString(CultureInfo.CreateSpecificCulture("en-US"))}h", ActivityType.Playing));
+                    await bot.DiscordClient.UpdateStatusAsync(activity: new DiscordActivity($"{bot.DiscordClient.Guilds.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} guilds | Up for {Math.Round((DateTime.UtcNow - bot.status.startupTime).TotalHours, 1).ToString(CultureInfo.CreateSpecificCulture("en-US"))}h", ActivityType.Playing));
                     await Task.Delay(30000);
                 }
                 catch (Exception ex)
