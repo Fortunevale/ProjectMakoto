@@ -121,7 +121,7 @@ internal sealed class RemindersCommand : BaseCommand
                     else if (Menu.GetCustomId() == SelectDueDateButton.CustomId)
                     {
 
-                        var ModalResult = await this.PromptModalForDateTime(Menu.Result.Interaction, false);
+                        var ModalResult = await this.PromptModalForDateTime(Menu.Result.Interaction, selectedDueDate ?? DateTime.UtcNow.AddMinutes(5), false);
 
                         if (ModalResult.TimedOut)
                         {

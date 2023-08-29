@@ -558,7 +558,7 @@ internal sealed class CustomEmbedCommand : BaseCommand
                     }
                     else if (Menu1.GetCustomId() == SetTimestamp.CustomId)
                     {
-                        var ModalResult = await this.PromptModalForDateTime(Menu1.Result.Interaction, false);
+                        var ModalResult = await this.PromptModalForDateTime(Menu1.Result.Interaction, null, false);
 
                         if (ModalResult.TimedOut)
                         {

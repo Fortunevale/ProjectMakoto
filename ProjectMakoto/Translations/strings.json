@@ -2562,16 +2562,32 @@
           "de": "Tage  (max. {Max})"
         },
         "CurrentTimespan": {
-          "en": "Current Timespan",
+          "en": "Currently selected Timespan",
           "de": "Aktuell-gewählte Zeitspanne"
         },
         "ManuallyDefineTimespan": {
           "en": "Manually define Timespan",
           "de": "Zeitspanne manuell auswählen"
         },
+        "CurrentDateTime": {
+          "en": "Currently selected Date & Time",
+          "de": "Aktuell-gewählter Zeitpunkt"
+        },
         "SelectADateTime": {
           "en": "Select a date and time",
           "de": "Ein Datum auswählen"
+        },
+        "ManuallyDefineDateTime": {
+          "en": "Manually define Date & Time",
+          "de": "Zeitpunkt manuell auswählen"
+        },
+        "SelectTimezonePrompt": {
+          "en": "Please select your timezone.",
+          "de": "Bitte wähle deine Zeitzone aus."
+        },
+        "SelectTimezone": {
+          "en": "Change timezone",
+          "de": "Zeitzone ändern"
         },
         "DateTimeMinute": {
           "en": "Minute",
