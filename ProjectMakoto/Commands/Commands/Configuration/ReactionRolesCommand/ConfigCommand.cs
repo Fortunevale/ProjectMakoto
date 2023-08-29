@@ -313,7 +313,7 @@ internal sealed class ConfigCommand : BaseCommand
                         await this.ExecuteCommand(ctx, arguments);
                         return;
                     }
-                    else if (Menu.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
+                    else if (Menu.GetCustomId() == MessageComponents.CancelButtonId)
                     {
                         _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -364,7 +364,7 @@ internal sealed class ConfigCommand : BaseCommand
                 await this.ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
+            else if (e.GetCustomId() == MessageComponents.CancelButtonId)
             {
                 this.DeleteOrInvalidate();
                 return;

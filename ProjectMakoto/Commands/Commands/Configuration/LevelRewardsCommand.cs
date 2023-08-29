@@ -349,7 +349,7 @@ internal sealed class LevelRewardsCommand : BaseCommand
                                     ctx.Client.ComponentInteractionCreated += SelectInteraction;
                                     return;
                                 }
-                                else if (Menu.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
+                                else if (Menu.GetCustomId() == MessageComponents.CancelButtonId)
                                 {
                                     _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -432,7 +432,7 @@ internal sealed class LevelRewardsCommand : BaseCommand
                             CurrentPage++;
                             await RefreshMessage();
                         }
-                        else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
+                        else if (e.GetCustomId() == MessageComponents.CancelButtonId)
                         {
                             _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 

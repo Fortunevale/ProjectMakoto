@@ -210,7 +210,7 @@ internal sealed class ImportCommand : BaseCommand
                     return;
                 }
             }
-            else if (Menu.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
+            else if (Menu.GetCustomId() == MessageComponents.CancelButtonId)
             {
                 _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
                 return;

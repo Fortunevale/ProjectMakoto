@@ -188,7 +188,7 @@ internal sealed class ReportHostCommand : BaseCommand
                 _ = embed.AsSuccess(ctx, this.GetString(this.t.Commands.Utility.ReportHost.Title));
                 _ = await this.RespondOrEdit(embed);
             }
-            else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
+            else if (e.GetCustomId() == MessageComponents.CancelButtonId)
             {
                 this.DeleteOrInvalidate();
             }

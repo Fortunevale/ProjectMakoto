@@ -163,7 +163,7 @@ internal sealed class NewPlaylistCommand : BaseCommand
                     });
                     return;
                 }
-                else if (Menu.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
+                else if (Menu.GetCustomId() == MessageComponents.CancelButtonId)
                 {
                     if (!ctx.Transferred)
                         this.DeleteOrInvalidate();

@@ -214,7 +214,7 @@ internal sealed class AutoCrosspostCommand : BaseCommand
                 await this.ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (Button.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
+            else if (Button.GetCustomId() == MessageComponents.CancelButtonId)
             {
                 this.DeleteOrInvalidate();
                 return;

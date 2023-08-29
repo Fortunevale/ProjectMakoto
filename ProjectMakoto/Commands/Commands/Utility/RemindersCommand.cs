@@ -167,7 +167,7 @@ internal sealed class RemindersCommand : BaseCommand
                         await this.ExecuteCommand(ctx, null);
                         return;
                     }
-                    else if (Menu.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
+                    else if (Menu.GetCustomId() == MessageComponents.BackButtonId)
                     {
                         _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -206,7 +206,7 @@ internal sealed class RemindersCommand : BaseCommand
                 await this.ExecuteCommand(ctx, null);
                 return;
             }
-            else if (SelectedCustomId == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
+            else if (SelectedCustomId == MessageComponents.CancelButtonId)
             {
                 this.DeleteOrInvalidate();
                 return;

@@ -365,7 +365,7 @@ internal sealed class PollCommand : BaseCommand
                     this.DeleteOrInvalidate();
                     return;
                 }
-                else if (Menu.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
+                else if (Menu.GetCustomId() == MessageComponents.CancelButtonId)
                 {
                     this.DeleteOrInvalidate();
                     return;

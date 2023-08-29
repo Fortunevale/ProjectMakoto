@@ -187,7 +187,7 @@ internal sealed class ActionLogCommand : BaseCommand
                     return;
                 }
             }
-            else if (Button.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
+            else if (Button.GetCustomId() == MessageComponents.CancelButtonId)
             {
                 this.DeleteOrInvalidate();
                 return;

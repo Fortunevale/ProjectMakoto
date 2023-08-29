@@ -1083,7 +1083,7 @@ public abstract class BaseCommand
                         _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
                         Finished = true;
                     }
-                    else if (e.Id == "cancel")
+                    else if (e.Id == MessageComponents.CancelButtonId)
                     {
                         _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
                         Cancelled = true;
@@ -1287,7 +1287,7 @@ public abstract class BaseCommand
                         Finished = true;
                         return;
                     }
-                    else if (e.Id == "cancel")
+                    else if (e.Id == MessageComponents.CancelButtonId)
                     {
                         _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
                         Cancelled = true;

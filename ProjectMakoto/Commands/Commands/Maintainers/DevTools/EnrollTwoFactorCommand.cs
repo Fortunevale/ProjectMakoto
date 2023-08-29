@@ -73,7 +73,7 @@ internal sealed class EnrollTwoFactorCommand : BaseCommand
 
                                 throw new Exception("Invalid Code");
                             }
-                            else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
+                            else if (e.GetCustomId() == MessageComponents.CancelButtonId)
                             {
                                 throw new Exception("Cancelled");
                             }
