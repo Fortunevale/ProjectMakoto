@@ -607,7 +607,7 @@ public sealed partial class DatabaseClient : RequiresBotReference
         if (this.Disposed)
             throw new Exception("DatabaseClient is disposed");
 
-        if (GetCache.TryGetValue($"{tableName}-{columnKey}-keys", out var cacheItem) && cacheItem.CacheTime.GetTimespanSince() < TimeSpan.FromMilliseconds(1000))
+        if (GetCache.TryGetValue($"{tableName}-{columnKey}-keys", out var cacheItem) && cacheItem.CacheTime.GetTimespanSince() < TimeSpan.FromMilliseconds(60000))
         {
             return (T[])cacheItem.item;
         }
