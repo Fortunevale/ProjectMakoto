@@ -24,7 +24,7 @@ internal sealed class PhishingUrlHandler : RequiresBotReference
             _ = new Func<Task>(async () =>
             {
                 _ = this.UpdatePhishingUrlDatabase();
-            }).CreateScheduledTask(DateTime.UtcNow.AddMinutes(30));
+            }).CreateScheduledTask(DateTime.UtcNow.AddHours(12));
 
             var urls = await this.GetUrls();
             var listFailed = false;
@@ -102,11 +102,13 @@ internal sealed class PhishingUrlHandler : RequiresBotReference
                     else
                         SanitizedMatches.Add(b, new List<string> { url });
                 }
+
+                await Task.Delay(1000);
             }
             catch (Exception ex)
             {
                 listFailed = true;
-                _logger.LogError("An exception occurred while trying to download URLs from '{url}'", ex, url);
+                _logger.LogWarn("An exception occurred while trying to download URLs from '{url}'", ex, url);
             }
         }
 
