@@ -10,7 +10,7 @@ jobs:
     runs-on: self-hosted
     steps:
     - name: Checkout Actions Repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Secret Scan
       uses: max/secret-scan@master
@@ -21,7 +21,7 @@ jobs:
     runs-on: self-hosted
     steps:
     - name: Checkout Actions Repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Check spelling
       uses: crate-ci/typos@master
@@ -36,7 +36,7 @@ jobs:
         with:
           dotnet-version: '7.x'
       - name: "Clone Repository"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: recursive
           path: ProjectMakotoTest
