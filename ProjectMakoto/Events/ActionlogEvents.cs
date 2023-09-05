@@ -532,7 +532,7 @@ internal sealed class ActionlogEvents : RequiresTranslation
 
         if (e.Role.IsManaged)
         {
-            if (e.Role.Tags?.IsPremiumSubscriber)
+            if (e.Role.Tags?.IsPremiumSubscriber ?? false)
                 Integration = $"**{this.tKey.Integration.Get(this.Bot.Guilds[e.Guild.Id])}**: `{this.tKey.ServerBooster.Get(this.Bot.Guilds[e.Guild.Id])}`\n\n";
 
             if (e.Role.Tags.BotId is not null and not 0)
@@ -592,7 +592,7 @@ internal sealed class ActionlogEvents : RequiresTranslation
 
         if (e.Role.IsManaged)
         {
-            if (e.Role.Tags?.IsPremiumSubscriber)
+            if (e.Role.Tags?.IsPremiumSubscriber ?? false)
                 Integration = $"**{this.tKey.Integration.Get(this.Bot.Guilds[e.Guild.Id])}**: `{this.tKey.ServerBooster.Get(this.Bot.Guilds[e.Guild.Id])}`\n\n";
 
             if (e.Role.Tags.BotId is not null and not 0)
@@ -690,7 +690,7 @@ internal sealed class ActionlogEvents : RequiresTranslation
 
         if (e.RoleAfter.IsManaged)
         {
-            if (e.RoleAfter.Tags?.IsPremiumSubscriber)
+            if (e.RoleAfter.Tags?.IsPremiumSubscriber ?? false)
                 Integration = $"**{this.tKey.Integration.Get(this.Bot.Guilds[e.Guild.Id])}**: `{this.tKey.ServerBooster.Get(this.Bot.Guilds[e.Guild.Id])}`\n\n";
 
             if (e.RoleAfter.Tags.BotId is not null and not 0)
