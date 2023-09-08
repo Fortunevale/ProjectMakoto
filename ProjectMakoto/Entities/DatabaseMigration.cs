@@ -18,11 +18,4 @@ internal class DatabaseMigration
         public ulong RoleId { get; set; }
         public ulong ChannelId { get; set; }
     }
-
-    internal class VcCreatorChannelList
-    {
-        public ulong OwnerId { get; set; }
-        public ulong[] BannedUsers { get; set; }
-        public DateTime LastRename { get; set; }
-    }
 }
