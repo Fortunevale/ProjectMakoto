@@ -168,8 +168,12 @@ public sealed partial class DatabaseClient : RequiresBotReference
 
                 if (!typeMatches || !nullabilityMatches || !defaultMatches)
                 {
-                    _logger.LogWarn("Wrong data type for column '{Column}' in '{Table}'\nType: {TypeMatch}\nNullable: {NullableMatch}\nDefault: {Default}",
-                        columnInfo.ColumnName, tableName, typeMatches, nullabilityMatches, defaultMatches);
+                    _logger.LogWarn("Wrong data type for column '{Column}' in '{Table}'\nType: {TypeMatch} ({Type1}:{Type2})\nNullable: {NullableMatch}\nDefault: {Default} ({Default1}:{Default2})",
+                        columnInfo.ColumnName, 
+                        tableName, 
+                        typeMatches, remoteColumn.Type.ToLower(), columnInfo.ColumnType.GetName().ToLower() + (columnInfo.MaxValue is not null ? $"({columnInfo.MaxValue})" : ""), 
+                        nullabilityMatches, 
+                        defaultMatches, remoteColumn.Default, columnInfo.Default);
 
                     ModifyColumn(databaseClient.mainDatabaseConnection, tableName, internalColumn, columnInfo);
                     remoteColumns = databaseClient.ListColumns(tableName, databaseClient.mainDatabaseConnection);
@@ -236,8 +240,12 @@ public sealed partial class DatabaseClient : RequiresBotReference
 
                 if (!typeMatches || !nullabilityMatches || !defaultMatches)
                 {
-                    _logger.LogWarn("Wrong data type for column '{Column}' in '{Table}'\nType: {TypeMatch}\nNullable: {NullableMatch}\nDefault: {Default}",
-                        columnInfo.ColumnName, tableName, typeMatches, nullabilityMatches, defaultMatches);
+                    _logger.LogWarn("Wrong data type for column '{Column}' in '{Table}'\nType: {TypeMatch} ({Type1}:{Type2})\nNullable: {NullableMatch}\nDefault: {Default} ({Default1}:{Default2})",
+                        columnInfo.ColumnName,
+                        tableName,
+                        typeMatches, remoteColumn.Type.ToLower(), columnInfo.ColumnType.GetName().ToLower() + (columnInfo.MaxValue is not null ? $"({columnInfo.MaxValue})" : ""),
+                        nullabilityMatches,
+                        defaultMatches, remoteColumn.Default, columnInfo.Default);
 
                     ModifyColumn(databaseClient.guildDatabaseConnection, tableName, internalColumn, columnInfo);
                     remoteColumns = databaseClient.ListColumns(tableName, databaseClient.guildDatabaseConnection);
@@ -428,7 +436,7 @@ public sealed partial class DatabaseClient : RequiresBotReference
                     if (reader.IsDBNull(0))
                         break;
 
-                    value = reader.GetString(0);
+                    value = reader.GetValue(0).ToString();
                     break;
                 }
 
@@ -621,7 +629,7 @@ public sealed partial class DatabaseClient : RequiresBotReference
             {
                 while (reader.Read())
                 {
-                    rows.Add((T)Convert.ChangeType(reader.GetString(0), typeof(T)));
+                    rows.Add((T)Convert.ChangeType(reader.GetValue(0), typeof(T)));
                 }
             }
 
@@ -712,7 +720,7 @@ public sealed partial class DatabaseClient : RequiresBotReference
                             reader.GetString(1), 
                             (!reader.IsDBNull(2) ? reader.GetString(2) : "").ToLower() == "yes", 
                             (!reader.IsDBNull(3) ? reader.GetString(3) : ""), 
-                            (!reader.IsDBNull(4) ? (reader.GetString(4).Contains("\\'") ? Regex.Match(reader.GetString(4), @"\\'(.*)\\'").Groups[1].Value : reader.GetString(4)) : null), 
+                            (!reader.IsDBNull(4) ? (reader.GetString(4).Contains('\'') ? Regex.Match(reader.GetString(4), @"\\?'(.*)\\?'").Groups[1].Value : reader.GetString(4)) : null), 
                             (!reader.IsDBNull(5) ? reader.GetString(5) : "")));
                     }
                 }

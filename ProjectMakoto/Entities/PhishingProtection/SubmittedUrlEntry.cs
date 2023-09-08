@@ -22,7 +22,7 @@ internal sealed class SubmittedUrlEntry : RequiresBotReference
     [ColumnName("messageid"), ColumnType(ColumnTypes.BigInt), Primary]
     internal ulong Id { get; init; }
 
-    [ColumnName("url"), ColumnType(ColumnTypes.LongText), Collation("utf8mb4_0900_ai_ci"), Default("")]
+    [ColumnName("url"), ColumnType(ColumnTypes.LongText), WithCollation, Default("")]
     public string Url
     {
         get => this.Bot.DatabaseClient.GetValue<string>("active_url_submissions", "messageid", this.Id, "url", this.Bot.DatabaseClient.mainDatabaseConnection);

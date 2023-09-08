@@ -23,10 +23,10 @@ public sealed class PhishingUrlEntry : RequiresBotReference
         this.Url = Url;
     }
 
-    [ColumnName("url"), ColumnType(ColumnTypes.VarChar), Collation("utf8mb4_0900_ai_ci"), MaxValue(500), Primary]
+    [ColumnName("url"), ColumnType(ColumnTypes.VarChar), WithCollation, MaxValue(500), Primary]
     public string Url { get; init; }
 
-    [ColumnName("origin"), ColumnType(ColumnTypes.LongText), Collation("utf8mb4_0900_ai_ci"), Default("[]")]
+    [ColumnName("origin"), ColumnType(ColumnTypes.LongText), WithCollation, Default("[]")]
     public string[] Origin
     {
         get => JsonConvert.DeserializeObject<string[]>(this.Bot.DatabaseClient.GetValue<string>("scam_urls", "url", this.Url, "origin", this.Bot.DatabaseClient.mainDatabaseConnection) ?? "");

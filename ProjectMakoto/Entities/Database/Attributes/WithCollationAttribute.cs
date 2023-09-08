@@ -10,12 +10,9 @@
 namespace ProjectMakoto.Entities.Database.ColumnAttributes;
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-public sealed class CollationAttribute : Attribute
+public sealed class WithCollationAttribute : Attribute
 {
-    public readonly string Collation;
-
-    public CollationAttribute(string Collation)
+    public WithCollationAttribute()
     {
-        this.Collation = Collation;
     }
 }

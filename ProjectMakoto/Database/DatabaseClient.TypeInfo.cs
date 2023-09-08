@@ -37,7 +37,7 @@ partial class DatabaseClient
                 if (property.GetCustomAttribute<ColumnNameAttribute>() is null &&
                     property.GetCustomAttribute<ColumnType>() is null &&
                     property.GetCustomAttribute<MaxValueAttribute>() is null &&
-                    property.GetCustomAttribute<CollationAttribute>() is null &&
+                    property.GetCustomAttribute<WithCollationAttribute>() is null &&
                     property.GetCustomAttribute<NullableAttribute>() is null &&
                     property.GetCustomAttribute<ContainsValuesAttribute>() is null)
                     continue;
@@ -69,10 +69,27 @@ partial class DatabaseClient
         => (info.GetCustomAttribute<ColumnNameAttribute>()?.Name ?? throw new InvalidOperationException("Not a valid column.").AddData("info", info),
             info.GetCustomAttribute<ColumnType>()?.Type ?? throw new InvalidOperationException("Not a valid column.").AddData("info", info),
             info.GetCustomAttribute<PrimaryAttribute>()?.Primary ?? false,
-            info.GetCustomAttribute<MaxValueAttribute>()?.MaxValue,
-            info.GetCustomAttribute<CollationAttribute>()?.Collation,
+            info.GetCustomAttribute<MaxValueAttribute>()?.MaxValue ?? (this.GetDefaultMaxValue(info.GetCustomAttribute<ColumnType>().Type, out var max) ? max : null),
+            info.GetCustomAttribute<WithCollationAttribute>() is not null ? this.Bot.status.LoadedConfig.Secrets.Database.Collation : null,
             info.GetCustomAttribute<NullableAttribute>()?.Nullable ?? false,
             info.GetCustomAttribute<DefaultAttribute>()?.Default);
+
+    internal bool GetDefaultMaxValue(ColumnTypes type, out long maxValue)
+    {
+        maxValue = type switch
+        {
+            ColumnTypes.BigInt => 20,
+            ColumnTypes.Int => 11,
+            ColumnTypes.TinyInt => 4,
+            _ => -1,
+        };
+
+        return type switch
+        {
+            ColumnTypes.BigInt or ColumnTypes.Int or ColumnTypes.TinyInt => true,
+            _ => false,
+        };
+    }
 
     internal (string ColumnName, ColumnTypes ColumnType, bool Primary, long? MaxValue, string? Collation, bool Nullable, string Default) GetPrimaryKey(Type type)
         => this.GetPropertyInfo(this.GetValidProperties(type).First(x => this.GetPropertyInfo(x).Primary));
