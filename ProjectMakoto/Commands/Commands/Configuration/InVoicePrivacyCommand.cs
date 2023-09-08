@@ -96,7 +96,7 @@ internal sealed class InVoicePrivacyCommand : BaseCommand
                 await this.ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
+            else if (e.GetCustomId() == MessageComponents.CancelButtonId)
             {
                 this.DeleteOrInvalidate();
                 return;

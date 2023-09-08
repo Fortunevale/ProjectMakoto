@@ -1,4 +1,4 @@
-// Project Makoto
+﻿// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -7,10 +7,15 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-namespace ProjectMakoto.Exceptions;
-internal sealed class TooManyRequestsException : Exception
+namespace ProjectMakoto.Entities.Database.ColumnAttributes;
+
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+internal sealed class ContainsValuesAttribute : Attribute
 {
-    public TooManyRequestsException(string message = "") : base(message)
-    {
+    public bool ContainsValues { get; set; }
+
+    public ContainsValuesAttribute(bool containsValues = true)
+    { 
+        this.ContainsValues = containsValues; 
     }
 }

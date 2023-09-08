@@ -25,13 +25,13 @@ internal sealed class BlockUserCommand : BaseCommand
                 return;
             }
 
-            if (victim.Id == ctx.Client.CurrentUser.Id)
+            if (victim.Id == ctx.Client.CurrentUser.Id || victim.Id == ctx.User.Id || victim.IsBot || (victim.Flags?.HasFlag(UserFlags.Staff) ?? false))
             {
                 _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(CommandKey.CannotBlock, true)).AsError(ctx));
                 return;
             }
 
-            ctx.DbUser.BlockedUsers.Add(victim.Id);
+            ctx.DbUser.BlockedUsers = ctx.DbUser.BlockedUsers.Add(victim.Id);
 
             _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(CommandKey.Blocked, true, new TVar("User", victim.Mention))).AsSuccess(ctx));
         });

@@ -19,7 +19,6 @@ public sealed class MaintainersAppCommands : ApplicationCommandsModule
     {
         Info,
         Log,
-        Save,
         Stop,
         BotNick,
         Evaluate,
@@ -380,12 +379,6 @@ public sealed class MaintainersAppCommands : ApplicationCommandsModule
                     _ = Task.Run(async () =>
                     {
                         await new Commands.DevTools.StopCommand().ExecuteCommandWith2FA(ctx, this._bot, null);
-                    });
-                    break;
-                case DevCommands.Save:
-                    _ = Task.Run(async () =>
-                    {
-                        await new Commands.DevTools.SaveCommand().ExecuteCommand(ctx, this._bot);
                     });
                     break;
                 case DevCommands.BatchLookup:

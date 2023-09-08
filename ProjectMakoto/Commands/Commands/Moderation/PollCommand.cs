@@ -22,7 +22,7 @@ internal sealed class PollCommand : BaseCommand
 
             var CommandKey = this.t.Commands.Moderation.Poll;
 
-            if (ctx.DbGuild.Polls.RunningPolls.Count >= 10)
+            if (ctx.DbGuild.Polls.RunningPolls.Length >= 10)
             {
                 _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(CommandKey.PollLimitReached, true)).AsError(ctx));
                 return;
@@ -179,7 +179,7 @@ internal sealed class PollCommand : BaseCommand
                 }
                 else if (Menu.GetCustomId() == SelectDueDateButton.CustomId)
                 {
-                    var ModalResult = await this.PromptModalForDateTime(Menu.Result.Interaction, false);
+                    var ModalResult = await this.PromptModalForDateTime(Menu.Result.Interaction, selectedDueDate ?? DateTime.UtcNow.AddMinutes(5), false);
 
                     if (ModalResult.TimedOut)
                     {
@@ -328,7 +328,7 @@ internal sealed class PollCommand : BaseCommand
                         continue;
                     }
 
-                    if (ctx.DbGuild.Polls.RunningPolls.Count >= 10)
+                    if (ctx.DbGuild.Polls.RunningPolls.Length >= 10)
                     {
                         _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(CommandKey.PollLimitReached, true)).AsError(ctx));
                         return;
@@ -350,7 +350,7 @@ internal sealed class PollCommand : BaseCommand
                             .WithDescription($"> **{polltxt}**\n\n_{this.GetGuildString(CommandKey.PollEnding, new TVar("Timestamp", selectedDueDate.Value.ToTimestamp()))}._\n\n`{this.GetGuildString(CommandKey.TotalVotes, new TVar("Count", 0))}`"))
                         .AddComponents(select).AddComponents(endearly));
 
-                    ctx.DbGuild.Polls.RunningPolls.Add(new()
+                    ctx.DbGuild.Polls.RunningPolls = ctx.DbGuild.Polls.RunningPolls.Add(new()
                     {
                         PollText = polltxt,
                         ChannelId = SelectedChannel.Id,
@@ -365,7 +365,7 @@ internal sealed class PollCommand : BaseCommand
                     this.DeleteOrInvalidate();
                     return;
                 }
-                else if (Menu.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
+                else if (Menu.GetCustomId() == MessageComponents.CancelButtonId)
                 {
                     this.DeleteOrInvalidate();
                     return;

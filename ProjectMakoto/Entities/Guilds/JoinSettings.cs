@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Database.ColumnAttributes;
+
 namespace ProjectMakoto.Entities.Guilds;
 
 public sealed class JoinSettings : RequiresParent<Guild>
@@ -15,64 +17,38 @@ public sealed class JoinSettings : RequiresParent<Guild>
     {
     }
 
-    private ulong _AutoAssignRoleId { get; set; } = 0;
+    [ColumnName("auto_assign_role_id"), ColumnType(ColumnTypes.BigInt), Default("0")]
     public ulong AutoAssignRoleId
     {
-        get => this._AutoAssignRoleId;
-        set
-        {
-            this._AutoAssignRoleId = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "auto_assign_role_id", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<ulong>("guilds", "serverid", this.Parent.Id, "auto_assign_role_id", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "auto_assign_role_id", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-
-    private ulong _JoinlogChannelId { get; set; } = 0;
+    [ColumnName("joinlog_channel_id"), ColumnType(ColumnTypes.BigInt), Default("0")]
     public ulong JoinlogChannelId
     {
-        get => this._JoinlogChannelId;
-        set
-        {
-            this._JoinlogChannelId = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "joinlog_channel_id", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<ulong>("guilds", "serverid", this.Parent.Id, "joinlog_channel_id", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "joinlog_channel_id", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-
-    private bool _AutoBanGlobalBans { get; set; } = true;
+    [ColumnName("autoban_global_ban"), ColumnType(ColumnTypes.TinyInt), Default("0")]
     public bool AutoBanGlobalBans
     {
-        get => this._AutoBanGlobalBans;
-        set
-        {
-            this._AutoBanGlobalBans = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "autoban_global_ban", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "autoban_global_ban", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "autoban_global_ban", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-
-
-    private bool _ReApplyRoles { get; set; } = false;
+    [ColumnName("reapplyroles"), ColumnType(ColumnTypes.TinyInt), Default("0")]
     public bool ReApplyRoles
     {
-        get => this._ReApplyRoles;
-        set
-        {
-            this._ReApplyRoles = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "reapplyroles", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "reapplyroles", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "reapplyroles", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-
-
-    private bool _ReApplyNickname { get; set; } = false;
+    [ColumnName("reapplynickname"), ColumnType(ColumnTypes.TinyInt), Default("0")]
     public bool ReApplyNickname
     {
-        get => this._ReApplyNickname;
-        set
-        {
-            this._ReApplyNickname = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "reapplynickname", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "reapplynickname", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "reapplynickname", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 }

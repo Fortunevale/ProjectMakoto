@@ -1,4 +1,4 @@
-// Project Makoto
+﻿// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -10,12 +10,12 @@
 namespace ProjectMakoto.Entities.Database.ColumnAttributes;
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-public sealed class CollationAttribute : Attribute
+internal sealed class ColumnType : Attribute
 {
-    public readonly string Collation;
+    internal Enums.ColumnTypes Type { get; set; }
 
-    public CollationAttribute(string Collation)
-    {
-        this.Collation = Collation;
+    internal ColumnType(Enums.ColumnTypes type)
+    { 
+        this.Type = type; 
     }
 }

@@ -80,7 +80,7 @@ internal sealed class ActionLogCommand : BaseCommand
 
             if (Button.GetCustomId() == Disable.CustomId)
             {
-                ctx.DbGuild.ActionLog = new(ctx.Bot, ctx.DbGuild);
+                ctx.DbGuild.ActionLog.Channel = 0;
 
                 await this.ExecuteCommand(ctx, arguments);
                 return;
@@ -187,7 +187,7 @@ internal sealed class ActionLogCommand : BaseCommand
                     return;
                 }
             }
-            else if (Button.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
+            else if (Button.GetCustomId() == MessageComponents.CancelButtonId)
             {
                 this.DeleteOrInvalidate();
                 return;

@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Database.ColumnAttributes;
+
 namespace ProjectMakoto.Entities.Users;
 
 public sealed class ExperienceUserSettings : RequiresParent<User>
@@ -15,14 +17,10 @@ public sealed class ExperienceUserSettings : RequiresParent<User>
     {
     }
 
-    private bool _DirectMessageOptOut { get; set; } = false;
+    [ColumnName("experience_directmessageoptout"), ColumnType(ColumnTypes.TinyInt), Default("0")]
     public bool DirectMessageOptOut
     {
-        get => this._DirectMessageOptOut;
-        set
-        {
-            this._DirectMessageOptOut = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "experience_directmessageoptout", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<bool>("users", "userid", this.Parent.Id, "experience_directmessageoptout", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Parent.Id, "experience_directmessageoptout", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 }

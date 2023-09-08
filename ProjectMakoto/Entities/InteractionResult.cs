@@ -23,7 +23,7 @@ public sealed class InteractionResult<T>
 
     public T Result { get; set; }
 
-    public bool Failed { get { return this.TimedOut || this.Cancelled; } }
+    public bool Failed { get { return this.TimedOut || this.Cancelled || this.Errored; } }
 
     public bool TimedOut { get { return (this.Exception is not null && this.Exception.GetType() == typeof(TimedOutException)); } }
 

@@ -180,6 +180,7 @@ public sealed class Translations
             public SingleTranslationKey PreviousContent;
             public SingleTranslationKey Message;
             public SingleTranslationKey MessageUpdated;
+            public SingleTranslationKey AffectedUsers;
             public SingleTranslationKey CheckAttachedFileForDeletedMessages;
             public SingleTranslationKey MultipleMessagesDeleted;
             public SingleTranslationKey UserSwitchedVoiceChannel;
@@ -823,6 +824,9 @@ public sealed class Translations
             public queue Queue;
             public sealed class queue
             {
+                public SingleTranslationKey Play;
+                public SingleTranslationKey Repeat;
+                public SingleTranslationKey Shuffle;
                 public SingleTranslationKey NoSong;
                 public SingleTranslationKey CurrentlyPlaying;
                 public SingleTranslationKey Track;
@@ -1448,7 +1452,13 @@ public sealed class Translations
                 public SingleTranslationKey DateTimeDay;
                 public SingleTranslationKey DateTimeHour;
                 public SingleTranslationKey DateTimeMinute;
+                public SingleTranslationKey SelectTimezone;
+                public SingleTranslationKey SelectTimezonePrompt;
+                public SingleTranslationKey ManuallyDefineDateTime;
                 public SingleTranslationKey SelectADateTime;
+                public SingleTranslationKey CurrentDateTime;
+                public SingleTranslationKey ManuallyDefineTimespan;
+                public SingleTranslationKey CurrentTimespan;
                 public SingleTranslationKey TimespanDays;
                 public SingleTranslationKey TimespanHours;
                 public SingleTranslationKey TimespanMinutes;

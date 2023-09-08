@@ -28,7 +28,8 @@ internal sealed class GlobalBanCommand : BaseCommand
             if (ctx.Bot.globalBans.ContainsKey(victim.Id))
             {
                 _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Updating Global Ban Entry for '{victim.GetUsernameWithIdentifier()}'..`").AsLoading(ctx, "Global Ban"));
-                ctx.Bot.globalBans[victim.Id] = new() { Reason = reason, Moderator = ctx.User.Id };
+                ctx.Bot.globalBans[victim.Id].Reason = reason;
+                ctx.Bot.globalBans[victim.Id].Moderator = ctx.User.Id;
                 _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Global Ban Entry for '{victim.GetUsernameWithIdentifier()}' updated.`").AsSuccess(ctx, "Global Ban"));
 
                 var announceChannel1 = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.GlobalBanAnnouncements);
@@ -62,7 +63,7 @@ internal sealed class GlobalBanCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot.globalBans.Add(victim.Id, new() { Reason = reason, Moderator = ctx.User.Id });
+            ctx.Bot.globalBans.Add(victim.Id, new(ctx.Bot, "globalbans", victim.Id) { Reason = reason, Moderator = ctx.User.Id });
 
             var Success = 0;
             var Failed = 0;
@@ -70,7 +71,7 @@ internal sealed class GlobalBanCommand : BaseCommand
             foreach (var b in ctx.Client.Guilds.OrderByDescending(x => x.Key == ctx.Guild.Id))
             {
                 if (!ctx.Bot.Guilds.ContainsKey(b.Key))
-                    ctx.Bot.Guilds.Add(b.Key, new Guild(b.Key, ctx.Bot));
+                    ctx.Bot.Guilds.Add(b.Key, new Guild(ctx.Bot, b.Key));
 
                 if (ctx.Bot.Guilds[b.Key].Join.AutoBanGlobalBans)
                 {

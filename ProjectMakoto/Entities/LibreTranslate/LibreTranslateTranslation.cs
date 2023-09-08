@@ -9,6 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
+
 internal sealed class LibreTranslateTranslation
 {
     public string translatedText { get; set; }

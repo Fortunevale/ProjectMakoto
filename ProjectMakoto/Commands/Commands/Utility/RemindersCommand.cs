@@ -27,15 +27,15 @@ internal sealed class RemindersCommand : BaseCommand
 
             var rem = ctx.DbUser.Reminders;
 
-            var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(this.t.Commands.Utility.Reminders.NewReminder), (rem.ScheduledReminders.Count >= 10), DiscordEmoji.FromUnicode("➕").ToComponent());
-            var RemoveButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(this.t.Commands.Utility.Reminders.DeleteReminder), (rem.ScheduledReminders.Count <= 0), DiscordEmoji.FromUnicode("➖").ToComponent());
+            var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(this.t.Commands.Utility.Reminders.NewReminder), (rem.ScheduledReminders.Length >= 10), DiscordEmoji.FromUnicode("➕").ToComponent());
+            var RemoveButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(this.t.Commands.Utility.Reminders.DeleteReminder), (rem.ScheduledReminders.Length <= 0), DiscordEmoji.FromUnicode("➖").ToComponent());
             var SelectedCustomId = (snoozeDescription is null ? "" : AddButton.CustomId);
 
             if (snoozeDescription is null)
             {
                 _ = await this.RespondOrEdit(new DiscordMessageBuilder()
                     .WithEmbed(new DiscordEmbedBuilder()
-                        .WithDescription($"{this.GetString(this.t.Commands.Utility.Reminders.Count, true, new TVar("Count", rem.ScheduledReminders.Count))}\n\n" +
+                        .WithDescription($"{this.GetString(this.t.Commands.Utility.Reminders.Count, true, new TVar("Count", rem.ScheduledReminders.Length))}\n\n" +
                          $"{string.Join("\n\n", rem.ScheduledReminders.Select(x => $"> {x.Description.FullSanitize()}\n{this.GetString(this.t.Commands.Utility.Reminders.CreatedOn, new TVar("Guild", $"**{x.CreationPlace}**"))}\n{this.GetString(this.t.Commands.Utility.Reminders.DueTime, new TVar("Relative", x.DueTime.ToTimestamp()), new TVar("DateTime", x.DueTime.ToTimestamp(TimestampFormat.LongDateTime)))}").ToList())}\n\n" +
                          $"**⚠ {this.GetString(this.t.Commands.Utility.Reminders.Notice)}**")
                         .AsInfo(ctx, this.GetString(this.t.Commands.Utility.Reminders.Title)))
@@ -121,7 +121,7 @@ internal sealed class RemindersCommand : BaseCommand
                     else if (Menu.GetCustomId() == SelectDueDateButton.CustomId)
                     {
 
-                        var ModalResult = await this.PromptModalForDateTime(Menu.Result.Interaction, false);
+                        var ModalResult = await this.PromptModalForDateTime(Menu.Result.Interaction, selectedDueDate ?? DateTime.UtcNow.AddMinutes(5), false);
 
                         if (ModalResult.TimedOut)
                         {
@@ -157,7 +157,7 @@ internal sealed class RemindersCommand : BaseCommand
                             continue;
                         }
 
-                        rem.ScheduledReminders.Add(new()
+                        rem.ScheduledReminders = rem.ScheduledReminders.Add(new()
                         {
                             Description = selectedDescription,
                             DueTime = selectedDueDate.Value.ToUniversalTime(),
@@ -167,7 +167,7 @@ internal sealed class RemindersCommand : BaseCommand
                         await this.ExecuteCommand(ctx, null);
                         return;
                     }
-                    else if (Menu.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
+                    else if (Menu.GetCustomId() == MessageComponents.BackButtonId)
                     {
                         _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -178,7 +178,7 @@ internal sealed class RemindersCommand : BaseCommand
             }
             else if (SelectedCustomId == RemoveButton.CustomId)
             {
-                if (rem.ScheduledReminders.Count == 0)
+                if (rem.ScheduledReminders.Length == 0)
                 {
                     await this.ExecuteCommand(ctx, null);
                     return;
@@ -202,11 +202,11 @@ internal sealed class RemindersCommand : BaseCommand
                     throw UuidResult.Exception;
                 }
 
-                _ = rem.ScheduledReminders.Remove(rem.ScheduledReminders.First(x => x.UUID == UuidResult.Result));
+                rem.ScheduledReminders = rem.ScheduledReminders.Remove(x => x.UUID, rem.ScheduledReminders.First(x => x.UUID == UuidResult.Result));
                 await this.ExecuteCommand(ctx, null);
                 return;
             }
-            else if (SelectedCustomId == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
+            else if (SelectedCustomId == MessageComponents.CancelButtonId)
             {
                 this.DeleteOrInvalidate();
                 return;

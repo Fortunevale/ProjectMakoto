@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Members;
+
 namespace ProjectMakoto.Commands;
 
 internal sealed class ClearBackupCommand : BaseCommand
@@ -34,10 +36,7 @@ internal sealed class ClearBackupCommand : BaseCommand
                 return;
             }
 
-            if (!ctx.DbGuild.Members.ContainsKey(victim.Id))
-                ctx.DbGuild.Members.Add(victim.Id, new(ctx.Bot, ctx.DbGuild, victim.Id));
-
-            ctx.DbGuild.Members[victim.Id].MemberRoles.Clear();
+            ctx.DbGuild.Members[victim.Id].MemberRoles = Array.Empty<MemberRole>();
             ctx.DbGuild.Members[victim.Id].SavedNickname = "";
 
             _ = await this.RespondOrEdit(new DiscordEmbedBuilder()

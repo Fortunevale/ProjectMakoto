@@ -42,7 +42,7 @@ internal sealed class ForceClearQueueCommand : BaseCommand
                 return;
             }
 
-            ctx.DbGuild.MusicModule.SongQueue.Clear();
+            ctx.DbGuild.MusicModule.SongQueue = Array.Empty<Entities.Guilds.Lavalink.QueueInfo>();
             ctx.DbGuild.MusicModule.collectedClearQueueVotes.Clear();
 
             _ = await this.RespondOrEdit(embed: new DiscordEmbedBuilder

@@ -8,11 +8,17 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Entities;
-internal sealed class MessageComponents
+internal static class MessageComponents
 {
     public static DiscordButtonComponent GetCancelButton(User user, Bot _bot)
-        => new(ButtonStyle.Secondary, "cancel", _bot.LoadedTranslations.Common.Cancel.Get(user), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌")));
+        => new(ButtonStyle.Secondary, CancelButtonId, _bot.LoadedTranslations.Common.Cancel.Get(user), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌")));
 
     public static DiscordButtonComponent GetBackButton(User user, Bot _bot)
-        => new(ButtonStyle.Secondary, "back", _bot.LoadedTranslations.Common.Back.Get(user), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
+        => new(ButtonStyle.Secondary, BackButtonId, _bot.LoadedTranslations.Common.Back.Get(user), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
+
+    public static string BackButtonId
+        => "back";
+    
+    public static string CancelButtonId
+        => "cancel";
 }

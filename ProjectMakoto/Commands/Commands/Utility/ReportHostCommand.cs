@@ -70,9 +70,9 @@ internal sealed class ReportHostCommand : BaseCommand
                 return;
             }
 
-            if (ctx.Bot.SubmittedHosts.Any(x => x.Value.Submitter == ctx.User.Id) && !ctx.User.IsMaintenance(ctx.Bot.status))
+            if (ctx.Bot.SubmittedHosts.Fetch().Any(x => x.Value.Submitter == ctx.User.Id) && !ctx.User.IsMaintenance(ctx.Bot.status))
             {
-                if (ctx.Bot.SubmittedHosts.Where(x => x.Value.Submitter == ctx.User.Id).Count() >= 5)
+                if (ctx.Bot.SubmittedHosts.Fetch().Where(x => x.Value.Submitter == ctx.User.Id).Count() >= 5)
                 {
                     embed.Description = this.GetString(this.t.Commands.Utility.ReportHost.LimitError, true);
                     _ = this.RespondOrEdit(embed.AsError(ctx, this.GetString(this.t.Commands.Utility.ReportHost.Title)));
@@ -158,7 +158,7 @@ internal sealed class ReportHostCommand : BaseCommand
                 var BanUserButton = new DiscordButtonComponent(ButtonStyle.Danger, "ban_user", "Deny submission & ban submitter", false, new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, 1005430134070841395)));
                 var BanGuildButton = new DiscordButtonComponent(ButtonStyle.Danger, "ban_guild", "Deny submission & ban guild", false, new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, 1005430134070841395)));
 
-                var subbmited_msg = await channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                var submittedMsg = await channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = StatusIndicatorIcons.Success, Name = this.GetString(this.t.Commands.Utility.ReportHost.Title) },
                     Color = EmbedColors.Success,
@@ -175,7 +175,7 @@ internal sealed class ReportHostCommand : BaseCommand
                     { BanGuildButton },
                 }));
 
-                ctx.Bot.SubmittedHosts.Add(subbmited_msg.Id, new SubmittedUrlEntry
+                ctx.Bot.SubmittedHosts.Add(submittedMsg.Id, new SubmittedUrlEntry(ctx.Bot, submittedMsg.Id)
                 {
                     Url = host,
                     Submitter = ctx.User.Id,
@@ -188,7 +188,7 @@ internal sealed class ReportHostCommand : BaseCommand
                 _ = embed.AsSuccess(ctx, this.GetString(this.t.Commands.Utility.ReportHost.Title));
                 _ = await this.RespondOrEdit(embed);
             }
-            else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
+            else if (e.GetCustomId() == MessageComponents.CancelButtonId)
             {
                 this.DeleteOrInvalidate();
             }

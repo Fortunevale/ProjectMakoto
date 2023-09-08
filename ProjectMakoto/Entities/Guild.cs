@@ -7,17 +7,21 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Database.ColumnAttributes;
 using ProjectMakoto.Entities.Guilds;
 
 namespace ProjectMakoto.Entities;
 
-public sealed class Guild : BaseSelfFillingListValue<Guild>
+[TableName("guilds")]
+public sealed class Guild : RequiresBotReference
 {
-    public override Guild Convert(BaseSelfFillingListValue<Guild> oldValue)
-        => new(oldValue.Id, oldValue.Bot);
-
-    public Guild(ulong serverId, Bot bot) : base(bot, serverId)
+    public Guild(Bot bot, ulong serverId) : base(bot)
     {
+        this.Id = serverId;
+
+        _ = this.Bot.DatabaseClient.CreateRow("guilds", typeof(Guild), serverId, this.Bot.DatabaseClient.mainDatabaseConnection);
+        _ = this.Bot.DatabaseClient.CreateTable(serverId.ToString(), typeof(Member), this.Bot.DatabaseClient.guildDatabaseConnection);
+
         this.TokenLeakDetection = new(bot, this);
         this.PhishingDetection = new(bot, this);
         this.BumpReminder = new(bot, this);
@@ -35,33 +39,98 @@ public sealed class Guild : BaseSelfFillingListValue<Guild>
         this.VcCreator = new(bot, this);
         this.PrefixSettings = new(bot, this);
 
-        this.Members = new();
+        this.Members = new(this.Bot.DatabaseClient, serverId.ToString(), "userid", true, (id) =>
+        {
+            return new Member(bot, this, id);
+        });
     }
 
-    public TokenLeakDetectionSettings TokenLeakDetection { get; set; }
-    public PhishingDetectionSettings PhishingDetection { get; set; }
-    public BumpReminderSettings BumpReminder { get; set; }
-    public JoinSettings Join { get; set; }
-    public ExperienceSettings Experience { get; set; }
-    public CrosspostSettings Crosspost { get; set; }
-    public ActionLogSettings ActionLog { get; set; }
-    public InVoiceTextPrivacySettings InVoiceTextPrivacy { get; set; }
-    public InviteTrackerSettings InviteTracker { get; set; }
-    public InviteNotesSettings InviteNotes { get; set; }
-    public NameNormalizerSettings NameNormalizer { get; set; }
-    public EmbedMessageSettings EmbedMessage { get; set; }
-    public PollSettings Polls { get; set; }
-    public VcCreatorSettings VcCreator { get; set; }
-    public PrefixSettings PrefixSettings { get; set; }
+    [ColumnName("serverid"), ColumnType(ColumnTypes.BigInt), Primary]
+    internal ulong Id { get; init; }
 
-    public List<ulong> AutoUnarchiveThreads { get; set; } = new();
-    public List<LevelRewardEntry> LevelRewards { get; set; } = new();
-    public List<KeyValuePair<ulong, ReactionRoleEntry>> ReactionRoles { get; set; } = new();
+    [ContainsValues]
+    public TokenLeakDetectionSettings TokenLeakDetection { get; init; }
 
-    public Dictionary<ulong, Member> Members { get; set; }
+    [ContainsValues]
+    public PhishingDetectionSettings PhishingDetection { get; init; }
 
+    [ContainsValues]
+    public BumpReminderSettings BumpReminder { get; init; }
+
+    [ContainsValues]
+    public JoinSettings Join { get; init; }
+
+    [ContainsValues]
+    public ExperienceSettings Experience { get; init; }
+
+    [ContainsValues]
+    public CrosspostSettings Crosspost { get; init; }
+
+    [ContainsValues]
+    public ActionLogSettings ActionLog { get; init; }
+
+    [ContainsValues]
+    public InVoiceTextPrivacySettings InVoiceTextPrivacy { get; init; }
+
+    [ContainsValues]
+    public InviteTrackerSettings InviteTracker { get; init; }
+
+    [ContainsValues]
+    public InviteNotesSettings InviteNotes { get; init; }
+
+    [ContainsValues]
+    public NameNormalizerSettings NameNormalizer { get; init; }
+
+    [ContainsValues]
+    public EmbedMessageSettings EmbedMessage { get; init; }
+
+    [ContainsValues]
+    public PollSettings Polls { get; init; }
+
+    [ContainsValues]
+    public VcCreatorSettings VcCreator { get; init; }
+
+    [ContainsValues]
+    public PrefixSettings PrefixSettings { get; init; }
+
+    [ContainsValues]
     public Lavalink MusicModule { get; set; }
 
-    public string? CurrentLocale { get; set; } = null;
-    public string? OverrideLocale { get; set; } = null;
+    [ColumnName("autounarchivelist"), ColumnType(ColumnTypes.LongText), WithCollation, Default("[]")]
+    public ulong[] AutoUnarchiveThreads
+    {
+        get => JsonConvert.DeserializeObject<ulong[]>(this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Id, "autounarchivelist", this.Bot.DatabaseClient.mainDatabaseConnection));
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Id, "autounarchivelist", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
+
+    [ColumnName("levelrewards"), ColumnType(ColumnTypes.LongText), WithCollation, Default("[]")]
+    public LevelRewardEntry[] LevelRewards // todo
+    {
+        get => JsonConvert.DeserializeObject<LevelRewardEntry[]>(this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Id, "levelrewards", this.Bot.DatabaseClient.mainDatabaseConnection));
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Id, "levelrewards", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
+
+    [ColumnName("reactionroles"), ColumnType(ColumnTypes.LongText), WithCollation, Default("[]")]
+    public ReactionRoleEntry[] ReactionRoles
+    {
+        get => JsonConvert.DeserializeObject<ReactionRoleEntry[]>(this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Id, "reactionroles", this.Bot.DatabaseClient.mainDatabaseConnection));
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Id, "reactionroles", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
+
+    [ColumnName("current_locale"), ColumnType(ColumnTypes.LongText), WithCollation, Nullable]
+    public string? CurrentLocale
+    {
+        get => this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Id, "current_locale", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Id, "current_locale", value, this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
+
+    [ColumnName("override_locale"), ColumnType(ColumnTypes.LongText), WithCollation, Nullable]
+    public string? OverrideLocale
+    {
+        get => this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Id, "override_locale", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Id, "override_locale", value, this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
+
+
+    public SelfFillingDatabaseDictionary<Member> Members { get; init; }
 }

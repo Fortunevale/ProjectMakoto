@@ -35,7 +35,7 @@ internal sealed class BanUserCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot.bannedUsers.Add(victim.Id, new() { Reason = reason, Moderator = ctx.User.Id });
+            ctx.Bot.bannedUsers.Add(victim.Id, new(ctx.Bot, "banned_users", victim.Id) { Reason = reason, Moderator = ctx.User.Id });
 
             foreach (var b in ctx.Client.Guilds.Where(x => x.Value.OwnerId == victim.Id))
             {

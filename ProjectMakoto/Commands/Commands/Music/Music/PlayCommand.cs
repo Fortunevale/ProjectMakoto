@@ -71,14 +71,14 @@ internal sealed class PlayCommand : BaseCommand
                 foreach (var b in Tracks)
                 {
                     added++;
-                    ctx.DbGuild.MusicModule.SongQueue.Add(new(b.Info.Title, b.Info.Uri.ToString(), b.Info.Length, ctx.Guild, ctx.User));
+                    ctx.DbGuild.MusicModule.SongQueue = ctx.DbGuild.MusicModule.SongQueue.Add(new(b.Info.Title, b.Info.Uri.ToString(), b.Info.Length, ctx.Guild, ctx.User));
                 }
 
                 embed.Description = this.GetString(this.t.Commands.Music.Play.QueuedMultiple, true,
                     new TVar("Count", added),
                     new TVar("Playlist", new EmbeddedLink(search, oriResult.GetResultAs<LavalinkPlaylist>().Info.Name)));
 
-                _ = embed.AddField(new DiscordEmbedField($"📜 {this.GetString(this.t.Commands.Music.Play.QueuePositions)}", $"{(ctx.DbGuild.MusicModule.SongQueue.Count - added + 1)} - {ctx.DbGuild.MusicModule.SongQueue.Count}", true));
+                _ = embed.AddField(new DiscordEmbedField($"📜 {this.GetString(this.t.Commands.Music.Play.QueuePositions)}", $"{(ctx.DbGuild.MusicModule.SongQueue.Length - added + 1)} - {ctx.DbGuild.MusicModule.SongQueue.Length}", true));
 
                 _ = embed.AsSuccess(ctx);
                 _ = await ctx.BaseCommand.RespondOrEdit(embed);
@@ -87,14 +87,14 @@ internal sealed class PlayCommand : BaseCommand
             {
                 var track = Tracks[0];
 
-                ctx.DbGuild.MusicModule.SongQueue.Add(new(track.Info.Title, track.Info.Uri.ToString(), track.Info.Length, ctx.Guild, ctx.User));
+                ctx.DbGuild.MusicModule.SongQueue = ctx.DbGuild.MusicModule.SongQueue.Add(new(track.Info.Title, track.Info.Uri.ToString(), track.Info.Length, ctx.Guild, ctx.User));
 
                 embed.Description = this.GetString(this.t.Commands.Music.Play.QueuedSingle, true,
                     new TVar("Track", new EmbeddedLink(track.Info.Uri.ToString(), track.Info.Title)));
 
-                _ = embed.AddField(new DiscordEmbedField($"📜 {this.GetString(this.t.Commands.Music.Play.QueuePosition)}", $"{ctx.DbGuild.MusicModule.SongQueue.Count}", true));
+                _ = embed.AddField(new DiscordEmbedField($"📜 {this.GetString(this.t.Commands.Music.Play.QueuePosition)}", $"{ctx.DbGuild.MusicModule.SongQueue.Length}", true));
                 _ = embed.AddField(new DiscordEmbedField($"🔼 {this.GetString(this.t.Commands.Music.Play.Uploader)}", $"{track.Info.Author}", true));
-                _ = embed.AddField(new DiscordEmbedField($"🕒 {this.GetString(this.t.Commands.Music.Play.Duration)}", $"{track.Info.Length.GetHumanReadable(TimeFormat.MINUTES)}", true));
+                _ = embed.AddField(new DiscordEmbedField($"🕒 {this.GetString(this.t.Commands.Music.Play.Duration)}", $"{track.Info.Length.GetHumanReadable(TimeFormat.Minutes)}", true));
 
                 _ = embed.AsSuccess(ctx);
                 _ = await ctx.BaseCommand.RespondOrEdit(embed.Build());

@@ -22,7 +22,7 @@ internal sealed class EnrollTwoFactorCommand : BaseCommand
         {
             if (ctx.Client.CheckTwoFactorEnrollmentFor(ctx.User.Id))
             {
-                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`You're already enrolled in Two Factor Authentication.`").AsBotError(ctx));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`You're already enrolled in Two Factor Authentication.`").AsError(ctx));
                 return;
             }
 
@@ -30,7 +30,7 @@ internal sealed class EnrollTwoFactorCommand : BaseCommand
 
             var ConfirmButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Confirm Two Factor Authentication", false, DiscordEmoji.FromUnicode("✅").ToComponent());
 
-            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Enrolling you into Two Factor Authentication..`").AsBotLoading(ctx));
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Enrolling you into Two Factor Authentication..`").AsLoading(ctx));
             var (Secret, QrCode) = ctx.Client.EnrollTwoFactor(ctx.User);
             _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithContent($"Please scan this QR Code or use the Secret below to register the Two Factor in an App of your choosing." +
                 $"\n\n`{Secret}`\n\n" +
@@ -45,7 +45,7 @@ internal sealed class EnrollTwoFactorCommand : BaseCommand
                 if (!Confirmed)
                 {
                     ctx.Client.DisenrollTwoFactor(ctx.User.Id);
-                    _ = this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Failed to authenticate. Enrollment reverted.`").AsBotError(ctx));
+                    _ = this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Failed to authenticate. Enrollment reverted.`").AsError(ctx));
                 }
             });
 
@@ -67,13 +67,13 @@ internal sealed class EnrollTwoFactorCommand : BaseCommand
                                 if (tfa_result.Result == TwoFactorResult.ValidCode)
                                 {
                                     Confirmed = true;
-                                    _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Enrolled successfully.`").AsBotSuccess(ctx));
+                                    _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Enrolled successfully.`").AsSuccess(ctx));
                                     return;
                                 }
 
                                 throw new Exception("Invalid Code");
                             }
-                            else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
+                            else if (e.GetCustomId() == MessageComponents.CancelButtonId)
                             {
                                 throw new Exception("Cancelled");
                             }
@@ -81,7 +81,7 @@ internal sealed class EnrollTwoFactorCommand : BaseCommand
                         catch (Exception)
                         {
                             ctx.Client.DisenrollTwoFactor(ctx.User.Id);
-                            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Failed to authenticate. Enrollment reverted.`").AsBotError(ctx));
+                            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Failed to authenticate. Enrollment reverted.`").AsError(ctx));
                         }
                     }
                 });

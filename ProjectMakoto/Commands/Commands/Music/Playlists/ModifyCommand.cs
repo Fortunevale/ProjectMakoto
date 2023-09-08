@@ -64,21 +64,21 @@ internal sealed class ModifyCommand : BaseCommand
 
                 var TotalTimespan = TimeSpan.Zero;
 
-                for (var i = 0; i < SelectedPlaylist.List.Count; i++)
+                for (var i = 0; i < SelectedPlaylist.List.Length; i++)
                 {
                     TotalTimespan = TotalTimespan.Add(SelectedPlaylist.List[i].Length.Value);
                 }
 
-                var Description = $"**`{this.GetString(this.t.Commands.Music.Playlists.Modify.CurrentTrackCount, new TVar("Count", SelectedPlaylist.List.Count), new TVar("Timespan", TotalTimespan.GetHumanReadable()))}`**\n\n";
-                Description += $"{string.Join("\n", CurrentTracks.Select(x => $"**{GetInt()}**. `{x.Length.Value.GetShortHumanReadable(TimeFormat.HOURS)}` {this.GetString(this.t.Commands.Music.Playlists.Modify.Track, new TVar("Track", $"**[`{x.Title}`]({x.Url})**"), new TVar("Timestamp", Formatter.Timestamp(x.AddedTime)))}"))}";
+                var Description = $"**`{this.GetString(this.t.Commands.Music.Playlists.Modify.CurrentTrackCount, new TVar("Count", SelectedPlaylist.List.Length), new TVar("Timespan", TotalTimespan.GetHumanReadable()))}`**\n\n";
+                Description += $"{string.Join("\n", CurrentTracks.Select(x => $"**{GetInt()}**. `{x.Length.Value.GetShortHumanReadable(TimeFormat.Hours)}` {this.GetString(this.t.Commands.Music.Playlists.Modify.Track, new TVar("Track", $"**[`{x.Title}`]({x.Url})**"), new TVar("Timestamp", Formatter.Timestamp(x.AddedTime)))}"))}";
 
-                if (SelectedPlaylist.List.Count > 0)
-                    Description += $"\n\n`{this.GetString(this.t.Common.Page)} {CurrentPage + 1}/{Math.Ceiling(SelectedPlaylist.List.Count / 10.0)}`";
+                if (SelectedPlaylist.List.Length > 0)
+                    Description += $"\n\n`{this.GetString(this.t.Common.Page)} {CurrentPage + 1}/{Math.Ceiling(SelectedPlaylist.List.Length / 10.0)}`";
 
                 if (CurrentPage <= 0)
                     PreviousPage = PreviousPage.Disable();
 
-                if ((CurrentPage * 10) + 10 >= SelectedPlaylist.List.Count)
+                if ((CurrentPage * 10) + 10 >= SelectedPlaylist.List.Length)
                     NextPage = NextPage.Disable();
 
                 embed.Author.IconUrl = ctx.Guild.IconUrl;
@@ -131,7 +131,7 @@ internal sealed class ModifyCommand : BaseCommand
                         {
                             case "AddSong":
                             {
-                                if (SelectedPlaylist.List.Count >= 250)
+                                if (SelectedPlaylist.List.Length >= 250)
                                 {
                                     embed.Description = this.GetString(this.t.Commands.Music.Playlists.Modify.TrackLimit, true);
                                     _ = embed.AsError(ctx, this.GetString(this.t.Commands.Music.Playlists.Title));
@@ -171,7 +171,7 @@ internal sealed class ModifyCommand : BaseCommand
                                     break;
                                 }
 
-                                if (SelectedPlaylist.List.Count >= 250)
+                                if (SelectedPlaylist.List.Length >= 250)
                                 {
                                     embed.Description = this.GetString(this.t.Commands.Music.Playlists.Modify.TrackLimit, true);
                                     _ = embed.AsError(ctx, this.GetString(this.t.Commands.Music.Playlists.Title));
@@ -183,7 +183,7 @@ internal sealed class ModifyCommand : BaseCommand
                                     return;
                                 }
 
-                                SelectedPlaylist.List.AddRange(Tracks.Take(250 - SelectedPlaylist.List.Count).Select(x => new PlaylistEntry { Title = x.Info.Title, Url = x.Info.Uri.ToString(), Length = x.Info.Length }));
+                                SelectedPlaylist.List = SelectedPlaylist.List.AddRange(Tracks.Take(250 - SelectedPlaylist.List.Length).Select(x => new PlaylistEntry { Title = x.Info.Title, Url = x.Info.Uri.ToString(), Length = x.Info.Length }));
 
                                 await UpdateMessage();
                                 break;
@@ -322,7 +322,7 @@ internal sealed class ModifyCommand : BaseCommand
                                 _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
                                 CurrentPage = 0;
-                                SelectedPlaylist.List = SelectedPlaylist.List.GroupBy(x => x.Url).Select(y => y.FirstOrDefault()).ToList();
+                                SelectedPlaylist.List = SelectedPlaylist.List.GroupBy(x => x.Url).Select(y => y.FirstOrDefault()).ToArray();
                                 await UpdateMessage();
                                 break;
                             }
@@ -348,17 +348,17 @@ internal sealed class ModifyCommand : BaseCommand
 
                                 foreach (var b in Response.Result.Values.Select(x => SelectedPlaylist.List.First(y => y.Url.MakeValidFileName() == x)))
                                 {
-                                    _ = SelectedPlaylist.List.Remove(b);
+                                    SelectedPlaylist.List = SelectedPlaylist.List.Remove(x => x.Url, b);
                                 }
 
-                                if (SelectedPlaylist.List.Count <= 0)
+                                if (SelectedPlaylist.List.Length <= 0)
                                 {
                                     _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                                     {
                                         Description = this.GetString(this.t.Commands.Music.Playlists.Delete.Deleted, true, new TVar("Name", SelectedPlaylist.PlaylistName)),
                                     }.AsSuccess(ctx, this.GetString(this.t.Commands.Music.Playlists.Title))));
 
-                                    _ = ctx.DbUser.UserPlaylists.Remove(SelectedPlaylist);
+                                    ctx.DbUser.UserPlaylists = ctx.DbUser.UserPlaylists.Remove(x => x.PlaylistId, SelectedPlaylist);
 
                                     await Task.Delay(5000);
                                     return;

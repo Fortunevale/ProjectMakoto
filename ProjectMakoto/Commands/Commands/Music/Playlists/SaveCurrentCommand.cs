@@ -30,11 +30,11 @@ internal sealed class SaveCurrentCommand : BaseCommand
             }
 
             var SelectedPlaylistName = "";
-            var SelectedTracks = ctx.DbGuild.MusicModule.SongQueue.Select(x => new PlaylistEntry { Title = x.VideoTitle, Url = x.Url, Length = x.Length }).Take(250).ToList();
+            var SelectedTracks = ctx.DbGuild.MusicModule.SongQueue.Select(x => new PlaylistEntry { Title = x.VideoTitle, Url = x.Url, Length = x.Length }).Take(250).ToArray();
 
             while (true)
             {
-                if (ctx.DbUser.UserPlaylists.Count >= 10)
+                if (ctx.DbUser.UserPlaylists.Length >= 10)
                 {
                     _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
@@ -52,7 +52,7 @@ internal sealed class SaveCurrentCommand : BaseCommand
                 var embed = new DiscordEmbedBuilder
                 {
                     Description = $"`{this.GetString(this.t.Commands.Music.Playlists.CreatePlaylist.PlaylistName).PadRight(pad)}`: `{(SelectedPlaylistName.IsNullOrWhiteSpace() ? this.GetString(this.t.Common.NotSelected) : SelectedPlaylistName)}`\n" +
-                                  $"`{this.GetString(this.t.Commands.Music.Playlists.CreatePlaylist.FirstTracks).PadRight(pad)}`: {(SelectedTracks.IsNotNullAndNotEmpty() ? (SelectedTracks.Count > 1 ? $"`{SelectedTracks.Count} {this.GetString(this.t.Commands.Music.Playlists.Tracks)}`" : $"[`{SelectedTracks[0].Title}`]({SelectedTracks[0].Url})") : this.GetString(this.t.Common.NotSelected, true))}"
+                                  $"`{this.GetString(this.t.Commands.Music.Playlists.CreatePlaylist.FirstTracks).PadRight(pad)}`: {(SelectedTracks.IsNotNullAndNotEmpty() ? (SelectedTracks.Length > 1 ? $"`{SelectedTracks.Length} {this.GetString(this.t.Commands.Music.Playlists.Tracks)}`" : $"[`{SelectedTracks[0].Title}`]({SelectedTracks[0].Url})") : this.GetString(this.t.Common.NotSelected, true))}"
                 }.AsAwaitingInput(ctx, this.GetString(this.t.Commands.Music.Playlists.Title));
 
                 _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
@@ -99,7 +99,7 @@ internal sealed class SaveCurrentCommand : BaseCommand
                 {
                     _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                    if (ctx.DbUser.UserPlaylists.Count >= 10)
+                    if (ctx.DbUser.UserPlaylists.Length >= 10)
                     {
                         _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                         {
@@ -120,13 +120,13 @@ internal sealed class SaveCurrentCommand : BaseCommand
                         List = SelectedTracks
                     };
 
-                    ctx.DbUser.UserPlaylists.Add(v);
+                    ctx.DbUser.UserPlaylists = ctx.DbUser.UserPlaylists.Add(v);
 
                     _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
                         Description = this.GetString(this.t.Commands.Music.Playlists.CreatePlaylist.Created, true,
                             new TVar("Playlist", v.PlaylistName),
-                            new TVar("Count", v.List.Count)),
+                            new TVar("Count", v.List.Length)),
                     }.AsSuccess(ctx, this.GetString(this.t.Commands.Music.Playlists.Title))));
                     await Task.Delay(2000);
                     await new ModifyCommand().TransferCommand(ctx, new Dictionary<string, object>
@@ -135,7 +135,7 @@ internal sealed class SaveCurrentCommand : BaseCommand
                     });
                     return;
                 }
-                else if (Menu.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
+                else if (Menu.GetCustomId() == MessageComponents.CancelButtonId)
                 {
                     if (!ctx.Transferred)
                         this.DeleteOrInvalidate();

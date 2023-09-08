@@ -38,18 +38,20 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dapper" Version="2.0.143" />
-    <PackageReference Include="DisCatSharp" Version="10.4.2-nightly-015" />
-    <PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.4.2-nightly-015" />
-    <PackageReference Include="DisCatSharp.CommandsNext" Version="10.4.2-nightly-015" />
-    <PackageReference Include="DisCatSharp.Common" Version="10.4.2-nightly-015" />
-    <PackageReference Include="DisCatSharp.Extensions.TwoFactorCommands" Version="1.0.0-alpha-007" />
-    <PackageReference Include="DisCatSharp.Interactivity" Version="10.4.2-nightly-015" />
-    <PackageReference Include="DisCatSharp.Lavalink" Version="10.4.2-nightly-015" />
+    <PackageReference Include="Dapper" Version="2.0.151" />
+    <PackageReference Include="DisCatSharp" Version="10.4.2-nightly-020" />
+    <PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.4.2-nightly-020" />
+    <PackageReference Include="DisCatSharp.CommandsNext" Version="10.4.2-nightly-020" />
+    <PackageReference Include="DisCatSharp.Common" Version="10.4.2-nightly-020" />
+    <PackageReference Include="DisCatSharp.Extensions.TwoFactorCommands" Version="2.0.0" />
+    <PackageReference Include="DisCatSharp.Interactivity" Version="10.4.2-nightly-020" />
+    <PackageReference Include="DisCatSharp.Lavalink" Version="10.4.2-nightly-020" />
+    <PackageReference Include="GenHTTP.Core" Version="7.0.0" />
+    <PackageReference Include="GenHTTP.Modules.StaticWebsites" Version="7.0.0" />
     <PackageReference Include="HtmlSanitizer" Version="8.0.692" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.7.0-2.final" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="4.7.0-2.final" />
-    <PackageReference Include="MySql.Data" Version="8.1.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.7.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="4.7.0" />
+    <PackageReference Include="MySqlConnector" Version="2.3.0-beta.3" />
     <PackageReference Include="Octokit" Version="7.1.0" />
     <PackageReference Include="QuickChart" Version="2.3.0" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.118" />

@@ -111,42 +111,10 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     ReminderEvents reminderEvents { get; set; }
     UserBlockEvents userBlockEvents { get; set; }
 
-    private void FillDatabase(DiscordGuild guild = null, DiscordMember member = null, DiscordUser user = null)
-    {
-        if (guild is not null)
-        {
-            if (!this.Bot.Guilds.ContainsKey(guild.Id))
-                this.Bot.Guilds.Add(guild.Id, new Guild(guild.Id, this.Bot));
-
-            if (guild.Members is not null && guild.Members.Count > 0)
-                foreach (var b in guild.Members)
-                    if (!this.Bot.Guilds[guild.Id].Members.ContainsKey(b.Key))
-                        this.Bot.Guilds[guild.Id].Members.Add(b.Key, new(this.Bot, this.Bot.Guilds[guild.Id], b.Key));
-
-            if (member is not null)
-                if (!this.Bot.Guilds[guild.Id].Members.ContainsKey(member.Id))
-                    this.Bot.Guilds[guild.Id].Members.Add(member.Id, new(this.Bot, this.Bot.Guilds[guild.Id], member.Id));
-
-            if (user is not null)
-                if (!this.Bot.Guilds[guild.Id].Members.ContainsKey(user.Id))
-                    this.Bot.Guilds[guild.Id].Members.Add(user.Id, new(this.Bot, this.Bot.Guilds[guild.Id], user.Id));
-        }
-
-        if (member is not null)
-            if (!this.Bot.Users.ContainsKey(member.Id) && !this.Bot.objectedUsers.Contains(member.Id))
-                this.Bot.Users.Add(member.Id, new(this.Bot, member.Id));
-
-        if (user is not null)
-            if (!this.Bot.Users.ContainsKey(user.Id) && !this.Bot.objectedUsers.Contains(user.Id))
-                this.Bot.Users.Add(user.Id, new(this.Bot, user.Id));
-    }
-
     internal async Task GuildMemberAdded(DiscordClient sender, GuildMemberAddEventArgs e)
     {
         _ = Task.Run(async () =>
         {
-            this.FillDatabase(e.Guild, e.Member);
-
             _ = this.genericGuildEvents.GuildMemberAdded(sender, e).Add(this.Bot);
             _ = this.actionlogEvents.UserJoined(sender, e).Add(this.Bot);
             _ = this.joinEvents.GuildMemberAdded(sender, e).Add(this.Bot);
@@ -159,8 +127,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            this.FillDatabase(e.Guild, e.Member);
-
             _ = this.genericGuildEvents.GuildMemberRemoved(sender, e).Add(this.Bot);
             _ = this.actionlogEvents.UserLeft(sender, e).Add(this.Bot);
             _ = this.joinEvents.GuildMemberRemoved(sender, e).Add(this.Bot);
@@ -171,8 +137,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            this.FillDatabase(e.Guild, e.Member);
-
             _ = this.genericGuildEvents.GuildMemberUpdated(sender, e).Add(this.Bot);
             _ = this.actionlogEvents.MemberUpdated(sender, e).Add(this.Bot);
             _ = this.nameNormalizerEvents.GuildMemberUpdated(sender, e).Add(this.Bot);
@@ -183,8 +147,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            this.FillDatabase(e.Guild, e.Member);
-
             _ = this.genericGuildEvents.GuildMemberBanned(sender, e).Add(this.Bot);
             _ = this.actionlogEvents.BanAdded(sender, e).Add(this.Bot);
         }).Add(this.Bot);
@@ -194,8 +156,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            this.FillDatabase(e.Context.Guild, e.Context.Member);
-
             _ = this.commandEvents.CommandExecuted(sender, e).Add(this.Bot);
         }).Add(this.Bot);
     }
@@ -204,7 +164,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            this.FillDatabase(e.Context.Guild, e.Context.Member);
             _ = this.commandEvents.CommandError(sender, e).Add(this.Bot);
         }).Add(this.Bot);
     }
@@ -213,8 +172,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            this.FillDatabase(e.Guild, user: e.Message.Author);
-
             _ = this.afkEvents.MessageCreated(sender, e).Add(this.Bot);
             _ = this.crosspostEvents.MessageCreated(sender, e).Add(this.Bot);
             _ = this.phishingProtectionEvents.MessageCreated(sender, e).Add(this.Bot);
@@ -242,8 +199,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            this.FillDatabase(e.Guild, user: e.Message.Author);
-
             _ = this.phishingProtectionEvents.MessageUpdated(sender, e).Add(this.Bot);
             _ = this.actionlogEvents.MessageUpdated(sender, e).Add(this.Bot);
             _ = this.tokenLeakEvents.MessageUpdated(sender, e).Add(this.Bot);
@@ -254,8 +209,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            this.FillDatabase(e.Guild, user: e.Interaction.User);
-
             _ = this.submissionEvents.ComponentInteractionCreated(sender, e).Add(this.Bot);
             _ = this.embedMessagesEvents.ComponentInteractionCreated(sender, e).Add(this.Bot);
             _ = this.reminderEvents.ComponentInteractionCreated(sender, e).Add(this.Bot);
@@ -266,8 +219,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            this.FillDatabase(e.Guild);
-
             _ = this.discordEvents.GuildCreated(sender, e).Add(this.Bot);
             _ = this.inviteTrackerEvents.GuildCreated(sender, e).Add(this.Bot);
         }).Add(this.Bot);
@@ -277,8 +228,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            this.FillDatabase(e.Guild, user: e.Message.Author);
-
             _ = this.actionlogEvents.MessageDeleted(sender, e).Add(this.Bot);
             _ = this.bumpReminderEvents.MessageDeleted(sender, e).Add(this.Bot);
         }).Add(this.Bot);
@@ -288,8 +237,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            this.FillDatabase(e.Guild);
-
             _ = this.actionlogEvents.MessageBulkDeleted(sender, e).Add(this.Bot);
         }).Add(this.Bot);
     }
@@ -298,8 +245,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            this.FillDatabase(e.Guild);
-
             _ = this.actionlogEvents.RoleCreated(sender, e).Add(this.Bot);
         }).Add(this.Bot);
     }
@@ -308,8 +253,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            this.FillDatabase(e.Guild);
-
             _ = this.actionlogEvents.RoleModified(sender, e).Add(this.Bot);
         }).Add(this.Bot);
     }
@@ -318,8 +261,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            this.FillDatabase(e.Guild);
-
             _ = this.actionlogEvents.RoleDeleted(sender, e).Add(this.Bot);
         }).Add(this.Bot);
     }
@@ -328,8 +269,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            this.FillDatabase(e.Guild, e.Member);
-
             _ = this.actionlogEvents.BanRemoved(sender, e).Add(this.Bot);
         }).Add(this.Bot);
     }
@@ -338,8 +277,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            this.FillDatabase(e.GuildAfter);
-
             _ = this.actionlogEvents.GuildUpdated(sender, e).Add(this.Bot);
         }).Add(this.Bot);
     }
@@ -348,8 +285,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            this.FillDatabase(e.Guild);
-
             _ = this.actionlogEvents.ChannelCreated(sender, e).Add(this.Bot);
             _ = this.voicePrivacyEvents.ChannelCreated(sender, e).Add(this.Bot);
         }).Add(this.Bot);
@@ -359,8 +294,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            this.FillDatabase(e.Guild);
-
             _ = this.actionlogEvents.ChannelDeleted(sender, e).Add(this.Bot);
         }).Add(this.Bot);
     }
@@ -369,8 +302,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            this.FillDatabase(e.Guild);
-
             _ = this.actionlogEvents.ChannelUpdated(sender, e).Add(this.Bot);
         }).Add(this.Bot);
     }
@@ -379,8 +310,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            this.FillDatabase(e.Guild);
-
             _ = this.actionlogEvents.InviteCreated(sender, e).Add(this.Bot);
             _ = this.inviteTrackerEvents.InviteCreated(sender, e).Add(this.Bot);
         }).Add(this.Bot);
@@ -390,8 +319,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            this.FillDatabase(e.Guild);
-
             _ = this.actionlogEvents.InviteDeleted(sender, e).Add(this.Bot);
             _ = this.inviteTrackerEvents.InviteDeleted(sender, e).Add(this.Bot);
             _ = this.inviteNoteEvents.InviteDeleted(sender, e).Add(this.Bot);
@@ -402,8 +329,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            this.FillDatabase(e.Guild, user: e.User);
-
             _ = this.bumpReminderEvents.ReactionAdded(sender, e).Add(this.Bot);
             _ = this.reactionRoleEvents.MessageReactionAdded(sender, e).Add(this.Bot);
         }).Add(this.Bot);
@@ -413,8 +338,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            this.FillDatabase(e.Guild, user: e.User);
-
             _ = this.bumpReminderEvents.ReactionRemoved(sender, e).Add(this.Bot);
             _ = this.reactionRoleEvents.MessageReactionRemoved(sender, e).Add(this.Bot);
         }).Add(this.Bot);
@@ -424,8 +347,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            this.FillDatabase(e.Guild, user: e.User);
-
             _ = this.actionlogEvents.VoiceStateUpdated(sender, e).Add(this.Bot);
             _ = this.voicePrivacyEvents.VoiceStateUpdated(sender, e).Add(this.Bot);
             _ = this.vcCreatorEvents.VoiceStateUpdated(sender, e).Add(this.Bot);
@@ -437,27 +358,23 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            this.FillDatabase(e.Guild);
-
             e.Thread.JoinWithQueue(this.Bot.ThreadJoinClient);
         }).Add(this.Bot);
     }
 
-    internal async Task ThreadDeleted(DiscordClient sender, ThreadDeleteEventArgs e)
+    internal Task ThreadDeleted(DiscordClient sender, ThreadDeleteEventArgs e)
     {
-        _ = Task.Run(async () =>
-        {
-            this.FillDatabase(e.Guild);
-        }).Add(this.Bot);
+        return Task.CompletedTask;
+        //_ = Task.Run(async () =>
+        //{
+
+        //}).Add(this.Bot);
     }
 
     internal async Task ThreadMemberUpdated(DiscordClient sender, ThreadMemberUpdateEventArgs e)
     {
         _ = Task.Run(async () =>
         {
-            if (e.Thread.Guild is not null)
-                this.FillDatabase(e.Thread.Guild);
-
             e.Thread.JoinWithQueue(this.Bot.ThreadJoinClient);
         }).Add(this.Bot);
     }
@@ -466,8 +383,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            this.FillDatabase(e.Guild);
-
             e.Thread.JoinWithQueue(this.Bot.ThreadJoinClient);
         }).Add(this.Bot);
     }
@@ -476,8 +391,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            this.FillDatabase(e.Guild);
-
             if (this.Bot.status.DiscordGuildDownloadCompleted)
                 foreach (var b in e.Threads)
                     b.JoinWithQueue(this.Bot.ThreadJoinClient);
@@ -488,8 +401,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            this.FillDatabase(e.Guild);
-
             _ = this.autoUnarchiveEvents.ThreadUpdated(sender, e).Add(this.Bot);
         }).Add(this.Bot);
     }
@@ -498,8 +409,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            this.FillDatabase(user: e.UserAfter);
-
             _ = this.nameNormalizerEvents.UserUpdated(sender, e).Add(this.Bot);
         }).Add(this.Bot);
     }

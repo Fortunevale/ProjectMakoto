@@ -7,9 +7,12 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-namespace ProjectMakoto.Entities.Database.ColumnTypes;
+namespace ProjectMakoto.Entities.Database.ColumnAttributes;
 
-public abstract class BaseColumn
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+public sealed class WithCollationAttribute : Attribute
 {
-    public abstract object GetValue();
+    public WithCollationAttribute()
+    {
+    }
 }

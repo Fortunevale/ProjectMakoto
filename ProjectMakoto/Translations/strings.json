@@ -2561,9 +2561,33 @@
           "en": "Days  (max. {Max})",
           "de": "Tage  (max. {Max})"
         },
+        "CurrentTimespan": {
+          "en": "Currently selected Timespan",
+          "de": "Aktuell-gewählte Zeitspanne"
+        },
+        "ManuallyDefineTimespan": {
+          "en": "Manually define Timespan",
+          "de": "Zeitspanne manuell auswählen"
+        },
+        "CurrentDateTime": {
+          "en": "Currently selected Date & Time",
+          "de": "Aktuell-gewählter Zeitpunkt"
+        },
         "SelectADateTime": {
           "en": "Select a date and time",
           "de": "Ein Datum auswählen"
+        },
+        "ManuallyDefineDateTime": {
+          "en": "Manually define Date & Time",
+          "de": "Zeitpunkt manuell auswählen"
+        },
+        "SelectTimezonePrompt": {
+          "en": "Please select your timezone.",
+          "de": "Bitte wähle deine Zeitzone aus."
+        },
+        "SelectTimezone": {
+          "en": "Change timezone",
+          "de": "Zeitzone ändern"
         },
         "DateTimeMinute": {
           "en": "Minute",
@@ -4396,6 +4420,18 @@
         "NoSong": {
           "en": "No song is playing",
           "de": "Kein Lied spielt"
+        },
+        "Shuffle": {
+          "en": "Shuffle",
+          "de": "Mischen"
+        },
+        "Repeat": {
+          "en": "Repeat",
+          "de": "Wiederholen"
+        },
+        "Play": {
+          "en": "Play",
+          "de": "Wiedergabe"
         }
       },
       "Join": {
@@ -6251,8 +6287,12 @@
         "de": "Mehrere Nachrichten gelöscht"
       },
       "CheckAttachedFileForDeletedMessages": {
-        "en": "Check the attached file to view the deleted messages",
-        "de": "Überprüfe die angehängte Datei, um die gelöschten Nachrichten anzuzeigen"
+        "en": "To view the messages, click the button below or download the attached file and view it in your browser.",
+        "de": "Um die gelöschten Dateien anzuzeigen, klicke den Knopf unter der Nachricht oder lade dir die angehängte Datei herunter und öffne sie mit deinem Browser."
+      },
+      "AffectedUsers": {
+        "en": "Affected Users",
+        "de": "Betroffene Benutzer"
       },
       "MessageUpdated": {
         "en": "Message updated",

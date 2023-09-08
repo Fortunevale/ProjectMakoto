@@ -9,13 +9,41 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class BanDetails
+[TableName("-")]
+public sealed class BanDetails : RequiresBotReference
 {
-    public string Reason { get; set; }
+    private string _tableName;
 
+    public BanDetails(Bot bot, string tableName, ulong Id) : base(bot)
+    {
+        this.Id = Id;
 
-    public ulong Moderator { get; set; }
+        this._tableName = tableName;
 
+        _ = this.Bot.DatabaseClient.CreateRow(this._tableName, typeof(BanDetails), Id, this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
 
-    public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+    [ColumnName("id"), ColumnType(ColumnTypes.BigInt), Primary]
+    internal ulong Id { get; init; }
+
+    [ColumnName("reason"), ColumnType(ColumnTypes.LongText), WithCollation, Default("-")]
+    public string Reason
+    {
+        get => this.Bot.DatabaseClient.GetValue<string>(this._tableName, "id", this.Id, "reason", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue(this._tableName, "id", this.Id, "reason", value, this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
+
+    [ColumnName("moderator"), ColumnType(ColumnTypes.BigInt), Default("0")]
+    public ulong Moderator
+    {
+        get => this.Bot.DatabaseClient.GetValue<ulong>(this._tableName, "id", this.Id, "moderator", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue(this._tableName, "id", this.Id, "moderator", value, this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
+
+    [ColumnName("timestamp"), ColumnType(ColumnTypes.BigInt), Default("0")]
+    public DateTime Timestamp
+    {
+        get => this.Bot.DatabaseClient.GetValue<DateTime>(this._tableName, "id", this.Id, "timestamp", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue(this._tableName, "id", this.Id, "timestamp", value, this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
 }

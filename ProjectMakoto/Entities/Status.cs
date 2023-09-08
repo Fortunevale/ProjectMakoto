@@ -15,14 +15,13 @@ public sealed class Status
 
     public DateTime startupTime { get; internal set; } = DateTime.UtcNow;
 
+    internal bool MigrationRequired { get; set; } = false;
     public string RunningVersion { get; internal set; }
 
     public bool DiscordInitialized { get; internal set; } = false;
     public bool DiscordGuildDownloadCompleted { get; internal set; } = false;
     public bool DiscordCommandsRegistered { get; internal set; } = false;
     public bool LavalinkInitialized { get; internal set; } = false;
-    public bool DatabaseInitialized { get; internal set; } = false;
-    public bool DatabaseInitialLoadCompleted { get; internal set; } = false;
 
     public ulong TeamOwner { get; internal set; } = new();
     public IReadOnlyList<ulong> TeamMembers

@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Database.ColumnAttributes;
+
 namespace ProjectMakoto.Entities.Guilds;
 
 public sealed class InviteTrackerSettings : RequiresParent<Guild>
@@ -15,25 +17,24 @@ public sealed class InviteTrackerSettings : RequiresParent<Guild>
     {
     }
 
-    private bool _Enabled { get; set; } = false;
+    [ColumnName("invitetracker_enabled"), ColumnType(ColumnTypes.TinyInt), Default("1")]
     public bool Enabled
     {
-        get => this._Enabled;
-        set
-        {
-            this._Enabled = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "invitetracker_enabled", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "invitetracker_enabled", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "invitetracker_enabled", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    private List<InviteTrackerCacheItem> _Cache { get; set; } = new();
-    public List<InviteTrackerCacheItem> Cache
+    [ColumnName("invitetracker_cache"), ColumnType(ColumnTypes.LongText), Default("[]")]
+    public InviteTrackerCacheItem[] Cache
     {
-        get => this._Cache;
-        set
-        {
-            this._Cache = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "invitetracker_cache", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => JsonConvert.DeserializeObject<InviteTrackerCacheItem[]>(this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Parent.Id, "invitetracker_cache", this.Bot.DatabaseClient.mainDatabaseConnection))
+            .Select(x =>
+            {
+                x.Bot = this.Bot;
+                x.Parent = this.Parent;
+
+                return x;
+            }).ToArray();
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "invitetracker_cache", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 }

@@ -47,18 +47,6 @@ public abstract class BasePlugin
         => this.Bot.status.DiscordCommandsRegistered;
 
     /// <summary>
-    /// Whether the database connection has been established.
-    /// </summary>
-    public bool DatabaseInitialized
-        => this.Bot.status.DatabaseInitialized;
-
-    /// <summary>
-    /// Whether the database content has loaded.
-    /// </summary>
-    public bool DatabaseInitialLoadCompleted
-        => this.Bot.status.DatabaseInitialLoadCompleted;
-
-    /// <summary>
     /// The name of this plugin.
     /// </summary>
     public abstract string Name { get; }
@@ -119,6 +107,7 @@ public abstract class BasePlugin
         return;
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter")]
     public void EnableCommandTranslations(ApplicationCommandsTranslationContext ctx)
     {
         return;

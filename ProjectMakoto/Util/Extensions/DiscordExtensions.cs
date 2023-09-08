@@ -241,7 +241,8 @@ internal static class DiscordExtensions
 
         md = Regex.Replace(md, @"(?<!\\)\`([^\n`]+?)\`", (e) =>
         {
-            return $"<discord-inline-code in-embed=\"{isEmbed.ToString().ToLower()}\" >{e.Groups[1].Value.Replace(" ", "&nbsp;")}</discord-inline-code>";
+            return $"<discord-inline-code in-embed=\"{isEmbed.ToString().ToLower()}\" >{e.Groups[1].Value
+                .Replace("*", "\\*").Replace("_", "\\_").Replace("&gt;", "\\&gt;").Replace("&lt;", "\\&lt;").Replace("~", "\\~").Replace("`", "\\`").Replace("|", "\\|").Replace(" ", "&nbsp;")}</discord-inline-code>";
         }, RegexOptions.Compiled);
         
         md = Regex.Replace(md, @"(?<!\\)(?:\`\`\`)(?:(\w{2,15})\n)?((?:.|\n)+?)(?:\`\`\`)", (e) =>
@@ -256,7 +257,8 @@ internal static class DiscordExtensions
 
         md = Regex.Replace(md, @"(?<!\\)\*\*([^\n*]+?)(?<!\\)\*\*", (e) =>
         {
-            return $"<discord-bold>{e.Groups[1].Value}</discord-bold>";
+            return $"<discord-bold>{e.Groups[1].Value
+                .Replace("*", "\\*").Replace("_", "\\_").Replace("&gt;", "\\&gt;").Replace("&lt;", "\\&lt;").Replace("~", "\\~").Replace("`", "\\`").Replace("|", "\\|")}</discord-bold>";
         }, RegexOptions.Compiled);
 
         md = Regex.Replace(md, @"(?<!\\)\~\~([^\n~]+?)(?<!\\)\~\~", (e) =>

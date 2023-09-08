@@ -26,7 +26,7 @@ internal sealed class DeleteCommand : BaseCommand
                 _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Description = this.GetString(this.t.Commands.Utility.Data.Object.ProfileAlreadyDeleted, true)
-                }.AsBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
+                }.AsAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
 
                 var Menu1 = await ctx.WaitForButtonAsync();
 
@@ -43,12 +43,11 @@ internal sealed class DeleteCommand : BaseCommand
                     _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                     {
                         Description = this.GetString(this.t.Commands.Utility.Data.Object.EnablingDataProcessing, true)
-                    }.AsBotLoading(ctx));
+                    }.AsLoading(ctx));
 
                     try
                     {
                         _ = ctx.Bot.objectedUsers.Remove(ctx.User.Id);
-                        await ctx.Bot.DatabaseClient._helper.DeleteRow(ctx.Bot.DatabaseClient.mainDatabaseConnection, "objected_users", "id", $"{ctx.User.Id}");
                     }
                     catch (Exception ex)
                     {
@@ -57,14 +56,14 @@ internal sealed class DeleteCommand : BaseCommand
                         _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                         {
                             Description = this.GetString(this.t.Commands.Utility.Data.Object.EnablingDataProcessingError, true)
-                        }.AsBotError(ctx));
+                        }.AsError(ctx));
                         return;
                     }
 
                     _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                     {
                         Description = this.GetString(this.t.Commands.Utility.Data.Object.EnablingDataProcessingSuccess, true)
-                    }.AsBotSuccess(ctx));
+                    }.AsSuccess(ctx));
                 }
                 else
                 {
@@ -81,7 +80,7 @@ internal sealed class DeleteCommand : BaseCommand
                     Description = this.GetString(this.t.Commands.Utility.Data.Object.DeletionAlreadyScheduled, true,
                     new TVar("RequestTimestamp", ctx.DbUser.Data.DeletionRequestDate.AddDays(-14).ToTimestamp()),
                     new TVar("ScheduleTimestamp", ctx.DbUser.Data.DeletionRequestDate.ToTimestamp()))
-                }.AsBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
+                }.AsAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
 
                 var Menu1 = await ctx.WaitForButtonAsync();
 
@@ -101,7 +100,7 @@ internal sealed class DeleteCommand : BaseCommand
                     _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                     {
                         Description = this.GetString(this.t.Commands.Utility.Data.Object.DeletionScheduleReversed, true)
-                    }.AsBotSuccess(ctx));
+                    }.AsSuccess(ctx));
                 }
                 else
                 {
@@ -114,7 +113,7 @@ internal sealed class DeleteCommand : BaseCommand
             _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
                 Description = this.GetString(this.t.Commands.Utility.Data.Object.ObjectionDisclaimer, true, true)
-            }.AsBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
+            }.AsAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
 
             var Menu = await ctx.WaitForButtonAsync();
 
@@ -131,7 +130,7 @@ internal sealed class DeleteCommand : BaseCommand
                 _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Description = $"**{this.GetString(this.t.Commands.Utility.Data.Object.SecondaryConfirm, true)}**"
-                }.AsBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { No, Yes }));
+                }.AsAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { No, Yes }));
 
                 Menu = await ctx.WaitForButtonAsync();
 
@@ -151,7 +150,7 @@ internal sealed class DeleteCommand : BaseCommand
                     _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                     {
                         Description = this.GetString(this.t.Commands.Utility.Data.Object.ProfileDeletionScheduled, true)
-                    }.AsBotSuccess(ctx));
+                    }.AsSuccess(ctx));
                 }
                 else
                 {

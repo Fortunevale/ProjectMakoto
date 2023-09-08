@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Database.ColumnAttributes;
+
 namespace ProjectMakoto.Entities.Guilds;
 
 public sealed class Lavalink : RequiresParent<Guild>
@@ -15,78 +17,72 @@ public sealed class Lavalink : RequiresParent<Guild>
     {
     }
 
-    DiscordGuild Guild { get; set; }
+    public void Reset()
+    {
+        this.SongQueue = Array.Empty<QueueInfo>();
+        this.ChannelId = 0;
+        this.CurrentVideo = null;
+        this.CurrentVideoPosition = -1;
+        this.Repeat = false;
+        this.Shuffle = false;
+        this.IsPaused = false;
 
-    public List<QueueInfo> SongQueue = new();
+        this.Parent.MusicModule = new(this.Parent.Bot, this.Parent);
+    }
+
+    private DiscordGuild Guild { get; set; }
 
     public List<ulong> collectedSkips = new();
     public List<ulong> collectedDisconnectVotes = new();
     public List<ulong> collectedClearQueueVotes = new();
 
-    private ulong _ChannelId { get; set; } = 0;
+    [ColumnName("lavalink_queue"), ColumnType(ColumnTypes.LongText), WithCollation, Default("[]")]
+    public QueueInfo[] SongQueue
+    {
+        get => JsonConvert.DeserializeObject<QueueInfo[]>(this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Parent.Id, "lavalink_queue", this.Bot.DatabaseClient.mainDatabaseConnection));
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "lavalink_queue", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
+
+    [ColumnName("lavalink_channel"), ColumnType(ColumnTypes.BigInt), Default("0")]
     public ulong ChannelId
     {
-        get => this._ChannelId;
-        set
-        {
-            this._ChannelId = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "lavalink_channel", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<ulong>("guilds", "serverid", this.Parent.Id, "lavalink_channel", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "lavalink_channel", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    private string _CurrentVideo { get; set; } = "";
-    public string CurrentVideo
+    [ColumnName("lavalink_currentvideo"), ColumnType(ColumnTypes.Text), WithCollation, Nullable]
+    public string? CurrentVideo
     {
-        get => this._CurrentVideo;
-        set
-        {
-            this._CurrentVideo = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "lavalink_currentvideo", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Parent.Id, "lavalink_currentvideo", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "lavalink_currentvideo", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    private long _CurrentVideoPosition { get; set; } = -1;
+    [ColumnName("lavalink_currentposition"), ColumnType(ColumnTypes.BigInt), Default("-1")]
     public long CurrentVideoPosition
     {
-        get => this._CurrentVideoPosition;
-        set
-        {
-            this._CurrentVideoPosition = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "lavalink_currentposition", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<long>("guilds", "serverid", this.Parent.Id, "lavalink_currentposition", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "lavalink_currentposition", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    private bool _Repeat { get; set; } = false;
+    [ColumnName("lavalink_repeat"), ColumnType(ColumnTypes.TinyInt), Default("0")]
     public bool Repeat
     {
-        get => this._Repeat;
-        set
-        {
-            this._Repeat = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "lavalink_repeat", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "lavalink_repeat", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "lavalink_repeat", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    private bool _Shuffle { get; set; } = false;
+    [ColumnName("lavalink_shuffle"), ColumnType(ColumnTypes.TinyInt), Default("0")]
     public bool Shuffle
     {
-        get => this._Shuffle;
-        set
-        {
-            this._Shuffle = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "lavalink_shuffle", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "lavalink_shuffle", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "lavalink_shuffle", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    private bool _IsPaused { get; set; } = false;
+    [ColumnName("lavalink_paused"), ColumnType(ColumnTypes.TinyInt), Default("0")]
     public bool IsPaused
     {
-        get => this._IsPaused;
-        set
-        {
-            this._IsPaused = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "lavalink_paused", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "lavalink_paused", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "lavalink_paused", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
     public sealed class QueueInfo
@@ -97,46 +93,19 @@ public sealed class Lavalink : RequiresParent<Guild>
             this.Url = Url;
             this.Length = length;
 
-            this.guild = guild;
-            this.user = user;
+            this.GuildId = guild?.Id ?? 0;
+            this.UserId = user?.Id ?? 0;
         }
+
+        public string UUID { get; set; } = Guid.NewGuid().ToString();
 
         public string VideoTitle { get; set; }
         public string Url { get; set; }
 
         public TimeSpan Length { get; set; }
 
-        [JsonIgnore]
-        public DiscordGuild guild { get; set; }
-
-        [JsonIgnore]
-        public DiscordUser user { get; set; }
-
-        private ulong _GuildId = 0;
-        public ulong GuildId
-        {
-            get => this.guild?.Id ?? this._GuildId;
-            set
-            {
-                if (this.guild is not null)
-                    throw new ArgumentException("Do not set this value when guild is already set.");
-
-                this._GuildId = value;
-            }
-        }
-
-        private ulong _UserId = 0;
-        public ulong UserId
-        {
-            get => this.user?.Id ?? this._UserId;
-            set
-            {
-                if (this.user is not null)
-                    throw new ArgumentException("Do not set this value when user is already set.");
-
-                this._UserId = value;
-            }
-        }
+        public ulong GuildId = 0;
+        public ulong UserId = 0;
     }
 
     public bool Disposed { private set; get; } = false;
@@ -148,7 +117,7 @@ public sealed class Lavalink : RequiresParent<Guild>
 
         _logger.LogDebug("Disposed Player for {Id}. ({reason})", Id, reason);
 
-        _bot.Guilds[Id].MusicModule = new(this.Bot, this.Parent);
+        _bot.Guilds[Id].MusicModule.Reset();
     }
 
     public void QueueHandler(Bot _bot, DiscordClient sender, LavalinkSession session, LavalinkGuildPlayer guildPlayer)
@@ -193,7 +162,7 @@ public sealed class Lavalink : RequiresParent<Guild>
                                     if (UserAmount <= 1)
                                     {
                                         _bot.Guilds[e.Guild.Id].MusicModule.Dispose(_bot, e.Guild.Id, "No users");
-                                        _bot.Guilds[e.Guild.Id].MusicModule = new(this.Bot, this.Parent);
+                                        _bot.Guilds[e.Guild.Id].MusicModule.Reset();
                                     }
                                 });
                         }
@@ -238,9 +207,9 @@ public sealed class Lavalink : RequiresParent<Guild>
                 {
                     var WaitSeconds = 30;
 
-                    while ((guildPlayer.CurrentTrack is not null || _bot.Guilds[this.Guild.Id].MusicModule.SongQueue.Count <= 0) && !TrackEnded && !this.Disposed)
+                    while ((guildPlayer.CurrentTrack is not null || _bot.Guilds[this.Guild.Id].MusicModule.SongQueue.Length <= 0) && !TrackEnded && !this.Disposed)
                     {
-                        if (guildPlayer.CurrentTrack is null && _bot.Guilds[this.Guild.Id].MusicModule.SongQueue.Count <= 0)
+                        if (guildPlayer.CurrentTrack is null && _bot.Guilds[this.Guild.Id].MusicModule.SongQueue.Length <= 0)
                         {
                             WaitSeconds--;
 
@@ -272,9 +241,9 @@ public sealed class Lavalink : RequiresParent<Guild>
 
                     if (LastPlayedTrack is not null && _bot.Guilds[this.Guild.Id].MusicModule.Repeat && _bot.Guilds[this.Guild.Id].MusicModule.SongQueue.Contains(LastPlayedTrack))
                     {
-                        skipSongs = _bot.Guilds[this.Guild.Id].MusicModule.SongQueue.IndexOf(LastPlayedTrack) + 1;
+                        skipSongs = Array.IndexOf(_bot.Guilds[this.Guild.Id].MusicModule.SongQueue, LastPlayedTrack) + 1;
 
-                        if (skipSongs >= _bot.Guilds[this.Guild.Id].MusicModule.SongQueue.Count)
+                        if (skipSongs >= _bot.Guilds[this.Guild.Id].MusicModule.SongQueue.Length)
                             skipSongs = 0;
                     }
 
@@ -290,7 +259,7 @@ public sealed class Lavalink : RequiresParent<Guild>
 
                     if (loadResult.LoadType is LavalinkLoadResultType.Error or LavalinkLoadResultType.Empty)
                     {
-                        _ = _bot.Guilds[this.Guild.Id].MusicModule.SongQueue.Remove(Track);
+                        _bot.Guilds[this.Guild.Id].MusicModule.SongQueue = _bot.Guilds[this.Guild.Id].MusicModule.SongQueue.Remove(x => x.UUID, Track);
                         continue;
                     }
 
@@ -316,7 +285,7 @@ public sealed class Lavalink : RequiresParent<Guild>
                     }
 
                     if (!_bot.Guilds[this.Guild.Id].MusicModule.Repeat)
-                        _ = _bot.Guilds[this.Guild.Id].MusicModule.SongQueue.Remove(Track);
+                        _bot.Guilds[this.Guild.Id].MusicModule.SongQueue = _bot.Guilds[this.Guild.Id].MusicModule.SongQueue.Remove(x => x.UUID, Track);
                 }
             }
             catch (Exception ex)

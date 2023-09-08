@@ -23,21 +23,29 @@ public sealed class Cooldown : RequiresParent<User>
         if (this.Bot.status.TeamMembers.Contains(ctx.User.Id) && !IgnoreStaff)
             return false;
 
-        if (this.WaitingList.Contains(ctx.CommandName))
+        bool alreadyWaiting;
+        lock (this.WaitingList)
+        {
+            alreadyWaiting = this.WaitingList.Contains(ctx.CommandName);
+        }
+        if (alreadyWaiting)
         {
             var stop_warn = await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} 🛑 `{ctx.BaseCommand.GetString(ctx.t.Commands.Common.Cooldown.SlowDown)}`"));
             await Task.Delay(3000);
-            _ = stop_warn.DeleteAsync();
+            ctx.BaseCommand.DeleteOrInvalidate();
             return true;
         }
 
-        if (!this.LastUseByCommand.ContainsKey(ctx.CommandName))
-            this.LastUseByCommand.Add(ctx.CommandName, DateTime.MinValue);
-
-        if (this.LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).GetTotalSecondsUntil() <= 0)
+        lock (this.LastUseByCommand)
         {
-            this.LastUseByCommand[ctx.CommandName] = DateTime.UtcNow.ToUniversalTime();
-            return false;
+            if (!this.LastUseByCommand.ContainsKey(ctx.CommandName))
+                this.LastUseByCommand.Add(ctx.CommandName, DateTime.MinValue);
+
+            if (this.LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).GetTotalSecondsUntil() <= 0)
+            {
+                this.LastUseByCommand[ctx.CommandName] = DateTime.UtcNow.ToUniversalTime();
+                return false;
+            } 
         }
 
         var cancelButton = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), ctx.BaseCommand.GetString(ctx.t.Commands.Common.Cooldown.CancelCommand), false, EmojiTemplates.GetError(ctx.Bot).ToComponent());
@@ -62,11 +70,18 @@ public sealed class Cooldown : RequiresParent<User>
             cancellationTokenSource.Cancel();
         }).Add(ctx.Bot);
 
-        var milliseconds = this.LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).GetTimespanUntil().TotalMilliseconds;
+        double milliseconds;
+        lock (this.LastUseByCommand)
+        {
+            milliseconds = this.LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).GetTimespanUntil().TotalMilliseconds; 
+        }
         if (milliseconds <= 0)
             milliseconds = 500;
 
-        this.WaitingList.Add(ctx.CommandName);
+        lock (this.WaitingList)
+        {
+            this.WaitingList.Add(ctx.CommandName);
+        }
         try
         {
             await Task.Delay(Convert.ToInt32(Math.Round(milliseconds, 0)), cancellationTokenSource.Token);
@@ -74,14 +89,17 @@ public sealed class Cooldown : RequiresParent<User>
         catch { }
         finally
         {
-            _ = this.WaitingList.Remove(ctx.CommandName);
+            lock (this.WaitingList)
+            {
+                _ = this.WaitingList.Remove(ctx.CommandName);
+            }
         }
 
         try
         {
             _ = await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder()
-            .WithContent($"{ctx.User.Mention} ⏳ {ctx.BaseCommand.GetString(ctx.t.Commands.Common.Cooldown.WaitingForCooldown, true, new TVar("Timestamp", this.LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).ToTimestamp()))}")
-            .AddComponents(cancelButton.Disable()));
+                    .WithContent($"{ctx.User.Mention} ⏳ {ctx.BaseCommand.GetString(ctx.t.Commands.Common.Cooldown.WaitingForCooldown, true, new TVar("Timestamp", DateTime.UtcNow.ToTimestamp()))}")
+                    .AddComponents(cancelButton.Disable()));
         }
         catch { }
 
@@ -91,7 +109,10 @@ public sealed class Cooldown : RequiresParent<User>
         if (ctx.CommandType == Enums.CommandType.Custom)
             ctx.BaseCommand.DeleteOrInvalidate();
 
-        this.LastUseByCommand[ctx.CommandName] = DateTime.UtcNow.ToUniversalTime();
+        lock (this.LastUseByCommand)
+        {
+            this.LastUseByCommand[ctx.CommandName] = DateTime.UtcNow.ToUniversalTime(); 
+        }
         return false;
     }
 

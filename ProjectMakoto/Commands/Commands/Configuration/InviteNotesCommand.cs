@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Guilds;
+
 namespace ProjectMakoto.Commands;
 
 internal sealed class InviteNotesCommand : BaseCommand
@@ -23,7 +25,7 @@ internal sealed class InviteNotesCommand : BaseCommand
             {
                 return !ctx.DbGuild.InviteNotes.Notes.Any()
                     ? ctx.BaseCommand.GetString(this.t.Commands.Config.InviteNotes.NoNotesDefined, true)
-                    : $"{string.Join('\n', ctx.DbGuild.InviteNotes.Notes.Select(x => $"> `{x.Key}`\n{x.Value.Note.FullSanitize()}"))}";
+                    : $"{string.Join('\n', ctx.DbGuild.InviteNotes.Notes.Select(x => $"> `{x.Invite}`\n{x.Note.FullSanitize()}"))}";
             }
 
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
@@ -37,7 +39,7 @@ internal sealed class InviteNotesCommand : BaseCommand
                 Description = GetCurrentConfiguration(ctx)
             }.AsInfo(ctx, this.GetString(CommandKey.Title));
 
-            if (!(ctx.DbGuild.InviteNotes.Notes.Count > 19))
+            if (!(ctx.DbGuild.InviteNotes.Notes.Length > 19))
             {
                 _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
                 .AddComponents(new List<DiscordComponent>
@@ -121,7 +123,7 @@ internal sealed class InviteNotesCommand : BaseCommand
 
                         var invites = await ctx.Guild.GetInvitesAsync();
 
-                        var SelectionResult = await this.PromptCustomSelection(invites.Where(x => !ctx.DbGuild.InviteNotes.Notes.ContainsKey(x.Code))
+                        var SelectionResult = await this.PromptCustomSelection(invites.Where(x => !ctx.DbGuild.InviteNotes.Notes.Any(a => a.Invite == x.Code))
                             .Select(x => new DiscordStringSelectComponentOption(x.Code, x.Code, this.GetString(CommandKey.InviteDescription, new TVar("Uses", x.Uses), new TVar("Creator", x.Inviter.GetUsernameWithIdentifier())))).ToList());
 
                         if (SelectionResult.TimedOut)
@@ -145,7 +147,7 @@ internal sealed class InviteNotesCommand : BaseCommand
                     {
                         _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        ctx.DbGuild.InviteNotes.Notes.Add(SelectedInvite.Code, new()
+                        ctx.DbGuild.InviteNotes.Notes = ctx.DbGuild.InviteNotes.Notes.Add(new()
                         {
                             Invite = SelectedInvite.Code,
                             Moderator = ctx.User.Id,
@@ -159,7 +161,7 @@ internal sealed class InviteNotesCommand : BaseCommand
             }
             else if (e.GetCustomId() == RemoveButton.CustomId)
             {
-                var SelectionResult = await this.PromptCustomSelection(ctx.DbGuild.InviteNotes.Notes.Select(x => new DiscordStringSelectComponentOption(x.Key, x.Key, $"{x.Value.Note.TruncateWithIndication(50)}")).ToList());
+                var SelectionResult = await this.PromptCustomSelection(ctx.DbGuild.InviteNotes.Notes.Select(x => new DiscordStringSelectComponentOption(x.Invite, x.Invite, $"{x.Note.TruncateWithIndication(50)}")).ToList());
 
                 if (SelectionResult.TimedOut)
                 {
@@ -176,12 +178,13 @@ internal sealed class InviteNotesCommand : BaseCommand
                     throw SelectionResult.Exception;
                 }
 
-                _ = ctx.DbGuild.InviteNotes.Notes.Remove(SelectionResult.Result);
+                ctx.DbGuild.InviteNotes.Notes = ctx.DbGuild.InviteNotes.Notes
+                    .Remove(x => x.Invite, ctx.DbGuild.InviteNotes.Notes.First(x => x.Invite == SelectionResult.Result));
 
                 await this.ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
+            else if (e.GetCustomId() == MessageComponents.CancelButtonId)
             {
                 this.DeleteOrInvalidate();
                 return;

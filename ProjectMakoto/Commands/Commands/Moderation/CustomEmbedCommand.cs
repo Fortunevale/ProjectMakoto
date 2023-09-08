@@ -275,7 +275,7 @@ internal sealed class CustomEmbedCommand : BaseCommand
                             };
                             continue;
                         }
-                        else if (Menu2.GetCustomId() == MessageComponents.GetBackButton(ctx.DbUser, ctx.Bot).CustomId)
+                        else if (Menu2.GetCustomId() == MessageComponents.BackButtonId)
                         {
                             _ = Menu2.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
                             continue;
@@ -548,7 +548,7 @@ internal sealed class CustomEmbedCommand : BaseCommand
                             };
                             continue;
                         }
-                        else if (Menu2.GetCustomId() == MessageComponents.GetBackButton(ctx.DbUser, ctx.Bot).CustomId)
+                        else if (Menu2.GetCustomId() == MessageComponents.BackButtonId)
                         {
                             _ = Menu2.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
                             continue;
@@ -558,7 +558,7 @@ internal sealed class CustomEmbedCommand : BaseCommand
                     }
                     else if (Menu1.GetCustomId() == SetTimestamp.CustomId)
                     {
-                        var ModalResult = await this.PromptModalForDateTime(Menu1.Result.Interaction, false);
+                        var ModalResult = await this.PromptModalForDateTime(Menu1.Result.Interaction, null, false);
 
                         if (ModalResult.TimedOut)
                         {
@@ -735,7 +735,7 @@ internal sealed class CustomEmbedCommand : BaseCommand
                         this.DeleteOrInvalidate();
                         return;
                     }
-                    else if (Menu1.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
+                    else if (Menu1.GetCustomId() == MessageComponents.CancelButtonId)
                     {
                         _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
                         this.DeleteOrInvalidate();

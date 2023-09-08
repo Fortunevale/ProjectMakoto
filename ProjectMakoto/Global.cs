@@ -61,6 +61,7 @@ global using ProjectMakoto.Plugins;
 global using ProjectMakoto.PrefixCommands;
 global using ProjectMakoto.Util.SystemMonitor;
 global using ProjectMakoto.Util.JsonSerializers;
+global using ProjectMakoto.Entities.Database.ColumnAttributes;
 global using static ProjectMakoto.Util.Log;
 
 global using Xorog.Logger;
@@ -72,6 +73,6 @@ global using Xorog.UniversalExtensions.Enums;
 global using Xorog.UniversalExtensions.Converters;
 
 global using Dapper;
-global using MySql.Data.MySqlClient;
+global using MySqlConnector;
 global using Newtonsoft.Json;
 global using QuickChart;

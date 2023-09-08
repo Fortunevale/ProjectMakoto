@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Database.ColumnAttributes;
+
 namespace ProjectMakoto.Entities.Guilds;
 public sealed class PrefixSettings : RequiresParent<Guild>
 {
@@ -14,23 +16,17 @@ public sealed class PrefixSettings : RequiresParent<Guild>
     {
     }
 
-    private string _Prefix { get; set; }
+    [ColumnName("prefix"), ColumnType(ColumnTypes.Text), WithCollation, Default(";;")]
     public string Prefix
     {
-        get => this._Prefix.IsNullOrWhiteSpace() ? this.Bot.Prefix : this._Prefix; set
-        {
-            this._Prefix = value.IsNullOrWhiteSpace() ? this.Bot.Prefix : value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "prefix", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Parent.Id, "prefix", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "prefix", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    private bool _PrefixDisabled { get; set; } = false;
+    [ColumnName("prefix_disabled"), ColumnType(ColumnTypes.TinyInt), Default("0")]
     public bool PrefixDisabled
     {
-        get => this._PrefixDisabled; set
-        {
-            this._PrefixDisabled = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "prefix_disabled", value, this.Bot.DatabaseClient.mainDatabaseConnection);
-        }
+        get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "prefix_disabled", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "prefix_disabled", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 }

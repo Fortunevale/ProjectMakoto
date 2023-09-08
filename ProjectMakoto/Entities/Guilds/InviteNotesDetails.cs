@@ -11,9 +11,50 @@ namespace ProjectMakoto.Entities.Guilds;
 
 public sealed class InviteNotesDetails
 {
-    public string Invite { get; set; }
+    [JsonIgnore]
+    public Bot Bot { get; set; }
 
-    public string Note { get; set; }
+    [JsonIgnore]
+    public Guild Parent { get; set; }
 
-    public ulong Moderator { get; set; }
+    private string _Invite { get; set; }
+    public string Invite
+    {
+        get => this._Invite;
+        set
+        {
+            this._Invite = value;
+            this.Update();
+        }
+    }
+
+    private string _Note { get; set; }
+    public string Note
+    {
+        get => this._Note;
+        set
+        {
+            this._Note = value;
+            this.Update();
+        }
+    }
+
+    private ulong _Moderator { get; set; }
+    public ulong Moderator
+    {
+        get => this._Moderator;
+        set
+        {
+            this._Moderator = value;
+            this.Update();
+        }
+    }
+
+    void Update()
+    {
+        if (this.Bot is null || this.Parent is null)
+            return;
+
+        this.Parent.InviteNotes.Notes = this.Parent.InviteNotes.Notes.Update(x => x.Invite, this);
+    }
 }

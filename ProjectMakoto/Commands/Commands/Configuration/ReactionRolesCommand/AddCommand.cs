@@ -156,7 +156,7 @@ internal sealed class AddCommand : BaseCommand
 
             embed.Author.IconUrl = ctx.Guild.IconUrl;
 
-            if (ctx.DbGuild.ReactionRoles.Count > 100)
+            if (ctx.DbGuild.ReactionRoles.Length > 100)
             {
                 embed.Description = this.GetString(CommandKey.ReactionRoleLimitReached, true);
                 _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, this.GetString(CommandKey.Title))));
@@ -170,14 +170,14 @@ internal sealed class AddCommand : BaseCommand
                 return;
             }
 
-            if (ctx.DbGuild.ReactionRoles.Any(x => (x.Key == message.Id && x.Value.EmojiName == emoji_parameter.GetUniqueDiscordName())))
+            if (ctx.DbGuild.ReactionRoles.Any(x => (x.MessageId == message.Id && x.EmojiName == emoji_parameter.GetUniqueDiscordName())))
             {
                 embed.Description = this.GetString(CommandKey.EmojiAlreadyUsed, true);
                 _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, this.GetString(CommandKey.Title))));
                 return;
             }
 
-            if (ctx.DbGuild.ReactionRoles.Any(x => x.Value.RoleId == role_parameter.Id))
+            if (ctx.DbGuild.ReactionRoles.Any(x => x.RoleId == role_parameter.Id))
             {
                 embed.Description = this.GetString(CommandKey.RoleAlreadyUsed, true);
                 _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, this.GetString(CommandKey.Title))));
@@ -186,13 +186,14 @@ internal sealed class AddCommand : BaseCommand
 
             await message.CreateReactionAsync(emoji_parameter);
 
-            ctx.DbGuild.ReactionRoles.Add(new KeyValuePair<ulong, ReactionRoleEntry>(message.Id, new()
+            ctx.DbGuild.ReactionRoles = ctx.DbGuild.ReactionRoles.Add(new()
             {
                 ChannelId = message.Channel.Id,
                 RoleId = role_parameter.Id,
                 EmojiId = emoji_parameter.Id,
-                EmojiName = emoji_parameter.GetUniqueDiscordName()
-            }));
+                EmojiName = emoji_parameter.GetUniqueDiscordName(),
+                MessageId = message.Id
+            });
 
             embed.Description = this.GetString(CommandKey.AddedReactionRole, true, 
                 new TVar("Role", role_parameter.Mention),

@@ -19,7 +19,7 @@ internal sealed class Quit2FASessionCommand : BaseCommand
         return Task.Run(async () =>
         {
             ctx.DbUser.LastSuccessful2FA = DateTime.MinValue;
-            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Your active 2FA Session, if present, has been quit.`").AsBotSuccess(ctx));
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Your active 2FA Session, if present, has been quit.`").AsSuccess(ctx));
         });
     }
 }

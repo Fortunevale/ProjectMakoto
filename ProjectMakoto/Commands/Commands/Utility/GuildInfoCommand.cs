@@ -25,7 +25,7 @@ internal sealed class GuildInfoCommand : BaseCommand
             if (guildId == 0)
                 guildId = ctx.Guild.Id;
 
-            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Utility.GuildInfo.Fetching, true)).AsBotLoading(ctx));
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Utility.GuildInfo.Fetching, true)).AsLoading(ctx));
 
             try
             {
@@ -40,7 +40,7 @@ internal sealed class GuildInfoCommand : BaseCommand
                     },
                     ImageUrl = guild.DiscoverySplashUrl ?? guild.SplashUrl ?? "",
                     Description = $"{(guild.Description.IsNullOrWhiteSpace() ? "" : $"{guild.Description}\n\n")}",
-                }.AsBotInfo(ctx);
+                }.AsInfo(ctx);
 
                 _ = embed.AddField(new DiscordEmbedField(this.GetString(this.t.Commands.Utility.GuildInfo.MemberTitle), $"👥 `{guild.Members.Count}` **{this.GetString(this.t.Commands.Utility.GuildInfo.MemberTitle)}**\n" +
                                   $"🟢 `{guild.Members.Where(x => (x.Value?.Presence?.Status ?? UserStatus.Offline) != UserStatus.Offline).Count()}` **{this.GetString(this.t.Commands.Utility.GuildInfo.OnlineMembers)}**\n" +
@@ -75,7 +75,8 @@ internal sealed class GuildInfoCommand : BaseCommand
                                   $"> {(!guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressRoleSubbscriptionPurchaseNotificationReplies)).ToPillEmote(ctx.Bot)} **{this.GetString(this.t.Commands.Utility.GuildInfo.SystemMessagesRoleSticker)}**\n" +
                                   $"> {(!guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressGuildReminderNotifications)).ToPillEmote(ctx.Bot)} **{this.GetString(this.t.Commands.Utility.GuildInfo.SystemMessagesSetupTips)}**\n"));
 
-                _ = embed.AddField(new DiscordEmbedField(this.GetString(this.t.Commands.Utility.GuildInfo.GuildFeatures), $"{string.Join(", ", guild.RawFeatures.Select(x => $"`{string.Join(" ", x.Replace("_", " ").ToLower().Split(" ").Select(x => x.FirstLetterToUpper()))}`"))}"));
+                if (guild.RawFeatures.Count > 0)
+                    _ = embed.AddField(new DiscordEmbedField(this.GetString(this.t.Commands.Utility.GuildInfo.GuildFeatures), $"{string.Join(", ", guild.RawFeatures.Select(x => $"`{string.Join(" ", x.Replace("_", " ").ToLower().Split(" ").Select(x => x.FirstLetterToUpper()))}`"))}"));
 
                 var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
@@ -102,7 +103,7 @@ internal sealed class GuildInfoCommand : BaseCommand
                         },
                         ImageUrl = preview.SplashUrl ?? preview.DiscoverySplashUrl ?? "",
                         Description = preview.Description ?? "",
-                    }.AsBotInfo(ctx, "", this.GetString(this.t.Commands.Utility.GuildInfo.GuildPreviewNotice));
+                    }.AsInfo(ctx, "", this.GetString(this.t.Commands.Utility.GuildInfo.GuildPreviewNotice));
 
                     _ = embed.AddField(new DiscordEmbedField(this.GetString(this.t.Commands.Utility.GuildInfo.MemberTitle), $"👥 `{preview.ApproximateMemberCount}` **{this.GetString(this.t.Commands.Utility.GuildInfo.MemberTitle)}**\n" +
                                   $"🟢 `{preview.ApproximatePresenceCount}` **{this.GetString(this.t.Commands.Utility.GuildInfo.OnlineMembers)}**\n"));
@@ -135,7 +136,7 @@ internal sealed class GuildInfoCommand : BaseCommand
                         var embed = new DiscordEmbedBuilder
                         {
                             Title = widget.Name,
-                        }.AsBotInfo(ctx, "", this.GetString(this.t.Commands.Utility.GuildInfo.GuildWidgetNotice));
+                        }.AsInfo(ctx, "", this.GetString(this.t.Commands.Utility.GuildInfo.GuildWidgetNotice));
 
                         _ = embed.AddField(new DiscordEmbedField(this.GetString(this.t.Commands.Utility.GuildInfo.MemberTitle), $"🟢 `{widget.PresenceCount}` **{this.GetString(this.t.Commands.Utility.GuildInfo.OnlineMembers)}**\n"));
 
@@ -160,7 +161,7 @@ internal sealed class GuildInfoCommand : BaseCommand
                                     Url = $"https://cdn.discordapp.com/icons/{guildId}/{mee6.guild.icon}.webp?size=96",
                                 },
                                 ImageUrl = mee6.banner_url ?? "",
-                            }.AsBotInfo(ctx, "", this.GetString(this.t.Commands.Utility.GuildInfo.Mee6Notice));
+                            }.AsInfo(ctx, "", this.GetString(this.t.Commands.Utility.GuildInfo.Mee6Notice));
 
                             _ = embed.AddField(new DiscordEmbedField(this.GetString(this.t.Commands.Utility.GuildInfo.MemberTitle), $"👥 `{mee6.players.Length}` **{this.GetString(this.t.Commands.Utility.GuildInfo.MemberTitle)}**\n"));
 
@@ -171,7 +172,7 @@ internal sealed class GuildInfoCommand : BaseCommand
                             var embed = new DiscordEmbedBuilder
                             {
                                 Description = this.GetString(this.t.Commands.Utility.GuildInfo.NoGuildFound, true),
-                            }.AsBotError(ctx);
+                            }.AsError(ctx);
 
                             _ = await this.RespondOrEdit(embed);
                         }

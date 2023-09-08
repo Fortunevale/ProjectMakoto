@@ -32,7 +32,7 @@ public abstract class BaseCommand
         ctx.Transferred = true;
 
         if (await this.BasePreExecutionCheck())
-            await this.ExecuteCommand(this.ctx, arguments);
+            await this.ExecuteCommand(this.ctx, arguments).Add(ctx.Bot, this.ctx);
     }
 
     public async Task ExecuteCommand(CommandContext ctx, Bot _bot, Dictionary<string, object> arguments = null)
@@ -41,7 +41,7 @@ public abstract class BaseCommand
         this.t = _bot.LoadedTranslations;
 
         if (await this.BasePreExecutionCheck())
-            await this.ExecuteCommand(this.ctx, arguments);
+            await this.ExecuteCommand(this.ctx, arguments).Add(_bot, this.ctx);
     }
 
     public async Task ExecuteCommand(InteractionContext ctx, Bot _bot, Dictionary<string, object> arguments = null, bool Ephemeral = true, bool InitiateInteraction = true, bool InteractionInitiated = false)
@@ -49,7 +49,7 @@ public abstract class BaseCommand
         this.ctx = new SharedCommandContext(this, ctx, _bot);
         this.t = _bot.LoadedTranslations;
 
-        _ = Task.Run(async () =>
+        await Task.Run(async () =>
         {
             if (InitiateInteraction)
                 await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
@@ -63,7 +63,7 @@ public abstract class BaseCommand
                 this.ctx.RespondedToInitial = true;
 
             if (await this.BasePreExecutionCheck())
-                await this.ExecuteCommand(this.ctx, arguments);
+                await this.ExecuteCommand(this.ctx, arguments).Add(_bot, this.ctx);
         }).Add(_bot, this.ctx);
     }
 
@@ -72,7 +72,7 @@ public abstract class BaseCommand
         this.ctx = new SharedCommandContext(this, ctx, _bot);
         this.t = _bot.LoadedTranslations;
 
-        _ = Task.Run(async () =>
+        await Task.Run(async () =>
         {
             this.ctx.RespondedToInitial = false;
 
@@ -82,7 +82,7 @@ public abstract class BaseCommand
                     _ = ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AddEmbed(new DiscordEmbedBuilder()
                     {
                         Description = "`Please enroll in Two Factor Authentication via 'Enroll2FA'.`"
-                    }.AsBotError(this.ctx)).AsEphemeral());
+                    }.AsError(this.ctx)).AsEphemeral());
                     return;
                 }
                 else
@@ -111,7 +111,7 @@ public abstract class BaseCommand
                 });
 
             if (await this.BasePreExecutionCheck())
-                await this.ExecuteCommand(this.ctx, arguments);
+                await this.ExecuteCommand(this.ctx, arguments).Add(_bot, this.ctx);
         }).Add(_bot, this.ctx);
     }
 
@@ -120,7 +120,7 @@ public abstract class BaseCommand
         this.ctx = new SharedCommandContext(this, ctx, _bot);
         this.t = _bot.LoadedTranslations;
 
-        _ = Task.Run(async () =>
+        await Task.Run(async () =>
         {
             if (InitiateInteraction)
                 await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
@@ -134,7 +134,7 @@ public abstract class BaseCommand
                 this.ctx.RespondedToInitial = true;
 
             if (await this.BasePreExecutionCheck())
-                await this.ExecuteCommand(this.ctx, arguments);
+                await this.ExecuteCommand(this.ctx, arguments).Add(_bot, this.ctx);
         }).Add(_bot, this.ctx);
     }
 
@@ -143,7 +143,7 @@ public abstract class BaseCommand
         this.ctx = new SharedCommandContext(this, ctx, client, commandName, _bot);
         this.t = _bot.LoadedTranslations;
 
-        _ = Task.Run(async () =>
+        await Task.Run(async () =>
         {
             if (InitiateInteraction)
                 await ctx.Interaction.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
@@ -157,7 +157,7 @@ public abstract class BaseCommand
                 this.ctx.RespondedToInitial = true;
 
             if (await this.BasePreExecutionCheck())
-                await this.ExecuteCommand(this.ctx, arguments);
+                await this.ExecuteCommand(this.ctx, arguments).Add(_bot, this.ctx);
         }).Add(_bot, ctx);
     }
 
@@ -410,7 +410,7 @@ public abstract class BaseCommand
         => this.GetString(key, false, false, vars);
 
     public string GetString(MultiTranslationKey key, bool Code = false, params TVar[] vars)
-        => this.GetString(key, true, false, vars);
+        => this.GetString(key, Code, false, vars);
 
     public string GetString(MultiTranslationKey key, bool Code = false, bool UseBoldMarker = false, params TVar[] vars)
         => key.Get(this.ctx.DbUser).Build(Code, UseBoldMarker, vars.Concat(this.GetDefaultVars()).ToArray());
@@ -714,7 +714,6 @@ public abstract class BaseCommand
         var CurrentPage = 0;
         var SelectionInteractionId = Guid.NewGuid().ToString();
 
-
         string FinalSelection = null;
 
         var Selected = options.FirstOrDefault(x => x.Default, null)?.Value ?? "";
@@ -722,6 +721,17 @@ public abstract class BaseCommand
         var FinishedSelection = false;
         var ExceptionOccurred = false;
         Exception ThrownException = null;
+
+        while (!Selected.IsNullOrWhiteSpace() && !options.Skip(CurrentPage * 25).Take(25).Any(x => x.Value == Selected))
+        {
+            if (!options.Skip(CurrentPage * 25).Take(25).Any())
+            {
+                CurrentPage = 0;
+                break;
+            }
+
+            CurrentPage++;
+        }
 
         async Task RefreshMessage()
         {
@@ -902,129 +912,496 @@ public abstract class BaseCommand
     }
 
 
-    public async Task<InteractionResult<TimeSpan>> PromptModalForTimeSpan(DiscordInteraction interaction, TimeSpan? MaxTime = null, TimeSpan? MinTime = null, TimeSpan? DefaultTime = null, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
+    public async Task<InteractionResult<TimeSpan>> PromptForTimeSpan(DiscordInteraction interaction, TimeSpan? MaxTime = null, TimeSpan? MinTime = null, TimeSpan? DefaultTime = null, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
     {
+        _ = interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
         MinTime ??= TimeSpan.Zero;
         MaxTime ??= TimeSpan.FromDays(356);
         DefaultTime ??= TimeSpan.FromSeconds(30);
+        timeOutOverride ??= TimeSpan.FromSeconds(300);
 
-        var modal = new DiscordInteractionModalBuilder().WithTitle(this.GetString(this.t.Commands.Common.Prompts.SelectATimeSpan)).WithCustomId(Guid.NewGuid().ToString());
+        var originalEmbed = ResetToOriginalEmbed ? this.ctx.ResponseMessage.Embeds : null;
 
-        _ = modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "seconds", this.GetString(this.t.Commands.Common.Prompts.TimespanSeconds).Build(new TVar("Max", 59)), "0", 1, 2, true, $"{DefaultTime.Value.Seconds}"));
+        var removeSeconds = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "10s", false, "➖".UnicodeToEmoji().ToComponent());
+        var removeSecond = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "1s", false, "➖".UnicodeToEmoji().ToComponent());
+        var addSecond = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "1s", false, "➕".UnicodeToEmoji().ToComponent());
+        var addSeconds = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "10s", false, "➕".UnicodeToEmoji().ToComponent());
+        
+        var removeMinutes = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "10m", false, "➖".UnicodeToEmoji().ToComponent());
+        var removeMinute = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "1m", false, "➖".UnicodeToEmoji().ToComponent());
+        var addMinute = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "1m", false, "➕".UnicodeToEmoji().ToComponent());
+        var addMinutes = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "10m", false, "➕".UnicodeToEmoji().ToComponent());
+        
+        var removeHours = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "10h", false, "➖".UnicodeToEmoji().ToComponent());
+        var removeHour = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "1h", false, "➖".UnicodeToEmoji().ToComponent());
+        var addHour = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "1h", false, "➕".UnicodeToEmoji().ToComponent());
+        var addHours = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "10h", false, "➕".UnicodeToEmoji().ToComponent());
+        
+        var removeDays = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "10d", false, "➖".UnicodeToEmoji().ToComponent());
+        var removeDay = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "1d", false, "➖".UnicodeToEmoji().ToComponent());
+        var addDay = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "1d", false, "➕".UnicodeToEmoji().ToComponent());
+        var addDays = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "10d", false, "➕".UnicodeToEmoji().ToComponent());
 
-        if (MaxTime.Value.TotalMinutes >= 1)
-            _ = modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "minutes", this.GetString(this.t.Commands.Common.Prompts.TimespanMinutes).Build(new TVar("Max", (MaxTime.Value.TotalMinutes >= 60 ? "59" : $"{((int)MaxTime.Value.TotalMinutes)}"))), $"0", 1, 2, true, $"{DefaultTime.Value.Minutes}"));
+        var setExact = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), this.GetString(this.t.Commands.Common.Prompts.ManuallyDefineTimespan), false, "🕒".UnicodeToEmoji().ToComponent());
+        var confirmSelection = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), this.GetString(this.t.Commands.Common.Prompts.ConfirmSelection), false, "✅".UnicodeToEmoji().ToComponent());
 
-        if (MaxTime.Value.TotalHours >= 1)
-            _ = modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "hours", this.GetString(this.t.Commands.Common.Prompts.TimespanHours).Build(new TVar("Max", (MaxTime.Value.TotalHours >= 24 ? "23" : $"{((int)MaxTime.Value.TotalHours)}"))), "0", 1, 2, true, $"{DefaultTime.Value.Hours}"));
+        var previousSuccessSelected = DefaultTime!.Value;
+        var currentSelectedTime = DefaultTime!.Value;
 
-        if (MaxTime.Value.TotalDays >= 1)
-            _ = modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "days", this.GetString(this.t.Commands.Common.Prompts.TimespanDays).Build(new TVar("Max", ((int)MaxTime.Value.TotalDays))), "0", 1, 3, true, $"{DefaultTime.Value.Days}"));
-
-        var ModalResult = await this.PromptModalWithRetry(interaction, modal, false);
-
-        if (ModalResult.TimedOut)
+        Task UpdateMessage()
         {
+            if (currentSelectedTime > MaxTime || MinTime > currentSelectedTime)
+                currentSelectedTime = previousSuccessSelected;
+
+            previousSuccessSelected = currentSelectedTime;
+
+            var embed = new DiscordEmbedBuilder()
+                .WithDescription($"`{this.GetString(this.t.Commands.Common.Prompts.CurrentTimespan)}`: `{currentSelectedTime.GetHumanReadable(TimeFormat.Days, TranslationUtil.GetTranslatedHumanReadableConfig(this.ctx.DbUser, this.ctx.Bot, true))}`")
+                .AsAwaitingInput(this.ctx);
+
+            return this.RespondOrEdit(new DiscordMessageBuilder()
+                .AddEmbed(embed)
+                .AddComponents(removeSeconds, removeSecond, addSecond, addSeconds)
+                .AddComponents(removeMinutes, removeMinute, addMinute, addMinutes)
+                .AddComponents(removeHours, removeHour, addHour, addHours)
+                .AddComponents(removeDays, removeDay, addDay, addDays)
+                .AddComponents(setExact, MessageComponents.GetCancelButton(this.ctx.DbUser, this.ctx.Bot), confirmSelection));
+        }
+        await UpdateMessage();
+
+        var Finished = false;
+        var Cancelled = false;
+        var timeOut = Stopwatch.StartNew();
+
+        async Task Interaction(DiscordClient sender, ComponentInteractionCreateEventArgs e)
+        {
+            _ = Task.Run(async () =>
+            {
+                if (e.Message?.Id == this.ctx.ResponseMessage?.Id)
+                {
+                    timeOut.Restart();
+
+                    if (e.Id == removeSecond.CustomId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        currentSelectedTime = currentSelectedTime.Subtract(TimeSpan.FromSeconds(1));
+                        await UpdateMessage();
+                    }
+                    else if (e.Id == removeSeconds.CustomId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        currentSelectedTime = currentSelectedTime.Subtract(TimeSpan.FromSeconds(10));
+                        await UpdateMessage();
+                    }
+                    else if (e.Id == addSecond.CustomId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        currentSelectedTime = currentSelectedTime.Add(TimeSpan.FromSeconds(1));
+                        await UpdateMessage();
+                    }
+                    else if (e.Id == addSeconds.CustomId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        currentSelectedTime = currentSelectedTime.Add(TimeSpan.FromSeconds(10));
+                        await UpdateMessage();
+                    }
+                    else if (e.Id == removeMinute.CustomId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        currentSelectedTime = currentSelectedTime.Subtract(TimeSpan.FromMinutes(1));
+                        await UpdateMessage();
+                    }
+                    else if (e.Id == removeMinutes.CustomId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        currentSelectedTime = currentSelectedTime.Subtract(TimeSpan.FromMinutes(10));
+                        await UpdateMessage();
+                    }
+                    else if (e.Id == addMinute.CustomId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        currentSelectedTime = currentSelectedTime.Add(TimeSpan.FromMinutes(1));
+                        await UpdateMessage();
+                    }
+                    else if (e.Id == addMinutes.CustomId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        currentSelectedTime = currentSelectedTime.Add(TimeSpan.FromMinutes(10));
+                        await UpdateMessage();
+                    }
+                    else if (e.Id == removeHour.CustomId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        currentSelectedTime = currentSelectedTime.Subtract(TimeSpan.FromHours(1));
+                        await UpdateMessage();
+                    }
+                    else if (e.Id == removeHours.CustomId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        currentSelectedTime = currentSelectedTime.Subtract(TimeSpan.FromHours(10));
+                        await UpdateMessage();
+                    }
+                    else if (e.Id == addHour.CustomId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        currentSelectedTime = currentSelectedTime.Add(TimeSpan.FromHours(1));
+                        await UpdateMessage();
+                    }
+                    else if (e.Id == addHours.CustomId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        currentSelectedTime = currentSelectedTime.Add(TimeSpan.FromHours(10));
+                        await UpdateMessage();
+                    }
+                    else if (e.Id == removeDay.CustomId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        currentSelectedTime = currentSelectedTime.Subtract(TimeSpan.FromDays(1));
+                        await UpdateMessage();
+                    }
+                    else if (e.Id == removeDays.CustomId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        currentSelectedTime = currentSelectedTime.Subtract(TimeSpan.FromDays(10));
+                        await UpdateMessage();
+                    }
+                    else if (e.Id == addDay.CustomId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        currentSelectedTime = currentSelectedTime.Add(TimeSpan.FromDays(1));
+                        await UpdateMessage();
+                    }
+                    else if (e.Id == addDays.CustomId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        currentSelectedTime = currentSelectedTime.Add(TimeSpan.FromDays(10));
+                        await UpdateMessage();
+                    }
+                    else if (e.Id == confirmSelection.CustomId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        Finished = true;
+                    }
+                    else if (e.Id == MessageComponents.CancelButtonId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        Cancelled = true;
+                    }
+                    else if (e.Id == setExact.CustomId)
+                    {
+
+                        var modal = new DiscordInteractionModalBuilder().WithTitle(this.GetString(this.t.Commands.Common.Prompts.SelectATimeSpan)).WithCustomId(Guid.NewGuid().ToString());
+
+                        if (MaxTime.Value.TotalDays >= 1)
+                            _ = modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "days", this.GetString(this.t.Commands.Common.Prompts.TimespanDays)
+                                .Build(new TVar("Max", ((int)MaxTime.Value.TotalDays))), "0", 1, 3, true, $"{currentSelectedTime.Days}"));
+
+                        if (MaxTime.Value.TotalHours >= 1)
+                            _ = modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "hours", this.GetString(this.t.Commands.Common.Prompts.TimespanHours)
+                                .Build(new TVar("Max", (MaxTime.Value.TotalHours >= 24 ? "23" : $"{((int)MaxTime.Value.TotalHours)}"))), "0", 1, 2, true, $"{currentSelectedTime.Hours}"));
+
+                        if (MaxTime.Value.TotalMinutes >= 1)
+                            _ = modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "minutes", this.GetString(this.t.Commands.Common.Prompts.TimespanMinutes)
+                                .Build(new TVar("Max", (MaxTime.Value.TotalMinutes >= 60 ? "59" : $"{((int)MaxTime.Value.TotalMinutes)}"))), $"0", 1, 2, true, $"{currentSelectedTime.Minutes}"));
+
+                        _ = modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "seconds", this.GetString(this.t.Commands.Common.Prompts.TimespanSeconds)
+                            .Build(new TVar("Max", 59)), "0", 1, 2, true, $"{currentSelectedTime.Seconds}"));
+
+                        var ModalResult = await this.PromptModalWithRetry(e.Interaction, modal, true, timeOutOverride.Value.Subtract(timeOut.Elapsed));
+
+                        if (!ModalResult.Failed)
+                        {
+                            try
+                            {
+                                var Response = ModalResult.Result;
+                                var modalLength = TimeSpan.FromSeconds(0);
+
+                                if ((Response.Interaction.Data.Components.Any(x => x.CustomId == "seconds") && !Response.Interaction.Data.Components.First(x => x.CustomId == "seconds").Value.IsDigitsOnly()) ||
+                                    (Response.Interaction.Data.Components.Any(x => x.CustomId == "minutes") && !Response.Interaction.Data.Components.First(x => x.CustomId == "minutes").Value.IsDigitsOnly()) ||
+                                    (Response.Interaction.Data.Components.Any(x => x.CustomId == "hours") && !Response.Interaction.Data.Components.First(x => x.CustomId == "hours").Value.IsDigitsOnly()) ||
+                                    (Response.Interaction.Data.Components.Any(x => x.CustomId == "days") && !Response.Interaction.Data.Components.First(x => x.CustomId == "days").Value.IsDigitsOnly()))
+                                    throw new InvalidOperationException("Invalid TimeSpan");
+                                var seconds = Response.Interaction.Data.Components.Any(x => x.CustomId == "seconds") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "seconds").Value)) : 0;
+                                var minutes = Response.Interaction.Data.Components.Any(x => x.CustomId == "minutes") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "minutes").Value)) : 0;
+                                var hours = Response.Interaction.Data.Components.Any(x => x.CustomId == "hours") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "hours").Value)) : 0;
+                                var days = Response.Interaction.Data.Components.Any(x => x.CustomId == "days") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "days").Value)) : 0;
+                                modalLength = modalLength.Add(TimeSpan.FromSeconds(seconds));
+                                modalLength = modalLength.Add(TimeSpan.FromMinutes(minutes));
+                                modalLength = modalLength.Add(TimeSpan.FromHours(hours));
+                                modalLength = modalLength.Add(TimeSpan.FromDays(days));
+
+                                currentSelectedTime = modalLength;
+                            }
+                            catch { }
+                        }
+
+                        await UpdateMessage();
+                    }
+                }
+            }).Add(this.ctx.Bot, this.ctx);
+        }
+
+        this.ctx.Client.ComponentInteractionCreated += Interaction;
+
+        while (!Finished && !Cancelled && timeOut.ElapsedMilliseconds < timeOutOverride.Value.TotalMilliseconds)
+            await Task.Delay(1000);
+
+        this.ctx.Client.ComponentInteractionCreated -= Interaction;
+
+        if (!Finished && !Cancelled && timeOut.ElapsedMilliseconds < timeOutOverride.Value.TotalMilliseconds)
             return new InteractionResult<TimeSpan>(new TimedOutException());
-        }
-        else if (ModalResult.Cancelled)
-        {
+        
+        if (Cancelled)
             return new InteractionResult<TimeSpan>(new CancelException());
-        }
-        else if (ModalResult.Errored)
-        {
-            return new InteractionResult<TimeSpan>(ModalResult.Exception);
-        }
 
-        InteractionCreateEventArgs Response = ModalResult.Result;
+        if (ResetToOriginalEmbed)
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(originalEmbed));
 
-        var length = TimeSpan.FromSeconds(0);
-
-        try
-        {
-            if ((Response.Interaction.Data.Components.Any(x => x.CustomId == "seconds") && !Response.Interaction.Data.Components.First(x => x.CustomId == "seconds").Value.IsDigitsOnly()) ||
-                (Response.Interaction.Data.Components.Any(x => x.CustomId == "minutes") && !Response.Interaction.Data.Components.First(x => x.CustomId == "minutes").Value.IsDigitsOnly()) ||
-                (Response.Interaction.Data.Components.Any(x => x.CustomId == "hours") && !Response.Interaction.Data.Components.First(x => x.CustomId == "hours").Value.IsDigitsOnly()) ||
-                (Response.Interaction.Data.Components.Any(x => x.CustomId == "days") && !Response.Interaction.Data.Components.First(x => x.CustomId == "days").Value.IsDigitsOnly()))
-                throw new InvalidOperationException("Invalid TimeSpan");
-
-            var seconds = Response.Interaction.Data.Components.Any(x => x.CustomId == "seconds") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "seconds").Value)) : 0;
-            var minutes = Response.Interaction.Data.Components.Any(x => x.CustomId == "minutes") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "minutes").Value)) : 0;
-            var hours = Response.Interaction.Data.Components.Any(x => x.CustomId == "hours") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "hours").Value)) : 0;
-            var days = Response.Interaction.Data.Components.Any(x => x.CustomId == "days") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "days").Value)) : 0;
-
-            length = length.Add(TimeSpan.FromSeconds(seconds));
-            length = length.Add(TimeSpan.FromMinutes(minutes));
-            length = length.Add(TimeSpan.FromHours(hours));
-            length = length.Add(TimeSpan.FromDays(days));
-        }
-        catch (Exception ex)
-        {
-            return new InteractionResult<TimeSpan>(ex);
-        }
-
-        return length > MaxTime || length < MinTime
+        return currentSelectedTime > MaxTime || currentSelectedTime < MinTime
             ? new InteractionResult<TimeSpan>(new InvalidOperationException("Invalid TimeSpan"))
-            : new InteractionResult<TimeSpan>(length);
+            : new InteractionResult<TimeSpan>(currentSelectedTime);
     }
 
-    public async Task<InteractionResult<DateTime>> PromptModalForDateTime(DiscordInteraction interaction, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
+    public async Task<InteractionResult<DateTime>> PromptModalForDateTime(DiscordInteraction interaction, DateTime? defaultTime = null, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
     {
-        var modal = new DiscordInteractionModalBuilder().WithTitle(this.GetString(this.t.Commands.Common.Prompts.SelectADateTime)).WithCustomId(Guid.NewGuid().ToString());
+        timeOutOverride ??= TimeSpan.FromMinutes(2);
+        defaultTime ??= DateTime.UtcNow;
 
-        _ = modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "minute", this.GetString(this.t.Commands.Common.Prompts.DateTimeMinute), this.GetString(this.t.Commands.Common.Prompts.DateTimeMinute), 1, 2, true, $"{DateTime.UtcNow.Minute}"));
-        _ = modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "hour", this.GetString(this.t.Commands.Common.Prompts.DateTimeHour), this.GetString(this.t.Commands.Common.Prompts.DateTimeHour), 1, 2, true, $"{DateTime.UtcNow.Hour}"));
-        _ = modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "day", this.GetString(this.t.Commands.Common.Prompts.DateTimeDay), this.GetString(this.t.Commands.Common.Prompts.DateTimeDay), 1, 2, true, $"{DateTime.UtcNow.Day}"));
-        _ = modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "month", this.GetString(this.t.Commands.Common.Prompts.DateTimeMonth), this.GetString(this.t.Commands.Common.Prompts.DateTimeMonth), 1, 2, true, $"{DateTime.UtcNow.Month}"));
-        _ = modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "year", this.GetString(this.t.Commands.Common.Prompts.DateTimeYear), this.GetString(this.t.Commands.Common.Prompts.DateTimeYear), 1, 4, true, $"{DateTime.UtcNow.Year}"));
+        var originalEmbed = ResetToOriginalEmbed ? this.ctx.ResponseMessage.Embeds : null;
 
+        _ = interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-        var ModalResult = await this.PromptModalWithRetry(interaction, modal, false);
+        var removeMinutes = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "10m", false, "➖".UnicodeToEmoji().ToComponent());
+        var removeMinute = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "1m", false, "➖".UnicodeToEmoji().ToComponent());
+        var addMinute = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "1m", false, "➕".UnicodeToEmoji().ToComponent());
+        var addMinutes = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "10m", false, "➕".UnicodeToEmoji().ToComponent());
 
-        if (ModalResult.TimedOut)
+        var removeHours = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "10h", false, "➖".UnicodeToEmoji().ToComponent());
+        var removeHour = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "1h", false, "➖".UnicodeToEmoji().ToComponent());
+        var addHour = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "1h", false, "➕".UnicodeToEmoji().ToComponent());
+        var addHours = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "10h", false, "➕".UnicodeToEmoji().ToComponent());
+
+        var removeDays = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "10d", false, "➖".UnicodeToEmoji().ToComponent());
+        var removeDay = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "1d", false, "➖".UnicodeToEmoji().ToComponent());
+        var addDay = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "1d", false, "➕".UnicodeToEmoji().ToComponent());
+        var addDays = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "10d", false, "➕".UnicodeToEmoji().ToComponent());
+
+        var setExact = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), this.GetString(this.t.Commands.Common.Prompts.ManuallyDefineDateTime), false, "🕒".UnicodeToEmoji().ToComponent());
+        var changeTimezone = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), this.GetString(this.t.Commands.Common.Prompts.SelectTimezone), false, "🌐".UnicodeToEmoji().ToComponent());
+        var confirmSelection = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), this.GetString(this.t.Commands.Common.Prompts.ConfirmSelection), false, "✅".UnicodeToEmoji().ToComponent());
+
+        var currentSelectedTime = defaultTime!.Value;
+
+        Task UpdateMessage()
         {
+            var embed = new DiscordEmbedBuilder()
+                .WithDescription($"`{this.GetString(this.t.Commands.Common.Prompts.CurrentDateTime)}`: {currentSelectedTime.ToTimestamp()} ({currentSelectedTime.ToTimestamp(TimestampFormat.LongDateTime)})")
+                .AsAwaitingInput(this.ctx);
+
+            return this.RespondOrEdit(new DiscordMessageBuilder()
+                .AddEmbed(embed)
+                .AddComponents(removeMinutes, removeMinute, addMinute, addMinutes)
+                .AddComponents(removeHours, removeHour, addHour, addHours)
+                .AddComponents(removeDays, removeDay, addDay, addDays)
+                .AddComponents(changeTimezone, setExact)
+                .AddComponents(MessageComponents.GetCancelButton(this.ctx.DbUser, this.ctx.Bot), confirmSelection));
+        }
+        await UpdateMessage();
+
+        var Finished = false;
+        var Cancelled = false;
+        var timeOut = Stopwatch.StartNew();
+
+        async Task Interaction(DiscordClient sender, ComponentInteractionCreateEventArgs e)
+        {
+            _ = Task.Run(async () =>
+            {
+                if (e.Message?.Id == this.ctx.ResponseMessage?.Id)
+                {
+                    timeOut.Restart();
+
+                    if (e.Id == removeMinute.CustomId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        currentSelectedTime = currentSelectedTime.Subtract(TimeSpan.FromMinutes(1));
+                    }
+                    else if (e.Id == removeMinutes.CustomId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        currentSelectedTime = currentSelectedTime.Subtract(TimeSpan.FromMinutes(10));
+                    }
+                    else if (e.Id == addMinute.CustomId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        currentSelectedTime = currentSelectedTime.Add(TimeSpan.FromMinutes(1));
+                    }
+                    else if (e.Id == addMinutes.CustomId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        currentSelectedTime = currentSelectedTime.Add(TimeSpan.FromMinutes(10));
+                    }
+                    else if (e.Id == removeHour.CustomId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        currentSelectedTime = currentSelectedTime.Subtract(TimeSpan.FromHours(1));
+                    }
+                    else if (e.Id == removeHours.CustomId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        currentSelectedTime = currentSelectedTime.Subtract(TimeSpan.FromHours(10));
+                    }
+                    else if (e.Id == addHour.CustomId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        currentSelectedTime = currentSelectedTime.Add(TimeSpan.FromHours(1));
+                    }
+                    else if (e.Id == addHours.CustomId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        currentSelectedTime = currentSelectedTime.Add(TimeSpan.FromHours(10));
+                    }
+                    else if (e.Id == removeDay.CustomId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        currentSelectedTime = currentSelectedTime.Subtract(TimeSpan.FromDays(1));
+                    }
+                    else if (e.Id == removeDays.CustomId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        currentSelectedTime = currentSelectedTime.Subtract(TimeSpan.FromDays(10));
+                    }
+                    else if (e.Id == addDay.CustomId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        currentSelectedTime = currentSelectedTime.Add(TimeSpan.FromDays(1));
+                    }
+                    else if (e.Id == addDays.CustomId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        currentSelectedTime = currentSelectedTime.Add(TimeSpan.FromDays(10));
+                    }
+                    else if (e.Id == confirmSelection.CustomId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        Finished = true;
+                        return;
+                    }
+                    else if (e.Id == MessageComponents.CancelButtonId)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                        Cancelled = true;
+                        return;
+                    }
+                    else if (e.Id == changeTimezone.CustomId)
+                    {
+                        _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Common.Prompts.SelectTimezonePrompt, true)).AsAwaitingInput(this.ctx));
+
+                        var promptResult = await this.PromptCustomSelection(TimeZoneInfo.GetSystemTimeZones()
+                                .Select(x => new DiscordStringSelectComponentOption(x.DisplayName, x.Id, null, x.Id == (this.ctx.DbUser.Timezone ?? "UTC"))), null, timeOutOverride.Value.Subtract(timeOut.Elapsed));
+
+                        if (promptResult.Failed)
+                        {
+                            await UpdateMessage();
+                            return;
+                        }
+
+                        this.ctx.DbUser.Timezone = promptResult.Result;
+                    }
+                    else if (e.Id == setExact.CustomId)
+                    {
+                        var modalInteraction = e.Interaction;
+
+                        if (this.ctx.DbUser.Timezone.IsNullOrWhiteSpace() || !TimeZoneInfo.GetSystemTimeZones().Any(x => x.Id == this.ctx.DbUser.Timezone))
+                        {
+                            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Common.Prompts.SelectTimezonePrompt, true)).AsAwaitingInput(this.ctx));
+
+                            var promptResult = await this.PromptCustomSelection(TimeZoneInfo.GetSystemTimeZones()
+                                    .Select(x => new DiscordStringSelectComponentOption(x.DisplayName, x.Id, null, x.Id == (this.ctx.DbUser.Timezone ?? "UTC"))), null, timeOutOverride.Value.Subtract(timeOut.Elapsed));
+
+                            if (promptResult.Failed)
+                            {
+                                await UpdateMessage();
+                                return;
+                            }
+
+                            this.ctx.DbUser.Timezone = promptResult.Result;
+                            modalInteraction = null;
+                        }
+
+                        var userTimezone = TimeZoneInfo.FindSystemTimeZoneById(this.ctx.DbUser.Timezone);
+                        var userTime = TimeZoneInfo.ConvertTimeFromUtc(currentSelectedTime, userTimezone);
+
+                        var modal = new DiscordInteractionModalBuilder().WithTitle(this.GetString(this.t.Commands.Common.Prompts.SelectADateTime)).WithCustomId(Guid.NewGuid().ToString());
+
+                        _ = modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "minute", this.GetString(this.t.Commands.Common.Prompts.DateTimeMinute), this.GetString(this.t.Commands.Common.Prompts.DateTimeMinute), 1, 2, true, $"{userTime.Minute}"));
+                        _ = modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "hour", this.GetString(this.t.Commands.Common.Prompts.DateTimeHour), this.GetString(this.t.Commands.Common.Prompts.DateTimeHour), 1, 2, true, $"{userTime.Hour}"));
+                        _ = modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "day", this.GetString(this.t.Commands.Common.Prompts.DateTimeDay), this.GetString(this.t.Commands.Common.Prompts.DateTimeDay), 1, 2, true, $"{userTime.Day}"));
+                        _ = modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "month", this.GetString(this.t.Commands.Common.Prompts.DateTimeMonth), this.GetString(this.t.Commands.Common.Prompts.DateTimeMonth), 1, 2, true, $"{userTime.Month}"));
+                        _ = modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "year", this.GetString(this.t.Commands.Common.Prompts.DateTimeYear), this.GetString(this.t.Commands.Common.Prompts.DateTimeYear), 1, 4, true, $"{userTime.Year}"));
+
+                        var ModalResult = await this.PromptModalWithRetry(modalInteraction, modal, null, false, timeOutOverride.Value.Subtract(timeOut.Elapsed), modalInteraction != null);
+
+                        if (ModalResult.Errored)
+                        {
+                            await UpdateMessage();
+                            return;
+                        }
+
+                        InteractionCreateEventArgs Response = ModalResult.Result;
+
+                        DateTime dateTime;
+
+                        try
+                        {
+                            if ((Response.Interaction.Data.Components.Any(x => x.CustomId == "hour") && !Response.Interaction.Data.Components.First(x => x.CustomId == "hour").Value.IsDigitsOnly()) ||
+                                (Response.Interaction.Data.Components.Any(x => x.CustomId == "minute") && !Response.Interaction.Data.Components.First(x => x.CustomId == "minute").Value.IsDigitsOnly()) ||
+                                (Response.Interaction.Data.Components.Any(x => x.CustomId == "day") && !Response.Interaction.Data.Components.First(x => x.CustomId == "day").Value.IsDigitsOnly()) ||
+                                (Response.Interaction.Data.Components.Any(x => x.CustomId == "month") && !Response.Interaction.Data.Components.First(x => x.CustomId == "month").Value.IsDigitsOnly()) ||
+                                (Response.Interaction.Data.Components.Any(x => x.CustomId == "year") && !Response.Interaction.Data.Components.First(x => x.CustomId == "year").Value.IsDigitsOnly()))
+                                throw new ArgumentException("Invalid date time");
+
+                            var hour = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("hour"));
+                            var minute = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("minute"));
+                            var day = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("day"));
+                            var month = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("month"));
+                            var year = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("year"));
+
+                            dateTime = TimeZoneInfo.ConvertTimeToUtc(new DateTime(year, month, day, hour, minute, 0, DateTimeKind.Unspecified), userTimezone);
+                        }
+                        catch (Exception)
+                        {
+                            await UpdateMessage();
+                            return;
+                        }
+
+                        currentSelectedTime = dateTime;
+                    }
+                    else
+                    { return; }
+
+                    await UpdateMessage();
+                }
+            }).Add(this.ctx.Bot, this.ctx);
+        }
+
+        this.ctx.Client.ComponentInteractionCreated += Interaction;
+
+        while (!Finished && !Cancelled && timeOut.ElapsedMilliseconds < timeOutOverride.Value.TotalMilliseconds)
+            await Task.Delay(1000);
+
+        this.ctx.Client.ComponentInteractionCreated -= Interaction;
+
+        if (!Finished && !Cancelled && timeOut.ElapsedMilliseconds < timeOutOverride.Value.TotalMilliseconds)
             return new InteractionResult<DateTime>(new TimedOutException());
-        }
-        else if (ModalResult.Cancelled)
-        {
+
+        if (Cancelled)
             return new InteractionResult<DateTime>(new CancelException());
-        }
-        else if (ModalResult.Errored)
-        {
-            return new InteractionResult<DateTime>(ModalResult.Exception);
-        }
 
-        InteractionCreateEventArgs Response = ModalResult.Result;
+        if (ResetToOriginalEmbed)
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(originalEmbed));
 
-        DateTime dateTime;
-
-        try
-        {
-            if ((Response.Interaction.Data.Components.Any(x => x.CustomId == "hour") && !Response.Interaction.Data.Components.First(x => x.CustomId == "hour").Value.IsDigitsOnly()) ||
-                (Response.Interaction.Data.Components.Any(x => x.CustomId == "minute") && !Response.Interaction.Data.Components.First(x => x.CustomId == "minute").Value.IsDigitsOnly()) ||
-                (Response.Interaction.Data.Components.Any(x => x.CustomId == "day") && !Response.Interaction.Data.Components.First(x => x.CustomId == "day").Value.IsDigitsOnly()) ||
-                (Response.Interaction.Data.Components.Any(x => x.CustomId == "month") && !Response.Interaction.Data.Components.First(x => x.CustomId == "month").Value.IsDigitsOnly()) ||
-                (Response.Interaction.Data.Components.Any(x => x.CustomId == "year") && !Response.Interaction.Data.Components.First(x => x.CustomId == "year").Value.IsDigitsOnly()))
-                throw new ArgumentException("Invalid date time");
-
-            var hour = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("hour"));
-            var minute = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("minute"));
-            var day = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("day"));
-            var month = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("month"));
-            var year = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("year"));
-
-            dateTime = new DateTime(year, month, day, hour, minute, 0, DateTimeKind.Utc);
-        }
-        catch (OverflowException)
-        {
-            return new InteractionResult<DateTime>(new InvalidOperationException());
-        }
-        catch (Exception ex)
-        {
-            return new InteractionResult<DateTime>(ex);
-        }
-
-        return new InteractionResult<DateTime>(dateTime);
+        return new InteractionResult<DateTime>(currentSelectedTime);
     }
     #endregion
 
@@ -1082,7 +1459,6 @@ public abstract class BaseCommand
 
     public void DeleteOrInvalidate()
     {
-        _ = this.RespondOrEdit($"✅ _{this.GetString(this.t.Commands.Common.InteractionFinished, true)}_");
         switch (this.ctx.CommandType)
         {
             case Enums.CommandType.ContextMenu:
@@ -1235,7 +1611,7 @@ public abstract class BaseCommand
     public void SendUserBanError(BanDetails entry)
         => _ = this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = this.GetString(this.t.Commands.Common.Errors.UserBan, true, new TVar("Reason", entry.Reason)),
+            Description = this.t.Commands.Common.Errors.UserBan.t["en"].Build(true, new TVar("Reason", entry.Reason)),
         }.AsError(this.ctx)));
 
     public void SendGuildBanError(BanDetails entry)
@@ -1268,7 +1644,7 @@ public abstract class BaseCommand
         => _ = this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
             Description = $"📩 {this.GetString(this.t.Commands.Common.Errors.DirectMessage, true)}",
-            ImageUrl = (this.ctx.User.Presence.ClientStatus.Mobile.HasValue ? "https://cdn.discordapp.com/attachments/712761268393738301/867143225868681226/1q3uUtPAUU_4.gif" : "https://cdn.discordapp.com/attachments/712761268393738301/867133233984569364/1q3uUtPAUU_1.gif")
+            ImageUrl = (this.ctx.User.Presence.ClientStatus.Mobile.HasValue ? "https://cdn.discordapp.com/attachments/1005430437952356423/1144961395515998238/34rhz83ghtzu3ght.gif" : "https://cdn.discordapp.com/attachments/1005430437952356423/1144964670197862400/et2grtzu2ghrzi52.gif")
         }.AsError(this.ctx)));
 
     public void SendDmRedirect()

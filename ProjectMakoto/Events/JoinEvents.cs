@@ -74,7 +74,7 @@ internal sealed class JoinEvents : RequiresTranslation
                     },
                     Description = this.tKey.UserLeft.Get(this.Bot.Guilds[e.Guild.Id]).Build(
                         new TVar("Guild", $"**{e.Guild.Name}**"), 
-                        new TVar("Timestamp", e.Member.JoinedAt.GetTimespanSince().GetHumanReadable(TimeFormat.DAYS, TranslationUtil.GetTranslatedHumanReadableConfig(this.Bot.Guilds[e.Guild.Id], this.Bot)))),
+                        new TVar("Timestamp", e.Member.JoinedAt.GetTimespanSince().GetHumanReadable(TimeFormat.Days, TranslationUtil.GetTranslatedHumanReadableConfig(this.Bot.Guilds[e.Guild.Id], this.Bot)))),
                     Color = EmbedColors.Error,
                     Thumbnail = new()
                     {
