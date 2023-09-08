@@ -266,35 +266,26 @@ public sealed partial class DatabaseClient : RequiresBotReference
 
         if (bot.status.MigrationRequired)
         {
-            foreach (var b in bot.Guilds.Keys)
+            _ = new Func<Task>(async () =>
             {
-                bot.Guilds[b].VcCreator.CreatedChannels = JsonConvert.DeserializeObject<List<KeyValuePair<ulong, DatabaseMigration.VcCreatorChannelList>>>(
-                    databaseClient.GetValue<string>("guilds", "serverid", b, "vccreator_channellist", databaseClient.mainDatabaseConnection))
-                    .Select(x => new VcCreatorDetails
-                    {
-                        ChannelId = x.Key,
-                        OwnerId = x.Value.OwnerId,
-                        BannedUsers = x.Value.BannedUsers,
-                        LastRename = x.Value.LastRename,
+                foreach (var b in bot.Guilds.Keys)
+                {
+                    await databaseClient.SetValue("guilds", "serverid", b, "vccreator_channellist", "[]", databaseClient.mainDatabaseConnection);
+                    await databaseClient.SetValue("guilds", "serverid", b, "crosspost_ratelimits", "[]", databaseClient.mainDatabaseConnection);
 
-                        Bot = bot,
-                        Parent = bot.Guilds[b],
-                    }).ToArray();
-
-                bot.Guilds[b].ReactionRoles = JsonConvert.DeserializeObject<Dictionary<ulong, DatabaseMigration.ReactionRoles>>(
-                    databaseClient.GetValue<string>("guilds", "serverid", b, "reactionroles", databaseClient.mainDatabaseConnection))
-                    .Select(x => new ReactionRoleEntry
-                    {
-                        ChannelId = x.Value.ChannelId,
-                        EmojiId = x.Value.EmojiId,
-                        EmojiName = x.Value.EmojiName,
-                        MessageId = x.Key,
-                        RoleId = x.Value.RoleId,
-                        UUID = x.Value.UUID
-                    }).ToArray();
-
-                await databaseClient.SetValue("guilds", "serverid", b, "crosspost_ratelimits", "[]", databaseClient.mainDatabaseConnection);
-            }
+                    bot.Guilds[b].ReactionRoles = JsonConvert.DeserializeObject<List<KeyValuePair<ulong, DatabaseMigration.ReactionRoles>>>(
+                        databaseClient.GetValue<string>("guilds", "serverid", b, "reactionroles", databaseClient.mainDatabaseConnection))
+                        .Select(x => new ReactionRoleEntry
+                        {
+                            ChannelId = x.Value.ChannelId,
+                            EmojiId = x.Value.EmojiId,
+                            EmojiName = x.Value.EmojiName,
+                            MessageId = x.Key,
+                            RoleId = x.Value.RoleId,
+                            UUID = x.Value.UUID
+                        }).ToArray();
+                }
+            }).CreateScheduledTask(DateTime.UtcNow.AddSeconds(20));
         }
 
         bot.DatabaseClient = databaseClient;

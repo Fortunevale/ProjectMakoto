@@ -143,6 +143,11 @@ public sealed class Bot
                     Credentials = new Credentials(this.status.LoadedConfig.Secrets.Github.Token)
                 };
 
+                if (this.status.LoadedConfig.DontModify.LastStartedVersion == "8e5f2b2")
+                {
+                    this.status.MigrationRequired = true;
+                }
+
                 await Task.WhenAll(DatabaseClient.InitializeDatabase(this),
                                    Util.Initializers.ListLoader.Load(this), 
                                    Util.Initializers.TranslationLoader.Load(this), 
@@ -246,11 +251,6 @@ public sealed class Bot
             {
                 if (this.status.LoadedConfig.DontModify.LastStartedVersion == this.status.RunningVersion)
                     return;
-
-                if (this.status.LoadedConfig.DontModify.LastStartedVersion == "8e5f2b2")
-                {
-                    this.status.MigrationRequired = true;
-                }
 
                 this.status.LoadedConfig.DontModify.LastStartedVersion = this.status.RunningVersion;
                 this.status.LoadedConfig.Save();
