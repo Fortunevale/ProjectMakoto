@@ -270,7 +270,10 @@ public sealed partial class DatabaseClient : RequiresBotReference
             {
                 foreach (var b in bot.Guilds.Keys)
                 {
-                    bot.Guilds[b].ReactionRoles = JsonConvert.DeserializeObject<Dictionary<ulong, DatabaseMigration.ReactionRoles>>(
+                    await databaseClient.SetValue("guilds", "serverid", b, "vccreator_channellist", "[]", databaseClient.mainDatabaseConnection);
+                    await databaseClient.SetValue("guilds", "serverid", b, "crosspost_ratelimits", "[]", databaseClient.mainDatabaseConnection);
+
+                    bot.Guilds[b].ReactionRoles = JsonConvert.DeserializeObject<List<KeyValuePair<ulong, DatabaseMigration.ReactionRoles>>>(
                         databaseClient.GetValue<string>("guilds", "serverid", b, "reactionroles", databaseClient.mainDatabaseConnection))
                         .Select(x => new ReactionRoleEntry
                         {
@@ -281,9 +284,6 @@ public sealed partial class DatabaseClient : RequiresBotReference
                             RoleId = x.Value.RoleId,
                             UUID = x.Value.UUID
                         }).ToArray();
-
-                    await databaseClient.SetValue("guilds", "serverid", b, "vccreator_channellist", "[]", databaseClient.mainDatabaseConnection);
-                    await databaseClient.SetValue("guilds", "serverid", b, "crosspost_ratelimits", "[]", databaseClient.mainDatabaseConnection);
                 }
             }).CreateScheduledTask(DateTime.UtcNow.AddSeconds(20));
         }
