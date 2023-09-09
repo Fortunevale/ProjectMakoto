@@ -33,7 +33,13 @@ public sealed class VcCreatorSettings : RequiresParent<Guild>
     [ColumnName("vccreator_channellist"), ColumnType(ColumnTypes.LongText), WithCollation, Default("[]")]
     public VcCreatorDetails[] CreatedChannels
     {
-        get => JsonConvert.DeserializeObject<VcCreatorDetails[]>(this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Parent.Id, "vccreator_channellist", this.Bot.DatabaseClient.mainDatabaseConnection));
+        get => JsonConvert.DeserializeObject<VcCreatorDetails[]>(this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Parent.Id, "vccreator_channellist", this.Bot.DatabaseClient.mainDatabaseConnection)).Select(x =>
+        {
+            x.Bot = this.Bot;
+            x.Parent = this;
+
+            return x;
+        }).ToArray();
         set
         {
             _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "vccreator_channellist", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);

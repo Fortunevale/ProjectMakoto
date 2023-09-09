@@ -15,7 +15,7 @@ public sealed class VcCreatorDetails
     public Bot Bot { get; set; }
 
     [JsonIgnore]
-    public Guild Parent { get; set; }
+    public VcCreatorSettings Parent { get; set; }
 
     private ulong _ChannelId { get; set; }
     public ulong ChannelId
@@ -69,6 +69,6 @@ public sealed class VcCreatorDetails
         if (this.Bot is null || this.Parent is null)
             return;
 
-        this.Parent.VcCreator.CreatedChannels = this.Parent.VcCreator.CreatedChannels.Update(x => x.ChannelId.ToString(), this);
+        this.Parent.CreatedChannels = this.Parent.CreatedChannels.Update(x => x.ChannelId.ToString(), this);
     }
 }

@@ -11,6 +11,12 @@ namespace ProjectMakoto.Entities.Guilds;
 
 public sealed class PollEntry
 {
+    [JsonIgnore]
+    public Bot Bot { get; set; }
+
+    [JsonIgnore]
+    public PollSettings Parent { get; set; }
+
     public string PollText { get; set; }
 
     public ulong ChannelId { get; set; }
@@ -25,5 +31,25 @@ public sealed class PollEntry
 
     public Dictionary<string, string> Options { get; set; }
 
-    public Dictionary<ulong, List<string>> Votes { get; set; }
+    private Vote[] _Votes { get; set; }
+    public Vote[] Votes
+    {
+        get => this._Votes;
+        set
+        {
+            this._Votes = value;
+            this.Update();
+        }
+    }
+
+    public record Vote(ulong Voter, string[] SelectedVotes);
+
+
+    void Update()
+    {
+        if (this.Bot is null || this.Parent is null)
+            return;
+
+        this.Parent.RunningPolls = this.Parent.RunningPolls.Update(x => x.SelectUUID.ToString(), this);
+    }
 }

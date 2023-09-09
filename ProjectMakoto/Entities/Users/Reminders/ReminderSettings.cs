@@ -15,6 +15,7 @@ public sealed class ReminderSettings : RequiresParent<User>
 {
     public ReminderSettings(Bot bot, User parent) : base(bot, parent)
     {
+        this.RemindersUpdated();
     }
 
     [ColumnName("reminders"), ColumnType(ColumnTypes.LongText), WithCollation, Default("[]")]

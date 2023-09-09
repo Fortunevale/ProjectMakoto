@@ -357,7 +357,7 @@ internal sealed class PollCommand : BaseCommand
                         MessageId = msg.Id,
                         SelectUUID = select.CustomId,
                         EndEarlyUUID = endearly.CustomId,
-                        Votes = new(),
+                        Votes = Array.Empty<Entities.Guilds.PollEntry.Vote>(),
                         DueTime = selectedDueDate.Value,
                         Options = SelectedOptions.ToDictionary(x => x.Value, y => y.Label)
                     });
