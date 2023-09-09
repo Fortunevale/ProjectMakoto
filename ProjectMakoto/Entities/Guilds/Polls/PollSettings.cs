@@ -15,6 +15,7 @@ public sealed class PollSettings : RequiresParent<Guild>
 {
     public PollSettings(Bot bot, Guild parent) : base(bot, parent)
     {
+        this.RunningPollsUpdatedAsync();
     }
 
     [ColumnName("polls"), ColumnType(ColumnTypes.LongText), Default("[]")]
@@ -58,7 +59,7 @@ public sealed class PollSettings : RequiresParent<Guild>
                                     if (b.Votes.TryGetValue(e.User.Id, out var currentVotes))
                                     {
                                         b.Votes[e.User.Id] = new List<string>(e.Values);
-                                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"🔁 {CommandKey.VoteUpdated.Get(this.Parent).Build(true, new TVar("Options", string.Join(", ", e.Values.Select(x => $"'{currentVotes}'"))))}"));
+                                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"🔁 {CommandKey.VoteUpdated.Get(this.Parent).Build(true, new TVar("Options", string.Join(", ", e.Values.Select(x => $"'{x}'"))))}"));
                                         return;
                                     }
 
@@ -112,7 +113,7 @@ public sealed class PollSettings : RequiresParent<Guild>
                         }).Add(this.Bot);
                     }
 
-                    Func<Task> task = new(async () =>
+                    taskuid = new Func<Task>(async () =>
                     {
                         cancellationTokenSource.Cancel();
 
@@ -145,7 +146,7 @@ public sealed class PollSettings : RequiresParent<Guild>
                             .WithDescription($"{CommandKey.PollEnded.Get(this.Parent).Build(true)}\n\n**{CommandKey.Results.Get(this.Parent).Build()}**\n{(votes.Count <= 0 ? CommandKey.NoVotes.Get(this.Parent).Build(true) : string.Join("\n\n", votes.OrderByDescending(x => x.Value).Select(x => $"> **{b.Options[x.Key].FullSanitize()}**\n{CommandKey.Votes.Get(this.Parent).Build(true, new TVar("Count", x.Value))}")))}")
                             .WithAuthor($"{CommandKey.Poll.Get(this.Parent)} • {channel.Guild.Name}", null, channel.Guild.IconUrl)
                             .WithColor(EmbedColors.Success));
-                    });
+                    }).CreateScheduledTask(b.DueTime.ToUniversalTime(), new ScheduledTaskIdentifier(this.Parent.Id, b.SelectUUID, "poll"));
 
                     _ = Task.Run(async () =>
                     {
@@ -173,8 +174,6 @@ public sealed class PollSettings : RequiresParent<Guild>
                     }).Add(this.Bot);
 
                     this.Bot.DiscordClient.ComponentInteractionCreated += VoteHandling;
-
-                    taskuid = task.CreateScheduledTask(b.DueTime.ToUniversalTime(), new ScheduledTaskIdentifier(this.Parent.Id, b.SelectUUID, "poll"));
 
                     this.Bot.DiscordClient.MessageDeleted += MessageDeletionHandling;
                     this.Bot.DiscordClient.ChannelDeleted += ChannelDeletionHandling;

@@ -15,6 +15,7 @@ public sealed class VcCreatorSettings : RequiresParent<Guild>
 {
     public VcCreatorSettings(Bot bot, Guild parent) : base(bot, parent)
     {
+        this.CreatedChannelsUpdated();
     }
 
     Translations.events.vcCreator tKey

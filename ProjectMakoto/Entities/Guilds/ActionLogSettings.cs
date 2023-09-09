@@ -15,6 +15,7 @@ public sealed class ActionLogSettings : RequiresParent<Guild>
 {
     public ActionLogSettings(Bot bot, Guild parent) : base(bot, parent)
     {
+        this.AuditLogCollectionUpdated();
     }
 
     [ColumnName("auditlogcache"), ColumnType(ColumnTypes.LongText), Default("[]")]
