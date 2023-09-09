@@ -21,7 +21,13 @@ public sealed class PollSettings : RequiresParent<Guild>
     [ColumnName("polls"), ColumnType(ColumnTypes.LongText), Default("[]")]
     public PollEntry[] RunningPolls
     {
-        get => JsonConvert.DeserializeObject<PollEntry[]>(this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Parent.Id, "polls", this.Bot.DatabaseClient.mainDatabaseConnection));
+        get => JsonConvert.DeserializeObject<PollEntry[]>(this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Parent.Id, "polls", this.Bot.DatabaseClient.mainDatabaseConnection)).Select(x =>
+        {
+            x.Bot = this.Bot;
+            x.Parent = this;
+
+            return x;
+        }).ToArray();
         set
         {
             _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "polls", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);
@@ -56,14 +62,14 @@ public sealed class PollSettings : RequiresParent<Guild>
                                 if (e.GetCustomId() == b.SelectUUID)
                                 {
 
-                                    if (b.Votes.TryGetValue(e.User.Id, out var currentVotes))
+                                    if (b.Votes.Any(x => x.Voter == e.User.Id))
                                     {
-                                        b.Votes[e.User.Id] = new List<string>(e.Values);
-                                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"🔁 {CommandKey.VoteUpdated.Get(this.Parent).Build(true, new TVar("Options", string.Join(", ", e.Values.Select(x => $"'{x}'"))))}"));
+                                        b.Votes = b.Votes.Update(x => x.Voter.ToString(), new PollEntry.Vote(e.User.Id, e.Values.ToArray()));
+                                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"🔁 {CommandKey.VoteUpdated.Get(this.Parent).Build(true, new TVar("Options", string.Join(", ", e.Values.Select(x => $"'{b.Options[x]}'"))))}"));
                                         return;
                                     }
 
-                                    b.Votes.Add(e.User.Id, new List<string>(e.Values));
+                                    b.Votes = b.Votes.Add(new PollEntry.Vote(e.User.Id, e.Values.ToArray()));
                                     _ = e.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"✅ {CommandKey.Voted.Get(this.Parent).Build(true, new TVar("Options", string.Join(", ", e.Values.Select(x => $"'{b.Options[x]}'"))))}"));
                                 }
                                 else if (e.GetCustomId() == b.EndEarlyUUID)
@@ -131,7 +137,7 @@ public sealed class PollSettings : RequiresParent<Guild>
                         Dictionary<string, int> votes = new();
 
                         foreach (var user in b.Votes)
-                            foreach (var vote in user.Value)
+                            foreach (var vote in user.SelectedVotes)
                             {
                                 if (!votes.ContainsKey(vote))
                                     votes.Add(vote, 0);
@@ -154,14 +160,14 @@ public sealed class PollSettings : RequiresParent<Guild>
 
                         while (this.RunningPolls.Contains(b))
                         {
-                            if (LastTotalVotes != b.Votes.Count)
+                            if (LastTotalVotes != b.Votes.Length)
                             {
-                                LastTotalVotes = b.Votes.Count;
+                                LastTotalVotes = b.Votes.Length;
 
                                 var channel = await this.Bot.DiscordClient.GetChannelAsync(b.ChannelId);
                                 var message = await channel.GetMessageAsync(b.MessageId, true);
 
-                                _ = await message.ModifyAsync(new DiscordEmbedBuilder(message.Embeds.ElementAt(0)).WithDescription($"> **{b.PollText}**\n\n_{CommandKey.PollEnding.Get(this.Parent).Build(new TVar("Timestamp", b.DueTime.ToTimestamp()))}._\n\n{CommandKey.TotalVotes.Get(this.Parent).Build(true, new TVar("Count", b.Votes.Count))}").Build());
+                                _ = await message.ModifyAsync(new DiscordEmbedBuilder(message.Embeds.ElementAt(0)).WithDescription($"> **{b.PollText}**\n\n_{CommandKey.PollEnding.Get(this.Parent).Build(new TVar("Timestamp", b.DueTime.ToTimestamp()))}._\n\n{CommandKey.TotalVotes.Get(this.Parent).Build(true, new TVar("Count", b.Votes.Length))}").Build());
                             }
 
                             if (cancellationTokenSource.IsCancellationRequested)
