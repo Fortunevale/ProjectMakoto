@@ -122,4 +122,6 @@
 	<Folder Include="Assets\Emojis\Upload\" />
   </ItemGroup>
 
+  <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
+
 </Project>
