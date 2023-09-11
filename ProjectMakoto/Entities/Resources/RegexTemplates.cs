@@ -16,7 +16,7 @@ internal static class RegexTemplates
 
     public static readonly Regex BandcampUrl = new(@"(https?:\/\/)?([\d|\w]+)\.bandcamp\.com\/?.*", RegexOptions.IgnoreCase | RegexOptions.Compiled);
     public static readonly Regex SoundcloudUrl = new(@"^https?:\/\/(soundcloud\.com|snd\.sc)\/(.*)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-    public static readonly Regex YouTubeUrl = new(@"^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+    public static readonly Regex YouTubeUrl = new(@"^((?:https?:)?\/\/)?((?:www|m|music)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
     public static readonly Regex DiscordChannelUrl = new(@"((https|http):\/\/(ptb\.|canary\.)?discord.com\/channels\/(\d+)\/(\d+)\/(\d+))", RegexOptions.IgnoreCase | RegexOptions.Compiled);
     public static readonly Regex Url = new(@"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
