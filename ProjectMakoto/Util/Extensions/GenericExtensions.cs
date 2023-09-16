@@ -22,22 +22,12 @@ internal static class GenericExtensions
         }
 
         var environmentVariables = Environment.GetEnvironmentVariables().ConvertToDictionary<string, string>();
-        string[] paths;
-
-        switch (Environment.OSVersion.Platform)
+        var paths = Environment.OSVersion.Platform switch
         {
-            case PlatformID.Win32S:
-            case PlatformID.Win32Windows:
-            case PlatformID.Win32NT:
-            case PlatformID.WinCE:
-                paths = environmentVariables.First(x => x.Key.ToLower() == "path").Value.Split(';');
-                break;
-            case PlatformID.Unix:
-                paths = environmentVariables.First(x => x.Key.ToLower() == "path").Value.Split(':');
-                break;
-            default:
-                throw new NotImplementedException();
-        }
+            PlatformID.Win32S or PlatformID.Win32Windows or PlatformID.Win32NT or PlatformID.WinCE => environmentVariables.First(x => x.Key.ToLower() == "path").Value.Split(';'),
+            PlatformID.Unix => environmentVariables.First(x => x.Key.ToLower() == "path").Value.Split(':'),
+            _ => throw new NotImplementedException(),
+        };
 
         foreach (var path in paths)
         {
