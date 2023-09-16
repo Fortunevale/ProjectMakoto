@@ -3093,6 +3093,22 @@
         "NoGuildFound": {
           "en": "Could not fetch any information about the server you specified.",
           "de": "Es konnten keine Informationen über den angegebenen Server gefunden werden."
+        },
+        "Banner": {
+          "en": "Banner",
+          "de": "Banner"
+        },
+        "Splash": {
+          "en": "Splash",
+          "de": "Titelbild"
+        },
+        "DiscoverySplash": {
+          "en": "Discovery Splash",
+          "de": "Entdeckungs-Splash"
+        },
+        "HomeHeader": {
+          "en": "Home Header",
+          "de": "Startseiten-Header"
         }
       },
       "Leaderboard": {
