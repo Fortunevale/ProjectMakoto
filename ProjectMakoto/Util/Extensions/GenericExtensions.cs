@@ -22,7 +22,7 @@ internal static class GenericExtensions
         }
 
         var environmentVariables = Environment.GetEnvironmentVariables().ConvertToDictionary<string, string>();
-        var paths = environmentVariables.First(x => x.Key.ToLower() == "path").Value.Split(";");
+        var paths = environmentVariables.First(x => x.Key.ToLower() == "path").Value.Split(';', ':');
 
         foreach (var path in paths)
         {
