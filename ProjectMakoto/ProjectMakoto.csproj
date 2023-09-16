@@ -46,6 +46,7 @@
     <PackageReference Include="DisCatSharp.Extensions.TwoFactorCommands" Version="2.0.0" />
     <PackageReference Include="DisCatSharp.Interactivity" Version="10.4.2-nightly-021" />
     <PackageReference Include="DisCatSharp.Lavalink" Version="10.4.2-nightly-021" />
+    <PackageReference Include="FFMpegCore" Version="5.1.0" />
     <PackageReference Include="GenHTTP.Core" Version="7.0.0" />
     <PackageReference Include="GenHTTP.Modules.StaticWebsites" Version="7.0.0" />
     <PackageReference Include="HtmlSanitizer" Version="8.0.692" />

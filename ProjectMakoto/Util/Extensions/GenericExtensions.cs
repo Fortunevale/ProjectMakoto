@@ -13,6 +13,50 @@ namespace ProjectMakoto.Util;
 
 internal static class GenericExtensions
 {
+    public static bool TryGetFileInfo(string fileName, out FileInfo file)
+    {
+        if (File.Exists(fileName))
+        {
+            file = new FileInfo(fileName);
+            return true;
+        }
+
+        var environmentVariables = Environment.GetEnvironmentVariables().ConvertToDictionary<string, string>();
+        var paths = environmentVariables.First(x => x.Key.ToLower() == "path").Value.Split(";");
+
+        foreach (var path in paths)
+        {
+            var currentFilePath = Path.Combine(path, fileName);
+            if (File.Exists(currentFilePath))
+            {
+                file = new FileInfo(currentFilePath);
+                return true;
+            }
+
+            currentFilePath += ".exe";
+
+            if (File.Exists(currentFilePath))
+            {
+                file = new FileInfo(currentFilePath);
+                return true;
+            }
+        }
+
+        file = null;
+        return false;
+    }
+
+    public static Dictionary<T1, T2> ConvertToDictionary<T1, T2>(this IDictionary iDic)
+    {
+        var dic = new Dictionary<T1, T2>();
+        var enumerator = iDic.GetEnumerator();
+        while (enumerator.MoveNext())
+        {
+            dic[(T1)enumerator.Key] = (T2)enumerator.Value;
+        }
+        return dic;
+    }
+
     public static T[] Add<T>(this T[] array, T addObject)
         => array.Append(addObject).ToArray();
     

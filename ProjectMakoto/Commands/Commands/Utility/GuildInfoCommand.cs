@@ -27,9 +27,37 @@ internal sealed class GuildInfoCommand : BaseCommand
 
             _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Utility.GuildInfo.Fetching, true)).AsLoading(ctx));
 
+            _ = Directory.CreateDirectory("cache");
+
             try
             {
                 var guild = await ctx.Client.GetGuildAsync(guildId);
+
+                //var imageHash = guild.DiscoverySplashHash ?? guild.SplashHash ?? "";
+                //var imageUrl = guild.DiscoverySplashUrl ?? guild.SplashUrl ?? "";
+                //if (!File.Exists($"cache/{imageHash}") && !imageHash.IsNullOrWhiteSpace())
+                //{
+                //    var fileExtension = imageUrl[..(imageUrl.LastIndexOf('?'))];
+                //    fileExtension = fileExtension[(fileExtension.LastIndexOf(".") + 1)..];
+
+                //    using (var outputStream = new MemoryStream())
+                //    {
+                //        var arguments = FFMpegArguments
+                //            .FromPipeInput(new StreamPipeSource(await new HttpClient().GetStreamAsync(imageUrl)))
+                //            .OutputToPipe(new StreamPipeSink(outputStream), x => x
+                //                .ForceFormat("image2")
+                //                .WithVideoCodec(fileExtension)
+                //                .WithArgument(new CustomArgument("-vf scale=2048:256:force_original_aspect_ratio=decrease,pad=2048:256:-1:-1")));
+
+                //        _ = await arguments.ProcessAsynchronously();
+
+                //        using (var file = new FileStream($"cache/{imageHash}", FileMode.Create, FileAccess.Write))
+                //        {
+                //            outputStream.Position = 0;
+                //            await outputStream.CopyToAsync(file);
+                //        }
+                //    }
+                //}
 
                 var embed = new DiscordEmbedBuilder
                 {
@@ -38,7 +66,7 @@ internal sealed class GuildInfoCommand : BaseCommand
                     {
                         Url = guild.IconUrl ?? AuditLogIcons.QuestionMark,
                     },
-                    ImageUrl = guild.DiscoverySplashUrl ?? guild.SplashUrl ?? "",
+                    //ImageUrl = $"attachment://banner.png",
                     Description = $"{(guild.Description.IsNullOrWhiteSpace() ? "" : $"{guild.Description}\n\n")}",
                 }.AsInfo(ctx);
 
@@ -84,6 +112,18 @@ internal sealed class GuildInfoCommand : BaseCommand
                     _ = builder.AddComponents(new DiscordLinkButtonComponent($"https://discord.gg/{guild.VanityUrlCode}", this.GetString(this.t.Commands.Utility.GuildInfo.JoinServer), false, DiscordEmoji.FromUnicode("🔗").ToComponent()));
 
                 _ = await this.RespondOrEdit(embed);
+
+                //if (imageHash.IsNullOrWhiteSpace())
+                //    _ = await this.RespondOrEdit(embed);
+                //else
+                //{
+                //    using (var file = new FileStream($"cache/{imageHash}", FileMode.Open, FileAccess.Read))
+                //    {
+                //        _ = await this.RespondOrEdit(new DiscordMessageBuilder()
+                //            .WithEmbed(embed)
+                //            .WithFile("banner.png", file));
+                //    }
+                //}
             }
             catch (Exception ex1) when (ex1 is DisCatSharp.Exceptions.UnauthorizedException or
                                        DisCatSharp.Exceptions.NotFoundException)
@@ -101,7 +141,7 @@ internal sealed class GuildInfoCommand : BaseCommand
                         {
                             Url = preview.IconUrl ?? AuditLogIcons.QuestionMark,
                         },
-                        ImageUrl = preview.SplashUrl ?? preview.DiscoverySplashUrl ?? "",
+                        //ImageUrl = preview.SplashUrl ?? preview.DiscoverySplashUrl ?? "",
                         Description = preview.Description ?? "",
                     }.AsInfo(ctx, "", this.GetString(this.t.Commands.Utility.GuildInfo.GuildPreviewNotice));
 
@@ -160,7 +200,7 @@ internal sealed class GuildInfoCommand : BaseCommand
                                 {
                                     Url = $"https://cdn.discordapp.com/icons/{guildId}/{mee6.guild.icon}.webp?size=96",
                                 },
-                                ImageUrl = mee6.banner_url ?? "",
+                                //ImageUrl = mee6.banner_url ?? "",
                             }.AsInfo(ctx, "", this.GetString(this.t.Commands.Utility.GuildInfo.Mee6Notice));
 
                             _ = embed.AddField(new DiscordEmbedField(this.GetString(this.t.Commands.Utility.GuildInfo.MemberTitle), $"👥 `{mee6.players.Length}` **{this.GetString(this.t.Commands.Utility.GuildInfo.MemberTitle)}**\n"));

@@ -151,7 +151,8 @@ public sealed class Bot
                 await Task.WhenAll(DatabaseClient.InitializeDatabase(this),
                                    Util.Initializers.ListLoader.Load(this), 
                                    Util.Initializers.TranslationLoader.Load(this), 
-                                   Util.Initializers.PluginLoader.LoadPlugins(this));
+                                   Util.Initializers.PluginLoader.LoadPlugins(this),
+                                   Util.Initializers.DependencyLoader.Load(this));
 
                 _ = Directory.CreateDirectory("WebServer");
 
