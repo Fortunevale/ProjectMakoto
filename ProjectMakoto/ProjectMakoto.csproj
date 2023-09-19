@@ -39,13 +39,13 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.151" />
-    <PackageReference Include="DisCatSharp" Version="10.4.2-nightly-024" />
-    <PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.4.2-nightly-024" />
-    <PackageReference Include="DisCatSharp.CommandsNext" Version="10.4.2-nightly-024" />
-    <PackageReference Include="DisCatSharp.Common" Version="10.4.2-nightly-024" />
-    <PackageReference Include="DisCatSharp.Extensions.TwoFactorCommands" Version="2.0.0" />
-    <PackageReference Include="DisCatSharp.Interactivity" Version="10.4.2-nightly-024" />
-    <PackageReference Include="DisCatSharp.Lavalink" Version="10.4.2-nightly-024" />
+    <PackageReference Include="DisCatSharp" Version="10.4.2-nightly-025" />
+    <PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.4.2-nightly-025" />
+    <PackageReference Include="DisCatSharp.CommandsNext" Version="10.4.2-nightly-025" />
+    <PackageReference Include="DisCatSharp.Common" Version="10.4.2-nightly-025" />
+    <PackageReference Include="DisCatSharp.Extensions.TwoFactorCommands" Version="2.0.1" />
+    <PackageReference Include="DisCatSharp.Interactivity" Version="10.4.2-nightly-025" />
+    <PackageReference Include="DisCatSharp.Lavalink" Version="10.4.2-nightly-025" />
     <PackageReference Include="FFMpegCore" Version="5.1.0" />
     <PackageReference Include="GenHTTP.Core" Version="7.0.0" />
     <PackageReference Include="GenHTTP.Modules.StaticWebsites" Version="7.0.0" />
