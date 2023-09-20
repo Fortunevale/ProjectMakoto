@@ -8,7 +8,8 @@
   "bumpVersion": "prerelease",
   "packageRules": [
     {
-      "matchPackagePatterns": [ "DisCatSharp", "discatsharp", "Discatsharp" ],
+      "excludePackagePatterns": [ "Extensions" ],
+      "matchPackagePrefixes": [ "DisCatSharp" ],
       "groupName": "discatsharp",
 	  "automerge": true
     }
