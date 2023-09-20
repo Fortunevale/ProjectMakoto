@@ -18,7 +18,7 @@ public sealed class SystemInfo
     public sealed class CpuInfo
     {
         public float Load { get; set; } = 0;
-        public float Temperature { get; set; } = 0;
+        public decimal Temperature { get; set; } = 0;
     }
 
     public sealed class MemoryInfo

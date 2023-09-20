@@ -30,12 +30,11 @@ public sealed class Config
     public bool IsDev = false;
     public bool AllowMoreThan100Guilds = false;
 
-    public bool MonitorSystemStatus = true;
-
     public bool EnablePlugins = false;
 
     public string SupportServerInvite = "";
 
+    public MonitorConfig MonitorSystem = new();
     public WebServerConfig WebServer = new();
     public DiscordConfig Discord = new();
     public ChannelsConfig Channels = new();
@@ -46,6 +45,13 @@ public sealed class Config
 
     public Dictionary<string, PluginInfo> PluginCache = new();
     public Dictionary<string, object> PluginData = new();
+
+    public sealed class MonitorConfig
+    {
+        public bool Enabled = true;
+        public string? SensorName = "k10temp-pci-00c3";
+        public string? SensorKey = "Tctl";
+    }
 
     public sealed class WebServerConfig
     {

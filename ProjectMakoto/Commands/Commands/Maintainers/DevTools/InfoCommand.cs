@@ -22,7 +22,6 @@ internal sealed class InfoCommand : BaseCommand
 
             _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Fetching system details..`").AsLoading(ctx));
 
-            var currentSystemStats = await ctx.Bot.MonitorClient.GetCurrent();
             var history = ctx.Bot.MonitorClient.GetHistory();
 
             var ServerUptime = "";
@@ -79,18 +78,18 @@ internal sealed class InfoCommand : BaseCommand
                 .AddField(new DiscordEmbedField("Server uptime", $"`{(ServerUptime.IsNullOrWhiteSpace() ? "Currently unavailable" : ServerUptime)}`"))
                 .AsInfo(ctx).WithFooter().WithTimestamp(null);
 
-            var cpuEmbed1 = new DiscordEmbedBuilder().WithTitle("CPU").WithDescription($"`Load        `: `{currentSystemStats.Cpu.Load.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`\n" +
-                                                                                       $"`  (15m avg.)`: `{history.Reverse().Take(45).Select(x => x.Value.Cpu.Load).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`\n" +
-                                                                                       $"`  (30m avg.)`: `{history.Reverse().Take(90).Select(x => x.Value.Cpu.Load).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`\n" +
-                                                                                       $"`  (60m avg.)`: `{history.Reverse().Take(180).Select(x => x.Value.Cpu.Load).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`").AsLoading(ctx).WithFooter().WithTimestamp(null).WithAuthor();
+            var cpuEmbed1 = new DiscordEmbedBuilder().WithTitle("CPU").WithDescription($"`Load        `: `{history.MaxBy(x => x.Key).Value.Cpu.Load.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`\n" +
+                                                                                       $"`  (15m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(15)).Select(x => x.Value.Cpu.Load).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`\n" +
+                                                                                       $"`  (30m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(30)).Select(x => x.Value.Cpu.Load).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`\n" +
+                                                                                       $"`  (60m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(60)).Select(x => x.Value.Cpu.Load).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`").AsLoading(ctx).WithFooter().WithTimestamp(null).WithAuthor();
 
-            var cpuEmbed2 = new DiscordEmbedBuilder().WithDescription($"`Temperature `: `{currentSystemStats.Cpu.Temperature.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n" +
-                                                                      $"`  (15m avg.)`: `{history.Reverse().Take(45).Select(x => x.Value.Cpu.Temperature).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n" +
-                                                                      $"`  (30m avg.)`: `{history.Reverse().Take(90).Select(x => x.Value.Cpu.Temperature).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n" +
-                                                                      $"`  (60m avg.)`: `{history.Reverse().Take(180).Select(x => x.Value.Cpu.Temperature).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n").AsInfo(ctx).WithFooter().WithTimestamp(null).WithAuthor();
+            var cpuEmbed2 = new DiscordEmbedBuilder().WithDescription($"`Temperature `: `{history.MaxBy(x => x.Key).Value.Cpu.Temperature.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n" +
+                                                                      $"`  (15m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(15)).Select(x => x.Value.Cpu.Temperature).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n" +
+                                                                      $"`  (30m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(30)).Select(x => x.Value.Cpu.Temperature).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n" +
+                                                                      $"`  (60m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(60)).Select(x => x.Value.Cpu.Temperature).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n").AsInfo(ctx).WithFooter().WithTimestamp(null).WithAuthor();
 
 
-            var memoryEmbed = new DiscordEmbedBuilder().WithTitle("Memory").WithDescription($"`Usage`: `{currentSystemStats.Memory.Used.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}/{currentSystemStats.Memory.Total.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} MB`").AsLoading(ctx);
+            var memoryEmbed = new DiscordEmbedBuilder().WithTitle("Memory").WithDescription($"`Usage`: `{history.MaxBy(x => x.Key).Value.Memory.Used.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}/{history.MaxBy(x => x.Key).Value.Memory.Total.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} MB`").AsLoading(ctx);
 
             _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(new List<DiscordEmbed>() { miscEmbed, cpuEmbed1, memoryEmbed }));
 
@@ -159,7 +158,7 @@ internal sealed class InfoCommand : BaseCommand
                 _ = cpuEmbed1.AsInfo(ctx).WithFooter().WithTimestamp(null).WithAuthor();
             }
 
-            if (currentSystemStats.Cpu.Temperature != 0)
+            if (history.MaxBy(x => x.Key).Value.Cpu.Temperature != 0)
                 try
                 {
                     var prev = "";
@@ -264,7 +263,7 @@ internal sealed class InfoCommand : BaseCommand
                                 scales: {{
                                     yAxes: [{{
                                     ticks: {{
-                                        max: {currentSystemStats.Memory.Total.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")).Replace(",", "").Replace(".", "")},
+                                        max: {history.First().Value.Memory.Total.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")).Replace(",", "").Replace(".", "")},
                                         min: 0
                                         }}
                                     }}]
