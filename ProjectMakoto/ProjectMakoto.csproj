@@ -43,7 +43,7 @@
     <PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.4.2-nightly-022" />
     <PackageReference Include="DisCatSharp.CommandsNext" Version="10.4.2-nightly-022" />
     <PackageReference Include="DisCatSharp.Common" Version="10.4.2-nightly-022" />
-    <PackageReference Include="DisCatSharp.Extensions.TwoFactorCommands" Version="2.0.0" />
+    <PackageReference Include="DisCatSharp.Extensions.TwoFactorCommands" Version="2.0.1" />
     <PackageReference Include="DisCatSharp.Interactivity" Version="10.4.2-nightly-022" />
     <PackageReference Include="DisCatSharp.Lavalink" Version="10.4.2-nightly-022" />
     <PackageReference Include="FFMpegCore" Version="5.1.0" />
