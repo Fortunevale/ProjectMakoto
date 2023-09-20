@@ -155,7 +155,7 @@ internal sealed class InfoCommand : BaseCommand
                 };
 
                 charts.Add("cpu.png", qc);
-                cpuEmbed2.ImageUrl = "attachment://cpu.png";
+                cpuEmbed1.ImageUrl = "attachment://cpu.png";
             }
             catch (Exception ex)
             {
@@ -294,7 +294,7 @@ internal sealed class InfoCommand : BaseCommand
                 };
 
                 charts.Add("mem.png", qc);
-                cpuEmbed2.ImageUrl = "attachment://mem.png";
+                memoryEmbed.ImageUrl = "attachment://mem.png";
             }
             catch (Exception ex)
             {
