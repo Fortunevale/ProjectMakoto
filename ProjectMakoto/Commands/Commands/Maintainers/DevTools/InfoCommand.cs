@@ -83,15 +83,17 @@ internal sealed class InfoCommand : BaseCommand
                                                                                        $"`  (30m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(30)).Select(x => x.Value.Cpu.Load).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`\n" +
                                                                                        $"`  (60m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(60)).Select(x => x.Value.Cpu.Load).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`").AsLoading(ctx).WithFooter().WithTimestamp(null).WithAuthor();
 
-            var cpuEmbed2 = new DiscordEmbedBuilder().WithDescription($"`Temperature `: `{history.MaxBy(x => x.Key).Value.Cpu.Temperature.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n" +
-                                                                      $"`  (15m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(15)).Select(x => x.Value.Cpu.Temperature).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n" +
-                                                                      $"`  (30m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(30)).Select(x => x.Value.Cpu.Temperature).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n" +
-                                                                      $"`  (60m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(60)).Select(x => x.Value.Cpu.Temperature).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n").AsInfo(ctx).WithFooter().WithTimestamp(null).WithAuthor();
+            var cpuEmbed2 = new DiscordEmbedBuilder().WithDescription($"`Temperature`: `{history.MaxBy(x => x.Key).Value.Cpu.Temperature.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n" +
+                                                                      $"` (15m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(15)).Select(x => x.Value.Cpu.Temperature).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n" +
+                                                                      $"` (30m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(30)).Select(x => x.Value.Cpu.Temperature).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n" +
+                                                                      $"` (60m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(60)).Select(x => x.Value.Cpu.Temperature).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n").AsInfo(ctx).WithFooter().WithTimestamp(null).WithAuthor();
 
 
             var memoryEmbed = new DiscordEmbedBuilder().WithTitle("Memory").WithDescription($"`Usage`: `{history.MaxBy(x => x.Key).Value.Memory.Used.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}/{history.MaxBy(x => x.Key).Value.Memory.Total.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} MB`").AsLoading(ctx);
 
             _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(new List<DiscordEmbed>() { miscEmbed, cpuEmbed1, memoryEmbed }));
+
+            Dictionary<string, Chart> charts = new();
 
             try
             {
@@ -106,7 +108,14 @@ internal sealed class InfoCommand : BaseCommand
                             {{
                                 labels: 
                                 [
-                                    {string.Join(",", history.Select(x => { var value = x.Key.GetTimespanSince().TotalMinutes.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")); if (prev == value) return "' '"; prev = value; return $"'{value}m ago'"; }))}
+                                    {string.Join(",", history.Select(x =>
+                                    {
+                                        var value = x.Key.GetTimespanSince().TotalHours.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"));
+                                        if (prev == value)
+                                            return "' '";
+                                        prev = value;
+                                        return $"'{value}h ago'";
+                                    }))}
                                 ],
                                 datasets: 
                                 [
@@ -145,9 +154,8 @@ internal sealed class InfoCommand : BaseCommand
                         }}"
                 };
 
-                var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.GraphAssets))
-                    .SendMessageAsync(new DiscordMessageBuilder().WithFile($"{Guid.NewGuid()}.png", new MemoryStream(qc.ToByteArray())));
-                cpuEmbed1.ImageUrl = asset.Attachments[0].Url;
+                charts.Add("cpu.png", qc);
+                cpuEmbed2.ImageUrl = "attachment://cpu.png";
             }
             catch (Exception ex)
             {
@@ -172,7 +180,14 @@ internal sealed class InfoCommand : BaseCommand
                                 {{
                                     labels: 
                                     [
-                                        {string.Join(",", history.Select(x => { var value = x.Key.GetTimespanSince().TotalMinutes.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")); if (prev == value) return "' '"; prev = value; return $"'{value}m ago'"; }))}
+                                        {string.Join(",", history.Select(x => 
+                                        { 
+                                            var value = x.Key.GetTimespanSince().TotalHours.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")); 
+                                            if (prev == value) 
+                                                return "' '"; 
+                                            prev = value; 
+                                            return $"'{value}h ago'"; 
+                                        }))}
                                     ],
                                     datasets: 
                                     [
@@ -211,9 +226,8 @@ internal sealed class InfoCommand : BaseCommand
                             }}"
                     };
 
-                    var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.GraphAssets))
-                        .SendMessageAsync(new DiscordMessageBuilder().WithFile($"{Guid.NewGuid()}.png", new MemoryStream(qc.ToByteArray())));
-                    cpuEmbed2.ImageUrl = asset.Attachments[0].Url;
+                    charts.Add("temp.png", qc);
+                    cpuEmbed2.ImageUrl = "attachment://temp.png";
                 }
                 catch (Exception ex)
                 {
@@ -233,7 +247,14 @@ internal sealed class InfoCommand : BaseCommand
                             {{
                                 labels: 
                                 [
-                                    {string.Join(",", history.Select(x => { var value = x.Key.GetTimespanSince().TotalMinutes.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")); if (prev == value) return "' '"; prev = value; return $"'{value}m ago'"; }))}
+                                    {string.Join(",", history.Select(x => 
+                                    {
+                                        var value = x.Key.GetTimespanSince().TotalHours.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"));
+                                        if (prev == value)
+                                            return "' '";
+                                        prev = value;
+                                        return $"'{value}h ago'";
+                                    }))}
                                 ],
                                 datasets: 
                                 [
@@ -272,9 +293,8 @@ internal sealed class InfoCommand : BaseCommand
                         }}"
                 };
 
-                var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.GraphAssets))
-                    .SendMessageAsync(new DiscordMessageBuilder().WithFile($"{Guid.NewGuid()}.png", new MemoryStream(qc.ToByteArray())));
-                memoryEmbed.ImageUrl = asset.Attachments[0].Url;
+                charts.Add("mem.png", qc);
+                cpuEmbed2.ImageUrl = "attachment://mem.png";
             }
             catch (Exception ex)
             {
@@ -294,7 +314,7 @@ internal sealed class InfoCommand : BaseCommand
 
             list.Add(memoryEmbed);
 
-            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(list));
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(list).WithFiles(charts.ToDictionary(x => x.Key, y => (Stream)new MemoryStream(y.Value.ToByteArray()))));
         });
     }
 }
