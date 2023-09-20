@@ -243,10 +243,10 @@ public sealed class Bot
 
             await Util.Initializers.PostLoginTaskLoader.Load(this);
 
-            foreach (var guild in this.DiscordClient.Guilds.Values)
-                _ = await this.DiscordClient.BulkOverwriteGuildApplicationCommandsAsync(guild.Id, Array.Empty<DiscordApplicationCommand>()).ConfigureAwait(false);
+            //foreach (var guild in this.DiscordClient.Guilds.Values)
+            //    await this.DiscordClient.BulkOverwriteGuildApplicationCommandsAsync(guild.Id, Array.Empty<DiscordApplicationCommand>()).ConfigureAwait(false);
 
-            _ = await this.DiscordClient.BulkOverwriteGlobalApplicationCommandsAsync(Array.Empty<DiscordApplicationCommand>()).ConfigureAwait(false);
+            //await this.DiscordClient.BulkOverwriteGlobalApplicationCommandsAsync(Array.Empty<DiscordApplicationCommand>()).ConfigureAwait(false);
 
             _ = Task.Run(async () =>
             {
