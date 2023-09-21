@@ -91,31 +91,25 @@ internal sealed class InfoCommand : BaseCommand
             Time = Time[..Time.IndexOf(",")];
 
             var miscEmbed = new DiscordEmbedBuilder().WithTitle($"{ctx.CurrentUser.GetUsername()} Details")
-                .AddField(new DiscordEmbedField("Currently running as", $"`{ctx.CurrentUser.GetUsernameWithIdentifier()}`"))
+                .AddField(new DiscordEmbedField("Currently running as", $"`{ctx.CurrentUser.GetUsernameWithIdentifier()}`", true))
+                .AddField(new DiscordEmbedField("Process PID", $"`{Environment.ProcessId}`", true))
+                .AddField(new DiscordEmbedField("󠂪 󠂪", $"󠂪 󠂪", true))
+                .AddField(new DiscordEmbedField("Bot uptime", $"`{Math.Round((DateTime.UtcNow - ctx.Bot.status.startupTime).TotalHours, 2)} hours`", true))
+                .AddField(new DiscordEmbedField("Discord API Latency", $"`{ctx.Client.Ping}ms`", true))
+                .AddField(new DiscordEmbedField("Server uptime", $"`{(ServerUptime.IsNullOrWhiteSpace() ? "Currently unavailable" : ServerUptime)}`", true))
                 .AddField(new DiscordEmbedField("Currently running software", $"`Project Makoto by {(await ctx.Client.GetUserAsync(411950662662881290)).GetUsernameWithIdentifier()} ({Version} ({Branch}) built on the {Date} at {Time})`"))
-                .AddField(new DiscordEmbedField("Process PID", $"`{Environment.ProcessId}`"))
                 .AddField(new DiscordEmbedField("Current bot library and version", $"[`{ctx.Client.BotLibrary} {ctx.Client.VersionString}`](https://github.com/Aiko-IT-Systems/DisCatSharp)"))
-                .AddField(new DiscordEmbedField("Bot uptime", $"`{Math.Round((DateTime.UtcNow - ctx.Bot.status.startupTime).TotalHours, 2)} hours`"))
-                .AddField(new DiscordEmbedField("Discord API Latency", $"`{ctx.Client.Ping}ms`"))
-                .AddField(new DiscordEmbedField("Server uptime", $"`{(ServerUptime.IsNullOrWhiteSpace() ? "Currently unavailable" : ServerUptime)}`"))
                 .AsInfo(ctx).WithFooter().WithTimestamp(null);
 
             var cpuEmbed1 = new DiscordEmbedBuilder()
                 .WithTitle("CPU")
-                .WithDescription($"`Load        `: `{history.MaxBy(x => x.Key).Value.Cpu.Load.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`\n" +
-                                 $"`  (15m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(15)).Select(x => x.Value.Cpu.Load).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`\n" +
-                                 $"`  (30m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(30)).Select(x => x.Value.Cpu.Load).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`\n" +
-                                 $"`  (60m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(60)).Select(x => x.Value.Cpu.Load).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`\n" +
-                                 $"\n" +
-                                 $"`Temperature `: `{history.MaxBy(x => x.Key).Value.Cpu.Temperature.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n" +
-                                 $"`  (15m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(15)).Select(x => x.Value.Cpu.Temperature).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n" +
-                                 $"`  (30m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(30)).Select(x => x.Value.Cpu.Temperature).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n" +
-                                 $"`  (60m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(60)).Select(x => x.Value.Cpu.Temperature).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n")
+                .AddField(new DiscordEmbedField("Load", $"`{history.MaxBy(x => x.Key).Value.Cpu.Load.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`", true))
+                .AddField(new DiscordEmbedField("Temperature", $"`{history.MaxBy(x => x.Key).Value.Cpu.Temperature.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`", true))
                 .AsLoading(ctx).WithFooter().WithTimestamp(null).WithAuthor();
 
             var memoryEmbed = new DiscordEmbedBuilder()
                 .WithTitle("Memory")
-                .WithDescription($"`Usage       `: `{history.MaxBy(x => x.Key).Value.Memory.Used.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}/{history.MaxBy(x => x.Key).Value.Memory.Total.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} MB`")
+                .AddField(new DiscordEmbedField("Usage", $"`{history.MaxBy(x => x.Key).Value.Memory.Used.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}/{history.MaxBy(x => x.Key).Value.Memory.Total.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} MB`", true))
                 .AsLoading(ctx);
 
             _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(new List<DiscordEmbed>() { miscEmbed, cpuEmbed1, memoryEmbed }));
