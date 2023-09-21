@@ -30,6 +30,9 @@ public sealed class MonitorClient : RequiresBotReference
 
     public IReadOnlyDictionary<DateTime, SystemInfo> GetHistory()
     {
+        if (!this.History.IsNotNullAndNotEmpty())
+            return new Dictionary<DateTime, SystemInfo>().AsReadOnly();
+
         return this.History.OrderBy(x => x.Key.Ticks).ToDictionary(x => x.Key, x => x.Value);
     }
 
@@ -110,7 +113,6 @@ public sealed class MonitorClient : RequiresBotReference
                     process.WaitForExit();
 
                     var output = process.StandardOutput.ReadToEnd().ReplaceLineEndings("\n");
-                    _logger.LogTrace("Executed sensors: {0}", output);
                     
                     var parsedSensors = this.ParseSensors(output);
 
@@ -139,8 +141,6 @@ public sealed class MonitorClient : RequiresBotReference
                     process.WaitForExit();
 
                     var output = process.StandardOutput.ReadToEnd();
-
-                    _logger.LogTrace("Executed cpu usage: {0}", output);
                     systemInfo.Cpu.Load = float.Parse(output);
                 }
                 catch (Exception ex)
