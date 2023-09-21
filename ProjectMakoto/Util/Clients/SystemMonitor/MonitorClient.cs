@@ -18,6 +18,19 @@ public sealed class MonitorClient : RequiresBotReference
         if (!bot.status.LoadedConfig.MonitorSystem.Enabled)
             return;
 
+        if (File.Exists("cache/monitor.json"))
+            try
+            {
+                this.History = JsonConvert.DeserializeObject<Dictionary<DateTime, SystemInfo>>(File.ReadAllText("cache/monitor.json"));
+
+                if (this.History is null)
+                    throw new Exception();
+            }
+            catch (Exception)
+            {
+                this.History = new();
+            }
+
         this.InitializeMonitor();
     }
 
@@ -70,13 +83,15 @@ public sealed class MonitorClient : RequiresBotReference
                         _ = this.History.Remove(this.History.Min(x => x.Key));
 
                     this.History.Add(DateTime.UtcNow, sensors);
+
+                    _ = Directory.CreateDirectory("cache");
+                    File.WriteAllText("cache/monitor.json", JsonConvert.SerializeObject(this.History));
                 }
                 catch (Exception ex)
                 {
                     _logger.LogWarn("Failed to fetch system info", ex);
 
                     this.LastScanStart = DateTime.UtcNow;
-                    this.History.Add(DateTime.UtcNow, null);
                 }
 
                 var waitTime = this.LastScanStart.AddSeconds(2).GetTimespanUntil();
