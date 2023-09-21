@@ -273,7 +273,7 @@ internal sealed class InfoCommand : BaseCommand
             var files = charts.ToDictionary(x => x.Key, y => (Stream)new MemoryStream(y.Value.ToByteArray()));
             try
             {
-                files.Add("1.png", new FileStream("Assets/Width.png", FileMode.Open));
+                files.Add("1.png", new FileStream("Assets/1.png", FileMode.Open));
                 _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(list).WithFiles(files));
             }
             finally
