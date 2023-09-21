@@ -95,6 +95,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Assets\1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\ASCII.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

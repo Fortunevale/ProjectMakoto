@@ -266,11 +266,21 @@ internal sealed class InfoCommand : BaseCommand
             }
 
             var list = new List<DiscordEmbed>();
-            list.Add(miscEmbed);
+            list.Add(miscEmbed.WithImageUrl("attachment://1.png"));
             list.Add(cpuEmbed1);
             list.Add(memoryEmbed);
 
-            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(list).WithFiles(charts.ToDictionary(x => x.Key, y => (Stream)new MemoryStream(y.Value.ToByteArray()))));
+            var files = charts.ToDictionary(x => x.Key, y => (Stream)new MemoryStream(y.Value.ToByteArray()));
+            try
+            {
+                files.Add("1.png", new FileStream("Assets/Width.png", FileMode.Open));
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(list).WithFiles(files));
+            }
+            finally
+            {
+                foreach (var file in files)
+                    file.Value.Dispose();
+            }
         });
     }
 }
