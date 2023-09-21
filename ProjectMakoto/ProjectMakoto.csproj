@@ -54,7 +54,6 @@
     <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="4.7.0" />
     <PackageReference Include="MySqlConnector" Version="2.3.0-beta.3" />
     <PackageReference Include="Octokit" Version="7.1.0" />
-    <PackageReference Include="QuickChart" Version="2.3.0" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.118" />
 	<PackageReference Include="DisCatSharp.Analyzer.Roselyn" Version="5.5.0">
 		<PrivateAssets>all</PrivateAssets>
@@ -63,6 +62,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\quickchart-csharp\QuickChart\QuickChart.csproj" />
     <ProjectReference Include="..\Xorog.Logger\Xorog.Logger.csproj" />
     <ProjectReference Include="..\Xorog.UniversalExtensions\Xorog.UniversalExtensions.csproj" />
   </ItemGroup>

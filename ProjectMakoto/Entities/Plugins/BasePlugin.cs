@@ -176,7 +176,7 @@ public abstract class BasePlugin
                 }
             }
         }
-        catch (ApiException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        catch (Octokit.ApiException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
         {
             this._logger.LogError("The repository could not be found at '{RepoUrl}', is the repo private, the credentials outdated or no release published?", this.UpdateUrl);
         }

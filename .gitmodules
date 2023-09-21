@@ -7,3 +7,6 @@
 [submodule "Xorog.ScoreSaber"]
 	path = Xorog.ScoreSaber
 	url = https://github.com/Fortunevale/Xorog.ScoreSaber
+[submodule "quickchart-csharp"]
+	path = quickchart-csharp
+	url = https://github.com/TheXorog/quickchart-csharp
