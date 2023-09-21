@@ -30,6 +30,9 @@ public sealed class MonitorClient : RequiresBotReference
 
     public IReadOnlyDictionary<DateTime, SystemInfo> GetHistory()
     {
+        if (!this.History.IsNotNullAndNotEmpty())
+            return new Dictionary<DateTime, SystemInfo>().AsReadOnly();
+
         return this.History.OrderBy(x => x.Key.Ticks).ToDictionary(x => x.Key, x => x.Value);
     }
 

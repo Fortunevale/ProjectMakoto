@@ -22,7 +22,29 @@ internal sealed class InfoCommand : BaseCommand
 
             _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Fetching system details..`").AsLoading(ctx));
 
-            var history = ctx.Bot.MonitorClient.GetHistory();
+            Dictionary<DateTime, Entities.SystemMonitor.SystemInfo> history = new();
+
+            try
+            {
+                var rawHistory = ctx.Bot.MonitorClient.GetHistory().GroupBy(x => $"{x.Key.Hour}-{x.Key.Minute}");
+                foreach (var entry in rawHistory)
+                {
+                    history.Add(entry.Last().Key, new()
+                    {
+                        Cpu = new()
+                        {
+                            Load = entry.Average(x => x.Value.Cpu.Load),
+                            Temperature = entry.Average(x => x.Value.Cpu.Temperature)
+                        },
+                        Memory = new()
+                        {
+                            Available = entry.Average(x => x.Value.Memory.Available),
+                            Used = entry.Average(x => x.Value.Memory.Used),
+                        }
+                    });
+                }
+            }
+            catch {}
 
             var ServerUptime = "";
             if (Environment.OSVersion.Platform == PlatformID.Unix)
@@ -78,18 +100,22 @@ internal sealed class InfoCommand : BaseCommand
                 .AddField(new DiscordEmbedField("Server uptime", $"`{(ServerUptime.IsNullOrWhiteSpace() ? "Currently unavailable" : ServerUptime)}`"))
                 .AsInfo(ctx).WithFooter().WithTimestamp(null);
 
-            var cpuEmbed1 = new DiscordEmbedBuilder().WithTitle("CPU").WithDescription($"`Load        `: `{history.MaxBy(x => x.Key).Value.Cpu.Load.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`\n" +
-                                                                                       $"`  (15m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(15)).Select(x => x.Value.Cpu.Load).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`\n" +
-                                                                                       $"`  (30m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(30)).Select(x => x.Value.Cpu.Load).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`\n" +
-                                                                                       $"`  (60m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(60)).Select(x => x.Value.Cpu.Load).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`").AsLoading(ctx).WithFooter().WithTimestamp(null).WithAuthor();
+            var cpuEmbed1 = new DiscordEmbedBuilder()
+                .WithTitle("CPU")
+                .WithDescription($"`Load        `: `{history.MaxBy(x => x.Key).Value.Cpu.Load.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`\n" +
+                                 $"`  (15m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(15)).Select(x => x.Value.Cpu.Load).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`\n" +
+                                 $"`  (30m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(30)).Select(x => x.Value.Cpu.Load).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`\n" +
+                                 $"`  (60m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(60)).Select(x => x.Value.Cpu.Load).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`\n\n" +
+                                 $"`Temperature `: `{history.MaxBy(x => x.Key).Value.Cpu.Temperature.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n" +
+                                 $"`  (15m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(15)).Select(x => x.Value.Cpu.Temperature).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n" +
+                                 $"`  (30m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(30)).Select(x => x.Value.Cpu.Temperature).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n" +
+                                 $"`  (60m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(60)).Select(x => x.Value.Cpu.Temperature).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n")
+                .AsLoading(ctx).WithFooter().WithTimestamp(null).WithAuthor();
 
-            var cpuEmbed2 = new DiscordEmbedBuilder().WithDescription($"`Temperature`: `{history.MaxBy(x => x.Key).Value.Cpu.Temperature.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n" +
-                                                                      $"` (15m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(15)).Select(x => x.Value.Cpu.Temperature).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n" +
-                                                                      $"` (30m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(30)).Select(x => x.Value.Cpu.Temperature).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n" +
-                                                                      $"` (60m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(60)).Select(x => x.Value.Cpu.Temperature).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n").AsInfo(ctx).WithFooter().WithTimestamp(null).WithAuthor();
-
-
-            var memoryEmbed = new DiscordEmbedBuilder().WithTitle("Memory").WithDescription($"`Usage`: `{history.MaxBy(x => x.Key).Value.Memory.Used.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}/{history.MaxBy(x => x.Key).Value.Memory.Total.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} MB`").AsLoading(ctx);
+            var memoryEmbed = new DiscordEmbedBuilder()
+                .WithTitle("Memory")
+                .WithDescription($"`Usage       `: `{history.MaxBy(x => x.Key).Value.Memory.Used.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}/{history.MaxBy(x => x.Key).Value.Memory.Total.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} MB`")
+                .AsLoading(ctx);
 
             _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(new List<DiscordEmbed>() { miscEmbed, cpuEmbed1, memoryEmbed }));
 
@@ -124,6 +150,13 @@ internal sealed class InfoCommand : BaseCommand
                                         data: [{string.Join(",", history.Select(x => $"{x.Value.Cpu.Load.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}"))}],
                                         fill: false,
                                         borderColor: getGradientFillHelper('vertical', ['#ff0000', '#00ff00']),
+                                        id: ""yaxis2""
+                                    }},
+                                    {{
+                                        label: 'Temperature (°C)',
+                                        data: [{string.Join(",", history.Select(x => $"{x.Value.Cpu.Temperature.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}"))}],
+                                        fill: false,
+                                        borderColor: getGradientFillHelper('vertical', ['#4287f5', '#ff0000']),
                                         id: ""yaxis2""
                                     }}
                                 ]
@@ -165,74 +198,6 @@ internal sealed class InfoCommand : BaseCommand
             {
                 _ = cpuEmbed1.AsInfo(ctx).WithFooter().WithTimestamp(null).WithAuthor();
             }
-
-            if (history.MaxBy(x => x.Key).Value.Cpu.Temperature != 0)
-                try
-                {
-                    var prev = "";
-                    Chart qc = new()
-                    {
-                        Width = 1000,
-                        Height = 500,
-                        Config = $@"{{
-                                type: 'line',
-                                data: 
-                                {{
-                                    labels: 
-                                    [
-                                        {string.Join(",", history.Select(x => 
-                                        { 
-                                            var value = x.Key.GetTimespanSince().TotalHours.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")); 
-                                            if (prev == value) 
-                                                return "' '"; 
-                                            prev = value; 
-                                            return $"'{value}h ago'"; 
-                                        }))}
-                                    ],
-                                    datasets: 
-                                    [
-                                        {{
-                                            label: 'Temperature (°C)',
-                                            data: [{string.Join(",", history.Select(x => $"{x.Value.Cpu.Temperature.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}"))}],
-                                            fill: false,
-                                            borderColor: getGradientFillHelper('vertical', ['#ff0000', '#00ff00']),
-                                            id: ""yaxis2""
-                                        }}
-                                    ]
-
-                                }},
-                                options:
-                                {{
-                                    legend:
-                                    {{
-                                        display: true,
-                                    }},
-                                    elements:
-                                    {{
-                                        point:
-                                        {{
-                                            radius: 0
-                                        }}
-                                    }},
-                                    scales: {{
-                                        yAxes: [{{
-                                        ticks: {{
-                                            max: 100,
-                                            min: 0
-                                            }}
-                                        }}]
-                                    }}
-                                }}
-                            }}"
-                    };
-
-                    charts.Add("temp.png", qc);
-                    cpuEmbed2.ImageUrl = "attachment://temp.png";
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError("Failed to generate cpu temp graph", ex);
-                }
 
             try
             {
@@ -308,10 +273,6 @@ internal sealed class InfoCommand : BaseCommand
             var list = new List<DiscordEmbed>();
             list.Add(miscEmbed);
             list.Add(cpuEmbed1);
-
-            if (!cpuEmbed2.ImageUrl.IsNullOrWhiteSpace())
-                list.Add(cpuEmbed2);
-
             list.Add(memoryEmbed);
 
             _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(list).WithFiles(charts.ToDictionary(x => x.Key, y => (Stream)new MemoryStream(y.Value.ToByteArray()))));
