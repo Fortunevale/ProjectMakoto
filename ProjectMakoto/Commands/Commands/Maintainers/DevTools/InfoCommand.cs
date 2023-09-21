@@ -105,7 +105,8 @@ internal sealed class InfoCommand : BaseCommand
                 .WithDescription($"`Load        `: `{history.MaxBy(x => x.Key).Value.Cpu.Load.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`\n" +
                                  $"`  (15m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(15)).Select(x => x.Value.Cpu.Load).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`\n" +
                                  $"`  (30m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(30)).Select(x => x.Value.Cpu.Load).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`\n" +
-                                 $"`  (60m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(60)).Select(x => x.Value.Cpu.Load).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`\n\n" +
+                                 $"`  (60m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(60)).Select(x => x.Value.Cpu.Load).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`\n" +
+                                 $"\n" +
                                  $"`Temperature `: `{history.MaxBy(x => x.Key).Value.Cpu.Temperature.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n" +
                                  $"`  (15m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(15)).Select(x => x.Value.Cpu.Temperature).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n" +
                                  $"`  (30m avg.)`: `{history.Reverse().TakeWhile(x => x.Key.GetTimespanSince() < TimeSpan.FromMinutes(30)).Select(x => x.Value.Cpu.Temperature).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n" +
@@ -126,8 +127,8 @@ internal sealed class InfoCommand : BaseCommand
                 var prev = "";
                 Chart qc = new()
                 {
-                    Width = 1000,
-                    Height = 500,
+                    Width = 800,
+                    Height = 600,
                     Config = $@"{{
                             type: 'line',
                             data: 
@@ -136,11 +137,11 @@ internal sealed class InfoCommand : BaseCommand
                                 [
                                     {string.Join(",", history.Select(x =>
                                     {
-                                        var value = x.Key.GetTimespanSince().TotalHours.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"));
+                                        var value = x.Key.ToString("HH:mm", CultureInfo.CreateSpecificCulture("en-US"));
                                         if (prev == value)
                                             return "' '";
                                         prev = value;
-                                        return $"'{value}h ago'";
+                                        return $"'{value}'";
                                     }))}
                                 ],
                                 datasets: 
@@ -204,21 +205,21 @@ internal sealed class InfoCommand : BaseCommand
                 var prev = "";
                 Chart qc = new()
                 {
-                    Width = 1000,
-                    Height = 500,
+                    Width = 800,
+                    Height = 600,
                     Config = $@"{{
                             type: 'line',
                             data: 
                             {{
                                 labels: 
                                 [
-                                    {string.Join(",", history.Select(x => 
+                                    {string.Join(",", history.Select(x =>
                                     {
-                                        var value = x.Key.GetTimespanSince().TotalHours.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"));
+                                        var value = x.Key.ToString("HH:mm", CultureInfo.CreateSpecificCulture("en-US"));
                                         if (prev == value)
                                             return "' '";
                                         prev = value;
-                                        return $"'{value}h ago'";
+                                        return $"'{value}'";
                                     }))}
                                 ],
                                 datasets: 
