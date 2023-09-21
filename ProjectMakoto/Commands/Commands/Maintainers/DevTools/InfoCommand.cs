@@ -123,15 +123,15 @@ internal sealed class InfoCommand : BaseCommand
                 var prev = "";
                 var qc = ctx.Bot.ChartsClient.GetChart(800, 600, history.Select(x =>
                 {
-                    var value = x.Key.ToString("HH:mm", CultureInfo.CreateSpecificCulture("en-US"));
+                    var value = x.Key.ToString("HH:mm");
                     if (prev == value)
                         return " ";
                     prev = value;
                     return $"{value}";
                 }), new ChartGeneration.Dataset[]
                 {
-                    new ChartGeneration.Dataset("Usage (%)", history.Select(x => $"{x.Value.Cpu.Load.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}"), "getGradientFillHelper('vertical', ['#ff0000', '#00ff00'])"),
-                    new ChartGeneration.Dataset("Temperature (°C)", history.Select(x => $"{x.Value.Cpu.Temperature.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}"), "getGradientFillHelper('vertical', ['#4287f5', '#ff0000'])"),
+                    new ChartGeneration.Dataset("Usage (%)", history.Select(x => $"{(int)x.Value.Cpu.Load}"), "getGradientFillHelper('vertical', ['#ff0000', '#00ff00'])"),
+                    new ChartGeneration.Dataset("Temperature (°C)", history.Select(x => $"{(int)x.Value.Cpu.Temperature}"), "getGradientFillHelper('vertical', ['#4287f5', '#ff0000'])"),
                 }, 0, 100);
 
                 charts.Add("cpu.png", qc.ToByteArray());
@@ -152,7 +152,7 @@ internal sealed class InfoCommand : BaseCommand
                 var prev = "";
                 var qc = ctx.Bot.ChartsClient.GetChart(800, 600, history.Select(x =>
                 {
-                    var value = x.Key.ToString("HH:mm", CultureInfo.CreateSpecificCulture("en-US"));
+                    var value = x.Key.ToString("HH:mm");
                     if (prev == value)
                         return " ";
                     prev = value;
@@ -160,7 +160,7 @@ internal sealed class InfoCommand : BaseCommand
                 }),
                 new ChartGeneration.Dataset[]
                 {
-                    new ChartGeneration.Dataset("Usage (%)", history.Select(x => $"{x.Value.Memory.Used.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}"))
+                    new ChartGeneration.Dataset("Usage (%)", history.Select(x => $"{(int)x.Value.Memory.Used}"))
                 }, 0, (int)history.First().Value.Memory.Total);
 
                 charts.Add("mem.png", qc.ToByteArray());
