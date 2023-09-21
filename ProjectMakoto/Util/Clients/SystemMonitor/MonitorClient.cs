@@ -41,10 +41,32 @@ public sealed class MonitorClient : RequiresBotReference
 
     bool _disposed = false;
 
+    private Dictionary<DateTime, SystemInfo> placeholder = new();
+
     public IReadOnlyDictionary<DateTime, SystemInfo> GetHistory()
     {
         if (!this.History.IsNotNullAndNotEmpty())
-            return new Dictionary<DateTime, SystemInfo>().AsReadOnly();
+        {
+            for (var i = 43200; i <= 0; i--)
+            {
+                this.placeholder.Add(DateTime.UtcNow.AddSeconds(i),
+                    new SystemInfo
+                    {
+                        Cpu = new()
+                        {
+                            Load = new Random().Next(0, 50),
+                            Temperature = new Random().Next(30, 50),
+                        },
+                        Memory = new()
+                        {
+                            Available = new Random().Next(0, 12000),
+                            Total = 24000,
+                        }
+                    });
+            }
+
+            return this.placeholder.AsReadOnly();
+        }
 
         return this.History.OrderBy(x => x.Key.Ticks).ToDictionary(x => x.Key, x => x.Value);
     }
