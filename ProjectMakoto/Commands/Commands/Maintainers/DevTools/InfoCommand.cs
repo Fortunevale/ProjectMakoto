@@ -26,7 +26,7 @@ internal sealed class InfoCommand : BaseCommand
 
             try
             {
-                var rawHistory = ctx.Bot.MonitorClient.GetHistory().GroupBy(x => $"{x.Key.Hour}-{x.Key.Minute}");
+                var rawHistory = ctx.Bot.MonitorClient.GetHistory().GroupBy(x => $"{x.Key.Hour}-{(int)Math.Floor(x.Key.Minute / 20d)}");
                 foreach (var entry in rawHistory)
                 {
                     history.Add(entry.Last().Key, new()
@@ -45,6 +45,8 @@ internal sealed class InfoCommand : BaseCommand
                 }
             }
             catch {}
+
+            history = history.OrderBy(x => x.Key.Ticks).ToDictionary(x => x.Key, x => x.Value);
 
             var ServerUptime = "";
             if (Environment.OSVersion.Platform == PlatformID.Unix)
@@ -114,80 +116,31 @@ internal sealed class InfoCommand : BaseCommand
 
             _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(new List<DiscordEmbed>() { miscEmbed, cpuEmbed1, memoryEmbed }));
 
-            Dictionary<string, Chart> charts = new();
+            Dictionary<string, byte[]> charts = new();
 
             try
             {
                 var prev = "";
-                Chart qc = new()
+                var qc = ctx.Bot.ChartsClient.GetChart(800, 600, history.Select(x =>
                 {
-                    Width = 800,
-                    Height = 600,
-                    Config = $@"{{
-                            type: 'line',
-                            data: 
-                            {{
-                                labels: 
-                                [
-                                    {string.Join(",", history.Select(x =>
-                                    {
-                                        var value = x.Key.ToString("HH:mm", CultureInfo.CreateSpecificCulture("en-US"));
-                                        if (prev == value)
-                                            return "' '";
-                                        prev = value;
-                                        return $"'{value}'";
-                                    }))}
-                                ],
-                                datasets: 
-                                [
-                                    {{
-                                        label: 'Usage (%)',
-                                        data: [{string.Join(",", history.Select(x => $"{x.Value.Cpu.Load.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}"))}],
-                                        fill: false,
-                                        borderColor: getGradientFillHelper('vertical', ['#ff0000', '#00ff00']),
-                                        id: ""yaxis2""
-                                    }},
-                                    {{
-                                        label: 'Temperature (°C)',
-                                        data: [{string.Join(",", history.Select(x => $"{x.Value.Cpu.Temperature.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}"))}],
-                                        fill: false,
-                                        borderColor: getGradientFillHelper('vertical', ['#4287f5', '#ff0000']),
-                                        id: ""yaxis2""
-                                    }}
-                                ]
+                    var value = x.Key.ToString("HH:mm", CultureInfo.CreateSpecificCulture("en-US"));
+                    if (prev == value)
+                        return " ";
+                    prev = value;
+                    return $"{value}";
+                }), new ChartGeneration.Dataset[]
+                {
+                    new ChartGeneration.Dataset("Usage (%)", history.Select(x => $"{x.Value.Cpu.Load.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}"), "getGradientFillHelper('vertical', ['#ff0000', '#00ff00'])"),
+                    new ChartGeneration.Dataset("Temperature (°C)", history.Select(x => $"{x.Value.Cpu.Temperature.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}"), "getGradientFillHelper('vertical', ['#4287f5', '#ff0000'])"),
+                }, 0, 100);
 
-                            }},
-                            options:
-                            {{
-                                legend:
-                                {{
-                                    display: true,
-                                }},
-                                elements:
-                                {{
-                                    point:
-                                    {{
-                                        radius: 0
-                                    }}
-                                }},
-                                scales: {{
-                                    yAxes: [{{
-                                    ticks: {{
-                                        max: 100,
-                                        min: 0
-                                        }}
-                                    }}]
-                                }}
-                            }}
-                        }}"
-                };
-
-                charts.Add("cpu.png", qc);
+                charts.Add("cpu.png", qc.ToByteArray());
                 cpuEmbed1.ImageUrl = "attachment://cpu.png";
             }
             catch (Exception ex)
             {
                 _logger.LogError("Failed to generate cpu usage graph", ex);
+                cpuEmbed1.ImageUrl = "attachment://1.png";
             }
             finally
             {
@@ -197,68 +150,26 @@ internal sealed class InfoCommand : BaseCommand
             try
             {
                 var prev = "";
-                Chart qc = new()
+                var qc = ctx.Bot.ChartsClient.GetChart(800, 600, history.Select(x =>
                 {
-                    Width = 800,
-                    Height = 600,
-                    Config = $@"{{
-                            type: 'line',
-                            data: 
-                            {{
-                                labels: 
-                                [
-                                    {string.Join(",", history.Select(x =>
-                                    {
-                                        var value = x.Key.ToString("HH:mm", CultureInfo.CreateSpecificCulture("en-US"));
-                                        if (prev == value)
-                                            return "' '";
-                                        prev = value;
-                                        return $"'{value}'";
-                                    }))}
-                                ],
-                                datasets: 
-                                [
-                                    {{
-                                        label: 'Usage (MB)',
-                                        data: [{string.Join(",", history.Select(x => $"{x.Value.Memory.Used.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")).Replace(",", "").Replace(".", "")}"))}],
-                                        fill: false,
-                                        borderColor: getGradientFillHelper('vertical', ['#ff0000', '#00ff00']),
-                                        id: ""yaxis2""
-                                    }}
-                                ]
+                    var value = x.Key.ToString("HH:mm", CultureInfo.CreateSpecificCulture("en-US"));
+                    if (prev == value)
+                        return " ";
+                    prev = value;
+                    return $"{value}";
+                }),
+                new ChartGeneration.Dataset[]
+                {
+                    new ChartGeneration.Dataset("Usage (%)", history.Select(x => $"{x.Value.Memory.Used.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}"))
+                }, 0, (int)history.First().Value.Memory.Total);
 
-                            }},
-                            options:
-                            {{
-                                legend:
-                                {{
-                                    display: true,
-                                }},
-                                elements:
-                                {{
-                                    point:
-                                    {{
-                                        radius: 0
-                                    }}
-                                }},
-                                scales: {{
-                                    yAxes: [{{
-                                    ticks: {{
-                                        max: {history.First().Value.Memory.Total.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")).Replace(",", "").Replace(".", "")},
-                                        min: 0
-                                        }}
-                                    }}]
-                                }}
-                            }}
-                        }}"
-                };
-
-                charts.Add("mem.png", qc);
+                charts.Add("mem.png", qc.ToByteArray());
                 memoryEmbed.ImageUrl = "attachment://mem.png";
             }
             catch (Exception ex)
             {
                 _logger.LogError("Failed to generate memory graph", ex);
+                memoryEmbed.ImageUrl = "attachment://1.png";
             }
             finally
             {
@@ -270,7 +181,7 @@ internal sealed class InfoCommand : BaseCommand
             list.Add(cpuEmbed1);
             list.Add(memoryEmbed);
 
-            var files = charts.ToDictionary(x => x.Key, y => (Stream)new MemoryStream(y.Value.ToByteArray()));
+            var files = charts.ToDictionary(x => x.Key, y => (Stream)new MemoryStream(y.Value));
             try
             {
                 files.Add("1.png", new FileStream("Assets/1.png", FileMode.Open));

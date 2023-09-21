@@ -47,25 +47,26 @@ public sealed class MonitorClient : RequiresBotReference
     {
         if (!this.History.IsNotNullAndNotEmpty())
         {
-            for (var i = 43200; i <= 0; i--)
-            {
-                this.placeholder.Add(DateTime.UtcNow.AddSeconds(i),
-                    new SystemInfo
-                    {
-                        Cpu = new()
+            if (this.placeholder.Count == 0)
+                for (var i = 0; i < 43200; i++)
+                {
+                    this.placeholder.Add(DateTime.UtcNow.AddSeconds(i * 2),
+                        new SystemInfo
                         {
-                            Load = new Random().Next(0, 50),
-                            Temperature = new Random().Next(30, 50),
-                        },
-                        Memory = new()
-                        {
-                            Available = new Random().Next(0, 12000),
-                            Total = 24000,
-                        }
-                    });
-            }
+                            Cpu = new()
+                            {
+                                Load = new Random().Next(0, 50),
+                                Temperature = new Random().Next(30, 50),
+                            },
+                            Memory = new()
+                            {
+                                Used = new Random().Next(0, 12000),
+                                Total = 24000,
+                            }
+                        });
+                }
 
-            return this.placeholder.AsReadOnly();
+            return this.placeholder.OrderBy(x => x.Key.Ticks).ToDictionary(x => x.Key, x => x.Value);
         }
 
         return this.History.OrderBy(x => x.Key.Ticks).ToDictionary(x => x.Key, x => x.Value);

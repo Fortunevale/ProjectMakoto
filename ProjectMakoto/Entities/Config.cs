@@ -137,11 +137,19 @@ public sealed class Config
         public string AbuseIpDbToken = "";
         public string LibreTranslateHost = "127.0.0.1";
 
+        public QuickChartSecrets QuickChart = new();
         public DiscordSecrets Discord = new();
         public TelegramSecrets Telegram = new();
         public GithubSecrets Github = new();
         public DatabaseSecrets Database = new();
         public LavalinkSecrets Lavalink = new();
+
+        public sealed class QuickChartSecrets
+        {
+            public string? Scheme = null;
+            public string? Host = null;
+            public int? Port = null;
+        }
 
         public sealed class DiscordSecrets
         {
