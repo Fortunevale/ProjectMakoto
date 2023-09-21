@@ -6,6 +6,7 @@
     <RootNamespace>ProjectMakoto</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>annotations</Nullable>
+	<EmbedAllSources>true</EmbedAllSources>
     <DebugType>embedded</DebugType>
 	<EmbedAllSources>true</EmbedAllSources>
     <PlatformTarget>x64</PlatformTarget>
