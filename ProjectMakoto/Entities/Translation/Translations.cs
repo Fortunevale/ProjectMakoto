@@ -931,6 +931,7 @@ public sealed class Translations
                 public SingleTranslationKey MapLeaderboard;
                 public SingleTranslationKey RecentScores;
                 public SingleTranslationKey TopScores;
+                public SingleTranslationKey InactiveUser;
                 public MultiTranslationKey LinkSuccessful;
                 public SingleTranslationKey OpenInBrowser;
                 public SingleTranslationKey LinkProfileToAccount;
@@ -1299,6 +1300,10 @@ public sealed class Translations
             public guildInfo GuildInfo;
             public sealed class guildInfo
             {
+                public SingleTranslationKey HomeHeader;
+                public SingleTranslationKey DiscoverySplash;
+                public SingleTranslationKey Splash;
+                public SingleTranslationKey Banner;
                 public SingleTranslationKey NoGuildFound;
                 public SingleTranslationKey Mee6Notice;
                 public SingleTranslationKey GuildWidgetNotice;

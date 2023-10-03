@@ -30,12 +30,11 @@ public sealed class Config
     public bool IsDev = false;
     public bool AllowMoreThan100Guilds = false;
 
-    public bool MonitorSystemStatus = true;
-
     public bool EnablePlugins = false;
 
     public string SupportServerInvite = "";
 
+    public MonitorConfig MonitorSystem = new();
     public WebServerConfig WebServer = new();
     public DiscordConfig Discord = new();
     public ChannelsConfig Channels = new();
@@ -46,6 +45,13 @@ public sealed class Config
 
     public Dictionary<string, PluginInfo> PluginCache = new();
     public Dictionary<string, object> PluginData = new();
+
+    public sealed class MonitorConfig
+    {
+        public bool Enabled = true;
+        public string? SensorName = "k10temp-pci-00c3";
+        public string? SensorKey = "Tctl";
+    }
 
     public sealed class WebServerConfig
     {
@@ -131,11 +137,19 @@ public sealed class Config
         public string AbuseIpDbToken = "";
         public string LibreTranslateHost = "127.0.0.1";
 
+        public QuickChartSecrets QuickChart = new();
         public DiscordSecrets Discord = new();
         public TelegramSecrets Telegram = new();
         public GithubSecrets Github = new();
         public DatabaseSecrets Database = new();
         public LavalinkSecrets Lavalink = new();
+
+        public sealed class QuickChartSecrets
+        {
+            public string? Scheme = null;
+            public string? Host = null;
+            public int? Port = null;
+        }
 
         public sealed class DiscordSecrets
         {

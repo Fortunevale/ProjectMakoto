@@ -33,6 +33,7 @@ public sealed class Bot
     public MonitorClient MonitorClient { get; internal set; }
     public TokenInvalidatorRepository TokenInvalidator { get; internal set; }
     internal GitHubClient GithubClient { get; set; }
+    internal ChartGeneration ChartsClient { get; set; }
 
     internal IServerHost WebServer { get; set; }
 
@@ -138,6 +139,7 @@ public sealed class Bot
                 this.MonitorClient = new MonitorClient(this);
                 this.AbuseIpDbClient = new AbuseIpDbClient(this);
                 this.TokenInvalidator = new TokenInvalidatorRepository(this);
+                this.ChartsClient = new ChartGeneration(this);
                 this.GithubClient = new GitHubClient(new ProductHeaderValue("ProjectMakoto", this.status.RunningVersion))
                 {
                     Credentials = new Credentials(this.status.LoadedConfig.Secrets.Github.Token)
@@ -151,7 +153,8 @@ public sealed class Bot
                 await Task.WhenAll(DatabaseClient.InitializeDatabase(this),
                                    Util.Initializers.ListLoader.Load(this), 
                                    Util.Initializers.TranslationLoader.Load(this), 
-                                   Util.Initializers.PluginLoader.LoadPlugins(this));
+                                   Util.Initializers.PluginLoader.LoadPlugins(this),
+                                   Util.Initializers.DependencyLoader.Load(this));
 
                 _ = Directory.CreateDirectory("WebServer");
 
@@ -406,7 +409,7 @@ public sealed class Bot
         _ = Task.Delay(Immediate ? TimeSpan.FromSeconds(10) : TimeSpan.FromMinutes(5)).ContinueWith(x =>
         {
             if (x.IsCompletedSuccessfully)
-                Environment.Exit((int)ExitCodes.ExitTasksTimeout);
+                Environment.Exit((int)ExitCodes.ExitTasksTimeout); // Fail-Safe in case the shutdown tasks lock up
         });
 
         if (this.DatabaseClient.Disposed || this.ExitCalled) // When the Database Client has been disposed, the Exit Call has already been made.

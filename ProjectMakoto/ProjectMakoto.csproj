@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -6,6 +6,7 @@
     <RootNamespace>ProjectMakoto</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>annotations</Nullable>
+	<EmbedAllSources>true</EmbedAllSources>
     <DebugType>embedded</DebugType>
 	<EmbedAllSources>true</EmbedAllSources>
     <PlatformTarget>x64</PlatformTarget>
@@ -19,6 +20,7 @@
     <NeutralLanguage>en</NeutralLanguage>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	<Platforms>x64</Platforms>
+	<RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -38,22 +40,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dapper" Version="2.0.151" />
-    <PackageReference Include="DisCatSharp" Version="10.4.2-nightly-020" />
-    <PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.4.2-nightly-020" />
-    <PackageReference Include="DisCatSharp.CommandsNext" Version="10.4.2-nightly-020" />
-    <PackageReference Include="DisCatSharp.Common" Version="10.4.2-nightly-020" />
-    <PackageReference Include="DisCatSharp.Extensions.TwoFactorCommands" Version="2.0.0" />
-    <PackageReference Include="DisCatSharp.Interactivity" Version="10.4.2-nightly-020" />
-    <PackageReference Include="DisCatSharp.Lavalink" Version="10.4.2-nightly-020" />
+    <PackageReference Include="Dapper" Version="2.1.4" />
+    <PackageReference Include="DisCatSharp.Extensions.TwoFactorCommands" Version="2.0.2" />
+    <PackageReference Include="FFMpegCore" Version="5.1.0" />
     <PackageReference Include="GenHTTP.Core" Version="7.0.0" />
     <PackageReference Include="GenHTTP.Modules.StaticWebsites" Version="7.0.0" />
-    <PackageReference Include="HtmlSanitizer" Version="8.0.692" />
+    <PackageReference Include="HtmlSanitizer" Version="8.0.718" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="4.7.0" />
     <PackageReference Include="MySqlConnector" Version="2.3.0-beta.3" />
-    <PackageReference Include="Octokit" Version="7.1.0" />
-    <PackageReference Include="QuickChart" Version="2.3.0" />
+    <PackageReference Include="Octokit" Version="8.0.1" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.118" />
 	<PackageReference Include="DisCatSharp.Analyzer.Roselyn" Version="5.5.0">
 		<PrivateAssets>all</PrivateAssets>
@@ -62,8 +58,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\quickchart-csharp\QuickChart\QuickChart.csproj" />
     <ProjectReference Include="..\Xorog.Logger\Xorog.Logger.csproj" />
     <ProjectReference Include="..\Xorog.UniversalExtensions\Xorog.UniversalExtensions.csproj" />
+    <ProjectReference Include="..\DisCatSharp\DisCatSharp\DisCatSharp.csproj" />
+    <ProjectReference Include="..\DisCatSharp\DisCatSharp.ApplicationCommands\DisCatSharp.ApplicationCommands.csproj" />
+    <ProjectReference Include="..\DisCatSharp\DisCatSharp.CommandsNext\DisCatSharp.CommandsNext.csproj" />
+    <ProjectReference Include="..\DisCatSharp\DisCatSharp.Common\DisCatSharp.Common.csproj" />
+    <ProjectReference Include="..\DisCatSharp\DisCatSharp.Experimental\DisCatSharp.Experimental.csproj" />
+    <ProjectReference Include="..\DisCatSharp\DisCatSharp.Interactivity\DisCatSharp.Interactivity.csproj" />
+    <ProjectReference Include="..\DisCatSharp\DisCatSharp.Lavalink\DisCatSharp.Lavalink.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -94,6 +98,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Assets\1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\ASCII.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

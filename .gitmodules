@@ -1,9 +1,16 @@
 [submodule "Xorog.Logger"]
 	path = Xorog.Logger
 	url = https://github.com/Fortunevale/Xorog.Logger
+	branch = main
 [submodule "Xorog.UniversalExtensions"]
 	path = Xorog.UniversalExtensions
 	url = https://github.com/Fortunevale/Xorog.UniversalExtensions
-[submodule "Xorog.ScoreSaber"]
-	path = Xorog.ScoreSaber
-	url = https://github.com/Fortunevale/Xorog.ScoreSaber
+	branch = main
+[submodule "quickchart-csharp"]
+	path = quickchart-csharp
+	url = https://github.com/TheXorog/quickchart-csharp
+	branch = applied-editorconfig
+[submodule "DisCatSharp"]
+	path = DisCatSharp
+	url = https://github.com/Aiko-IT-Systems/DisCatSharp
+	branch = build-test

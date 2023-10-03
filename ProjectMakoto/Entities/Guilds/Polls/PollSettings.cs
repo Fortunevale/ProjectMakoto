@@ -50,7 +50,7 @@ public sealed class PollSettings : RequiresParent<Guild>
             foreach (var b in this.RunningPolls.ToList())
                 if (!ScheduledTaskExtensions.GetScheduledTasks().ContainsTask("poll", this.Parent.Id, b.SelectUUID))
                 {
-                    var taskuid = "";
+                    var voteTaskUid = "";
                     CancellationTokenSource cancellationTokenSource = new();
 
                     async Task VoteHandling(DiscordClient sender, ComponentInteractionCreateEventArgs e)
@@ -119,7 +119,7 @@ public sealed class PollSettings : RequiresParent<Guild>
                         }).Add(this.Bot);
                     }
 
-                    taskuid = new Func<Task>(async () =>
+                    voteTaskUid = new Func<Task>(async () =>
                     {
                         cancellationTokenSource.Cancel();
 
@@ -149,32 +149,43 @@ public sealed class PollSettings : RequiresParent<Guild>
                         { _ = message.ModifyAsync(new DiscordMessageBuilder().WithEmbed(message.Embeds?.ElementAt(0))); }
                         catch { }
                         _ = await message.RespondAsync(new DiscordEmbedBuilder()
-                            .WithDescription($"{CommandKey.PollEnded.Get(this.Parent).Build(true)}\n\n**{CommandKey.Results.Get(this.Parent).Build()}**\n{(votes.Count <= 0 ? CommandKey.NoVotes.Get(this.Parent).Build(true) : string.Join("\n\n", votes.OrderByDescending(x => x.Value).Select(x => $"> **{b.Options[x.Key].FullSanitize()}**\n{CommandKey.Votes.Get(this.Parent).Build(true, new TVar("Count", x.Value))}")))}")
+                            .WithDescription($"{CommandKey.PollEnded.Get(this.Parent).Build(true)}\n\n**{CommandKey.Results.Get(this.Parent).Build()}**\n" +
+                                $"{(votes.Count <= 0 ? CommandKey.NoVotes.Get(this.Parent).Build(true) : string.Join("\n\n", votes
+                                    .OrderByDescending(x => x.Value)
+                                    .Select(x => $"> **{b.Options[x.Key].FullSanitize()}**\n" +
+                                $"{CommandKey.Votes.Get(this.Parent).Build(true, new TVar("Count", x.Value))}")))}")
                             .WithAuthor($"{CommandKey.Poll.Get(this.Parent)} • {channel.Guild.Name}", null, channel.Guild.IconUrl)
                             .WithColor(EmbedColors.Success));
                     }).CreateScheduledTask(b.DueTime.ToUniversalTime(), new ScheduledTaskIdentifier(this.Parent.Id, b.SelectUUID, "poll"));
 
                     _ = Task.Run(async () =>
                     {
-                        var LastTotalVotes = -1;
+                        var channel = await this.Bot.DiscordClient.GetChannelAsync(b.ChannelId);
 
-                        while (this.RunningPolls.Contains(b))
+                        var lastVotes = "";
+
+                        while (this.RunningPolls.Any(x => b.SelectUUID == x.SelectUUID))
                         {
-                            if (LastTotalVotes != b.Votes.Length)
-                            {
-                                LastTotalVotes = b.Votes.Length;
+                            var currentVotes = JsonConvert.SerializeObject(b.Votes);
 
-                                var channel = await this.Bot.DiscordClient.GetChannelAsync(b.ChannelId);
+                            if (lastVotes != currentVotes)
+                            {
+                                lastVotes = currentVotes;
                                 var message = await channel.GetMessageAsync(b.MessageId, true);
 
-                                _ = await message.ModifyAsync(new DiscordEmbedBuilder(message.Embeds.ElementAt(0)).WithDescription($"> **{b.PollText}**\n\n_{CommandKey.PollEnding.Get(this.Parent).Build(new TVar("Timestamp", b.DueTime.ToTimestamp()))}._\n\n{CommandKey.TotalVotes.Get(this.Parent).Build(true, new TVar("Count", b.Votes.Length))}").Build());
+                                _ = await message.ModifyAsync(
+                                    new DiscordEmbedBuilder(
+                                        message.Embeds.ElementAt(0))
+                                            .WithDescription($"> **{b.PollText}**\n\n" +
+                                                $"_{CommandKey.PollEnding.Get(this.Parent).Build(new TVar("Timestamp", b.DueTime.ToTimestamp()))}._" +
+                                                $"\n\n{CommandKey.TotalVotes.Get(this.Parent).Build(true, new TVar("Count", b.Votes.Length))}").Build());
                             }
 
                             if (cancellationTokenSource.IsCancellationRequested)
                                 return;
 
                             try
-                            { await Task.Delay(TimeSpan.FromMinutes(2), cancellationTokenSource.Token); }
+                            { await Task.Delay(TimeSpan.FromSeconds(10), cancellationTokenSource.Token); }
                             catch { }
                         }
                     }).Add(this.Bot);

@@ -96,7 +96,7 @@ internal static class ScoreSaberCommandAbstractions
 
                             var new_msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
-                                Description = GetMString(t.Commands.ScoreSaber.Profile.LinkSuccessful).Build(
+                                Description = GetMString(t.Commands.ScoreSaber.Profile.LinkSuccessful).Build(true, 
                                     new TVar("ProfileName", player.name),
                                     new TVar("ProfileId", player.id),
                                     new TVar("ProfileCommand", $"{ctx.Prefix}scoresaber profile"),
@@ -200,8 +200,13 @@ internal static class ScoreSaberCommandAbstractions
             {
                 _ = embed.ClearFields();
                 embed.ImageUrl = "";
-                embed.Description = $":globe_with_meridians: **#{player.rank}** 󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪:flag_{player.country.ToLower()}: **#{player.countryRank}**\n\n" +
-                                    $"{(scoreType == ScoreType.Top ? $"**{GetString(t.Commands.ScoreSaber.Profile.TopScores)}**" : $"**{GetString(t.Commands.ScoreSaber.Profile.TopScores)}**")}";
+
+                if (!player.inactive)
+                    embed.Description = $":globe_with_meridians: **#{player.rank}** 󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪:flag_{player.country.ToLower()}: **#{player.countryRank}**\n\n" +
+                                    $"{(scoreType == ScoreType.Top ? $"**{GetString(t.Commands.ScoreSaber.Profile.TopScores)}**" : $"**{GetString(t.Commands.ScoreSaber.Profile.RecentScores)}**")}";
+                else
+                    embed.Description = $"{GetString(t.Commands.ScoreSaber.Profile.InactiveUser, true)}\n\n" +
+                                    $"{(scoreType == ScoreType.Top ? $"**{GetString(t.Commands.ScoreSaber.Profile.TopScores)}**" : $"**{GetString(t.Commands.ScoreSaber.Profile.RecentScores)}**")}";
 
                 foreach (var score in scores.playerScores.Take(5))
                 {
@@ -234,7 +239,10 @@ internal static class ScoreSaberCommandAbstractions
                 _ = embed.ClearFields();
                 embed.Title = $"{player.name.FullSanitize()} 󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪`{player.pp.ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}pp`";
                 embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = player.profilePicture };
-                embed.Description = $":globe_with_meridians: **#{player.rank}** 󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪:flag_{player.country.ToLower()}: **#{player.countryRank}**\n";
+                if (!player.inactive)
+                    embed.Description = $":globe_with_meridians: **#{player.rank}** 󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪:flag_{player.country.ToLower()}: **#{player.countryRank}**\n";
+                else
+                    embed.Description = $"{GetString(t.Commands.ScoreSaber.Profile.InactiveUser, true)}";
                 _ = embed.AddField(new DiscordEmbedField(GetString(t.Commands.ScoreSaber.Profile.RankedPlayCount), $"`{player.scoreStats.rankedPlayCount}`", true));
                 _ = embed.AddField(new DiscordEmbedField(GetString(t.Commands.ScoreSaber.Profile.TotalRankedScore), $"`{player.scoreStats.totalRankedScore.ToString("N0", CultureInfo.GetCultureInfo("en-US"))}`", true));
                 _ = embed.AddField(new DiscordEmbedField(GetString(t.Commands.ScoreSaber.Profile.AverageRankedAccuracy), $"`{Math.Round(player.scoreStats.averageRankedAccuracy, 2).ToString().Replace(",", ".")}%`", true));
@@ -258,82 +266,37 @@ internal static class ScoreSaberCommandAbstractions
 
                 var file = $"{Guid.NewGuid()}.png";
 
-                var labels = "";
+                var labels = new List<string>();
 
                 for (var i = 50; i >= 0; i -= 2)
                 {
                     if (i == 0)
                     {
-                        labels += $"'{t.Commands.ScoreSaber.Profile.GraphToday}'\n";
+                        labels.Add(GetString(t.Commands.ScoreSaber.Profile.GraphToday));
                         break;
                     }
                     if (i == 2)
                     {
-                        labels += $"'{GetString(t.Commands.ScoreSaber.Profile.GraphDays).Build(new TVar("Count", i))}',\n";
+                        labels.Add(GetString(t.Commands.ScoreSaber.Profile.GraphDays, false, new TVar("Count", i)));
                         continue;
                     }
 
-                    labels += $"'{GetString(t.Commands.ScoreSaber.Profile.GraphDays).Build(new TVar("Count", i))}','',\n";
+                    labels.Add(GetString(t.Commands.ScoreSaber.Profile.GraphDays, false, new TVar("Count", i)));
+                    labels.Add("");
                 }
 
                 if (string.IsNullOrWhiteSpace(LoadedGraph))
                     try
                     {
-                        Chart qc = new()
+                        if (player.inactive)
+                            throw new Exception("Player is inactive");
+
+                        var qc = ctx.Bot.ChartsClient.GetChart(1000, 500, labels, new ChartGeneration.Dataset[]
                         {
-                            Width = 1000,
-                            Height = 500,
-                            Config = $@"{{
-                            type: 'line',
-                            data: 
-                            {{
-                                labels: 
-                                [
-                                    {labels}
-                                ],
-                                datasets: 
-                                [
-                                    {{
-                                        label: '{GetString(t.Commands.ScoreSaber.Profile.Placement)}',
-                                        data: [{player.histories},{player.rank}],
-                                        fill: false,
-                                        borderColor: getGradientFillHelper('vertical', ['#6b76da', '#a336eb', '#FC0000']),
-                                        reverse: true,
-                                        id: ""yaxis2""
-
-                                    }}
-                                ]
-
-                            }},
-                            options:
-                            {{
-                                legend:
-                                {{
-                                    display: false,
-                                }},
-                                elements:
-                                {{
-                                    point:
-                                    {{
-                                        radius: 0
-                                    }}
-                                }},
-                                scales:
-                                {{
-                                    yAxes:
-                                    [
-                                        {{
-                                            reverse: true,
-                                            ticks:
-                                            {{
-                                                reverse: true
-                                            }}
-                                        }}
-                                    ]
-                                }}
-                            }}
-                        }}"
-                        };
+                            new ChartGeneration.Dataset(GetString(t.Commands.ScoreSaber.Profile.Placement), 
+                                player.histories.Split(",").Append(player.rank.ToString()), 
+                                "getGradientFillHelper('vertical', ['#6b76da', '#a336eb', '#FC0000'])", "yaxis2", true),
+                        }, -1, -1);
 
                         qc.ToFile(file);
 
@@ -354,7 +317,6 @@ internal static class ScoreSaberCommandAbstractions
                         embed = embed.AsInfo(ctx, "Score Saber");
                         _ = builder.AddComponents(ProfileInteractionRow);
                         _ = await ctx.BaseCommand.RespondOrEdit(builder);
-                        _logger.LogError(ex.ToString());
                     }
 
                 try

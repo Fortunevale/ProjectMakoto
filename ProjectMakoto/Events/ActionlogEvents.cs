@@ -535,7 +535,7 @@ internal sealed class ActionlogEvents : RequiresTranslation
             if (e.Role.Tags?.IsPremiumSubscriber ?? false)
                 Integration = $"**{this.tKey.Integration.Get(this.Bot.Guilds[e.Guild.Id])}**: `{this.tKey.ServerBooster.Get(this.Bot.Guilds[e.Guild.Id])}`\n\n";
 
-            if (e.Role.Tags.BotId is not null and not 0)
+            if (e.Role.Tags?.BotId is not null and not 0)
             {
                 var bot = await sender.GetUserAsync((ulong)e.Role.Tags.BotId);
 

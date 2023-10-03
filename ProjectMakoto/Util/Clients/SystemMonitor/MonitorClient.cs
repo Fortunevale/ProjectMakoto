@@ -11,12 +11,25 @@ using ProjectMakoto.Entities.SystemMonitor;
 
 namespace ProjectMakoto.Util.SystemMonitor;
 
-public sealed class MonitorClient
+public sealed class MonitorClient : RequiresBotReference
 {
-    internal MonitorClient(Bot bot)
+    internal MonitorClient(Bot bot) : base(bot)
     {
-        if (!bot.status.LoadedConfig.MonitorSystemStatus)
+        if (!bot.status.LoadedConfig.MonitorSystem.Enabled)
             return;
+
+        if (File.Exists("cache/monitor.json"))
+            try
+            {
+                this.History = JsonConvert.DeserializeObject<Dictionary<DateTime, SystemInfo>>(File.ReadAllText("cache/monitor.json"));
+
+                if (this.History is null)
+                    throw new Exception();
+            }
+            catch (Exception)
+            {
+                this.History = new();
+            }
 
         this.InitializeMonitor();
     }
@@ -28,14 +41,40 @@ public sealed class MonitorClient
 
     bool _disposed = false;
 
+    private Dictionary<DateTime, SystemInfo> placeholder = new();
+
     public IReadOnlyDictionary<DateTime, SystemInfo> GetHistory()
     {
+        if (!this.History.IsNotNullAndNotEmpty())
+        {
+            if (this.placeholder.Count == 0)
+                for (var i = 0; i < 43200; i++)
+                {
+                    this.placeholder.Add(DateTime.UtcNow.AddSeconds((i * 2) * -1),
+                        new SystemInfo
+                        {
+                            Cpu = new()
+                            {
+                                Load = new Random().Next(0, 50),
+                                Temperature = new Random().Next(30, 50),
+                            },
+                            Memory = new()
+                            {
+                                Used = new Random().Next(0, 12000),
+                                Total = 24000,
+                            }
+                        });
+                }
+
+            return this.placeholder.OrderBy(x => x.Key.Ticks).ToDictionary(x => x.Key, x => x.Value);
+        }
+
         return this.History.OrderBy(x => x.Key.Ticks).ToDictionary(x => x.Key, x => x.Value);
     }
 
     public Task<SystemInfo> GetCurrent()
     {
-        return ReadSystemInfoAsync();
+        return this.ReadSystemInfoAsync();
     }
 
     private Dictionary<DateTime, SystemInfo> History = new();
@@ -59,25 +98,26 @@ public sealed class MonitorClient
                 try
                 {
                     this.LastScanStart = DateTime.UtcNow;
-                    var sensors = await ReadSystemInfoAsync();
+                    var sensors = await this.ReadSystemInfoAsync();
 
                     _logger.LogDebug(JsonConvert.SerializeObject(sensors, Formatting.Indented));
 
-                    if (this.History.Count >= 180)
+                    while (this.History.Any(x => x.Key.GetTimespanSince() > TimeSpan.FromDays(1)))
                         _ = this.History.Remove(this.History.Min(x => x.Key));
 
-
                     this.History.Add(DateTime.UtcNow, sensors);
+
+                    _ = Directory.CreateDirectory("cache");
+                    File.WriteAllText("cache/monitor.json", JsonConvert.SerializeObject(this.History));
                 }
                 catch (Exception ex)
                 {
                     _logger.LogWarn("Failed to fetch system info", ex);
 
                     this.LastScanStart = DateTime.UtcNow;
-                    this.History.Add(DateTime.UtcNow, null);
                 }
 
-                var waitTime = this.LastScanStart.AddSeconds(20).GetTimespanUntil();
+                var waitTime = this.LastScanStart.AddSeconds(2).GetTimespanUntil();
 
                 if (waitTime < TimeSpan.FromSeconds(1))
                     waitTime = TimeSpan.FromSeconds(1);
@@ -87,7 +127,7 @@ public sealed class MonitorClient
         });
     }
 
-    private static Task<SystemInfo> ReadSystemInfoAsync()
+    private Task<SystemInfo> ReadSystemInfoAsync()
     {
         return Task.Run<SystemInfo>(() =>
         {
@@ -110,22 +150,17 @@ public sealed class MonitorClient
 
                     process.WaitForExit();
 
-                    var output = process.StandardOutput.ReadToEnd();
-                    _logger.LogTrace("Executed sensors: {0}", output);
+                    var output = process.StandardOutput.ReadToEnd().ReplaceLineEndings("\n");
+                    
+                    var parsedSensors = this.ParseSensors(output);
 
-                    var matches = Regex.Matches(output, @"(((\w| )*): *(\+*[0-9]*.[0-9]*°C)(?!,|\)))");
-                    Dictionary<string, float> tempsDict = new();
-
-                    foreach (var b in matches.Cast<Match>())
-                    {
-                        tempsDict.Add(b.Groups[2].Value, float.Parse(b.Groups[4].Value.Replace("+", "").Replace("°C", "")));
-                    }
-
-                    systemInfo.Cpu.Temperature = tempsDict.FirstOrDefault<KeyValuePair<string, float>>(x => x.Key.StartsWith("Package id"), new KeyValuePair<string, float>("", 0)).Value;
+                    systemInfo.Cpu.Temperature = parsedSensors
+                        .FirstOrDefault(x => x.Key == this.Bot.status.LoadedConfig.MonitorSystem.SensorName).Value
+                        .First(x => (x.Type == TrackType.C && x.Key == this.Bot.status.LoadedConfig.MonitorSystem.SensorKey)).Value;
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarn("Failed to execute sensors", ex);
+                    _logger.LogWarn("Failed to execute/parse sensors", ex);
                 }
 
                 try
@@ -144,8 +179,6 @@ public sealed class MonitorClient
                     process.WaitForExit();
 
                     var output = process.StandardOutput.ReadToEnd();
-
-                    _logger.LogTrace("Executed cpu usage: {0}", output);
                     systemInfo.Cpu.Load = float.Parse(output);
                 }
                 catch (Exception ex)
@@ -172,6 +205,82 @@ public sealed class MonitorClient
                 return systemInfo;
             }
         });
+    }
+
+    private enum TrackType
+    {
+        mV,
+        V,
+        RPM,
+        C,
+        Unknown
+    }
+
+    private class TrackDetail
+    {
+        internal string Key;
+        internal decimal Value;
+        internal TrackType Type;
+
+        public override string ToString()
+        {
+            return $"{this.Key}, {this.Value}, {this.Type}";
+        }
+    }
+
+    private IReadOnlyDictionary<string, List<TrackDetail>> ParseSensors(string sensorOutput)
+    {
+        Dictionary<string, List<TrackDetail>> parsedTemperatures = new();
+        Dictionary<string, Tuple<int, int>> adapterRanges = new();
+        Dictionary<string, List<string>> adapterList = new();
+
+        var splitLines = sensorOutput.ReplaceLineEndings("\n").Split('\n');
+        for (var i = 0; i < splitLines.Length; i++)
+        {
+            if (splitLines[i].IsNullOrWhiteSpace() || splitLines[i].Contains(':') || splitLines[i].StartsWith(' '))
+                continue;
+
+            if (adapterRanges.Count != 0)
+                adapterRanges[adapterRanges.Last().Key] = new Tuple<int, int>(adapterRanges.Last().Value.Item1, i - 1);
+
+            adapterRanges.Add(splitLines[i].Trim(), new Tuple<int, int>(i, i));
+        }
+
+        if (adapterRanges.Count != 0)
+            adapterRanges[adapterRanges.Last().Key] = new Tuple<int, int>(adapterRanges.Last().Value.Item1, splitLines.Length);
+
+        foreach (var adapter in adapterRanges)
+            adapterList.Add(adapter.Key, splitLines.Skip(adapter.Value.Item1).Take(adapter.Value.Item2 - adapter.Value.Item1).ToList());
+
+        foreach (var adapter in adapterList)
+        {
+            parsedTemperatures.Add(adapter.Key, new());
+            var detail = parsedTemperatures[adapter.Key];
+
+            foreach (var line in adapter.Value)
+            {
+                var match = Regex.Match(line, @"^([^:\n]+?): +((?:\+|\-)?[\d.]+?)(?: |°)(RPM|C|V|mV)(?: +?\(|\n| )?");
+
+                if (!match.Success)
+                    continue;
+
+                detail.Add(new TrackDetail
+                {
+                    Key = match.Groups[1].Value,
+                    Value = decimal.Parse(match.Groups[2].Value, new CultureInfo("en-US")),
+                    Type = match.Groups[3].Value switch
+                    {
+                        "mV" => TrackType.mV,
+                        "V" => TrackType.V,
+                        "RPM" => TrackType.RPM,
+                        "C" => TrackType.C,
+                        _ => TrackType.Unknown,
+                    }
+                });
+            }
+        }
+
+        return parsedTemperatures.AsReadOnly();
     }
 }
 

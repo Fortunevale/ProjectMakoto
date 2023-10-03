@@ -348,7 +348,7 @@ internal static class DisCatSharpExtensionsLoader
             while (!bot.status.DiscordInitialized)
                 await Task.Delay(100);
 
-            _ = bot.DiscordClient.UpdateStatusAsync(userStatus: UserStatus.Online, activity: new DiscordActivity("Registering commands..", ActivityType.Playing));
+            _ = bot.DiscordClient.UpdateStatusAsync(userStatus: UserStatus.Online, activity: new DiscordActivity("Registering commands..", ActivityType.Custom));
 
             while (bot.DiscordClient.GetApplicationCommands()?.RegisteredCommands?.Count == 0)
                 await Task.Delay(1000);
@@ -362,7 +362,7 @@ internal static class DisCatSharpExtensionsLoader
                     if (bot.DatabaseClient.Disposed)
                         return;
 
-                    await bot.DiscordClient.UpdateStatusAsync(activity: new DiscordActivity($"{bot.DiscordClient.Guilds.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} guilds | Up for {Math.Round((DateTime.UtcNow - bot.status.startupTime).TotalHours, 1).ToString(CultureInfo.CreateSpecificCulture("en-US"))}h", ActivityType.Playing));
+                    await bot.DiscordClient.UpdateStatusAsync(activity: new DiscordActivity($"{bot.DiscordClient.Guilds.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} guilds | Up for {Math.Round((DateTime.UtcNow - bot.status.startupTime).TotalHours, 1).ToString(CultureInfo.CreateSpecificCulture("en-US"))}h", ActivityType.Custom));
                     await Task.Delay(30000);
                 }
                 catch (Exception ex)

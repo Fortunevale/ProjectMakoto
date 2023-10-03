@@ -13,6 +13,55 @@ namespace ProjectMakoto.Util;
 
 internal static class GenericExtensions
 {
+    public static bool TryGetFileInfo(string fileName, out FileInfo file)
+    {
+        if (File.Exists(fileName))
+        {
+            file = new FileInfo(fileName);
+            return true;
+        }
+
+        var environmentVariables = Environment.GetEnvironmentVariables().ConvertToDictionary<string, string>();
+        var paths = Environment.OSVersion.Platform switch
+        {
+            PlatformID.Win32S or PlatformID.Win32Windows or PlatformID.Win32NT or PlatformID.WinCE => environmentVariables.First(x => x.Key.ToLower() == "path").Value.Split(';'),
+            PlatformID.Unix => environmentVariables.First(x => x.Key.ToLower() == "path").Value.Split(':'),
+            _ => throw new NotImplementedException(),
+        };
+
+        foreach (var path in paths)
+        {
+            var currentFilePath = Path.Combine(path, fileName);
+            if (File.Exists(currentFilePath))
+            {
+                file = new FileInfo(currentFilePath);
+                return true;
+            }
+
+            currentFilePath += ".exe";
+
+            if (File.Exists(currentFilePath))
+            {
+                file = new FileInfo(currentFilePath);
+                return true;
+            }
+        }
+
+        file = null;
+        return false;
+    }
+
+    public static Dictionary<T1, T2> ConvertToDictionary<T1, T2>(this IDictionary iDic)
+    {
+        var dic = new Dictionary<T1, T2>();
+        var enumerator = iDic.GetEnumerator();
+        while (enumerator.MoveNext())
+        {
+            dic[(T1)enumerator.Key] = (T2)enumerator.Value;
+        }
+        return dic;
+    }
+
     public static T[] Add<T>(this T[] array, T addObject)
         => array.Append(addObject).ToArray();
     
@@ -49,6 +98,20 @@ internal static class GenericExtensions
 
             return scheduledTaskIdentifier.Snowflake == snowflake;
         }).Any(x => ((ScheduledTaskIdentifier)x.CustomData).Id == id);
+
+    internal static bool EqualsTask(this ScheduledTask? task, string type, ulong snowflake, string id)
+    {
+        if (task.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier)
+            return false;
+
+        if (scheduledTaskIdentifier.Type != type)
+            return false;
+
+        if (scheduledTaskIdentifier.Id != id)
+            return false;
+
+        return true;
+    }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2254:Template should be a static expression", Justification = "<Pending>")]
     internal static string Log(this string str, CustomLogLevel lvl, string additionalInfo)

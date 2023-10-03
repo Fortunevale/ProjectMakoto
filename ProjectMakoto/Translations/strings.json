@@ -2951,7 +2951,7 @@
           "de": "Willkommensbildschirm"
         },
         "Verification": {
-          "en": "Verification Lever",
+          "en": "Verification Level",
           "de": "Verifikationslevel"
         },
         "VerificationNone": {
@@ -3093,6 +3093,22 @@
         "NoGuildFound": {
           "en": "Could not fetch any information about the server you specified.",
           "de": "Es konnten keine Informationen über den angegebenen Server gefunden werden."
+        },
+        "Banner": {
+          "en": "Banner",
+          "de": "Banner"
+        },
+        "Splash": {
+          "en": "Splash",
+          "de": "Titelbild"
+        },
+        "DiscoverySplash": {
+          "en": "Discovery Splash",
+          "de": "Entdeckungs-Splash"
+        },
+        "HomeHeader": {
+          "en": "Home Header",
+          "de": "Startseiten-Header"
         }
       },
       "Leaderboard": {
@@ -4158,6 +4174,10 @@
             "'{ProfileName}' ({ProfileId}) mit deinem Discord Account verknüpft. Du kannst jetzt '{ProfileCommand}' ausführen ohne Argumente um dein Profil anzusehen.",
             "Um die Verknüpfung zu entfernen, verwende '{UnlinkCommand}'."
           ]
+        },
+        "InactiveUser": {
+          "en": "User is inactive.",
+          "de": "Benutzer ist inaktiv."
         },
         "TopScores": {
           "en": "Top Scores",
