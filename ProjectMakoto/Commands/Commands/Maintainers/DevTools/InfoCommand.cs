@@ -26,7 +26,7 @@ internal sealed class InfoCommand : BaseCommand
 
             try
             {
-                var rawHistory = ctx.Bot.MonitorClient.GetHistory().GroupBy(x => $"{x.Key.Hour}-{(int)Math.Floor(x.Key.Minute / 20d)}");
+                var rawHistory = ctx.Bot.MonitorClient.GetHistory().GroupBy(x => $"{x.Key.Hour}-{(int)Math.Floor(x.Key.Minute / 6d)}");
                 foreach (var entry in rawHistory)
                 {
                     history.Add(entry.Last().Key, new()
@@ -46,6 +46,7 @@ internal sealed class InfoCommand : BaseCommand
             }
             catch {}
 
+            history.Add(DateTime.UtcNow, await ctx.Bot.MonitorClient.GetCurrent());
             history = history.OrderBy(x => x.Key.Ticks).ToDictionary(x => x.Key, x => x.Value);
 
             var ServerUptime = "";
@@ -160,7 +161,7 @@ internal sealed class InfoCommand : BaseCommand
                 }),
                 new ChartGeneration.Dataset[]
                 {
-                    new ChartGeneration.Dataset("Usage (%)", history.Select(x => $"{(int)x.Value.Memory.Used}"))
+                    new ChartGeneration.Dataset("Usage (MB)", history.Select(x => $"{(int)x.Value.Memory.Used}"))
                 }, 0, (int)history.First().Value.Memory.Total);
 
                 charts.Add("mem.png", qc.ToByteArray());

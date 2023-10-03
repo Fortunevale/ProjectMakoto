@@ -116,7 +116,7 @@ internal sealed class ClearQueueCommand : BaseCommand
                         }
 
                         embed.Description = $"`{this.GetGuildString(this.t.Commands.Music.ClearQueue.VoteStarted)} ({ctx.DbGuild.MusicModule.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
-                        _ = await this.RespondOrEdit(embed.Build());
+                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(DisconnectVote));
                     }
                 }).Add(ctx.Bot);
             }

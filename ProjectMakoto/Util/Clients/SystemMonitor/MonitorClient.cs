@@ -50,7 +50,7 @@ public sealed class MonitorClient : RequiresBotReference
             if (this.placeholder.Count == 0)
                 for (var i = 0; i < 43200; i++)
                 {
-                    this.placeholder.Add(DateTime.UtcNow.AddSeconds(i * 2),
+                    this.placeholder.Add(DateTime.UtcNow.AddSeconds((i * 2) * -1),
                         new SystemInfo
                         {
                             Cpu = new()

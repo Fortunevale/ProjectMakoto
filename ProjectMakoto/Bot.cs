@@ -409,7 +409,7 @@ public sealed class Bot
         _ = Task.Delay(Immediate ? TimeSpan.FromSeconds(10) : TimeSpan.FromMinutes(5)).ContinueWith(x =>
         {
             if (x.IsCompletedSuccessfully)
-                Environment.Exit((int)ExitCodes.ExitTasksTimeout);
+                Environment.Exit((int)ExitCodes.ExitTasksTimeout); // Fail-Safe in case the shutdown tasks lock up
         });
 
         if (this.DatabaseClient.Disposed || this.ExitCalled) // When the Database Client has been disposed, the Exit Call has already been made.

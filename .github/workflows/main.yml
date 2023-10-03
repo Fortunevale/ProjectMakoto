@@ -35,8 +35,9 @@ jobs:
         run: dotnet restore
         working-directory: ProjectMakoto/ProjectMakoto/
       - name: Build Makoto
-        run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained --output "build" --property:PublishDir="build"
+        run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained --output "build" --property:PublishDir="build" --framework net7.0
         working-directory: ProjectMakoto/ProjectMakoto/
+        timeout-minutes: 5
       - name: Create Version File
         run: git rev-parse --short HEAD > "ProjectMakoto/build/LatestGitPush.cfg" && git branch --show-current >> ProjectMakoto/build/LatestGitPush.cfg && echo $(date +%d.%m.%y) >> ProjectMakoto/build/LatestGitPush.cfg && echo $(date +%H:%M:%S,00) >> ProjectMakoto/build/LatestGitPush.cfg
         working-directory: ProjectMakoto/
