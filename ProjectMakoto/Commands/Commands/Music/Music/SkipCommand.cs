@@ -108,13 +108,13 @@ internal sealed class SkipCommand : BaseCommand
 
                             _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
-                                Description = this.GetString(this.t.Commands.Music.Skip.Skipped),
+                                Description = this.GetString(this.t.Commands.Music.Skip.Skipped. true),
                             }.AsSuccess(ctx)));
                             return;
                         }
 
                         embed.Description = $"`{this.GetGuildString(this.t.Commands.Music.Skip.VoteStarted)} ({ctx.DbGuild.MusicModule.collectedSkips.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
-                        _ = await this.RespondOrEdit(embed.Build());
+                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(SkipSongVote));
                     }
                 }).Add(ctx.Bot);
             }
