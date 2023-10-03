@@ -108,7 +108,7 @@ internal sealed class SkipCommand : BaseCommand
 
                             _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
-                                Description = this.GetString(this.t.Commands.Music.Skip.Skipped. true),
+                                Description = this.GetString(this.t.Commands.Music.Skip.Skipped, true),
                             }.AsSuccess(ctx)));
                             return;
                         }
