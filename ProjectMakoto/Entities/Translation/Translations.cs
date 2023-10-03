@@ -931,6 +931,7 @@ public sealed class Translations
                 public SingleTranslationKey MapLeaderboard;
                 public SingleTranslationKey RecentScores;
                 public SingleTranslationKey TopScores;
+                public SingleTranslationKey InactiveUser;
                 public MultiTranslationKey LinkSuccessful;
                 public SingleTranslationKey OpenInBrowser;
                 public SingleTranslationKey LinkProfileToAccount;

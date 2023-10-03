@@ -4175,6 +4175,10 @@
             "Um die Verknüpfung zu entfernen, verwende '{UnlinkCommand}'."
           ]
         },
+        "InactiveUser": {
+          "en": "User is inactive.",
+          "de": "Benutzer ist inaktiv."
+        },
         "TopScores": {
           "en": "Top Scores",
           "de": "Beste Scores"
