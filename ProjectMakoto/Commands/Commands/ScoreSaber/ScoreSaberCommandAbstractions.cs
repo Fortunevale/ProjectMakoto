@@ -258,82 +258,34 @@ internal static class ScoreSaberCommandAbstractions
 
                 var file = $"{Guid.NewGuid()}.png";
 
-                var labels = "";
+                var labels = new List<string>();
 
                 for (var i = 50; i >= 0; i -= 2)
                 {
                     if (i == 0)
                     {
-                        labels += $"'{t.Commands.ScoreSaber.Profile.GraphToday}'\n";
+                        labels.Add(GetString(t.Commands.ScoreSaber.Profile.GraphToday));
                         break;
                     }
                     if (i == 2)
                     {
-                        labels += $"'{GetString(t.Commands.ScoreSaber.Profile.GraphDays).Build(new TVar("Count", i))}',\n";
+                        labels.Add(GetString(t.Commands.ScoreSaber.Profile.GraphDays, false, new TVar("Count", i)));
                         continue;
                     }
 
-                    labels += $"'{GetString(t.Commands.ScoreSaber.Profile.GraphDays).Build(new TVar("Count", i))}','',\n";
+                    labels.Add(GetString(t.Commands.ScoreSaber.Profile.GraphDays, false, new TVar("Count", i)));
+                    labels.Add("");
                 }
 
                 if (string.IsNullOrWhiteSpace(LoadedGraph))
                     try
                     {
-                        Chart qc = new()
+                        var qc = ctx.Bot.ChartsClient.GetChart(1000, 500, labels, new ChartGeneration.Dataset[]
                         {
-                            Width = 1000,
-                            Height = 500,
-                            Config = $@"{{
-                            type: 'line',
-                            data: 
-                            {{
-                                labels: 
-                                [
-                                    {labels}
-                                ],
-                                datasets: 
-                                [
-                                    {{
-                                        label: '{GetString(t.Commands.ScoreSaber.Profile.Placement)}',
-                                        data: [{player.histories},{player.rank}],
-                                        fill: false,
-                                        borderColor: getGradientFillHelper('vertical', ['#6b76da', '#a336eb', '#FC0000']),
-                                        reverse: true,
-                                        id: ""yaxis2""
-
-                                    }}
-                                ]
-
-                            }},
-                            options:
-                            {{
-                                legend:
-                                {{
-                                    display: false,
-                                }},
-                                elements:
-                                {{
-                                    point:
-                                    {{
-                                        radius: 0
-                                    }}
-                                }},
-                                scales:
-                                {{
-                                    yAxes:
-                                    [
-                                        {{
-                                            reverse: true,
-                                            ticks:
-                                            {{
-                                                reverse: true
-                                            }}
-                                        }}
-                                    ]
-                                }}
-                            }}
-                        }}"
-                        };
+                            new ChartGeneration.Dataset(GetString(t.Commands.ScoreSaber.Profile.Placement), 
+                                player.histories.Split(",").Append(player.rank.ToString()), 
+                                "getGradientFillHelper('vertical', ['#6b76da', '#a336eb', '#FC0000'])", "yaxis2", true),
+                        }, -1, -1);
 
                         qc.ToFile(file);
 

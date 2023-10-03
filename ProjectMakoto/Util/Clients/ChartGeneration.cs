@@ -16,11 +16,7 @@ internal class ChartGeneration : RequiresBotReference
 
     internal Chart GetChart(int Width, int Height, IEnumerable<string> Labels, IEnumerable<Dataset> Datasets, int Min, int Max)
     {
-        return new(this.Bot.status.LoadedConfig.Secrets.QuickChart.Scheme, this.Bot.status.LoadedConfig.Secrets.QuickChart.Host, this.Bot.status.LoadedConfig.Secrets.QuickChart.Port)
-        {
-            Width = Width,
-            Height = Height,
-            Config = $@"{{
+        var v = $@"{{
                     type: 'line',
                     data: 
                     {{
@@ -36,6 +32,7 @@ internal class ChartGeneration : RequiresBotReference
                                     label: '{x.Name}',
                                     data: [{string.Join(",", x.Data)}],
                                     fill: false,
+                                    reverse: {x.Reverse.ToString().ToLower()},
                                     borderColor: {x.Color ?? "getGradientFillHelper('vertical', ['#4287f5', '#ff0000'])"},
                                     id: ""{x.Id}""
                                 }}";
@@ -55,7 +52,8 @@ internal class ChartGeneration : RequiresBotReference
                             {{
                                 radius: 0
                             }}
-                        }},
+                        }}{(Min == -1 && Max == -1 ? "" : $@"
+                        ,
                         scales: {{
                             yAxes: [{{
                             ticks: {{
@@ -64,10 +62,17 @@ internal class ChartGeneration : RequiresBotReference
                                 }}
                             }}]
                         }}
+                        ")}
                     }}
-                }}"
+                }}";
+
+        return new(this.Bot.status.LoadedConfig.Secrets.QuickChart.Scheme, this.Bot.status.LoadedConfig.Secrets.QuickChart.Host, this.Bot.status.LoadedConfig.Secrets.QuickChart.Port)
+        {
+            Width = Width,
+            Height = Height,
+            Config = v
         };
     }
 
-    internal record Dataset(string Name, IEnumerable<string> Data, string? Color = null, string Id = "yaxis2");
+    internal record Dataset(string Name, IEnumerable<string> Data, string? Color = null, string Id = "yaxis2", bool Reverse = false);
 }
