@@ -99,6 +99,20 @@ internal static class GenericExtensions
             return scheduledTaskIdentifier.Snowflake == snowflake;
         }).Any(x => ((ScheduledTaskIdentifier)x.CustomData).Id == id);
 
+    internal static bool EqualsTask(this ScheduledTask? task, string type, ulong snowflake, string id)
+    {
+        if (task.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier)
+            return false;
+
+        if (scheduledTaskIdentifier.Type != type)
+            return false;
+
+        if (scheduledTaskIdentifier.Id != id)
+            return false;
+
+        return true;
+    }
+
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2254:Template should be a static expression", Justification = "<Pending>")]
     internal static string Log(this string str, CustomLogLevel lvl, string additionalInfo)
     {
