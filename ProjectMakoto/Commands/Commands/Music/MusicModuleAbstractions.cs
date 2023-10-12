@@ -70,15 +70,22 @@ internal static class MusicModuleAbstractions
         {
             loadResult = await session.LoadTracksAsync(LavalinkSearchType.Plain, searchQuery);
         }
+        else if (RegexTemplates.SpotifyUrl.IsMatch(searchQuery))
+        {
+            loadResult = await session.LoadTracksAsync(LavalinkSearchType.Plain, searchQuery);
+        }
         else
         {
             embed.Description = t.Commands.Music.Play.PlatformSelect.Get(ctx.DbUser).Build(true);
             _ = embed.AsAwaitingInput(ctx);
 
-            var YouTube = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "YouTube", false, new DiscordComponentEmoji(EmojiTemplates.GetYouTube(ctx.Bot)));
-            var SoundCloud = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Soundcloud", false, new DiscordComponentEmoji(EmojiTemplates.GetSoundcloud(ctx.Bot)));
+            var YouTube = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "YouTube", false, EmojiTemplates.GetYouTube(ctx.Bot).ToComponent());
+            var SoundCloud = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Soundcloud", false, EmojiTemplates.GetSoundcloud(ctx.Bot).ToComponent());
+            var Spotify = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Spotify", false, EmojiTemplates.GetSpotify(ctx.Bot).ToComponent());
 
-            _ = await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent> { YouTube, SoundCloud }));
+            _ = await ctx.BaseCommand.RespondOrEdit(
+                new DiscordMessageBuilder().WithEmbed(embed)
+                .AddComponents(new List<DiscordComponent> { YouTube, SoundCloud, Spotify }));
 
             var Menu1 = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
 
@@ -90,11 +97,30 @@ internal static class MusicModuleAbstractions
 
             _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
+            var platformString = String.Empty;
+            var searchType = LavalinkSearchType.Plain;
+
+            if (Menu1.GetCustomId() == YouTube.CustomId)
+            {
+                platformString = "YouTube";
+                searchType = LavalinkSearchType.Youtube;
+            }
+            else if (Menu1.GetCustomId() == SoundCloud.CustomId)
+            {
+                platformString = "SoundCloud";
+                searchType = LavalinkSearchType.SoundCloud;
+            }
+            else if (Menu1.GetCustomId() == Spotify.CustomId)
+            {
+                platformString = "Spotify";
+                searchType = LavalinkSearchType.Spotify;
+            }
+
             _ = await ctx.BaseCommand.RespondOrEdit(embed.WithDescription(t.Commands.Music.Play.LookingFor.Get(ctx.DbUser).Build(true,
                 new TVar("Search", searchQuery),
-                new TVar("Platform", (Menu1.GetCustomId() == YouTube.CustomId ? "YouTube" : "SoundCloud")))).AsLoading(ctx));
+                new TVar("Platform", platformString))).AsLoading(ctx));
 
-            loadResult = await session.LoadTracksAsync((Menu1.GetCustomId() == YouTube.CustomId ? LavalinkSearchType.Youtube : LavalinkSearchType.SoundCloud), searchQuery);
+            loadResult = await session.LoadTracksAsync(searchType, searchQuery);
         }
 
         if (loadResult.LoadType == LavalinkLoadResultType.Error)

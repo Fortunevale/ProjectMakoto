@@ -159,6 +159,9 @@ public sealed class Lavalink : RequiresParent<Guild>
                                     if (!x.IsCompletedSuccessfully)
                                         return;
 
+                                    if (this.Disposed)
+                                        return;
+
                                     if (UserAmount <= 1)
                                     {
                                         _bot.Guilds[e.Guild.Id].MusicModule.Dispose(_bot, e.Guild.Id, "No users");
