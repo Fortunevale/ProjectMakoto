@@ -38,5 +38,6 @@ internal static class EmojiTemplates
 
     public static DiscordEmoji GetYouTube(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.YouTube);
     public static DiscordEmoji GetSoundcloud(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.SoundCloud);
+    public static DiscordEmoji GetSpotify(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.Spotify);
     public static DiscordEmoji GetAbuseIpDb(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.AbuseIPDB);
 }

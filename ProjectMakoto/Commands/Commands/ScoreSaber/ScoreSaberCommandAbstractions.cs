@@ -312,7 +312,7 @@ internal static class ScoreSaberCommandAbstractions
                         _ = builder.AddComponents(ProfileInteractionRow);
                         _ = await ctx.BaseCommand.RespondOrEdit(builder);
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         embed = embed.AsInfo(ctx, "Score Saber");
                         _ = builder.AddComponents(ProfileInteractionRow);
