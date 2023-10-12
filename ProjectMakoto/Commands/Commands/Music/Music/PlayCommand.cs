@@ -45,6 +45,14 @@ internal sealed class PlayCommand : BaseCommand
 
             var (Tracks, oriResult, Continue) = await MusicModuleAbstractions.GetLoadResult(ctx, search);
 
+
+            embed.Author.IconUrl = ctx.Guild.IconUrl;
+
+            if (!Continue || !Tracks.IsNotNullAndNotEmpty())
+            {
+                return;
+            }
+
             _ = await this.RespondOrEdit(embed);
 
             try
@@ -53,14 +61,6 @@ internal sealed class PlayCommand : BaseCommand
             }
             catch (CancelException)
             {
-                return;
-            }
-
-            embed.Author.IconUrl = ctx.Guild.IconUrl;
-
-            if (!Continue || !Tracks.IsNotNullAndNotEmpty())
-            {
-                this.DeleteOrInvalidate();
                 return;
             }
 
