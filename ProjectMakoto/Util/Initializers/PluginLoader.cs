@@ -8,6 +8,7 @@
 // but WITHOUT ANY WARRANTY
 
 using System.Collections.Immutable;
+using System.Runtime.Loader;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
@@ -22,39 +23,85 @@ internal static class PluginLoader
     {
         if (bot.status.LoadedConfig.EnablePlugins)
         {
-            _logger.LogDebug("Loading Plugins..");
-            List<string> pluginsToLoad = new();
+            List<string> pluginsToExtract = new();
 
             if (Directory.Exists("Plugins"))
-                pluginsToLoad.AddRange(Directory.GetFiles("Plugins").Where(x => x.EndsWith(".dll")));
+                pluginsToExtract.AddRange(Directory.GetFiles("Plugins").Where(x => x.EndsWith(".pmpl")));
 
-            foreach (var pluginPath in pluginsToLoad)
+            foreach (var plugin in pluginsToExtract)
             {
-                var count = 0;
-                _logger.LogDebug("Loading Plugin from '{0}'", pluginPath);
+                var pluginName = Path.GetFileNameWithoutExtension(plugin);
+                var extractDir = $"Plugins/{pluginName}";
 
-                PluginLoadContext pluginLoadContext = new(pluginPath);
-                var assembly = pluginLoadContext.LoadFromAssemblyName(new AssemblyName(Path.GetFileNameWithoutExtension(pluginPath)));
-
-                foreach (var type in assembly.GetTypes())
+                if (Directory.Exists(extractDir))
                 {
-                    if (typeof(BasePlugin).IsAssignableFrom(type))
+                    _ = Directory.CreateDirectory("Plugins/.OldPlugins");
+
+                    _logger.LogDebug("Plugin '{PluginName}' updated, moving old version to 'Plugins/.OldPlugins/'..", pluginName);
+                    Directory.Move(extractDir, $"Plugins/.OldPlugins/{pluginName}-{DateTime.UtcNow.Ticks}");
+                }
+
+                ZipFile.ExtractToDirectory(plugin, extractDir);
+                File.Delete(plugin);
+
+                _logger.LogInfo("Extracted Plugin '{PluginName}'!", pluginName);
+            }
+
+            _logger.LogDebug("Loading Plugins..");
+            foreach (var pluginFolder in Directory.GetDirectories("Plugins").Where(x => !x.StartsWith(".")))
+            {
+                var pluginName = Path.GetFileName(pluginFolder);
+
+                _logger.LogDebug("Loading Plugin '{Name}'..", pluginName);
+
+                var count = 0;
+
+                foreach (var pluginPath in Directory.GetFiles(pluginFolder).Where(x => x.EndsWith(".dll")))
+                {
+                    AssemblyLoadContext pluginLoadContext = new(null);
+
+                    var assemblyName = Path.GetFileNameWithoutExtension(pluginPath);
+
+                    if (AppDomain.CurrentDomain.GetAssemblies().Select(x => x.GetName()).Any(x => x.Name == assemblyName))
                     {
-                        count++;
-                        var result = Activator.CreateInstance(type) as BasePlugin;
-                        result.LoadedFile = new FileInfo(pluginPath);
-                        bot._Plugins.Add(Path.GetFileNameWithoutExtension(pluginPath), result);
+                        _logger.LogTrace("{Assembly} already loaded, skipping", assemblyName);
+                        continue;
+                    }
+
+                    var assembly = Assembly.LoadFile(Path.GetFullPath(pluginPath));
+
+                    foreach (var type in assembly.GetTypes())
+                    {
+                        if (typeof(BasePlugin).IsAssignableFrom(type))  
+                        {
+                            _logger.LogDebug("Loading Plugin from '{0}'", pluginPath);
+
+                            count++;
+                            var result = Activator.CreateInstance(type) as BasePlugin;
+                            result.LoadedFile = new FileInfo(pluginPath);
+                            bot._Plugins.Add(Path.GetFileNameWithoutExtension(pluginPath), result);
+
+                            var previousWorkingDir = Environment.CurrentDirectory;
+                            try
+                            {
+                                Environment.CurrentDirectory = new FileInfo(pluginPath).Directory.FullName;
+                                UniversalExtensions.LoadAllReferencedAssemblies(AppDomain.CurrentDomain);
+                            }
+                            finally
+                            {
+                                Environment.CurrentDirectory = previousWorkingDir;
+                            }
+                        }
                     }
                 }
 
                 if (count == 0)
                 {
-                    var availableTypes = string.Join(", ", assembly.GetTypes().Select(t => t.FullName));
-                    _logger.LogWarn("Cannot load Plugin '{0}': Plugin Assembly does not contain type that inherits BasePlugin. Types found: {1}", assembly.GetName(), availableTypes);
+                    _logger.LogWarn("Cannot load Plugin '{0}': Plugin Assembly does not contain type that inherits BasePlugin.", pluginName);
+                    continue;
                 }
 
-
-                _logger.LogInfo("Loaded Plugin from '{0}'", pluginPath);
+                _logger.LogInfo("Loaded Plugin from '{0}'", pluginName);
             }
 
             _logger.LogInfo("Loaded {0} Plugins.", bot.Plugins.Count);
@@ -101,8 +148,7 @@ internal static class PluginLoader
             }
             catch (Exception ex)
             {
-                _logger.LogError("Failed to load Plugin from '{0}': '{1}' (v{2}).", b.Key, b.Value.Name, b.Value.Version.ToString());
-                _logger.LogError("Exception", ex);
+                _logger.LogError("Failed to initialize Plugin from '{0}': '{1}' (v{2}).", ex, b.Key, b.Value.Name, b.Value.Version.ToString());
             }
 
             try
@@ -139,7 +185,7 @@ internal static class PluginLoader
 
                     foreach (var b in pluginInfo.CompiledCommands)
                     {
-                        PluginLoadContext pluginLoadContext = new(b.Key);
+                        AssemblyLoadContext pluginLoadContext = new(null);
                         var assembly = pluginLoadContext.LoadFromAssemblyName(new AssemblyName(Path.GetFileNameWithoutExtension(b.Key)));
 
                         assemblyList.Add(assembly, b.Value);
