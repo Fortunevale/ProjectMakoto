@@ -51,7 +51,7 @@
     <PackageReference Include="MySqlConnector" Version="2.3.0-beta.3" />
     <PackageReference Include="Octokit" Version="8.1.1" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.118" />
-	<PackageReference Include="DisCatSharp.Analyzer.Roselyn" Version="5.5.0">
+	<PackageReference Include="DisCatSharp.Analyzer.Roselyn" Version="6.1.0">
 		<PrivateAssets>all</PrivateAssets>
 		<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	</PackageReference>
