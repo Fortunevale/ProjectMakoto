@@ -40,7 +40,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dapper" Version="2.1.15" />
+    <PackageReference Include="Dapper" Version="2.1.21" />
     <PackageReference Include="DisCatSharp.Extensions.TwoFactorCommands" Version="2.0.2" />
     <PackageReference Include="FFMpegCore" Version="5.1.0" />
     <PackageReference Include="GenHTTP.Core" Version="7.0.0" />
