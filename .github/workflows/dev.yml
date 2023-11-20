@@ -31,10 +31,10 @@ jobs:
     steps:
       - name: Cleanup before build
         run: rm -rf ProjectMakotoTest/
-      - name: Setup .NET Core SDK 7.x
+      - name: Setup .NET Core SDK 8.x
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '7.x'
+          dotnet-version: '8.x'
       - name: "Clone Repository"
         uses: actions/checkout@v4
         with:
