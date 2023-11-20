@@ -115,7 +115,15 @@ internal sealed class InfoCommand : BaseCommand
                 .AddField(new DiscordEmbedField("Usage", $"`{history.MaxBy(x => x.Key).Value.Memory.Used.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}/{history.MaxBy(x => x.Key).Value.Memory.Total.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} MB`", true))
                 .AsLoading(ctx);
 
-            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(new List<DiscordEmbed>() { miscEmbed, cpuEmbed1, memoryEmbed }));
+            var embeds = new List<DiscordEmbed>() { miscEmbed };
+
+            if (ctx.Bot.status.LoadedConfig.MonitorSystem.Enabled)
+                embeds.AddRange(cpuEmbed1, memoryEmbed);
+
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(embeds));
+
+            if (!ctx.Bot.status.LoadedConfig.MonitorSystem.Enabled)
+                return;
 
             Dictionary<string, byte[]> charts = new();
 
@@ -186,7 +194,7 @@ internal sealed class InfoCommand : BaseCommand
             try
             {
                 files.Add("1.png", new FileStream("Assets/1.png", FileMode.Open));
-                _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(list).WithFiles(files));
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(embeds).WithFiles(files));
             }
             finally
             {
