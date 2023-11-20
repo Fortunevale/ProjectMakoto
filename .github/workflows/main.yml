@@ -35,7 +35,7 @@ jobs:
         run: dotnet restore
         working-directory: ProjectMakoto/ProjectMakoto/
       - name: Build Makoto
-        run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained --output "build" --property:PublishDir="build" --framework net7.0
+        run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained --output "build" --property:PublishDir="build" --framework net8.0
         working-directory: ProjectMakoto/ProjectMakoto/
         timeout-minutes: 5
       - name: Create Version File

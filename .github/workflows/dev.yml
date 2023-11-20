@@ -48,6 +48,6 @@ jobs:
         run: dotnet restore
         working-directory: ProjectMakotoTest/ProjectMakoto/
       - name: Test Build Makoto
-        run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained --framework net7.0 -v n
+        run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained --framework net8.0 -v n
         working-directory: ProjectMakotoTest/ProjectMakoto/
         timeout-minutes: 5
