@@ -323,41 +323,12 @@ public abstract class BaseCommand
             }
 
             case Enums.CommandType.PrefixCommand:
-            {
-                if (this.ctx.ResponseMessage is not null)
-                {
-                    if (discordMessageBuilder.Files?.Any() ?? false)
-                    {
-                        await this.ctx.ResponseMessage.DeleteAsync();
-                        var msg1 = await this.ctx.Channel.SendMessageAsync(discordMessageBuilder);
-                        this.ctx.ResponseMessage = msg1;
-                        return this.ctx.ResponseMessage;
-                    }
-
-                    _ = await this.ctx.ResponseMessage.ModifyAsync(discordMessageBuilder);
-                    this.ctx.ResponseMessage = await this.ctx.ResponseMessage.Refetch();
-
-                    return this.ctx.ResponseMessage;
-                }
-
-                var msg = await this.ctx.Channel.SendMessageAsync(discordMessageBuilder);
-
-                this.ctx.ResponseMessage = msg;
-
-                return msg;
-            }
-
             case Enums.CommandType.Custom:
             {
                 if (this.ctx.ResponseMessage is not null)
                 {
                     if (discordMessageBuilder.Files?.Any() ?? false)
-                    {
-                        await this.ctx.ResponseMessage.DeleteAsync();
-                        var msg1 = await this.ctx.Channel.SendMessageAsync(discordMessageBuilder);
-                        this.ctx.ResponseMessage = msg1;
-                        return this.ctx.ResponseMessage;
-                    }
+                        _ = discordMessageBuilder.KeepAttachments(false);
 
                     _ = await this.ctx.ResponseMessage.ModifyAsync(discordMessageBuilder);
                     this.ctx.ResponseMessage = await this.ctx.ResponseMessage.Refetch();
