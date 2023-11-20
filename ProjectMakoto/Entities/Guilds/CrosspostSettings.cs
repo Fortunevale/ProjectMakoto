@@ -11,12 +11,8 @@ using ProjectMakoto.Entities.Database.ColumnAttributes;
 
 namespace ProjectMakoto.Entities.Guilds;
 
-public sealed class CrosspostSettings : RequiresParent<Guild>
+public sealed class CrosspostSettings(Bot bot, Guild parent) : RequiresParent<Guild>(bot, parent)
 {
-    public CrosspostSettings(Bot bot, Guild parent) : base(bot, parent)
-    {
-    }
-
     [ColumnName("crosspostdelay"), ColumnType(ColumnTypes.Int), Default("5")]
     public int DelayBeforePosting
     {

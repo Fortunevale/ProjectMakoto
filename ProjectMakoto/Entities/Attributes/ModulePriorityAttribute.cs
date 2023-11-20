@@ -16,12 +16,7 @@ using System.Threading.Tasks;
 namespace ProjectMakoto.Entities;
 
 [AttributeUsage(AttributeTargets.Class)]
-internal class ModulePriorityAttribute : Attribute
+internal class ModulePriorityAttribute(int Priority) : Attribute
 {
-    public ModulePriorityAttribute(int Priority)
-    {
-        this.Priority = Priority;
-    }
-
-    public int Priority { get; set; }
+    public int Priority { get; set; } = Priority;
 }

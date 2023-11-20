@@ -9,12 +9,8 @@
 
 namespace ProjectMakoto.Events;
 
-internal sealed class CommandEvents : RequiresTranslation
+internal sealed class CommandEvents(Bot bot) : RequiresTranslation(bot)
 {
-    public CommandEvents(Bot bot) : base(bot)
-    {
-    }
-
     internal async Task CommandExecuted(CommandsNextExtension sender, CommandExecutionEventArgs e)
     {
         _logger.LogDebug("Successfully started execution of '{Prefix}{Name}' for {User} on {Guild} ({ResponseTime}ms)",

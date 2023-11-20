@@ -11,12 +11,8 @@ using ProjectMakoto.Entities.Database.ColumnAttributes;
 
 namespace ProjectMakoto.Entities.Guilds;
 
-public sealed class Lavalink : RequiresParent<Guild>
+public sealed class Lavalink(Bot bot, Guild parent) : RequiresParent<Guild>(bot, parent)
 {
-    public Lavalink(Bot bot, Guild parent) : base(bot, parent)
-    {
-    }
-
     public void Reset()
     {
         this.SongQueue = Array.Empty<QueueInfo>();
@@ -85,27 +81,17 @@ public sealed class Lavalink : RequiresParent<Guild>
         set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "lavalink_paused", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    public sealed class QueueInfo
+    public sealed class QueueInfo(string VideoTitle, string Url, TimeSpan length, DiscordGuild guild, DiscordUser user)
     {
-        public QueueInfo(string VideoTitle, string Url, TimeSpan length, DiscordGuild guild, DiscordUser user)
-        {
-            this.VideoTitle = VideoTitle;
-            this.Url = Url;
-            this.Length = length;
-
-            this.GuildId = guild?.Id ?? 0;
-            this.UserId = user?.Id ?? 0;
-        }
-
         public string UUID { get; set; } = Guid.NewGuid().ToString();
 
-        public string VideoTitle { get; set; }
-        public string Url { get; set; }
+        public string VideoTitle { get; set; } = VideoTitle;
+        public string Url { get; set; } = Url;
 
-        public TimeSpan Length { get; set; }
+        public TimeSpan Length { get; set; } = length;
 
-        public ulong GuildId = 0;
-        public ulong UserId = 0;
+        public ulong GuildId = guild?.Id ?? 0;
+        public ulong UserId = user?.Id ?? 0;
     }
 
     public bool Disposed { private set; get; } = false;

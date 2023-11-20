@@ -9,12 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class RequiresParent<T> : RequiresBotReference
+public class RequiresParent<T>(Bot bot, T parent) : RequiresBotReference(bot)
 {
-    public RequiresParent(Bot bot, T parent) : base(bot)
-    {
-        this.Parent = parent;
-    }
-
-    internal T Parent { get; set; }
+    internal T Parent { get; set; } = parent;
 }

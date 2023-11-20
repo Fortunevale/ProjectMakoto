@@ -22,7 +22,7 @@ public sealed class SingleTranslationKey : IDictionary<string, string>
         if (Locale is null || !this.t.ContainsKey(Locale))
             Locale = "en";
 
-        return !this.t.ContainsKey(Locale) ? "Missing Translation. Please report to the developer." : this.t[Locale];
+        return !this.t.TryGetValue(Locale, out var value) ? "Missing Translation. Please report to the developer." : value;
     }
 
     public string Get(Guild user)
@@ -32,7 +32,7 @@ public sealed class SingleTranslationKey : IDictionary<string, string>
         if (Locale is null || !this.t.ContainsKey(Locale))
             Locale = "en";
 
-        return !this.t.ContainsKey(Locale) ? "Missing Translation. Please report to the developer." : this.t[Locale];
+        return !this.t.TryGetValue(Locale, out var value) ? "Missing Translation. Please report to the developer." : value;
     }
 
     public string Get(DiscordGuild guild)
@@ -45,7 +45,7 @@ public sealed class SingleTranslationKey : IDictionary<string, string>
         if (Locale is null || !this.t.ContainsKey(Locale))
             Locale = "en";
 
-        return !this.t.ContainsKey(Locale) ? "Missing Translation. Please report to the developer." : this.t[Locale];
+        return !this.t.TryGetValue(Locale, out var value) ? "Missing Translation. Please report to the developer." : value;
     }
 
     public string Get(DiscordUser user)
@@ -58,7 +58,7 @@ public sealed class SingleTranslationKey : IDictionary<string, string>
         if (Locale is null || !this.t.ContainsKey(Locale))
             Locale = "en";
 
-        return !this.t.ContainsKey(Locale) ? "Missing Translation. Please report to the developer." : this.t[Locale];
+        return !this.t.TryGetValue(Locale, out var value) ? "Missing Translation. Please report to the developer." : value;
     }
 
     public ICollection<string> Keys => this.t.Keys;

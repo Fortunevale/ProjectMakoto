@@ -205,7 +205,7 @@ internal static class DiscordExtensions
             return messageBuilder;
         }).ToArray();
 
-        if (!messageStrings.Any())
+        if (messageStrings.Length == 0)
             return string.Empty;
 
         return LoadedHtml
@@ -704,11 +704,11 @@ internal static class DiscordExtensions
 
             var processed = link.Remove(0, link.IndexOf("channels/") + 9);
 
-            GuildId = Convert.ToUInt64(processed.Remove(processed.IndexOf("/"), processed.Length - processed.IndexOf("/")));
-            processed = processed.Remove(0, processed.IndexOf("/") + 1);
+            GuildId = Convert.ToUInt64(processed.Remove(processed.IndexOf('/'), processed.Length - processed.IndexOf('/')));
+            processed = processed.Remove(0, processed.IndexOf('/') + 1);
 
-            ChannelId = Convert.ToUInt64(processed.Remove(processed.IndexOf("/"), processed.Length - processed.IndexOf("/")));
-            processed = processed.Remove(0, processed.IndexOf("/") + 1);
+            ChannelId = Convert.ToUInt64(processed.Remove(processed.IndexOf('/'), processed.Length - processed.IndexOf('/')));
+            processed = processed.Remove(0, processed.IndexOf('/') + 1);
 
             MessageId = Convert.ToUInt64(processed);
 

@@ -48,7 +48,7 @@ internal static class PluginLoader
             }
 
             _logger.LogDebug("Loading Plugins..");
-            foreach (var pluginFolder in Directory.GetDirectories("Plugins").Where(x => !x.StartsWith(".")))
+            foreach (var pluginFolder in Directory.GetDirectories("Plugins").Where(x => !x.StartsWith('.')))
             {
                 var pluginName = Path.GetFileName(pluginFolder);
 
@@ -200,7 +200,7 @@ internal static class PluginLoader
 
                 pluginInfo.LastKnownHash = pluginHash;
 
-                if (pluginInfo.CompiledCommands.Any())
+                if (pluginInfo.CompiledCommands.Count != 0)
                     _ = FileExtensions.CleanupFilesAndDirectories(new(), pluginInfo.CompiledCommands.Select(x => x.Key).ToList());
 
                 pluginInfo.CompiledCommands = new();

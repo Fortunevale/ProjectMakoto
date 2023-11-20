@@ -11,12 +11,8 @@ using Octokit;
 
 namespace ProjectMakoto.Events;
 
-internal sealed class TokenLeakEvents : RequiresTranslation
+internal sealed class TokenLeakEvents(Bot bot) : RequiresTranslation(bot)
 {
-    public TokenLeakEvents(Bot bot) : base(bot)
-    {
-    }
-
     Translations.events.tokenDetection tKey
         => this.Bot.LoadedTranslations.Events.TokenDetection;
 

@@ -91,7 +91,7 @@ internal sealed class InfoCommand : BaseCommand
             var Date = bFile.Skip(2).First().Trim().Replace("/", ".");
 
             var Time = bFile.Skip(3).First().Trim();
-            Time = Time[..Time.IndexOf(",")];
+            Time = Time[..Time.IndexOf(',')];
 
             var miscEmbed = new DiscordEmbedBuilder().WithTitle($"{ctx.CurrentUser.GetUsername()} Details")
                 .AddField(new DiscordEmbedField("Currently running as", $"`{ctx.CurrentUser.GetUsernameWithIdentifier()}`", true))
@@ -131,8 +131,8 @@ internal sealed class InfoCommand : BaseCommand
                     return $"{value}";
                 }), new ChartGeneration.Dataset[]
                 {
-                    new ChartGeneration.Dataset("Usage (%)", history.Select(x => $"{(int)x.Value.Cpu.Load}"), "getGradientFillHelper('vertical', ['#ff0000', '#00ff00'])"),
-                    new ChartGeneration.Dataset("Temperature (°C)", history.Select(x => $"{(int)x.Value.Cpu.Temperature}"), "getGradientFillHelper('vertical', ['#4287f5', '#ff0000'])"),
+                    new("Usage (%)", history.Select(x => $"{(int)x.Value.Cpu.Load}"), "getGradientFillHelper('vertical', ['#ff0000', '#00ff00'])"),
+                    new("Temperature (°C)", history.Select(x => $"{(int)x.Value.Cpu.Temperature}"), "getGradientFillHelper('vertical', ['#4287f5', '#ff0000'])"),
                 }, 0, 100);
 
                 charts.Add("cpu.png", qc.ToByteArray());
@@ -161,7 +161,7 @@ internal sealed class InfoCommand : BaseCommand
                 }),
                 new ChartGeneration.Dataset[]
                 {
-                    new ChartGeneration.Dataset("Usage (MB)", history.Select(x => $"{(int)x.Value.Memory.Used}"))
+                    new("Usage (MB)", history.Select(x => $"{(int)x.Value.Memory.Used}"))
                 }, 0, (int)history.First().Value.Memory.Total);
 
                 charts.Add("mem.png", qc.ToByteArray());

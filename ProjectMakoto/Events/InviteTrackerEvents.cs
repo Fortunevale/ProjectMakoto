@@ -11,12 +11,8 @@ using ProjectMakoto.Entities.Guilds;
 
 namespace ProjectMakoto.Events;
 
-internal sealed class InviteTrackerEvents : RequiresTranslation
+internal sealed class InviteTrackerEvents(Bot bot) : RequiresTranslation(bot)
 {
-    public InviteTrackerEvents(Bot bot) : base(bot)
-    {
-    }
-
     public async static Task UpdateCachedInvites(Bot bot, DiscordGuild guild)
     {
         _logger.LogDebug("Fetching invites for {Guild}", guild.Id);

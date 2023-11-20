@@ -90,10 +90,10 @@ public sealed class GoogleTranslateClient : RequiresBotReference
         while (this.Queue.ContainsKey(key) && !this.Queue[key].Resolved && !this.Queue[key].Failed)
             await Task.Delay(100);
 
-        if (!this.Queue.ContainsKey(key))
+        if (!this.Queue.TryGetValue(key, out var value))
             throw new Exception("The request has been removed from the queue prematurely.");
 
-        var response = this.Queue[key];
+        var response = value;
         _ = this.Queue.Remove(key);
 
         if (response.Resolved)

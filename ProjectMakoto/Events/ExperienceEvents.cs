@@ -9,12 +9,8 @@
 
 namespace ProjectMakoto.Events;
 
-internal sealed class ExperienceEvents : RequiresTranslation
+internal sealed class ExperienceEvents(Bot bot) : RequiresTranslation(bot)
 {
-    public ExperienceEvents(Bot bot) : base(bot)
-    {
-    }
-
     internal async Task MessageCreated(DiscordClient sender, MessageCreateEventArgs e)
     {
         if (e.Message.WebhookMessage || e.Guild is null)

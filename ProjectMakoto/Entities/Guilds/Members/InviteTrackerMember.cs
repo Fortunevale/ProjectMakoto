@@ -12,12 +12,8 @@ using ProjectMakoto.Entities.Guilds;
 
 namespace ProjectMakoto.Entities.Members;
 
-public sealed class InviteTrackerMember : RequiresParent<Member>
+public sealed class InviteTrackerMember(Bot bot, Member parent) : RequiresParent<Member>(bot, parent)
 {
-    public InviteTrackerMember(Bot bot, Member parent) : base(bot, parent)
-    {
-    }
-
     [ColumnName("invite_user"), ColumnType(ColumnTypes.BigInt), Default("0")]
     public ulong UserId
     {

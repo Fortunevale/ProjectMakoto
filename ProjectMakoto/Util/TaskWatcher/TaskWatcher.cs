@@ -284,6 +284,7 @@ public sealed class TaskWatcher
                                     _ = embed.AddField(new DiscordEmbedField("Stack Trace", $"```No Stack Trace captured.```"));
                                 }
 
+                                _ = embed.AddField(new DiscordEmbedField("Type", $"`{ex?.GetType().FullName ?? "No Type captured."}`".TruncateWithIndication(1024, "`"), true));
                                 _ = embed.AddField(new DiscordEmbedField("Source", $"`{ex.Source?.SanitizeForCode() ?? "No Source captured."}`".TruncateWithIndication(1024, "`"), true));
                                 _ = embed.AddField(new DiscordEmbedField("Throwing Method", $"`{ex.TargetSite?.Name ?? "No Method captured"}` in `{ex.TargetSite?.DeclaringType?.Name ?? "No Type captured."}`".TruncateWithIndication(1024, "`"), true));
                                 _ = embed.WithFooter(ex.HResult.ToString());

@@ -12,12 +12,8 @@ using ProjectMakoto.Entities.Guilds;
 
 namespace ProjectMakoto.Entities.Members;
 
-public sealed class ExperienceMember : RequiresParent<Member>
+public sealed class ExperienceMember(Bot bot, Member parent) : RequiresParent<Member>(bot, parent)
 {
-    public ExperienceMember(Bot bot, Member parent) : base(bot, parent)
-    {
-    }
-
     [ColumnName("experience_last_message"), ColumnType(ColumnTypes.BigInt), Default("0")]
     public DateTime Last_Message
     {

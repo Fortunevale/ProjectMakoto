@@ -9,12 +9,8 @@
 
 namespace ProjectMakoto.Events;
 
-internal sealed class AutoUnarchiveEvents : RequiresTranslation
+internal sealed class AutoUnarchiveEvents(Bot bot) : RequiresTranslation(bot)
 {
-    public AutoUnarchiveEvents(Bot bot) : base(bot)
-    {
-    }
-
     internal async Task ThreadUpdated(DiscordClient sender, ThreadUpdateEventArgs e)
     {
         await Task.Delay(5000);

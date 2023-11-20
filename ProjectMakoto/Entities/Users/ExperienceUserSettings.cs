@@ -11,12 +11,8 @@ using ProjectMakoto.Entities.Database.ColumnAttributes;
 
 namespace ProjectMakoto.Entities.Users;
 
-public sealed class ExperienceUserSettings : RequiresParent<User>
+public sealed class ExperienceUserSettings(Bot bot, User parent) : RequiresParent<User>(bot, parent)
 {
-    public ExperienceUserSettings(Bot bot, User parent) : base(bot, parent)
-    {
-    }
-
     [ColumnName("experience_directmessageoptout"), ColumnType(ColumnTypes.TinyInt), Default("0")]
     public bool DirectMessageOptOut
     {

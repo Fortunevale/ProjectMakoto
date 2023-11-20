@@ -139,9 +139,7 @@ public sealed class PollSettings : RequiresParent<Guild>
                         foreach (var user in b.Votes)
                             foreach (var vote in user.SelectedVotes)
                             {
-                                if (!votes.ContainsKey(vote))
-                                    votes.Add(vote, 0);
-
+                                _ = votes.TryAdd(vote, 0);
                                 votes[vote]++;
                             }
 

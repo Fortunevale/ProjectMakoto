@@ -23,7 +23,7 @@ internal sealed class InviteNotesCommand : BaseCommand
 
             string GetCurrentConfiguration(SharedCommandContext ctx)
             {
-                return !ctx.DbGuild.InviteNotes.Notes.Any()
+                return ctx.DbGuild.InviteNotes.Notes.Length == 0
                     ? ctx.BaseCommand.GetString(this.t.Commands.Config.InviteNotes.NoNotesDefined, true)
                     : $"{string.Join('\n', ctx.DbGuild.InviteNotes.Notes.Select(x => $"> `{x.Invite}`\n{x.Note.FullSanitize()}"))}";
             }

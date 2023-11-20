@@ -17,6 +17,8 @@ public sealed class UtilityAppCommands : ApplicationCommandsModule
 
     public sealed class HelpAutoComplete : IAutocompleteProvider
     {
+        private static readonly string[] separator = new string[] { "-", "_" };
+
         public async Task<IEnumerable<DiscordApplicationCommandAutocompleteChoice>> Provider(AutocompleteContext ctx)
         {
             try
@@ -30,7 +32,7 @@ public sealed class UtilityAppCommands : ApplicationCommandsModule
                     .Take(25);
 
                 var options = filteredCommands
-                    .Select(x => new DiscordApplicationCommandAutocompleteChoice(string.Join("-", x.Name.Split(new string[] { "-", "_" }, StringSplitOptions.None)
+                    .Select(x => new DiscordApplicationCommandAutocompleteChoice(string.Join("-", x.Name.Split(separator, StringSplitOptions.None)
                         .Select(x => x.FirstLetterToUpper())), x.Name))
                     .ToList();
                 return options.AsEnumerable();
@@ -126,7 +128,7 @@ public sealed class UtilityAppCommands : ApplicationCommandsModule
                     {
                         var filteredTypes = Assembly.GetAssembly(this.GetType()).GetTypes()
                             .Where(t => String.Equals(t.Namespace, "ProjectMakoto.Events", StringComparison.Ordinal))
-                            .Where(t => !t.Name.StartsWith("<"))
+                            .Where(t => !t.Name.StartsWith('<'))
                             .Where(x => x.Name.Contains(ctx.FocusedOption.Value.ToString(), StringComparison.InvariantCultureIgnoreCase))
                             .Take(25);
 

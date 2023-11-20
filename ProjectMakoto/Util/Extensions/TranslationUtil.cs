@@ -58,7 +58,7 @@ public static class TranslationUtil
                 continue;
             }
 
-            if (newText.StartsWith("<") && newText.EndsWith(">") && Code)
+            if (newText.StartsWith('<') && newText.EndsWith('>') && Code)
             {
                 if (b.Sanitize)
                     newText = newText.SanitizeForCode();

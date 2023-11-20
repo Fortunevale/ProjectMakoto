@@ -293,7 +293,7 @@ internal static class ScoreSaberCommandAbstractions
 
                         var qc = ctx.Bot.ChartsClient.GetChart(1000, 500, labels, new ChartGeneration.Dataset[]
                         {
-                            new ChartGeneration.Dataset(GetString(t.Commands.ScoreSaber.Profile.Placement), 
+                            new(GetString(t.Commands.ScoreSaber.Profile.Placement), 
                                 player.histories.Split(",").Append(player.rank.ToString()), 
                                 "getGradientFillHelper('vertical', ['#6b76da', '#a336eb', '#FC0000'])", "yaxis2", true),
                         }, -1, -1);

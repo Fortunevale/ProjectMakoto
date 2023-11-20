@@ -9,12 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public abstract class RequiresTranslation : RequiresBotReference
+public abstract class RequiresTranslation(Bot bot) : RequiresBotReference(bot)
 {
-    public RequiresTranslation(Bot bot) : base(bot)
-    {
-        this.t = bot.LoadedTranslations;
-    }
-
-    protected Translations t { get; private set; }
+    protected Translations t { get; private set; } = bot.LoadedTranslations;
 }

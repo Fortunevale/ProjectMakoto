@@ -10,12 +10,8 @@
 using ProjectMakoto.Entities.Database.ColumnAttributes;
 
 namespace ProjectMakoto.Entities.Users;
-public sealed class DataSettings : RequiresParent<User>
+public sealed class DataSettings(Bot bot, User parent) : RequiresParent<User>(bot, parent)
 {
-    public DataSettings(Bot bot, User parent) : base(bot, parent)
-    {
-    }
-
     [ColumnName("last_data_request"), ColumnType(ColumnTypes.BigInt), Default("0")]
     public DateTime LastDataRequest
     {

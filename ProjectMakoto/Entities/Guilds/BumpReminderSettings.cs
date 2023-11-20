@@ -11,12 +11,8 @@ using ProjectMakoto.Entities.Database.ColumnAttributes;
 
 namespace ProjectMakoto.Entities.Guilds;
 
-public sealed class BumpReminderSettings : RequiresParent<Guild>
+public sealed class BumpReminderSettings(Bot bot, Guild parent) : RequiresParent<Guild>(bot, parent)
 {
-    public BumpReminderSettings(Bot bot, Guild parent) : base(bot, parent)
-    {
-    }
-
     public void Reset()
     {
         this.ChannelId = 0;

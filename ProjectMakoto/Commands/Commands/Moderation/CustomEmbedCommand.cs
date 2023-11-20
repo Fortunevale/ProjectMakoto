@@ -99,7 +99,7 @@ internal sealed class CustomEmbedCommand : BaseCommand
                         { continue; }
 
                         if (!url.IsNullOrWhiteSpace())
-                            if (!url.ToLower().StartsWith("https://") && !url.ToLower().StartsWith("http://"))
+                            if (!url.StartsWith("https://", StringComparison.OrdinalIgnoreCase) && !url.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
                                 url = url.Insert(0, "https://");
 
                         GeneratedEmbed.Title = Response.Interaction.GetModalValueByCustomId("title");
@@ -184,7 +184,7 @@ internal sealed class CustomEmbedCommand : BaseCommand
                             var url = Response.Interaction.GetModalValueByCustomId("url");
 
                             if (!url.IsNullOrWhiteSpace())
-                                if (!url.ToLower().StartsWith("https://") && !url.ToLower().StartsWith("http://"))
+                                if (!url.StartsWith("https://", StringComparison.OrdinalIgnoreCase) && !url.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
                                     url = url.Insert(0, "https://");
 
                             GeneratedEmbed.Author.Url = url;

@@ -194,7 +194,7 @@ internal static class DisCatSharpExtensionsLoader
                             ((List<DisCatSharp.ApplicationCommands.Entities.CommandTranslator>)commandProperty.GetValue(translator)).Add(obj);
                         }
 
-                        if (!((List<DisCatSharp.ApplicationCommands.Entities.CommandTranslator>)commandProperty.GetValue(translator)).Any())
+                        if (((List<DisCatSharp.ApplicationCommands.Entities.CommandTranslator>)commandProperty.GetValue(translator)).Count == 0)
                             commandProperty.SetValue(translator, null);
                     }
 
@@ -214,7 +214,7 @@ internal static class DisCatSharpExtensionsLoader
                             ((List<DisCatSharp.ApplicationCommands.Entities.OptionTranslator>)optionProperty.GetValue(translator)).Add(obj);
                         }
 
-                        if (!((List<DisCatSharp.ApplicationCommands.Entities.OptionTranslator>)optionProperty.GetValue(translator)).Any())
+                        if (((List<DisCatSharp.ApplicationCommands.Entities.OptionTranslator>)optionProperty.GetValue(translator)).Count == 0)
                             optionProperty.SetValue(translator, null);
                     }
 
@@ -234,7 +234,7 @@ internal static class DisCatSharpExtensionsLoader
                             ((List<DisCatSharp.ApplicationCommands.Entities.ChoiceTranslator>)choiceProperty.GetValue(translator)).Add(obj);
                         }
 
-                        if (!((List<DisCatSharp.ApplicationCommands.Entities.ChoiceTranslator>)choiceProperty.GetValue(translator)).Any())
+                        if (((List<DisCatSharp.ApplicationCommands.Entities.ChoiceTranslator>)choiceProperty.GetValue(translator)).Count == 0)
                             choiceProperty.SetValue(translator, null);
                     }
 
@@ -255,7 +255,7 @@ internal static class DisCatSharpExtensionsLoader
                             ((List<DisCatSharp.ApplicationCommands.Entities.SubGroupTranslator>)groupProperty.GetValue(translator)).Add(obj);
                         }
 
-                        if (!((List<DisCatSharp.ApplicationCommands.Entities.SubGroupTranslator>)groupProperty.GetValue(translator)).Any())
+                        if (((List<DisCatSharp.ApplicationCommands.Entities.SubGroupTranslator>)groupProperty.GetValue(translator)).Count == 0)
                             groupProperty.SetValue(translator, null);
                     }
 

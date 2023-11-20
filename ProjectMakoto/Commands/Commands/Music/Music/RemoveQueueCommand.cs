@@ -62,7 +62,7 @@ internal sealed class RemoveQueueCommand : BaseCommand
             }
             else
             {
-                if (!ctx.DbGuild.MusicModule.SongQueue.Any(x => x.VideoTitle.ToLower() == selection.ToLower()))
+                if (!ctx.DbGuild.MusicModule.SongQueue.Any(x =>  x.VideoTitle.ToLower() == selection.ToLower()))
                 {
                     _ = await this.RespondOrEdit(embed: new DiscordEmbedBuilder
                     {

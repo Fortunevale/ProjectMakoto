@@ -13,27 +13,19 @@ using ProjectMakoto.Entities.Database.ColumnAttributes;
 
 namespace ProjectMakoto.Entities;
 
-public class DatabaseList<T1>
+/// <summary>
+/// Create a new dictionary mapped to a database table. The key corresponds to the table's primary key.
+/// </summary>
+/// <param name="client">The database client to use.</param>
+/// <param name="tableName">The table this dictionary is mapped to.</param>
+/// <param name="primaryKey">The name of the table's primary key.</param>
+/// <param name="useGuildConnection">Whether this table is in the guild database.</param>
+public class DatabaseList<T1>(DatabaseClient client, string tableName, string primaryKey, bool useGuildConnection)
 {
-    /// <summary>
-    /// Create a new dictionary mapped to a database table. The key corresponds to the table's primary key.
-    /// </summary>
-    /// <param name="client">The database client to use.</param>
-    /// <param name="tableName">The table this dictionary is mapped to.</param>
-    /// <param name="primaryKey">The name of the table's primary key.</param>
-    /// <param name="useGuildConnection">Whether this table is in the guild database.</param>
-    public DatabaseList(DatabaseClient client, string tableName, string primaryKey, bool useGuildConnection)
-    {
-        this._client = client;
-        this._tableName = tableName;
-        this._primaryKey = primaryKey;
-        this._useGuildConnection = useGuildConnection;
-    }
-
-    private DatabaseClient _client;
-    private string _tableName;
-    private string _primaryKey;
-    private bool _useGuildConnection;
+    private DatabaseClient _client = client;
+    private string _tableName = tableName;
+    private string _primaryKey = primaryKey;
+    private bool _useGuildConnection = useGuildConnection;
 
     private DatabaseClient.MySqlConnectionInformation _connection
         => this._useGuildConnection ? this._client.guildDatabaseConnection : this._client.mainDatabaseConnection;

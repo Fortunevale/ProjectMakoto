@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using System.Diagnostics.CodeAnalysis;
+
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage(null, "IDE0047")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage(null, "DV2001")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage(null, "CS8625")]
@@ -14,3 +16,10 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage(null, "CS1998")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage(null, "CS8981")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage(null, "DCS0200")]
+[assembly: SuppressMessage("Style", "IDE0300:Simplify collection initialization", Justification = "no")]
+[assembly: SuppressMessage("Style", "IDE0028:Simplify collection initialization", Justification = "no")]
+[assembly: SuppressMessage("Style", "IDE0301:Simplify collection initialization", Justification = "no")]
+[assembly: SuppressMessage("Style", "IDE0305:Simplify collection initialization", Justification = "no")]
+[assembly: SuppressMessage("Style", "CA1862", Justification = "no")]
+[assembly: SuppressMessage("Style", "CA1510", Justification = "no")]
+[assembly: SuppressMessage("Style", "CA1861", Justification = "no")]

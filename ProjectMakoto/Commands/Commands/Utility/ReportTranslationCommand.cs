@@ -13,6 +13,8 @@ namespace ProjectMakoto.Commands;
 
 internal sealed class ReportTranslationCommand : BaseCommand
 {
+    internal static readonly string[] labels = new string[] { "Translations", "Low Priority" };
+
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
@@ -138,7 +140,7 @@ internal sealed class ReportTranslationCommand : BaseCommand
 
             try
             {
-                _ = await ctx.Bot.GithubClient.Issue.Labels.ReplaceAllForIssue(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository, issue.Number, new string[] { "Translations", "Low Priority" });
+                _ = await ctx.Bot.GithubClient.Issue.Labels.ReplaceAllForIssue(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository, issue.Number, labels);
             }
             catch (Exception ex)
             {

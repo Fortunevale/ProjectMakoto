@@ -42,7 +42,7 @@ public sealed class Bot
     #region Plugins
     public IReadOnlyDictionary<string, BasePlugin> Plugins
     => this._Plugins.AsReadOnly();
-    internal Dictionary<string, BasePlugin> _Plugins { get; set; } = new();
+    internal Dictionary<string, BasePlugin> _Plugins { get; set; } = [];
 
     public IReadOnlyDictionary<string, List<BasePluginCommand>> PluginCommands
         => this._PluginCommands.AsReadOnly();

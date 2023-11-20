@@ -327,7 +327,7 @@ public abstract class BaseCommand
             {
                 if (this.ctx.ResponseMessage is not null)
                 {
-                    if (discordMessageBuilder.Files?.Any() ?? false)
+                    if ((discordMessageBuilder.Files?.Count ?? 0) > 0)
                         _ = discordMessageBuilder.KeepAttachments(false);
 
                     _ = await this.ctx.ResponseMessage.ModifyAsync(discordMessageBuilder);
@@ -352,15 +352,15 @@ public abstract class BaseCommand
     TVar[] GetDefaultVars()
         => new TVar[]
         {
-            new TVar("CurrentCommand", this.ctx.Prefix + this.ctx.CommandName, false),
-            new TVar("Bot", this.ctx.CurrentUser.Mention, false),
-            new TVar("BotName", this.ctx.Client.CurrentApplication.Name, false),
-            new TVar("FullBot", this.ctx.CurrentUser.GetUsernameWithIdentifier(), false),
-            new TVar("BotDisplayName", this.ctx.CurrentUser.GetUsernameWithIdentifier(), false),
-            new TVar("User", this.ctx.User.Mention, false),
-            new TVar("UserName", this.ctx.User.GetUsername(), false),
-            new TVar("FullUser", this.ctx.User.GetUsernameWithIdentifier(), false),
-            new TVar("UserDisplayName", this.ctx.Member?.DisplayName ?? this.ctx.User.GetUsername(), false),
+            new("CurrentCommand", this.ctx.Prefix + this.ctx.CommandName, false),
+            new("Bot", this.ctx.CurrentUser.Mention, false),
+            new("BotName", this.ctx.Client.CurrentApplication.Name, false),
+            new("FullBot", this.ctx.CurrentUser.GetUsernameWithIdentifier(), false),
+            new("BotDisplayName", this.ctx.CurrentUser.GetUsernameWithIdentifier(), false),
+            new("User", this.ctx.User.Mention, false),
+            new("UserName", this.ctx.User.GetUsername(), false),
+            new("FullUser", this.ctx.User.GetUsernameWithIdentifier(), false),
+            new("UserDisplayName", this.ctx.Member?.DisplayName ?? this.ctx.User.GetUsername(), false),
         };
 
     public string GetString(SingleTranslationKey key)
@@ -455,7 +455,7 @@ public abstract class BaseCommand
             if (configuration.IncludeEveryone)
                 components.Add(EveryoneButton);
 
-            if (components.Any())
+            if (components.Count != 0)
                 _ = builder.AddComponents(components);
 
             _ = builder.AddComponents(MessageComponents.GetCancelButton(this.ctx.DbUser, this.ctx.Bot), ConfirmSelectionButton);
@@ -593,7 +593,7 @@ public abstract class BaseCommand
             if (!configuration.DisableOption.IsNullOrWhiteSpace())
                 components.Add(DisableButton);
 
-            if (components.Any())
+            if (components.Count > 0)
                 _ = builder.AddComponents(components);
 
             _ = builder.AddComponents(MessageComponents.GetCancelButton(this.ctx.DbUser, this.ctx.Bot), ConfirmSelectionButton);

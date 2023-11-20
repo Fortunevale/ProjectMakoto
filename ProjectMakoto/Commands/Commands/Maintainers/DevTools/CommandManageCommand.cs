@@ -17,13 +17,13 @@ internal sealed class CommandManageCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var EnableCommandButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Enable Command", !ctx.Bot.status.LoadedConfig.Discord.DisabledCommands.Any(), "➕".UnicodeToEmoji().ToComponent());
+            var EnableCommandButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Enable Command", ctx.Bot.status.LoadedConfig.Discord.DisabledCommands.Count == 0, "➕".UnicodeToEmoji().ToComponent());
             var DisableCommandButton = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "Disable Command", false, "➖".UnicodeToEmoji().ToComponent());
 
             _ = await this.RespondOrEdit(new DiscordMessageBuilder()
                 .AddEmbed(new DiscordEmbedBuilder()
                     .WithTitle("Disabled Commands")
-                    .WithDescription($"{(ctx.Bot.status.LoadedConfig.Discord.DisabledCommands.Any() ? string.Join(", ", ctx.Bot.status.LoadedConfig.Discord.DisabledCommands.Select(x => $"`{x}`")) : "`No commands disabled.`")}")
+                    .WithDescription($"{(ctx.Bot.status.LoadedConfig.Discord.DisabledCommands.Count != 0 ? string.Join(", ", ctx.Bot.status.LoadedConfig.Discord.DisabledCommands.Select(x => $"`{x}`")) : "`No commands disabled.`")}")
                     .AsAwaitingInput(ctx))
                 .AddComponents(EnableCommandButton, DisableCommandButton)
                 .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
@@ -92,7 +92,7 @@ internal sealed class CommandManageCommand : BaseCommand
                     }
                 }
 
-                if (!CommandList.Any())
+                if (CommandList.Count == 0)
                 {
                     await this.ExecuteCommand(ctx, arguments);
                     return;

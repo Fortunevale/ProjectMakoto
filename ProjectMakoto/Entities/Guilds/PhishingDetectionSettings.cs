@@ -11,12 +11,8 @@ using ProjectMakoto.Entities.Database.ColumnAttributes;
 
 namespace ProjectMakoto.Entities.Guilds;
 
-public sealed class PhishingDetectionSettings : RequiresParent<Guild>
+public sealed class PhishingDetectionSettings(Bot bot, Guild parent) : RequiresParent<Guild>(bot, parent)
 {
-    public PhishingDetectionSettings(Bot bot, Guild parent) : base(bot, parent)
-    {
-    }
-
     [ColumnName("phishing_detect"), ColumnType(ColumnTypes.TinyInt), Default("1")]
     public bool DetectPhishing
     {

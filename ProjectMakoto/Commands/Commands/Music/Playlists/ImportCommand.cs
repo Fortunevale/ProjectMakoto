@@ -168,7 +168,7 @@ internal sealed class ImportCommand : BaseCommand
 
                     ImportJson.List = ImportJson.List.Where(x => RegexTemplates.Url.IsMatch(x.Url)).Select(x => new PlaylistEntry { Title = x.Title, Url = x.Url, Length = x.Length }).Take(250).ToArray();
 
-                    if (!ImportJson.List.Any())
+                    if (ImportJson.List.Length == 0)
                         throw new Exception();
 
                     if (ctx.DbUser.UserPlaylists.Length >= 10)

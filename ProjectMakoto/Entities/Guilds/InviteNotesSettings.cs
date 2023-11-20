@@ -11,12 +11,8 @@ using ProjectMakoto.Entities.Database.ColumnAttributes;
 
 namespace ProjectMakoto.Entities.Guilds;
 
-public sealed class InviteNotesSettings : RequiresParent<Guild>
+public sealed class InviteNotesSettings(Bot bot, Guild parent) : RequiresParent<Guild>(bot, parent)
 {
-    public InviteNotesSettings(Bot bot, Guild parent) : base(bot, parent)
-    {
-    }
-
     [ColumnName("invitenotes"), ColumnType(ColumnTypes.LongText), Default("[]")]
     public InviteNotesDetails[] Notes
     {

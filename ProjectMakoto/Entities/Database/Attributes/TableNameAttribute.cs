@@ -10,12 +10,7 @@
 namespace ProjectMakoto.Entities.Database.ColumnAttributes;
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-public sealed class ColumnNameAttribute : Attribute
+public sealed class ColumnNameAttribute(string Name) : Attribute
 {
-    public readonly string Name;
-
-    public ColumnNameAttribute(string Name)
-    {
-        this.Name = Name;
-    }
+    public readonly string Name = Name;
 }

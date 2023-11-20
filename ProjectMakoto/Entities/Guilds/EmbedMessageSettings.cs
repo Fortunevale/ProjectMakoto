@@ -11,12 +11,8 @@ using ProjectMakoto.Entities.Database.ColumnAttributes;
 
 namespace ProjectMakoto.Entities.Guilds;
 
-public sealed class EmbedMessageSettings : RequiresParent<Guild>
+public sealed class EmbedMessageSettings(Bot bot, Guild parent) : RequiresParent<Guild>(bot, parent)
 {
-    public EmbedMessageSettings(Bot bot, Guild parent) : base(bot, parent)
-    {
-    }
-
     [ColumnName("embed_messages"), ColumnType(ColumnTypes.TinyInt), Default("1")]
     public bool UseEmbedding
     {

@@ -9,12 +9,8 @@
 
 namespace ProjectMakoto.Events;
 
-internal sealed class NameNormalizerEvents : RequiresTranslation
+internal sealed class NameNormalizerEvents(Bot bot) : RequiresTranslation(bot)
 {
-    public NameNormalizerEvents(Bot bot) : base(bot)
-    {
-    }
-
     internal async Task GuildMemberAdded(DiscordClient sender, GuildMemberAddEventArgs e)
     {
         if (!this.Bot.Guilds[e.Guild.Id].NameNormalizer.NameNormalizerEnabled)

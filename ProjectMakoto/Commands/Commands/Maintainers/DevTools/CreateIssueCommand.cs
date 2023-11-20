@@ -62,7 +62,7 @@ internal sealed class CreateIssueCommand : BaseCommand
                         var description = e.Interaction.Data.Components.Where(x => x.CustomId == "description").First().Value;
                         var labels = labelComp.Type == ComponentType.StringSelect
                             ? labelComp.Values.ToList()
-                            : labelComp.Value.Split("\n", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Where(x => x.StartsWith("#")).Select(x => x.Replace("#", "")).ToList();
+                            : labelComp.Value.Split("\n", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Where(x => x.StartsWith('#')).Select(x => x.Replace("#", "")).ToList();
 
                         if (ctx.Bot.status.LoadedConfig.Secrets.Github.TokenExperiation.GetTotalSecondsUntil() <= 0)
                         {

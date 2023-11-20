@@ -8,9 +8,6 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Exceptions;
-internal sealed class CancelException : Exception
+internal sealed class CancelException(string message = null) : Exception(message)
 {
-    public CancelException(string message = null) : base(message)
-    {
-    }
 }
