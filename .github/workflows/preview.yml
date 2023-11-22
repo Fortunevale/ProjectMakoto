@@ -83,7 +83,7 @@ jobs:
           artifacts: "ProjectMakotoPreview/ProjectMakoto/Release.zip"
           generateReleaseNotes: true
           prerelease: true
-          tag: ${{ steps.truncatedString.outputs.string }}
+          tag: ${{ steps.truncatedString.outputs.string }}-pre
           commit: ${{ github.sha }}
       - name: Cleanup
         run: rm -rf ProjectMakotoPreview/
