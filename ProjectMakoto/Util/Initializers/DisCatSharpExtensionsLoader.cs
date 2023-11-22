@@ -95,16 +95,6 @@ internal static class DisCatSharpExtensionsLoader
         _logger.LogDebug("Registering Interactivity..");
         _ = bot.DiscordClient.UseInteractivity(new InteractivityConfiguration { });
 
-        _ = Task.Delay(60000).ContinueWith(t =>
-        {
-            if (!bot.status.DiscordInitialized)
-            {
-                _logger.LogError("An exception occurred while trying to log into discord: {0}", "The log in took longer than 60 seconds");
-                Environment.Exit((int)ExitCodes.FailedDiscordLogin);
-                return;
-            }
-        });
-
         var appCommands = bot.DiscordClient.UseApplicationCommands(new ApplicationCommandsConfiguration
         {
             ServiceProvider = new ServiceCollection()
