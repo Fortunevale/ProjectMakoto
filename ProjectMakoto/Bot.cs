@@ -241,6 +241,8 @@ public sealed class Bot
             await Task.Delay(2000);
             _logger.LogInfo("Connected and authenticated with Discord as {User}.", this.DiscordClient.CurrentUser.GetUsernameWithIdentifier());
 
+            this.status.DiscordInitialized = true;
+
             await Util.Initializers.PostLoginTaskLoader.Load(this);
 
             //foreach (var guild in this.DiscordClient.Guilds.Values)
