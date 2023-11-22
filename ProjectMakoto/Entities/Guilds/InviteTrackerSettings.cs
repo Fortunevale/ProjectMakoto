@@ -11,12 +11,8 @@ using ProjectMakoto.Entities.Database.ColumnAttributes;
 
 namespace ProjectMakoto.Entities.Guilds;
 
-public sealed class InviteTrackerSettings : RequiresParent<Guild>
+public sealed class InviteTrackerSettings(Bot bot, Guild parent) : RequiresParent<Guild>(bot, parent)
 {
-    public InviteTrackerSettings(Bot bot, Guild parent) : base(bot, parent)
-    {
-    }
-
     [ColumnName("invitetracker_enabled"), ColumnType(ColumnTypes.TinyInt), Default("1")]
     public bool Enabled
     {

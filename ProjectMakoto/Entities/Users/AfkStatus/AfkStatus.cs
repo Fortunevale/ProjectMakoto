@@ -11,12 +11,8 @@ using ProjectMakoto.Entities.Database.ColumnAttributes;
 
 namespace ProjectMakoto.Entities.Users;
 
-public sealed class AfkStatus : RequiresParent<User>
+public sealed class AfkStatus(Bot bot, User parent) : RequiresParent<User>(bot, parent)
 {
-    public AfkStatus(Bot bot, User parent) : base(bot, parent)
-    {
-    }
-
     [ColumnName("afk_reason"), ColumnType(ColumnTypes.Text), WithCollation, Nullable]
     public string Reason
     {

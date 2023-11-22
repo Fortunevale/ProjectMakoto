@@ -9,12 +9,8 @@
 
 namespace ProjectMakoto.Entities.Users;
 
-public sealed class Cooldown : RequiresParent<User>
+public sealed class Cooldown(Bot bot, User parent) : RequiresParent<User>(bot, parent)
 {
-    public Cooldown(Bot bot, User parent) : base(bot, parent)
-    {
-    }
-
     private Dictionary<string, DateTime> LastUseByCommand = new();
     private List<string> WaitingList = new();
 
@@ -38,9 +34,7 @@ public sealed class Cooldown : RequiresParent<User>
 
         lock (this.LastUseByCommand)
         {
-            if (!this.LastUseByCommand.ContainsKey(ctx.CommandName))
-                this.LastUseByCommand.Add(ctx.CommandName, DateTime.MinValue);
-
+            _ = this.LastUseByCommand.TryAdd(ctx.CommandName, DateTime.MinValue);
             if (this.LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).GetTotalSecondsUntil() <= 0)
             {
                 this.LastUseByCommand[ctx.CommandName] = DateTime.UtcNow.ToUniversalTime();

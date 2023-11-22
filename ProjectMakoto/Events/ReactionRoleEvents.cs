@@ -11,12 +11,8 @@ using ProjectMakoto.Entities.Guilds;
 
 namespace ProjectMakoto.Events;
 
-internal sealed class ReactionRoleEvents : RequiresTranslation
+internal sealed class ReactionRoleEvents(Bot bot) : RequiresTranslation(bot)
 {
-    public ReactionRoleEvents(Bot bot) : base(bot)
-    {
-    }
-
     internal async Task MessageReactionAdded(DiscordClient sender, MessageReactionAddEventArgs e)
     {
         if (e.Guild is null || e.Channel is null || e.Channel.IsPrivate)

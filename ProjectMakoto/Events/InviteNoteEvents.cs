@@ -11,12 +11,8 @@ using ProjectMakoto.Entities.Guilds;
 
 namespace ProjectMakoto.Events;
 
-internal sealed class InviteNoteEvents : RequiresTranslation
+internal sealed class InviteNoteEvents(Bot bot) : RequiresTranslation(bot)
 {
-    public InviteNoteEvents(Bot bot) : base(bot)
-    {
-    }
-
     internal async Task InviteDeleted(DiscordClient sender, InviteDeleteEventArgs e)
     {
         if (this.Bot.Guilds[e.Guild.Id].InviteNotes.Notes.Any(x => x.Invite == e.Invite.Code))

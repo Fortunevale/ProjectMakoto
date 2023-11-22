@@ -11,12 +11,8 @@ using System.Net.Http.Headers;
 
 namespace ProjectMakoto.Util;
 
-internal sealed class PhishingUrlHandler : RequiresBotReference
+internal sealed class PhishingUrlHandler(Bot bot) : RequiresBotReference(bot)
 {
-    public PhishingUrlHandler(Bot bot) : base(bot)
-    {
-    }
-
     public async Task UpdatePhishingUrlDatabase()
     {
         try
@@ -151,6 +147,6 @@ internal sealed class PhishingUrlHandler : RequiresBotReference
                 .Replace(",", "")
                 .Replace("127.0.0.1", "").Trim())
                 .ToList()
-            .Where(x => !x.StartsWith("#") && !x.StartsWith("!") && x.Contains('.')).ToList();
+            .Where(x => !x.StartsWith('#') && !x.StartsWith('!') && x.Contains('.')).ToList();
     }
 }

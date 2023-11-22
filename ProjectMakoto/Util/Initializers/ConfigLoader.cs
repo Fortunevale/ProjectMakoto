@@ -23,6 +23,8 @@ internal static class ConfigLoader
             await Task.Delay(500);
             bot.status.LoadedConfig.Save();
 
+            await Task.Delay(10000);
+
             while (true)
             {
                 try

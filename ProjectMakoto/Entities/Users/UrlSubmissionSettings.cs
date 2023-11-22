@@ -11,12 +11,8 @@ using ProjectMakoto.Entities.Database.ColumnAttributes;
 
 namespace ProjectMakoto.Entities.Users;
 
-public sealed class UrlSubmissionSettings : RequiresParent<User>
+public sealed class UrlSubmissionSettings(Bot bot, User parent) : RequiresParent<User>(bot, parent)
 {
-    public UrlSubmissionSettings(Bot bot, User parent) : base(bot, parent)
-    {
-    }
-
     [ColumnName("submission_accepted_tos"), ColumnType(ColumnTypes.TinyInt), Default("0")]
     public int AcceptedTOS
     {

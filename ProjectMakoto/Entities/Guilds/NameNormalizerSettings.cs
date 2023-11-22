@@ -11,12 +11,8 @@ using ProjectMakoto.Entities.Database.ColumnAttributes;
 
 namespace ProjectMakoto.Entities.Guilds;
 
-public sealed class NameNormalizerSettings : RequiresParent<Guild>
+public sealed class NameNormalizerSettings(Bot bot, Guild parent) : RequiresParent<Guild>(bot, parent)
 {
-    public NameNormalizerSettings(Bot bot, Guild parent) : base(bot, parent)
-    {
-    }
-
     [ColumnName("normalizenames"), ColumnType(ColumnTypes.TinyInt), Default("0")]
     public bool NameNormalizerEnabled
     {

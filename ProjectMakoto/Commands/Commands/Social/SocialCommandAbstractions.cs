@@ -11,6 +11,7 @@ namespace ProjectMakoto.Commands;
 internal static class SocialCommandAbstractions
 {
     private static HttpClient httpClient = null;
+    internal static readonly string[] sourceArray = new string[] { "cuddle", "slap", "pat", "hug", "kiss" };
 
     internal static async Task<Tuple<string, string>> GetGif(Bot bot, string action)
     {
@@ -31,7 +32,7 @@ internal static class SocialCommandAbstractions
 
             try
             {
-                if (!new string[] { "cuddle", "slap", "pat", "hug", "kiss" }.Contains(action))
+                if (!sourceArray.Contains(action))
                     throw new NotSupportedException("Unsupported gif type");
 
                 var request = JsonConvert.DeserializeObject<NekosLifeRequest>(await httpClient.GetStringAsync($"https://nekos.life/api/v2/img/{action}"));

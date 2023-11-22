@@ -11,12 +11,8 @@ using ProjectMakoto.Entities.Members;
 
 namespace ProjectMakoto.Events;
 
-internal sealed class GenericGuildEvents : RequiresTranslation
+internal sealed class GenericGuildEvents(Bot bot) : RequiresTranslation(bot)
 {
-    public GenericGuildEvents(Bot bot) : base(bot)
-    {
-    }
-
     internal async Task GuildMemberAdded(DiscordClient sender, GuildMemberAddEventArgs e)
     {
         if (this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].FirstJoinDate == DateTime.MinValue)

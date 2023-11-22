@@ -42,7 +42,7 @@ public sealed class Bot
     #region Plugins
     public IReadOnlyDictionary<string, BasePlugin> Plugins
     => this._Plugins.AsReadOnly();
-    internal Dictionary<string, BasePlugin> _Plugins { get; set; } = new();
+    internal Dictionary<string, BasePlugin> _Plugins { get; set; } = [];
 
     public IReadOnlyDictionary<string, List<BasePluginCommand>> PluginCommands
         => this._PluginCommands.AsReadOnly();
@@ -240,8 +240,6 @@ public sealed class Bot
             await this.DiscordClient.ConnectAsync();
             await Task.Delay(2000);
             _logger.LogInfo("Connected and authenticated with Discord as {User}.", this.DiscordClient.CurrentUser.GetUsernameWithIdentifier());
-
-            this.status.DiscordInitialized = true;
 
             await Util.Initializers.PostLoginTaskLoader.Load(this);
 

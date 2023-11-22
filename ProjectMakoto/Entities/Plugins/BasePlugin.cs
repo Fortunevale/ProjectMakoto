@@ -26,7 +26,7 @@ public abstract class BasePlugin
     /// <summary>
     /// Allows you to log events.
     /// </summary>
-    public PluginLoggerClient _logger { get; set; }
+    public PluginLoggerClient _logger { get; internal set; }
 
     /// <summary>
     /// Whether the client logged into discord.

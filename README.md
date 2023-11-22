@@ -11,7 +11,7 @@
 
 ## What is Makoto?
 
-**Makoto is a multi-purpose Discord Bot written in C# using .NET 6.**
+**Makoto is a multi-purpose Discord Bot written in C# using .NET 8.**
 <br></br>
 Makoto has a lot of features, current notable features are:
 - **No premium features**. (This may change in the future, it'll depend on how viable a hosting this bot is without them. The source code itself will always stay available and you could simply host your own Makoto instance.)

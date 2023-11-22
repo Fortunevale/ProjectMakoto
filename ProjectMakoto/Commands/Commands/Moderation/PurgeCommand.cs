@@ -94,7 +94,7 @@ internal sealed class PurgeCommand : BaseCommand
 
                 try
                 {
-                    while (fetchedMessages.Any())
+                    while (fetchedMessages.Count != 0)
                     {
                         var currentDeletion = fetchedMessages.Take(100);
 

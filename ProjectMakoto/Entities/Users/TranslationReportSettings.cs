@@ -10,12 +10,8 @@
 using ProjectMakoto.Entities.Database.ColumnAttributes;
 
 namespace ProjectMakoto.Entities.Users;
-public class TranslationReportSettings : RequiresParent<User>
+public class TranslationReportSettings(Bot bot, User parent) : RequiresParent<User>(bot, parent)
 {
-    public TranslationReportSettings(Bot bot, User parent) : base(bot, parent)
-    {
-    }
-
     [ColumnName("translationreport_accepted_tos"), ColumnType(ColumnTypes.TinyInt), Default("0")]
     public int AcceptedTOS
     {

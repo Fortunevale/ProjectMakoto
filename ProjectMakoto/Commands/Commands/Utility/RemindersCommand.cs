@@ -19,7 +19,7 @@ internal sealed class RemindersCommand : BaseCommand
         {
             string? snoozeDescription = null;
 
-            if (arguments?.Any() ?? false)
+            if ((arguments?.Count ?? 0) > 0)
                 snoozeDescription = arguments["description"]?.ToString();
 
             if (await ctx.DbUser.Cooldown.WaitForModerate(ctx))

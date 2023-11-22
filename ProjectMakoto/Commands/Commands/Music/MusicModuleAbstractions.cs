@@ -15,7 +15,7 @@ internal static class MusicModuleAbstractions
     {
         var t = ctx.t;
 
-        if (Regex.IsMatch(searchQuery, "{jndi:(ldap[s]?|rmi):\\/\\/[^\n]+") || searchQuery.ToLower().Contains("localhost") || searchQuery.ToLower().Contains("127.0.0.1"))
+        if (Regex.IsMatch(searchQuery, "{jndi:(ldap[s]?|rmi):\\/\\/[^\n]+") || searchQuery.Contains("localhost", StringComparison.OrdinalIgnoreCase) || searchQuery.Contains("127.0.0.1", StringComparison.OrdinalIgnoreCase))
             throw new Exception();
 
         List<LavalinkTrack> Tracks = new();
@@ -35,7 +35,7 @@ internal static class MusicModuleAbstractions
                 Group group = Regex.Match(searchQuery, @"((\?|&)list=RDMM\w+)(&*)", RegexOptions.ExplicitCapture);
                 var value = group.Value;
 
-                if (value.EndsWith("&"))
+                if (value.EndsWith('&'))
                     value = value[..^1];
 
                 searchQuery = searchQuery.Replace(value, "");
@@ -46,13 +46,13 @@ internal static class MusicModuleAbstractions
                 Group group = Regex.Match(searchQuery, @"((\?|&)start_radio=\d+)(&*)", RegexOptions.ExplicitCapture);
                 var value = group.Value;
 
-                if (value.EndsWith("&"))
+                if (value.EndsWith('&'))
                     value = value[..^1];
 
                 searchQuery = searchQuery.Replace(value, "");
             }
 
-            var AndIndex = searchQuery.IndexOf("&");
+            var AndIndex = searchQuery.IndexOf('&');
 
             if (!searchQuery.Contains('?') && AndIndex != -1)
             {

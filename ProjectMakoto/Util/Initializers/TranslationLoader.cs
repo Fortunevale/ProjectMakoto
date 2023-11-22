@@ -39,9 +39,7 @@ internal static class TranslationLoader
                     {
                         foreach (var b in CalculateTranslationProgress(item, field.Name, field.Name == "CommandList" || isCommandList))
                         {
-                            if (!counts.ContainsKey(b.Key))
-                                counts.Add(b.Key, 0);
-
+                            _ = counts.TryAdd(b.Key, 0);
                             counts[b.Key] += b.Value;
                         }
                     }
@@ -55,9 +53,7 @@ internal static class TranslationLoader
                             if (fieldValue is not null)
                                 foreach (var b in ((SingleTranslationKey)fieldValue).t)
                                 {
-                                    if (!counts.ContainsKey(b.Key))
-                                        counts.Add(b.Key, 0);
-
+                                    _ = counts.TryAdd(b.Key, 0);
                                     counts[b.Key]++;
                                 }
                         }
@@ -66,18 +62,14 @@ internal static class TranslationLoader
                             if (fieldValue is not null)
                                 foreach (var b in ((MultiTranslationKey)fieldValue).t)
                                 {
-                                    if (!counts.ContainsKey(b.Key))
-                                        counts.Add(b.Key, 0);
-
+                                    _ = counts.TryAdd(b.Key, 0);
                                     counts[b.Key]++;
                                 }
                         }
 
                         foreach (var b in CalculateTranslationProgress(fieldValue, field.Name, field.Name == "CommandList" || isCommandList))
                         {
-                            if (!counts.ContainsKey(b.Key))
-                                counts.Add(b.Key, 0);
-
+                            _ = counts.TryAdd(b.Key, 0);
                             counts[b.Key] += b.Value;
                         }
                     }
@@ -87,9 +79,7 @@ internal static class TranslationLoader
                         {
                             foreach (var b in ((SingleTranslationKey)fieldValue).t)
                             {
-                                if (!counts.ContainsKey(b.Key))
-                                    counts.Add(b.Key, 0);
-
+                                _ = counts.TryAdd(b.Key, 0);
                                 counts[b.Key]++;
                             }
                         }
@@ -97,9 +87,7 @@ internal static class TranslationLoader
                         {
                             foreach (var b in ((MultiTranslationKey)fieldValue).t)
                             {
-                                if (!counts.ContainsKey(b.Key))
-                                    counts.Add(b.Key, 0);
-
+                                _ = counts.TryAdd(b.Key, 0);
                                 counts[b.Key]++;
                             }
                         }

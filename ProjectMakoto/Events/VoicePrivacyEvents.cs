@@ -78,7 +78,7 @@ internal sealed class VoicePrivacyEvents : RequiresTranslation
                             List<DiscordMessage> discordMessages = new();
                             discordMessages.AddRange(await e.Before.Channel.GetMessagesAsync(1));
 
-                            if (!discordMessages.Any())
+                            if (discordMessages.Count == 0)
                                 return;
 
                             var failcount = 0;
@@ -111,7 +111,7 @@ internal sealed class VoicePrivacyEvents : RequiresTranslation
 
                             discordMessages = discordMessages.Where(x => x.Author.Id == e.User.Id).ToList();
 
-                            if (discordMessages.Any())
+                            if (discordMessages.Count != 0)
                             {
                                 failcount = 0;
                                 var BulkDeletions = discordMessages.Where(x => x.Timestamp.GetTimespanSince() < TimeSpan.FromDays(14)).ToList();
@@ -128,7 +128,7 @@ internal sealed class VoicePrivacyEvents : RequiresTranslation
                                             _ = BulkDeletions.Remove(MessagesToDelete[i]);
                                         }
 
-                                        if (BulkDeletions.Any())
+                                        if (BulkDeletions.Count != 0)
                                             await Task.Delay(30000);
                                     }
                                     catch (Exception ex)
@@ -155,7 +155,7 @@ internal sealed class VoicePrivacyEvents : RequiresTranslation
                                         await e.Before.Channel.DeleteMessageAsync(msg, this.tKey.LeftWithDeleteMessages.Get(this.Bot.Guilds[e.Guild.Id]));
                                         _ = SingleDeletions.Remove(msg);
 
-                                        if (SingleDeletions.Any())
+                                        if (SingleDeletions.Count != 0)
                                             await Task.Delay(30000);
                                     }
                                     catch (Exception ex)

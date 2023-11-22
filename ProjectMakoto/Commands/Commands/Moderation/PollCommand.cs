@@ -273,7 +273,7 @@ internal sealed class PollCommand : BaseCommand
 
                     var hash = (title + desc).GetSHA256();
 
-                    if (SelectedOptions.Any(x => x.Value == hash || x.Label.ToLower() == title.ToLower()))
+                    if (SelectedOptions.Any(x => x.Value == hash || x.Label.Equals(title, StringComparison.OrdinalIgnoreCase)))
                     {
                         _ = await this.RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(this.GetString(CommandKey.OptionExists)));
                         await Task.Delay(3000);

@@ -9,12 +9,8 @@
 
 namespace ProjectMakoto.Events;
 
-internal sealed class CrosspostEvents : RequiresTranslation
+internal sealed class CrosspostEvents(Bot bot) : RequiresTranslation(bot)
 {
-    public CrosspostEvents(Bot bot) : base(bot)
-    {
-    }
-
     internal async Task MessageCreated(DiscordClient sender, MessageCreateEventArgs e)
     {
         if (e.Guild is null || e.Channel.IsPrivate)

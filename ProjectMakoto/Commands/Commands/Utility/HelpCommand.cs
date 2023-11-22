@@ -86,8 +86,8 @@ internal sealed class HelpCommand : BaseCommand
 
                         Command? prefixCommand;
 
-                        if (PrefixCommandsList.Any(x => x.Value.Name.ToLower() == appCommand.Name.ToLower()))
-                            prefixCommand = PrefixCommandsList.First(x => x.Value.Name.ToLower() == appCommand.Name.ToLower()).Value;
+                        if (PrefixCommandsList.Any(x => x.Value.Name.Equals(appCommand.Name, StringComparison.CurrentCultureIgnoreCase)))
+                            prefixCommand = PrefixCommandsList.First(x => x.Value.Name.Equals(appCommand.Name, StringComparison.CurrentCultureIgnoreCase)).Value;
                         else prefixCommand = appCommand.CustomAttributes.Any(x => x is PrefixCommandAlternativeAttribute)
                             ? PrefixCommandsList
                                 .First(x => x.Value.Name.ToLower() == ((PrefixCommandAlternativeAttribute)appCommand.CustomAttributes
@@ -153,7 +153,7 @@ internal sealed class HelpCommand : BaseCommand
                 catch { }
             }
 
-            if (!Commands.Any())
+            if (Commands.Count == 0)
                 throw new NullReferenceException();
 
             var Fields = Commands.PrepareEmbedFields();

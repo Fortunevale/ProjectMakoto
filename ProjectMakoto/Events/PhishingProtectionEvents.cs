@@ -9,12 +9,8 @@
 
 namespace ProjectMakoto.Events;
 
-internal sealed class PhishingProtectionEvents : RequiresTranslation
+internal sealed class PhishingProtectionEvents(Bot bot) : RequiresTranslation(bot)
 {
-    public PhishingProtectionEvents(Bot bot) : base(bot)
-    {
-    }
-
     Translations.events.phishing tKey
         => this.t.Events.Phishing;
 
@@ -166,7 +162,7 @@ internal sealed class PhishingProtectionEvents : RequiresTranslation
                             }
                         }
 
-                        if (!this.recentlyResolvedUrls.ContainsKey(unshortened_url) || this.recentlyResolvedUrls[unshortened_url].AddSeconds(10) < DateTime.UtcNow)
+                        if (!this.recentlyResolvedUrls.TryGetValue(unshortened_url, out var value) || value.AddSeconds(10) < DateTime.UtcNow)
                             redirectUrls.Add(match.Value, unshortened_url);
                     }
                 }

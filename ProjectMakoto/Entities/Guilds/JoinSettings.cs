@@ -11,12 +11,8 @@ using ProjectMakoto.Entities.Database.ColumnAttributes;
 
 namespace ProjectMakoto.Entities.Guilds;
 
-public sealed class JoinSettings : RequiresParent<Guild>
+public sealed class JoinSettings(Bot bot, Guild parent) : RequiresParent<Guild>(bot, parent)
 {
-    public JoinSettings(Bot bot, Guild parent) : base(bot, parent)
-    {
-    }
-
     [ColumnName("auto_assign_role_id"), ColumnType(ColumnTypes.BigInt), Default("0")]
     public ulong AutoAssignRoleId
     {

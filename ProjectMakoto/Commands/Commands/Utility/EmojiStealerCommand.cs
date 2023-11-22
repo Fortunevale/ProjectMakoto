@@ -69,7 +69,7 @@ internal sealed class EmojiStealerCommand : BaseCommand
                     EntryType = EmojiType.EMOJI
                 });
 
-            if (!Emotes.Any() && (bMessage.Stickers is null || bMessage.Stickers.Count == 0))
+            if (Emotes.Count == 0 && (bMessage.Stickers is null || bMessage.Stickers.Count == 0))
             {
                 embed.Description = this.GetString(this.t.Commands.Utility.EmojiStealer.NoEmojis, true);
                 _ = await this.RespondOrEdit(embed.AsError(ctx));

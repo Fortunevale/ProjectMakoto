@@ -8,12 +8,8 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto;
-internal sealed class BumpReminderHandler: RequiresBotReference
+internal sealed class BumpReminderHandler(Bot bot) : RequiresBotReference(bot)
 {
-    public BumpReminderHandler(Bot bot) : base(bot)
-    {
-    }
-
     Translations.events.bumpReminder tKey
         => this.Bot.LoadedTranslations.Events.BumpReminder;
 
