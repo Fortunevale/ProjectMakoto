@@ -47,9 +47,24 @@ internal static class PluginLoader
                 _logger.LogInfo("Extracted Plugin '{PluginName}'!", pluginName);
             }
 
-            _logger.LogDebug("Loading Plugins..");
-            foreach (var pluginFolder in Directory.GetDirectories("Plugins").Where(x => !x.StartsWith('.')))
+            var referenceFiles = Directory.GetFiles("Plugins", "*.dll", SearchOption.AllDirectories).Where(x => !x.Contains(".OldPlugins")).ToArray();
+            AppDomain.CurrentDomain.AssemblyResolve += (obj, arg) =>
             {
+                var name = $"{new AssemblyName(arg.Name).Name}.dll";
+                var assemblyFile = referenceFiles.Where(x => x.EndsWith(name)).FirstOrDefault();
+                if (assemblyFile != null)
+                    return Assembly.LoadFrom(assemblyFile);
+                
+                throw new Exception($"Could not locate: '{name}'");
+            };
+
+
+            _logger.LogDebug("Loading Plugins..");
+            foreach (var pluginFolder in Directory.GetDirectories("Plugins"))
+            {
+                if (new DirectoryInfo(pluginFolder).Name.StartsWith('.'))
+                    continue;
+
                 var pluginName = Path.GetFileName(pluginFolder);
 
                 _logger.LogDebug("Loading Plugin '{Name}'..", pluginName);
@@ -70,28 +85,27 @@ internal static class PluginLoader
 
                     var assembly = Assembly.LoadFile(Path.GetFullPath(pluginPath));
 
-                    foreach (var type in assembly.GetTypes())
+                    try
                     {
-                        if (typeof(BasePlugin).IsAssignableFrom(type))  
+                        foreach (var type in assembly.GetTypes())
                         {
-                            _logger.LogDebug("Loading Plugin from '{0}'", pluginPath);
-
-                            count++;
-                            var result = Activator.CreateInstance(type) as BasePlugin;
-                            result.LoadedFile = new FileInfo(pluginPath);
-                            bot._Plugins.Add(Path.GetFileNameWithoutExtension(pluginPath), result);
-
-                            var previousWorkingDir = Environment.CurrentDirectory;
-                            try
+                            if (typeof(BasePlugin).IsAssignableFrom(type))
                             {
-                                Environment.CurrentDirectory = new FileInfo(pluginPath).Directory.FullName;
-                                UniversalExtensions.LoadAllReferencedAssemblies(AppDomain.CurrentDomain);
-                            }
-                            finally
-                            {
-                                Environment.CurrentDirectory = previousWorkingDir;
+                                _logger.LogDebug("Loading Plugin from '{0}'", pluginPath);
+
+                                count++;
+                                var result = Activator.CreateInstance(type) as BasePlugin;
+                                result.LoadedFile = new FileInfo(pluginPath);
+                                bot._Plugins.Add(Path.GetFileNameWithoutExtension(pluginPath), result);
+
+                                UniversalExtensions.LoadAllReferencedAssemblies(assembly.GetReferencedAssemblies());
                             }
                         }
+                    }
+                    catch (Exception ex)
+                    {
+                        _ = bot._Plugins.Remove(Path.GetFileNameWithoutExtension(pluginPath));
+                        _logger.LogError("Failed to load Plugin from '{0}'", ex, pluginPath);
                     }
                 }
 
