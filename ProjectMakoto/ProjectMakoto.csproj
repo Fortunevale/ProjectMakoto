@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿ <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -70,6 +70,9 @@
     <ProjectReference Include="..\DisCatSharp\DisCatSharp.Lavalink\DisCatSharp.Lavalink.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+	<RuntimeHostConfigurationOption Include="Switch.System.IO.Compression.ZipFile.UseBackslash" Value="true" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Update="Global.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
