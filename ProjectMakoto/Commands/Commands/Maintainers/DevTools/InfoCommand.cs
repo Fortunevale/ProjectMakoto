@@ -102,6 +102,7 @@ internal sealed class InfoCommand : BaseCommand
                 .AddField(new DiscordEmbedField("Server uptime", $"`{(ServerUptime.IsNullOrWhiteSpace() ? "Currently unavailable" : ServerUptime)}`", true))
                 .AddField(new DiscordEmbedField("Currently running software", $"`Project Makoto by {(await ctx.Client.GetUserAsync(411950662662881290)).GetUsernameWithIdentifier()} ({Version} ({Branch}) built on the {Date} at {Time})`"))
                 .AddField(new DiscordEmbedField("Current bot library and version", $"[`{ctx.Client.BotLibrary} {ctx.Client.VersionString}`](https://github.com/Aiko-IT-Systems/DisCatSharp)"))
+                .AddField(new DiscordEmbedField("Plugin Status", $"`{(ctx.Bot.status.LoadedConfig.EnablePlugins && ctx.Bot.Plugins.Count <= 0 ? $"{ctx.Bot.Plugins.Count}/{new DirectoryInfo("Plugins")?.GetDirectories()?.Where(x => !x.Name.StartsWith('.'))?.Count() ?? 0} loaded" : "Disabled")}`"))
                 .AsInfo(ctx).WithFooter().WithTimestamp(null);
 
             var cpuEmbed1 = new DiscordEmbedBuilder()
@@ -194,7 +195,7 @@ internal sealed class InfoCommand : BaseCommand
             try
             {
                 files.Add("1.png", new FileStream("Assets/1.png", FileMode.Open));
-                _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(embeds).WithFiles(files));
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(new DiscordEmbed[] { miscEmbed.Build(), cpuEmbed1.Build(), memoryEmbed.Build() }).WithFiles(files));
             }
             finally
             {
