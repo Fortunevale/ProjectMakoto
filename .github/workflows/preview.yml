@@ -41,7 +41,7 @@ jobs:
           key: ${{ secrets.SSH_TOKEN }}
           known_hosts: ${{ secrets.SSH_KNOWN_HOST }}
       - name: Setup .NET Core SDK 8.x
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.x'
       - name: "Clone Repository"
