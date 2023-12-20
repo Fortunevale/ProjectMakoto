@@ -93,7 +93,7 @@ internal sealed class UserInfoCommand : BaseCommand
                         $"\n**{(bMember is null ? $"{this.GetString(this.t.Commands.Utility.UserInfo.Roles)} ({this.GetString(this.t.Commands.Utility.UserInfo.Backup)})" : this.GetString(this.t.Commands.Utility.UserInfo.Roles))}**\n{GenerateRoles}"
             };
 
-            if (ctx.Bot.globalNotes.TryGetValue(victim.Id, out var globalNotes) && globalNotes.Notes.Any())
+            if (ctx.Bot.globalNotes.TryGetValue(victim.Id, out var globalNotes) && globalNotes.Notes.Length != 0)
             {
                 _ = embed.AddField(new DiscordEmbedField(this.GetString(this.t.Commands.Utility.UserInfo.BotNotes), $"{string.Join("\n\n", ctx.Bot.globalNotes[victim.Id].Notes.Select(x => $"{x.Reason.FullSanitize()} - <@{x.Moderator}> {x.Timestamp.ToTimestamp()}"))}".TruncateWithIndication(512)));
             }

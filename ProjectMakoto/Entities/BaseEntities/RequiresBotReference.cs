@@ -9,12 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public abstract class RequiresBotReference
+public abstract class RequiresBotReference(Bot bot)
 {
-    public RequiresBotReference(Bot bot)
-    {
-        this.Bot = bot;
-    }
-
-    internal Bot Bot { get; set; }
+    internal Bot Bot { get; set; } = bot;
 }

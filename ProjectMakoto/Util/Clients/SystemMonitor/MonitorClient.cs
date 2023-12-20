@@ -7,6 +7,7 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using System.Collections.ObjectModel;
 using ProjectMakoto.Entities.SystemMonitor;
 
 namespace ProjectMakoto.Util.SystemMonitor;
@@ -228,7 +229,7 @@ public sealed class MonitorClient : RequiresBotReference
         }
     }
 
-    private IReadOnlyDictionary<string, List<TrackDetail>> ParseSensors(string sensorOutput)
+    private ReadOnlyDictionary<string, List<TrackDetail>> ParseSensors(string sensorOutput)
     {
         Dictionary<string, List<TrackDetail>> parsedTemperatures = new();
         Dictionary<string, Tuple<int, int>> adapterRanges = new();

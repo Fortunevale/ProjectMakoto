@@ -228,12 +228,13 @@ internal sealed class ExperienceHandler : RequiresTranslation
 
     internal long CalculateLevelRequirement(long Level)
     {
-        if (!this.LevelCache.ContainsKey(Level))
+        if (!this.LevelCache.TryGetValue(Level, out var value))
         {
             var v = (long)Math.Ceiling(Math.Pow((double)Level, 1.60) * 92);
-            this.LevelCache.Add(Level, v);
+            value = v;
+            this.LevelCache.Add(Level, value);
         }
 
-        return this.LevelCache[Level];
+        return value;
     }
 }

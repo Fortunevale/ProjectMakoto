@@ -9,12 +9,8 @@
 
 namespace ProjectMakoto.Events;
 
-internal sealed class ActionlogEvents : RequiresTranslation
+internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
 {
-    public ActionlogEvents(Bot bot) : base(bot)
-    {
-    }
-
     internal async Task<bool> ValidateServer(DiscordGuild guild)
     {
         if (guild is null)
@@ -52,7 +48,7 @@ internal sealed class ActionlogEvents : RequiresTranslation
             .WithDescription($"**{this.tKey.User.Get(this.Bot.Guilds[e.Guild.Id]).Build()}**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`\n" +
                              $"**{this.tKey.AccountAge.Get(this.Bot.Guilds[e.Guild.Id]).Build()}**: {e.Member.CreationTimestamp.ToTimestamp()} ({e.Member.CreationTimestamp.ToTimestamp(TimestampFormat.LongDateTime)})");
 
-        if (this.Bot.globalNotes.TryGetValue(e.Member.Id, out var globalNote) && globalNote.Notes.Any())
+        if (this.Bot.globalNotes.TryGetValue(e.Member.Id, out var globalNote) && globalNote.Notes.Length != 0)
         {
             _ = embed.AddField(new DiscordEmbedField(this.tKey.StaffNotes.Get(this.Bot.Guilds[e.Guild.Id]).Build(),
                 $"{string.Join("\n\n", globalNote.Notes.Select(x => $"{x.Reason.FullSanitize()} - <@{x.Moderator}> {x.Timestamp.ToTimestamp()}"))}".TruncateWithIndication(512)));

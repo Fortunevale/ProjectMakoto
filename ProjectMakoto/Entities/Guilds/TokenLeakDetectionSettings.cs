@@ -11,12 +11,8 @@ using ProjectMakoto.Entities.Database.ColumnAttributes;
 
 namespace ProjectMakoto.Entities.Guilds;
 
-public sealed class TokenLeakDetectionSettings : RequiresParent<Guild>
+public sealed class TokenLeakDetectionSettings(Bot bot, Guild parent) : RequiresParent<Guild>(bot, parent)
 {
-    public TokenLeakDetectionSettings(Bot bot, Guild parent) : base(bot, parent)
-    {
-    }
-
     [ColumnName("tokens_detect"), ColumnType(ColumnTypes.TinyInt), Default("1")]
     public bool DetectTokens
     {

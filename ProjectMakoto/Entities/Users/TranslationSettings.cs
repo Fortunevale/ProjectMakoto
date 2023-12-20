@@ -11,12 +11,8 @@ using ProjectMakoto.Entities.Database.ColumnAttributes;
 
 namespace ProjectMakoto.Entities.Users;
 
-public sealed class TranslationSettings : RequiresParent<User>
+public sealed class TranslationSettings(Bot bot, User parent) : RequiresParent<User>(bot, parent)
 {
-    public TranslationSettings(Bot bot, User parent) : base(bot, parent)
-    {
-    }
-
     [ColumnName("last_google_source"), ColumnType(ColumnTypes.Text), WithCollation, Nullable]
     public string LastGoogleSource
     {

@@ -11,12 +11,8 @@ using ProjectMakoto.Entities.Database.ColumnAttributes;
 
 namespace ProjectMakoto.Entities.Users;
 
-public sealed class ScoreSaberSettings : RequiresParent<User>
+public sealed class ScoreSaberSettings(Bot bot, User parent) : RequiresParent<User>(bot, parent)
 {
-    public ScoreSaberSettings(Bot bot, User parent) : base(bot, parent)
-    {
-    }
-
     [ColumnName("scoresaber_id"), ColumnType(ColumnTypes.BigInt), Default("0")]
     public ulong Id
     {

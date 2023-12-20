@@ -10,12 +10,8 @@
 using ProjectMakoto.Entities.Database.ColumnAttributes;
 
 namespace ProjectMakoto.Entities.Guilds;
-public sealed class PrefixSettings : RequiresParent<Guild>
+public sealed class PrefixSettings(Bot bot, Guild parent) : RequiresParent<Guild>(bot, parent)
 {
-    public PrefixSettings(Bot bot, Guild parent) : base(bot, parent)
-    {
-    }
-
     [ColumnName("prefix"), ColumnType(ColumnTypes.Text), WithCollation, Default(";;")]
     public string Prefix
     {

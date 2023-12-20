@@ -35,7 +35,7 @@ internal static class SyncTasks
                         {
                             if (b.Length is null || !b.Length.HasValue)
                             {
-                                if (!VideoLengthCache.ContainsKey(b.Url))
+                                if (!VideoLengthCache.TryGetValue(b.Url, out var value))
                                 {
                                     _logger.LogInfo("Fetching video length for '{Url}'", b.Url);
 
@@ -49,11 +49,12 @@ internal static class SyncTasks
                                         continue;
                                     }
 
-                                    VideoLengthCache.Add(b.Url, track.Info.Length);
+                                    value = track.Info.Length;
+                                    VideoLengthCache.Add(b.Url, value);
                                     await Task.Delay(100);
                                 }
 
-                                b.Length = VideoLengthCache[b.Url];
+                                b.Length = value;
                             }
                         }
                     }
@@ -102,7 +103,7 @@ internal static class SyncTasks
                     bot.BumpReminder.ScheduleBump(sender, guild.Key);
                 }
 
-                if (bot.Guilds[guild.Key].Crosspost.CrosspostChannels.Any())
+                if (bot.Guilds[guild.Key].Crosspost.CrosspostChannels.Length != 0)
                 {
                     _ = Task.Run(async () =>
                     {

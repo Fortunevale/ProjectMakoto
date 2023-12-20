@@ -113,14 +113,14 @@ public sealed partial class DatabaseClient : RequiresBotReference
 
         foreach (var keyValue in new KeyValuePair<Type, string>[]
         {
-            new KeyValuePair<Type, string>(typeof(User), ""),
-            new KeyValuePair<Type, string>(typeof(Guild), ""),
-            new KeyValuePair<Type, string>(typeof(PhishingUrlEntry), ""),
-            new KeyValuePair<Type, string>(typeof(SubmittedUrlEntry), ""),
-            new KeyValuePair<Type, string>(typeof(GlobalNote), ""),
-            new KeyValuePair<Type, string>(typeof(BanDetails), "banned_guilds"),
-            new KeyValuePair<Type, string>(typeof(BanDetails), "banned_users"),
-            new KeyValuePair<Type, string>(typeof(BanDetails), "globalbans"),
+            new(typeof(User), ""),
+            new(typeof(Guild), ""),
+            new(typeof(PhishingUrlEntry), ""),
+            new(typeof(SubmittedUrlEntry), ""),
+            new(typeof(GlobalNote), ""),
+            new(typeof(BanDetails), "banned_guilds"),
+            new(typeof(BanDetails), "banned_users"),
+            new(typeof(BanDetails), "globalbans"),
         })
         {
             var internalTable = keyValue.Key;
@@ -708,8 +708,8 @@ public sealed partial class DatabaseClient : RequiresBotReference
                     while (reader.Read())
                     {
                         Columns.Add((reader.GetString(0), 
-                            reader.GetString(1), 
-                            (!reader.IsDBNull(2) ? reader.GetString(2) : "").ToLower() == "yes", 
+                            reader.GetString(1),
+                            (!reader.IsDBNull(2) ? reader.GetString(2) : "").Equals("yes", StringComparison.CurrentCultureIgnoreCase), 
                             (!reader.IsDBNull(3) ? reader.GetString(3) : ""), 
                             (!reader.IsDBNull(4) ? (reader.GetString(4).Contains('\'') ? Regex.Match(reader.GetString(4), @"\\?'(.*)\\?'").Groups[1].Value : reader.GetString(4)) : null), 
                             (!reader.IsDBNull(5) ? reader.GetString(5) : "")));
@@ -814,7 +814,7 @@ public sealed partial class DatabaseClient : RequiresBotReference
 
         return $"`{columnInfo.ColumnName}` {Enum.GetName(columnInfo.ColumnType).ToUpper()}" +
                $"{(columnInfo.MaxValue is not null ? $"({columnInfo.MaxValue})" : "")}" +
-               $"{(columnInfo.Collation is not null ? $" CHARACTER SET {columnInfo.Collation[..columnInfo.Collation.IndexOf("_")]} COLLATE {columnInfo.Collation}" : "")}" +
+               $"{(columnInfo.Collation is not null ? $" CHARACTER SET {columnInfo.Collation[..columnInfo.Collation.IndexOf('_')]} COLLATE {columnInfo.Collation}" : "")}" +
                $"{(columnInfo.Nullable ? " NULL" : " NOT NULL")}" +
                $"{(columnInfo.Default is not null ? $" DEFAULT {defaultText}" : "")}";
     }

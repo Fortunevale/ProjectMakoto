@@ -10,12 +10,7 @@
 namespace ProjectMakoto.Entities.Database.ColumnAttributes;
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-public sealed class NullableAttribute : Attribute
+public sealed class NullableAttribute(bool Nullable = true) : Attribute
 {
-    public readonly bool Nullable;
-
-    public NullableAttribute(bool Nullable = true)
-    {
-        this.Nullable = Nullable;
-    }
+    public readonly bool Nullable = Nullable;
 }

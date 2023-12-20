@@ -27,7 +27,7 @@ internal sealed class AutoUnarchiveCommand : BaseCommand
                         ctx.DbGuild.AutoUnarchiveThreads = ctx.DbGuild.AutoUnarchiveThreads.Remove(x => x.ToString(), b);
                 }
 
-                return $"{(ctx.DbGuild.AutoUnarchiveThreads.Any() ? string.Join("\n", ctx.DbGuild.AutoUnarchiveThreads.Select(x => $"{ctx.Guild.GetChannel(x).Mention} [`#{ctx.Guild.GetChannel(x).Name}`] (`{x}`)")) : ctx.Bot.LoadedTranslations.Commands.Config.AutoUnarchive.NoChannels.Get(ctx.DbUser).Build(true))}";
+                return $"{(ctx.DbGuild.AutoUnarchiveThreads.Length != 0 ? string.Join("\n", ctx.DbGuild.AutoUnarchiveThreads.Select(x => $"{ctx.Guild.GetChannel(x).Mention} [`#{ctx.Guild.GetChannel(x).Name}`] (`{x}`)")) : ctx.Bot.LoadedTranslations.Commands.Config.AutoUnarchive.NoChannels.Get(ctx.DbUser).Build(true))}";
             }
 
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))

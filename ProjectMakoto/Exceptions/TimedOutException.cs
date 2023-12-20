@@ -8,9 +8,6 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Exceptions;
-internal sealed class TimedOutException : Exception
+internal sealed class TimedOutException(string message = "") : Exception(message)
 {
-    public TimedOutException(string message = "") : base(message)
-    {
-    }
 }

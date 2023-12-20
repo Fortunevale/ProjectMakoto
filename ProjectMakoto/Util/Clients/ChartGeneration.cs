@@ -8,12 +8,8 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Util;
-internal class ChartGeneration : RequiresBotReference
+internal class ChartGeneration(Bot bot) : RequiresBotReference(bot)
 {
-    public ChartGeneration(Bot bot) : base(bot)
-    {
-    }
-
     internal Chart GetChart(int Width, int Height, IEnumerable<string> Labels, IEnumerable<Dataset> Datasets, int Min, int Max)
     {
         var v = $@"{{

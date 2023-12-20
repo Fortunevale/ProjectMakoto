@@ -1,8 +1,5 @@
 namespace ProjectMakoto.Exceptions;
 
-public class UnprocessableEntityException : Exception
+public class UnprocessableEntityException(string message) : Exception(message)
 {
-    public UnprocessableEntityException(string message) : base(message)
-    {
-    }
 }

@@ -11,12 +11,8 @@ using ProjectMakoto.Entities.Database.ColumnAttributes;
 
 namespace ProjectMakoto.Entities.Guilds;
 
-public sealed class ExperienceSettings : RequiresParent<Guild>
+public sealed class ExperienceSettings(Bot bot, Guild parent) : RequiresParent<Guild>(bot, parent)
 {
-    public ExperienceSettings(Bot bot, Guild parent) : base(bot, parent)
-    {
-    }
-
     [ColumnName("experience_use"), ColumnType(ColumnTypes.TinyInt), Default("0")]
     public bool UseExperience
     {

@@ -11,12 +11,8 @@ using ProjectMakoto.Entities.Database.ColumnAttributes;
 
 namespace ProjectMakoto.Entities.Guilds;
 
-public sealed class InVoiceTextPrivacySettings : RequiresParent<Guild>
+public sealed class InVoiceTextPrivacySettings(Bot bot, Guild parent) : RequiresParent<Guild>(bot, parent)
 {
-    public InVoiceTextPrivacySettings(Bot bot, Guild parent) : base(bot, parent)
-    {
-    }
-
     [ColumnName("vc_privacy_clear"), ColumnType(ColumnTypes.TinyInt), Default("0")]
     public bool ClearTextEnabled
     {

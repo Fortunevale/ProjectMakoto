@@ -42,7 +42,7 @@ public sealed class Bot
     #region Plugins
     public IReadOnlyDictionary<string, BasePlugin> Plugins
     => this._Plugins.AsReadOnly();
-    internal Dictionary<string, BasePlugin> _Plugins { get; set; } = new();
+    internal Dictionary<string, BasePlugin> _Plugins { get; set; } = [];
 
     public IReadOnlyDictionary<string, List<BasePluginCommand>> PluginCommands
         => this._PluginCommands.AsReadOnly();
@@ -229,7 +229,7 @@ public sealed class Bot
                 if (!this.status.DiscordInitialized)
                 {
                     _logger.LogError("An exception occurred while trying to log into discord: {0}", "The log in took longer than 60 seconds");
-                    Environment.Exit((int)ExitCodes.FailedDiscordLogin);
+                    Environment.FailFast("An exception occurred while trying to log into discord: The log in took longer than 60 seconds");
                     return;
                 }
             });
@@ -474,6 +474,8 @@ public sealed class Bot
 
         await Task.Delay(500);
         Environment.Exit(0);
+        await Task.Delay(10000);
+        Environment.FailFast("Failed to exit");
     }
 
     private async Task ProcessDeletionRequests()

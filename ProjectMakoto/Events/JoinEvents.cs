@@ -9,12 +9,8 @@
 
 namespace ProjectMakoto.Events;
 
-internal sealed class JoinEvents : RequiresTranslation
+internal sealed class JoinEvents(Bot bot) : RequiresTranslation(bot)
 {
-    public JoinEvents(Bot bot) : base(bot)
-    {
-    }
-
     Translations.events.join tKey
         => this.t.Events.Join;
 

@@ -9,12 +9,8 @@
 
 namespace ProjectMakoto;
 
-internal sealed class BumpReminderEvents : RequiresTranslation
+internal sealed class BumpReminderEvents(Bot bot) : RequiresTranslation(bot)
 {
-    public BumpReminderEvents(Bot bot) : base(bot)
-    {
-    }
-
     Translations.events.bumpReminder tKey 
         => this.Bot.LoadedTranslations.Events.BumpReminder;
 

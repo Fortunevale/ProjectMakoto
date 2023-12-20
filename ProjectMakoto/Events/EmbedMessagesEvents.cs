@@ -9,12 +9,8 @@
 
 namespace ProjectMakoto.Events;
 
-internal sealed class EmbedMessagesEvents : RequiresTranslation
+internal sealed class EmbedMessagesEvents(Bot bot) : RequiresTranslation(bot)
 {
-    public EmbedMessagesEvents(Bot bot) : base(bot)
-    {
-    }
-
     Translations.events.embedMessages tKey => this.t.Events.EmbedMessages;
 
     internal async Task MessageCreated(DiscordClient sender, MessageCreateEventArgs e)
@@ -89,7 +85,7 @@ internal sealed class EmbedMessagesEvents : RequiresTranslation
                 var fileUrl = b.Value;
                 fileUrl = fileUrl.Replace("github.com", "raw.githubusercontent.com");
                 fileUrl = fileUrl.Replace("/blob", "");
-                fileUrl = fileUrl[..fileUrl.LastIndexOf("#")];
+                fileUrl = fileUrl[..fileUrl.LastIndexOf('#')];
 
                 var repoOwner = b.Groups[1].Value;
                 var repoName = b.Groups[2].Value;
@@ -100,7 +96,7 @@ internal sealed class EmbedMessagesEvents : RequiresTranslation
 
                 try
                 {
-                    fileEnding = relativeFilePath.Remove(0, relativeFilePath.LastIndexOf(".") + 1);
+                    fileEnding = relativeFilePath.Remove(0, relativeFilePath.LastIndexOf('.') + 1);
                 }
                 catch { }
 

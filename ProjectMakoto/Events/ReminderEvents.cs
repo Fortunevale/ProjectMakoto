@@ -10,12 +10,8 @@
 using ProjectMakoto.Entities.Users;
 
 namespace ProjectMakoto.Events;
-internal sealed class ReminderEvents : RequiresTranslation
+internal sealed class ReminderEvents(Bot bot) : RequiresTranslation(bot)
 {
-    public ReminderEvents(Bot bot) : base(bot)
-    {
-    }
-
     internal async Task ComponentInteractionCreated(DiscordClient sender, ComponentInteractionCreateEventArgs e)
     {
         if (!e.Channel?.IsPrivate ?? true)

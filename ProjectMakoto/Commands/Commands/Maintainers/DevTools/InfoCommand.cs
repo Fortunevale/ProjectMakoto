@@ -91,7 +91,7 @@ internal sealed class InfoCommand : BaseCommand
             var Date = bFile.Skip(2).First().Trim().Replace("/", ".");
 
             var Time = bFile.Skip(3).First().Trim();
-            Time = Time[..Time.IndexOf(",")];
+            Time = Time[..Time.IndexOf(',')];
 
             var miscEmbed = new DiscordEmbedBuilder().WithTitle($"{ctx.CurrentUser.GetUsername()} Details")
                 .AddField(new DiscordEmbedField("Currently running as", $"`{ctx.CurrentUser.GetUsernameWithIdentifier()}`", true))
@@ -102,6 +102,7 @@ internal sealed class InfoCommand : BaseCommand
                 .AddField(new DiscordEmbedField("Server uptime", $"`{(ServerUptime.IsNullOrWhiteSpace() ? "Currently unavailable" : ServerUptime)}`", true))
                 .AddField(new DiscordEmbedField("Currently running software", $"`Project Makoto by {(await ctx.Client.GetUserAsync(411950662662881290)).GetUsernameWithIdentifier()} ({Version} ({Branch}) built on the {Date} at {Time})`"))
                 .AddField(new DiscordEmbedField("Current bot library and version", $"[`{ctx.Client.BotLibrary} {ctx.Client.VersionString}`](https://github.com/Aiko-IT-Systems/DisCatSharp)"))
+                .AddField(new DiscordEmbedField("Plugin Status", $"`{(ctx.Bot.status.LoadedConfig.EnablePlugins && ctx.Bot.Plugins.Count <= 0 ? $"{ctx.Bot.Plugins.Count}/{new DirectoryInfo("Plugins")?.GetDirectories()?.Where(x => !x.Name.StartsWith('.'))?.Count() ?? 0} loaded" : "Disabled")}`"))
                 .AsInfo(ctx).WithFooter().WithTimestamp(null);
 
             var cpuEmbed1 = new DiscordEmbedBuilder()
@@ -115,7 +116,15 @@ internal sealed class InfoCommand : BaseCommand
                 .AddField(new DiscordEmbedField("Usage", $"`{history.MaxBy(x => x.Key).Value.Memory.Used.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}/{history.MaxBy(x => x.Key).Value.Memory.Total.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} MB`", true))
                 .AsLoading(ctx);
 
-            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(new List<DiscordEmbed>() { miscEmbed, cpuEmbed1, memoryEmbed }));
+            var embeds = new List<DiscordEmbed>() { miscEmbed };
+
+            if (ctx.Bot.status.LoadedConfig.MonitorSystem.Enabled)
+                embeds.AddRange(cpuEmbed1, memoryEmbed);
+
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(embeds));
+
+            if (!ctx.Bot.status.LoadedConfig.MonitorSystem.Enabled)
+                return;
 
             Dictionary<string, byte[]> charts = new();
 
@@ -131,8 +140,8 @@ internal sealed class InfoCommand : BaseCommand
                     return $"{value}";
                 }), new ChartGeneration.Dataset[]
                 {
-                    new ChartGeneration.Dataset("Usage (%)", history.Select(x => $"{(int)x.Value.Cpu.Load}"), "getGradientFillHelper('vertical', ['#ff0000', '#00ff00'])"),
-                    new ChartGeneration.Dataset("Temperature (°C)", history.Select(x => $"{(int)x.Value.Cpu.Temperature}"), "getGradientFillHelper('vertical', ['#4287f5', '#ff0000'])"),
+                    new("Usage (%)", history.Select(x => $"{(int)x.Value.Cpu.Load}"), "getGradientFillHelper('vertical', ['#ff0000', '#00ff00'])"),
+                    new("Temperature (°C)", history.Select(x => $"{(int)x.Value.Cpu.Temperature}"), "getGradientFillHelper('vertical', ['#4287f5', '#ff0000'])"),
                 }, 0, 100);
 
                 charts.Add("cpu.png", qc.ToByteArray());
@@ -161,7 +170,7 @@ internal sealed class InfoCommand : BaseCommand
                 }),
                 new ChartGeneration.Dataset[]
                 {
-                    new ChartGeneration.Dataset("Usage (MB)", history.Select(x => $"{(int)x.Value.Memory.Used}"))
+                    new("Usage (MB)", history.Select(x => $"{(int)x.Value.Memory.Used}"))
                 }, 0, (int)history.First().Value.Memory.Total);
 
                 charts.Add("mem.png", qc.ToByteArray());
@@ -186,7 +195,7 @@ internal sealed class InfoCommand : BaseCommand
             try
             {
                 files.Add("1.png", new FileStream("Assets/1.png", FileMode.Open));
-                _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(list).WithFiles(files));
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(new DiscordEmbed[] { miscEmbed.Build(), cpuEmbed1.Build(), memoryEmbed.Build() }).WithFiles(files));
             }
             finally
             {

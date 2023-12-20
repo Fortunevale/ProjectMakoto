@@ -12,14 +12,12 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ProjectMakoto.Entities;
 
-public sealed class SelfFillingDatabaseDictionary<T> : DatabaseDictionary<ulong, T>
+/// <summary>
+/// Creates a new self filling dictionary. 
+/// </summary>
+/// <param name="newValuePredicate">A predicate to create the intended value. If null, will default to the default value of the value.</param>
+public sealed class SelfFillingDatabaseDictionary<T>(DatabaseClient client, string tableName, string primaryKey, bool useGuildConnection, Func<ulong, T>? newValuePredicate = null) : DatabaseDictionary<ulong, T>(client, tableName, primaryKey, useGuildConnection, newValuePredicate)
 {
-    /// <summary>
-    /// Creates a new self filling dictionary. 
-    /// </summary>
-    /// <param name="newValuePredicate">A predicate to create the intended value. If null, will default to the default value of the value.</param>
-    public SelfFillingDatabaseDictionary(DatabaseClient client, string tableName, string primaryKey, bool useGuildConnection, Func<ulong, T>? newValuePredicate = null) : base(client, tableName, primaryKey, useGuildConnection, newValuePredicate)
-    { }
 
     /// <summary>
     /// Gets a value from this dictionary, filling in values if not already present.

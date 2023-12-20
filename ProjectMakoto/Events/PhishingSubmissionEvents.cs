@@ -9,12 +9,8 @@
 
 namespace ProjectMakoto;
 
-internal sealed class PhishingSubmissionEvents : RequiresBotReference
+internal sealed class PhishingSubmissionEvents(Bot bot) : RequiresBotReference(bot)
 {
-    public PhishingSubmissionEvents(Bot bot) : base(bot)
-    {
-    }
-
     internal async Task ComponentInteractionCreated(DiscordClient sender, ComponentInteractionCreateEventArgs e)
     {
         if (this.Bot.SubmittedHosts.ContainsKey(e.Message?.Id ?? 0))

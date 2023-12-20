@@ -30,9 +30,5 @@ internal class InvalidCallException : Exception
     {
     }
 
-    protected InvalidCallException(SerializationInfo info, StreamingContext context) : base(info, context)
-    {
-    }
-
     public override string? StackTrace { get; }
 }

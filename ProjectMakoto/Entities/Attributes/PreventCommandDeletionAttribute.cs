@@ -10,12 +10,7 @@
 namespace ProjectMakoto.Entities;
 
 [AttributeUsage(AttributeTargets.All, AllowMultiple = false)]
-public sealed class PreventCommandDeletionAttribute : Attribute
+public sealed class PreventCommandDeletionAttribute(bool PreventDeleteMessage = true) : Attribute
 {
-    public readonly bool PreventDeleteCommandMessage;
-
-    public PreventCommandDeletionAttribute(bool PreventDeleteMessage = true)
-    {
-        this.PreventDeleteCommandMessage = PreventDeleteMessage;
-    }
+    public readonly bool PreventDeleteCommandMessage = PreventDeleteMessage;
 }

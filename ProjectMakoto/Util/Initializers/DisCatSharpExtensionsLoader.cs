@@ -95,16 +95,6 @@ internal static class DisCatSharpExtensionsLoader
         _logger.LogDebug("Registering Interactivity..");
         _ = bot.DiscordClient.UseInteractivity(new InteractivityConfiguration { });
 
-        _ = Task.Delay(60000).ContinueWith(t =>
-        {
-            if (!bot.status.DiscordInitialized)
-            {
-                _logger.LogError("An exception occurred while trying to log into discord: {0}", "The log in took longer than 60 seconds");
-                Environment.Exit((int)ExitCodes.FailedDiscordLogin);
-                return;
-            }
-        });
-
         var appCommands = bot.DiscordClient.UseApplicationCommands(new ApplicationCommandsConfiguration
         {
             ServiceProvider = new ServiceCollection()
@@ -194,7 +184,7 @@ internal static class DisCatSharpExtensionsLoader
                             ((List<DisCatSharp.ApplicationCommands.Entities.CommandTranslator>)commandProperty.GetValue(translator)).Add(obj);
                         }
 
-                        if (!((List<DisCatSharp.ApplicationCommands.Entities.CommandTranslator>)commandProperty.GetValue(translator)).Any())
+                        if (((List<DisCatSharp.ApplicationCommands.Entities.CommandTranslator>)commandProperty.GetValue(translator)).Count == 0)
                             commandProperty.SetValue(translator, null);
                     }
 
@@ -214,7 +204,7 @@ internal static class DisCatSharpExtensionsLoader
                             ((List<DisCatSharp.ApplicationCommands.Entities.OptionTranslator>)optionProperty.GetValue(translator)).Add(obj);
                         }
 
-                        if (!((List<DisCatSharp.ApplicationCommands.Entities.OptionTranslator>)optionProperty.GetValue(translator)).Any())
+                        if (((List<DisCatSharp.ApplicationCommands.Entities.OptionTranslator>)optionProperty.GetValue(translator)).Count == 0)
                             optionProperty.SetValue(translator, null);
                     }
 
@@ -234,7 +224,7 @@ internal static class DisCatSharpExtensionsLoader
                             ((List<DisCatSharp.ApplicationCommands.Entities.ChoiceTranslator>)choiceProperty.GetValue(translator)).Add(obj);
                         }
 
-                        if (!((List<DisCatSharp.ApplicationCommands.Entities.ChoiceTranslator>)choiceProperty.GetValue(translator)).Any())
+                        if (((List<DisCatSharp.ApplicationCommands.Entities.ChoiceTranslator>)choiceProperty.GetValue(translator)).Count == 0)
                             choiceProperty.SetValue(translator, null);
                     }
 
@@ -255,7 +245,7 @@ internal static class DisCatSharpExtensionsLoader
                             ((List<DisCatSharp.ApplicationCommands.Entities.SubGroupTranslator>)groupProperty.GetValue(translator)).Add(obj);
                         }
 
-                        if (!((List<DisCatSharp.ApplicationCommands.Entities.SubGroupTranslator>)groupProperty.GetValue(translator)).Any())
+                        if (((List<DisCatSharp.ApplicationCommands.Entities.SubGroupTranslator>)groupProperty.GetValue(translator)).Count == 0)
                             groupProperty.SetValue(translator, null);
                     }
 

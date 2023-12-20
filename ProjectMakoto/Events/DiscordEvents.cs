@@ -9,12 +9,8 @@
 
 namespace ProjectMakoto.Events;
 
-internal sealed class DiscordEvents : RequiresTranslation
+internal sealed class DiscordEvents(Bot bot) : RequiresTranslation(bot)
 {
-    public DiscordEvents(Bot bot) : base(bot)
-    {
-    }
-
     Translations.events.genericEvent tKey
         => this.Bot.LoadedTranslations.Events.GenericEvent;
 

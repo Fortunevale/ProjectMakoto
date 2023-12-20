@@ -18,7 +18,7 @@ public sealed class ReactionRoleEntry
     public DiscordEmoji GetEmoji(DiscordClient client)
     {
         return this.EmojiId == 0
-            ? DiscordEmoji.FromName(client, $":{this.EmojiName.Remove(this.EmojiName.LastIndexOf(":"), this.EmojiName.Length - this.EmojiName.LastIndexOf(":"))}:")
+            ? DiscordEmoji.FromName(client, $":{this.EmojiName.Remove(this.EmojiName.LastIndexOf(':'), this.EmojiName.Length - this.EmojiName.LastIndexOf(':'))}:")
             : DiscordEmoji.FromGuildEmote(client, this.EmojiId);
     }
 

@@ -10,12 +10,7 @@
 namespace ProjectMakoto.Entities.Database.ColumnAttributes;
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-public sealed class DefaultAttribute : Attribute
+public sealed class DefaultAttribute(string Default) : Attribute
 {
-    public readonly string Default;
-
-    public DefaultAttribute(string Default)
-    {
-        this.Default = Default;
-    }
+    public readonly string Default = Default;
 }

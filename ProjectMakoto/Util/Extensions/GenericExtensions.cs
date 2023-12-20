@@ -13,6 +13,9 @@ namespace ProjectMakoto.Util;
 
 internal static class GenericExtensions
 {
+    public static void AddRange<T>(this List<T> list, params T[] items)
+        => list.AddRange(items);
+
     public static bool TryGetFileInfo(string fileName, out FileInfo file)
     {
         if (File.Exists(fileName))
