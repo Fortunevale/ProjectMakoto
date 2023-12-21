@@ -525,13 +525,13 @@ internal static class DiscordExtensions
 
     internal static string GetCommandMention(this DiscordClient client, Bot bot, string command)
         => (bot.status.LoadedConfig.IsDev ?
-        client.GetApplicationCommands().GuildCommands.FirstOrDefault(x => x.Key == bot.status.LoadedConfig.Discord.AssetsGuild).Value.ToList() :
+        client.GetApplicationCommands().GuildCommands.FirstOrDefault(x => x.Key == bot.status.LoadedConfig.Discord.DevelopmentGuild).Value.ToList() :
         client.GetApplicationCommands().GlobalCommands.ToList())
         .First(x => x.Name == command).Mention;
 
     internal static IReadOnlyList<DiscordApplicationCommand> GetCommandList(this DiscordClient client, Bot bot)
         => (bot.status.LoadedConfig.IsDev ?
-        client.GetApplicationCommands().GuildCommands.FirstOrDefault(x => x.Key == bot.status.LoadedConfig.Discord.AssetsGuild).Value :
+        client.GetApplicationCommands().GuildCommands.FirstOrDefault(x => x.Key == bot.status.LoadedConfig.Discord.DevelopmentGuild).Value :
         client.GetApplicationCommands().GlobalCommands);
 
     internal static string GetIcon(this DiscordChannel discordChannel) => discordChannel.Type switch
