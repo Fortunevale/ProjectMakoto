@@ -5691,7 +5691,7 @@
         },
         "Autoban": {
           "en": "Autoban Globally Banned Users",
-          "de": "Automatische Bannung für global-gebannte Benutzer"
+          "de": "Global-gebannte Benutzer bannen"
         },
         "JoinLogChannel": {
           "en": "Joinlog Channel",
@@ -5703,11 +5703,11 @@
         },
         "ReApplyRoles": {
           "en": "Re-Apply Roles on Rejoin",
-          "de": "Rollen erneut zuweisen beim Wiedereintritt"
+          "de": "Rollen zuweisen beim Wiedereintritt"
         },
         "ReApplyNickname": {
           "en": "Re-Apply Nickname on Rejoin",
-          "de": "Spitznamen erneut zuweisen beim Wiedereintritt"
+          "de": "Nickname zuweisen beim Wiedereintritt"
         },
         "SecurityNotice": {
           "en": "For security reasons, roles with any of the following permissions never get re-applied: {Permissions}",
@@ -5756,6 +5756,54 @@
         "CantUseRole": {
           "en": "You cannot set the bump reminder role to be automatically assigned on join.",
           "de": "Du kannst die Erinnerungsrolle für das Bumpen nicht automatisch beim Beitritt zuweisen."
+        },
+        "AutoKickSpammer": {
+          "en": "Auto Kick Likely Spammer",
+          "de": "Mögliche Spammer auto-kicken"
+        },
+        "AutoKickNewAccounts": {
+          "en": "Kick Accounts younger than",
+          "de": "Accounts kicken die jünger sind als"
+        },
+        "AutoKickNoRoles": {
+          "en": "Kick Members without roles after",
+          "de": "Member ohne Rolle kicken nach"
+        },
+        "ToggleAutoKickSpammer": {
+          "en": "Toggle Auto Kick Likely Spammer",
+          "de": "Mögliche Spammer auto-kicken umschalten"
+        },
+        "ChangeAutoKickNewAccounts": {
+          "en": "Change Auto Kick New Accounts",
+          "de": "Neue Accounts auto-kicken ändern"
+        },
+        "ChangeAutoKickNoRoles": {
+          "en": "Change Auto Kick Members without Roles",
+          "de": "Neue Member ohne Rolle auto-kicken ändern"
+        },
+        "AutoKickNoRolesDurationLimit": {
+          "en": "The time span has to be between 0 seconds and 30 minutes.",
+          "de": "Die Zeitspanne muss zwischen 0 Sekunden und 30 Minuten liegen."
+        },
+        "AutoKickNewAccountsDurationLimit": {
+          "en": "The time span has to be between 0 seconds and 30 days.",
+          "de": "Die Zeitspanne muss zwischen 0 Sekunden und 30 Tagen liegen."
+        },
+        "AutoKickSpammerReason": {
+          "en": "Likely Spammer",
+          "de": "Wahrscheinlicher Spammer"
+        },
+        "AutoKickAccountAgeReason": {
+          "en": "Account too young",
+          "de": "Account zu jung"
+        },
+        "AutoKickNoRolesReason": {
+          "en": "User did not receive any roles",
+          "de": "Nutzer hat keine Rollen erhalten"
+        },
+        "LowTimeWarning": {
+          "en": "A time of {Time} may not be sufficient for the user to receive any roles. Please double check the selected time.",
+          "de": "{Time} sind eventuell nicht genug um eine Rolle zu erhalten, bitte überprüfe die gewählte Zeit."
         }
       },
       "LevelRewards": {
