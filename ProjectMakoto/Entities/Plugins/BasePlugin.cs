@@ -21,6 +21,9 @@ public abstract class BasePlugin
 
     internal FileInfo LoadedFile { get; set; }
 
+    /// <summary>
+    /// Makoto Instance
+    /// </summary>
     public Bot Bot { get; set; }
 
     /// <summary>
@@ -81,6 +84,10 @@ public abstract class BasePlugin
     /// </summary>
     public virtual Credentials? UpdateUrlCredentials { get; }
 
+    /// <summary>
+    /// Called upon loading dll.
+    /// </summary>
+    /// <param name="bot"></param>
     public void Load(Bot bot)
     {
         this.Bot = bot;
@@ -95,27 +102,51 @@ public abstract class BasePlugin
         });
     }
 
+    /// <summary>
+    /// Called when plugin was loaded into memory.
+    /// </summary>
+    /// <returns></returns>
     public abstract BasePlugin Initialize();
 
+    /// <summary>
+    /// Called after registering built-in commands.
+    /// </summary>
+    /// <returns></returns>
     public virtual async Task<List<BasePluginCommand>> RegisterCommands()
     {
         return new List<BasePluginCommand>();
     }
 
+    /// <summary>
+    /// Called when Makoto is shuttin down.
+    /// </summary>
+    /// <returns></returns>
     public virtual async Task Shutdown()
     {
         return;
     }
 
+    /// <summary>
+    /// Allows you to define Application Command Translations.
+    /// </summary>
+    /// <param name="ctx"></param>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter")]
     public void EnableCommandTranslations(ApplicationCommandsTranslationContext ctx)
     {
         return;
     }
 
+    /// <summary>
+    /// Gets your plugin's config object.
+    /// </summary>
+    /// <returns></returns>
     public object GetConfig()
         => (this.Bot.status.LoadedConfig.PluginData.TryGetValue(this.Name, out var val) ? val : null);
 
+    /// <summary>
+    /// Writes your plugin's config to makoto's config.
+    /// </summary>
+    /// <param name="configObject"></param>
     public void WriteConfig(object configObject)
     {
         if (!this.Bot.status.LoadedConfig.PluginData.ContainsKey(this.Name))
@@ -125,6 +156,10 @@ public abstract class BasePlugin
         this.Bot.status.LoadedConfig.Save();
     }
 
+    /// <summary>
+    /// Checks whether a config already exists.
+    /// </summary>
+    /// <returns></returns>
     public bool CheckIfConfigExists()
         => this.Bot.status.LoadedConfig.PluginData.ContainsKey(this.Name);
 
