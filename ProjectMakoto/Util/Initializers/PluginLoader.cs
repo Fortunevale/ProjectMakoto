@@ -97,6 +97,10 @@ internal static class PluginLoader
                                 count++;
                                 var result = Activator.CreateInstance(type) as BasePlugin;
                                 result.LoadedFile = new FileInfo(pluginPath);
+
+                                if (result.SupportedPluginApis == null || !result.SupportedPluginApis.Contains(BasePlugin.CurrentApiVersion))
+                                    throw new IndexOutOfRangeException($"Plugin does not support Api Version {BasePlugin.CurrentApiVersion}");
+
                                 bot._Plugins.Add(Path.GetFileNameWithoutExtension(pluginPath), result);
 
                                 UniversalExtensions.LoadAllReferencedAssemblies(assembly.GetReferencedAssemblies());

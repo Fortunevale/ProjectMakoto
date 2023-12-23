@@ -19,6 +19,11 @@ public abstract class BasePlugin
         this._logger = new(Log._logger, this);
     }
 
+    /// <summary>
+    /// 1
+    /// </summary>
+    internal static int CurrentApiVersion = 1;
+
     internal FileInfo LoadedFile { get; set; }
 
     /// <summary>
@@ -73,6 +78,13 @@ public abstract class BasePlugin
     /// The current version of this plugin.
     /// </summary>
     public abstract SemVer Version { get; }
+
+    /// <summary>
+    /// The currently supported PluginApis. Current Plugin Api is <inheritdoc cref="BasePlugin.CurrentApiVersion"/>.
+    /// <para>Gets changed every breaking change.</para>
+    /// <code> = [ 1, 2 ]; // example </code>
+    /// </summary>
+    public abstract int[] SupportedPluginApis { get; }
 
     /// <summary>
     /// The url to the github repo containing this plugin. Used for automated update checking.
