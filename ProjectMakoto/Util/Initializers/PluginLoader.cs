@@ -41,8 +41,17 @@ internal static class PluginLoader
                     Directory.Move(extractDir, $"Plugins/.OldPlugins/{pluginName}-{DateTime.UtcNow.Ticks}");
                 }
 
-                using var zip = new ZipArchive(new FileStream(plugin, FileMode.Open, FileAccess.Read), ZipArchiveMode.Read);
-                zip.ExtractToDirectory(extractDir);
+                var stream = new FileStream(plugin, FileMode.Open, FileAccess.Read);
+                try
+                {
+                    using var zip = new ZipArchive(stream, ZipArchiveMode.Read);
+                    zip.ExtractToDirectory(extractDir);
+                }
+                finally
+                {
+                    stream.Dispose();
+                }
+
                 File.Delete(plugin);
 
                 _logger.LogInfo("Extracted Plugin '{PluginName}'!", pluginName);
