@@ -53,6 +53,8 @@ internal sealed class JoinEvents(Bot bot) : RequiresTranslation(bot)
                 });
             }
         }
+
+        await this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].PerformAutoKickChecks(e.Guild, e.Member);
     }
 
     internal async Task GuildMemberRemoved(DiscordClient sender, GuildMemberRemoveEventArgs e)

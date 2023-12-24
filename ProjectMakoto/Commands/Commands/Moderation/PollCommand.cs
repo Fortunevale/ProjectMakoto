@@ -179,7 +179,8 @@ internal sealed class PollCommand : BaseCommand
                 }
                 else if (Menu.GetCustomId() == SelectDueDateButton.CustomId)
                 {
-                    var ModalResult = await this.PromptModalForDateTime(Menu.Result.Interaction, selectedDueDate ?? DateTime.UtcNow.AddMinutes(5), false);
+                    _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                    var ModalResult = await this.PromptModalForDateTime(selectedDueDate ?? DateTime.UtcNow.AddMinutes(5), false);
 
                     if (ModalResult.TimedOut)
                     {

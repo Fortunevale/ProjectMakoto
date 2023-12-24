@@ -883,14 +883,18 @@ public abstract class BaseCommand
     }
 
 
-    public async Task<InteractionResult<TimeSpan>> PromptForTimeSpan(DiscordInteraction interaction, TimeSpan? MaxTime = null, TimeSpan? MinTime = null, TimeSpan? DefaultTime = null, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
+    public async Task<InteractionResult<TimeSpan>> PromptForTimeSpan(TimeSpan? MaxTime = null, TimeSpan? MinTime = null, TimeSpan? DefaultTime = null, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
     {
-        _ = interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-
         MinTime ??= TimeSpan.Zero;
         MaxTime ??= TimeSpan.FromDays(356);
         DefaultTime ??= TimeSpan.FromSeconds(30);
         timeOutOverride ??= TimeSpan.FromSeconds(300);
+
+        if (DefaultTime > MaxTime)
+            DefaultTime = MaxTime;
+
+        if (DefaultTime < MinTime)
+            DefaultTime = MinTime;
 
         var originalEmbed = ResetToOriginalEmbed ? this.ctx.ResponseMessage.Embeds : null;
 
@@ -927,9 +931,68 @@ public abstract class BaseCommand
 
             previousSuccessSelected = currentSelectedTime;
 
+            foreach (var button in new List<DiscordButtonComponent>()
+            {
+                removeSeconds, removeSecond, addSecond, addSeconds,
+                removeMinutes, removeMinute, addMinute, addMinutes,
+                removeHours, removeHour, addHour, addHours,
+                removeDays, removeDay, addDay, addDays
+            })
+                _ = button.Enable();
+
+            if (currentSelectedTime - TimeSpan.FromSeconds(10) < MinTime)
+                _ = removeSeconds.Disable();
+
+            if (currentSelectedTime - TimeSpan.FromSeconds(1) < MinTime)
+                _ = removeSecond.Disable();
+
+            if (currentSelectedTime - TimeSpan.FromMinutes(10) < MinTime)
+                _ = removeMinutes.Disable();
+
+            if (currentSelectedTime - TimeSpan.FromMinutes(1) < MinTime)
+                _ = removeMinute.Disable();
+
+            if (currentSelectedTime - TimeSpan.FromHours(10) < MinTime)
+                _ = removeHours.Disable();
+
+            if (currentSelectedTime - TimeSpan.FromHours(1) < MinTime)
+                _ = removeHour.Disable();
+
+            if (currentSelectedTime - TimeSpan.FromDays(10) < MinTime)
+                _ = removeDays.Disable();
+
+            if (currentSelectedTime - TimeSpan.FromDays(1) < MinTime)
+                _ = removeDay.Disable();
+
+            if (currentSelectedTime + TimeSpan.FromSeconds(10) > MaxTime)
+                _ = addSeconds.Disable();
+
+            if (currentSelectedTime + TimeSpan.FromSeconds(1) > MaxTime)
+                _ = addSecond.Disable();
+
+            if (currentSelectedTime + TimeSpan.FromMinutes(10) > MaxTime)
+                _ = addMinutes.Disable();
+
+            if (currentSelectedTime + TimeSpan.FromMinutes(1) > MaxTime)
+                _ = addMinute.Disable();
+
+            if (currentSelectedTime + TimeSpan.FromHours(10) > MaxTime)
+                _ = addHours.Disable();
+
+            if (currentSelectedTime + TimeSpan.FromHours(1) > MaxTime)
+                _ = addHour.Disable();
+
+            if (currentSelectedTime + TimeSpan.FromDays(10) > MaxTime)
+                _ = addDays.Disable();
+
+            if (currentSelectedTime + TimeSpan.FromDays(1) > MaxTime)
+                _ = addDay.Disable();
+
             var embed = new DiscordEmbedBuilder()
                 .WithDescription($"`{this.GetString(this.t.Commands.Common.Prompts.CurrentTimespan)}`: `{currentSelectedTime.GetHumanReadable(TimeFormat.Days, TranslationUtil.GetTranslatedHumanReadableConfig(this.ctx.DbUser, this.ctx.Bot, true))}`")
                 .AsAwaitingInput(this.ctx);
+
+
 
             return this.RespondOrEdit(new DiscordMessageBuilder()
                 .AddEmbed(embed)
@@ -1134,14 +1197,12 @@ public abstract class BaseCommand
             : new InteractionResult<TimeSpan>(currentSelectedTime);
     }
 
-    public async Task<InteractionResult<DateTime>> PromptModalForDateTime(DiscordInteraction interaction, DateTime? defaultTime = null, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
+    public async Task<InteractionResult<DateTime>> PromptModalForDateTime(DateTime? defaultTime = null, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
     {
         timeOutOverride ??= TimeSpan.FromMinutes(2);
         defaultTime ??= DateTime.UtcNow;
 
         var originalEmbed = ResetToOriginalEmbed ? this.ctx.ResponseMessage.Embeds : null;
-
-        _ = interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
         var removeMinutes = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "10m", false, "➖".UnicodeToEmoji().ToComponent());
         var removeMinute = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "1m", false, "➖".UnicodeToEmoji().ToComponent());

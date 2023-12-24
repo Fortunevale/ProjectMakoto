@@ -194,8 +194,8 @@ internal sealed class PhishingCommand : BaseCommand
                     return;
                 }
 
-
-                var ModalResult = await this.PromptForTimeSpan(Button.Result.Interaction, TimeSpan.FromDays(28), TimeSpan.FromSeconds(10), ctx.DbGuild.PhishingDetection.CustomPunishmentLength, false);
+                _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                var ModalResult = await this.PromptForTimeSpan(TimeSpan.FromDays(28), TimeSpan.FromSeconds(10), ctx.DbGuild.PhishingDetection.CustomPunishmentLength, false);
 
                 if (ModalResult.TimedOut)
                 {
