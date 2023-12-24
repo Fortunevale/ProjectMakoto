@@ -58,15 +58,17 @@ internal static class PluginLoader
             }
 
             var referenceFiles = Directory.GetFiles("Plugins", "*.dll", SearchOption.AllDirectories).Where(x => !x.Contains(".OldPlugins")).ToArray();
-            AppDomain.CurrentDomain.AssemblyResolve += (obj, arg) =>
-            {
-                var name = $"{new AssemblyName(arg.Name).Name}.dll";
-                var assemblyFile = referenceFiles.Where(x => x.EndsWith(name)).FirstOrDefault();
-                if (assemblyFile != null)
-                    return Assembly.LoadFrom(assemblyFile);
-                
-                throw new Exception($"Could not locate: '{name}'");
-            };
+            ResolveEventHandler resolveAssemblyEvent = (obj, arg) =>
+                        {
+                            var name = $"{new AssemblyName(arg.Name).Name}.dll";
+                            var assemblyFile = referenceFiles.Where(x => x.EndsWith(name)).FirstOrDefault();
+                            if (assemblyFile != null)
+                                return Assembly.LoadFrom(assemblyFile);
+
+                            throw new Exception($"Could not locate: '{name}' ({arg.RequestingAssembly?.FullName})");
+                        };
+
+            AppDomain.CurrentDomain.AssemblyResolve += resolveAssemblyEvent;
 
 
             _logger.LogDebug("Loading Plugins..");
@@ -131,6 +133,8 @@ internal static class PluginLoader
 
                 _logger.LogInfo("Loaded Plugin from '{0}'", pluginName);
             }
+
+            AppDomain.CurrentDomain.AssemblyResolve -= resolveAssemblyEvent;
 
             _logger.LogInfo("Loaded {0} Plugins.", bot.Plugins.Count);
         }
@@ -214,7 +218,8 @@ internal static class PluginLoader
                     foreach (var b in pluginInfo.CompiledCommands)
                     {
                         AssemblyLoadContext pluginLoadContext = new(null);
-                        var assembly = pluginLoadContext.LoadFromAssemblyName(new AssemblyName(Path.GetFileNameWithoutExtension(b.Key)));
+                        using var file = new FileStream(b.Key, FileMode.Open, FileAccess.Read);
+                        var assembly = pluginLoadContext.LoadFromStream(file);
 
                         assemblyList.Add(assembly, b.Value);
                     }
