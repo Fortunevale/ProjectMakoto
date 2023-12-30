@@ -282,6 +282,8 @@ internal static class SyncTasks
                     }).ToArray();
 
                     bot.Guilds[guild.Key].Members[member.Id].SavedNickname = member.Nickname;
+
+                    await bot.Guilds[guild.Key].Members[member.Id].PerformAutoKickChecks(guild.Value, member);
                 }
 
                 foreach (var databaseMember in bot.Guilds[guild.Key].Members)

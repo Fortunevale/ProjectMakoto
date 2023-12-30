@@ -23,13 +23,24 @@ internal sealed class JoinCommand : BaseCommand
             {
                 var CommandKey = ctx.Bot.LoadedTranslations.Commands.Config.Join;
 
-                var pad = TranslationUtil.CalculatePadding(ctx.DbUser, CommandKey.Autoban, CommandKey.JoinLogChannel, CommandKey.Role, CommandKey.ReApplyRoles, CommandKey.ReApplyNickname);
+                var pad = TranslationUtil.CalculatePadding(ctx.DbUser, 
+                    CommandKey.Autoban, 
+                    CommandKey.JoinLogChannel, 
+                    CommandKey.Role, 
+                    CommandKey.ReApplyRoles, 
+                    CommandKey.ReApplyNickname, 
+                    CommandKey.AutoKickSpammer,
+                    CommandKey.AutoKickNewAccounts,
+                    CommandKey.AutoKickNoRoles);
 
                 return $"{"🌐".UnicodeToEmoji()} `{CommandKey.Autoban.Get(ctx.DbUser).PadRight(pad)}`: {ctx.DbGuild.Join.AutoBanGlobalBans.ToEmote(ctx.Bot)}\n" +
                         $"{"👋".UnicodeToEmoji()} `{CommandKey.JoinLogChannel.Get(ctx.DbUser).PadRight(pad)}`: {(ctx.DbGuild.Join.JoinlogChannelId != 0 ? $"<#{ctx.DbGuild.Join.JoinlogChannelId}>" : false.ToEmote(ctx.Bot))}\n" +
                         $"{"👤".UnicodeToEmoji()} `{CommandKey.Role.Get(ctx.DbUser).PadRight(pad)}`: {(ctx.DbGuild.Join.AutoAssignRoleId != 0 ? $"<@&{ctx.DbGuild.Join.AutoAssignRoleId}>" : false.ToEmote(ctx.Bot))}\n" +
                         $"{"👥".UnicodeToEmoji()} `{CommandKey.ReApplyRoles.Get(ctx.DbUser).PadRight(pad)}`: {ctx.DbGuild.Join.ReApplyRoles.ToEmote(ctx.Bot)}\n" +
                         $"{"💬".UnicodeToEmoji()} `{CommandKey.ReApplyNickname.Get(ctx.DbUser).PadRight(pad)}`: {ctx.DbGuild.Join.ReApplyNickname.ToEmote(ctx.Bot)}\n\n" +
+                        $"{"⚠️".UnicodeToEmoji()} `{CommandKey.AutoKickSpammer.Get(ctx.DbUser).PadRight(pad)}`: {ctx.DbGuild.Join.AutoKickSpammer.ToEmote(ctx.Bot)}\n" +
+                        $"{"🕒".UnicodeToEmoji()} `{CommandKey.AutoKickNewAccounts.Get(ctx.DbUser).PadRight(pad)}`: {(ctx.DbGuild.Join.AutoKickAccountAge == TimeSpan.Zero ? false.ToEmote(ctx.Bot) : $"`{ctx.DbGuild.Join.AutoKickAccountAge.GetHumanReadable(TimeFormat.Days, TranslationUtil.GetTranslatedHumanReadableConfig(ctx.DbUser, ctx.Bot))}`")}\n" +
+                        $"{"📝".UnicodeToEmoji()} `{CommandKey.AutoKickNoRoles.Get(ctx.DbUser).PadRight(pad)}`: {(ctx.DbGuild.Join.AutoKickNoRoleTime == TimeSpan.Zero ? false.ToEmote(ctx.Bot) : $"`{ctx.DbGuild.Join.AutoKickNoRoleTime.GetHumanReadable(TimeFormat.Minutes, TranslationUtil.GetTranslatedHumanReadableConfig(ctx.DbUser, ctx.Bot))}`")}\n\n" +
                         $"{CommandKey.SecurityNotice.Get(ctx.DbUser).Build(true, new TVar("Permissions", string.Join(", ", Resources.ProtectedPermissions.Select(x => $"{x.ToTranslatedPermissionString(ctx.DbUser, ctx.Bot)}"))))}\n\n" +
                         $"{CommandKey.TimeNotice.Get(ctx.DbUser).Build()}";
             }
@@ -49,6 +60,10 @@ internal sealed class JoinCommand : BaseCommand
             var ChangeRoleOnJoin = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.ChangeRoleButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
             var ToggleReApplyRoles = new DiscordButtonComponent((ctx.DbGuild.Join.ReApplyRoles ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.ToggleReApplyRole), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👥")));
             var ToggleReApplyName = new DiscordButtonComponent((ctx.DbGuild.Join.ReApplyNickname ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.ToggleReApplyNickname), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
+            
+            var ToggleAutoKickSpammer = new DiscordButtonComponent((ctx.DbGuild.Join.AutoKickSpammer ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.ToggleAutoKickSpammer), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚠️")));
+            var ChangeAutoKickNewAccounts = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.ChangeAutoKickNewAccounts), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
+            var ChangeAutoKickNoRoles = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.ChangeAutoKickNoRoles), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📝")));
 
             _ = await this.RespondOrEdit(builder
             .AddComponents(new List<DiscordComponent>
@@ -61,6 +76,12 @@ internal sealed class JoinCommand : BaseCommand
             {
                 ChangeJoinlogChannel,
                 ChangeRoleOnJoin,
+            })
+            .AddComponents(new List<DiscordComponent>
+            {
+                ToggleAutoKickSpammer,
+                ChangeAutoKickNewAccounts,
+                ChangeAutoKickNoRoles,
             })
             .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
 
@@ -170,6 +191,82 @@ internal sealed class JoinCommand : BaseCommand
                 }
 
                 ctx.DbGuild.Join.AutoAssignRoleId = RoleResult.Result is null ? 0 : RoleResult.Result.Id;
+
+                await this.ExecuteCommand(ctx, arguments);
+                return;
+            }
+            else if (e.GetCustomId() == ToggleAutoKickSpammer.CustomId)
+            {
+                ctx.DbGuild.Join.AutoKickSpammer = !ctx.DbGuild.Join.AutoKickSpammer;
+
+                await this.ExecuteCommand(ctx, arguments);
+                return;
+            }
+            else if (e.GetCustomId() == ChangeAutoKickNewAccounts.CustomId)
+            {
+                var TimeResult = await this.PromptForTimeSpan(TimeSpan.FromDays(30), TimeSpan.Zero, ctx.DbGuild.Join.AutoKickAccountAge);
+
+                if (TimeResult.TimedOut)
+                {
+                    this.ModifyToTimedOut();
+                    return;
+                }
+                else if (TimeResult.Cancelled)
+                {
+                    await this.ExecuteCommand(ctx, arguments);
+                    return;
+                }
+                else if (TimeResult.Failed)
+                {
+                    if (TimeResult.Exception.GetType() == typeof(InvalidOperationException))
+                    {
+                        _ = await this.RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(this.GetString(CommandKey.AutoKickNewAccountsDurationLimit)));
+                        await Task.Delay(3000);
+                        return;
+                    }
+
+                    throw TimeResult.Exception;
+                }
+
+                ctx.DbGuild.Join.AutoKickAccountAge = TimeResult.Result;
+
+                await this.ExecuteCommand(ctx, arguments);
+                return;
+            }
+            else if (e.GetCustomId() == ChangeAutoKickNoRoles.CustomId)
+            {
+                var TimeResult = await this.PromptForTimeSpan(TimeSpan.FromMinutes(30), TimeSpan.Zero, ctx.DbGuild.Join.AutoKickNoRoleTime);
+
+                if (TimeResult.TimedOut)
+                {
+                    this.ModifyToTimedOut();
+                    return;
+                }
+                else if (TimeResult.Cancelled)
+                {
+                    await this.ExecuteCommand(ctx, arguments);
+                    return;
+                }
+                else if (TimeResult.Failed)
+                {
+                    if (TimeResult.Exception.GetType() == typeof(NullReferenceException))
+                    {
+                        _ = await this.RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(this.GetString(CommandKey.AutoKickNoRolesDurationLimit)));
+                        await Task.Delay(3000);
+                        return;
+                    }
+
+                    throw TimeResult.Exception;
+                }
+
+                if (TimeResult.Result < TimeSpan.FromMinutes(1) && TimeResult.Result != TimeSpan.Zero)
+                {
+                    _ = await this.RespondOrEdit(new DiscordEmbedBuilder().AsWarning(ctx).WithDescription($"{this.GetString(CommandKey.LowTimeWarning, true, new TVar("Time", TimeResult.Result.GetHumanReadable(TimeFormat.Minutes, TranslationUtil.GetTranslatedHumanReadableConfig(ctx.DbUser, ctx.Bot))))}\n\n" +
+                        $"{this.GetString(this.t.Commands.Moderation.CustomEmbed.ContinueTimer, true, new TVar("Timestamp", DateTime.UtcNow.AddSeconds(6).ToTimestamp()))}"));
+                    await Task.Delay(5000);
+                }
+
+                ctx.DbGuild.Join.AutoKickNoRoleTime = TimeResult.Result;
 
                 await this.ExecuteCommand(ctx, arguments);
                 return;

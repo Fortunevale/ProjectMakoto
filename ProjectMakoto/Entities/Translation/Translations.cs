@@ -357,6 +357,18 @@ public sealed class Translations
             public join Join;
             public sealed class join
             {
+                public SingleTranslationKey LowTimeWarning;
+                public SingleTranslationKey AutoKickNoRolesReason;
+                public SingleTranslationKey AutoKickAccountAgeReason;
+                public SingleTranslationKey AutoKickSpammerReason;
+                public SingleTranslationKey AutoKickNewAccountsDurationLimit;
+                public SingleTranslationKey AutoKickNoRolesDurationLimit;
+                public SingleTranslationKey ChangeAutoKickNoRoles;
+                public SingleTranslationKey ChangeAutoKickNewAccounts;
+                public SingleTranslationKey ToggleAutoKickSpammer;
+                public SingleTranslationKey AutoKickNoRoles;
+                public SingleTranslationKey AutoKickNewAccounts;
+                public SingleTranslationKey AutoKickSpammer;
                 public SingleTranslationKey CantUseRole;
                 public SingleTranslationKey DisableRoleOnJoin;
                 public SingleTranslationKey AutoAssignRoleName;

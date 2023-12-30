@@ -47,4 +47,25 @@ public sealed class JoinSettings(Bot bot, Guild parent) : RequiresParent<Guild>(
         get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "reapplynickname", this.Bot.DatabaseClient.mainDatabaseConnection);
         set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "reapplynickname", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
+    
+    [ColumnName("autokickspammer"), ColumnType(ColumnTypes.TinyInt), Default("0")]
+    public bool AutoKickSpammer
+    {
+        get => this.Bot.DatabaseClient.GetValue<bool>("guilds", "serverid", this.Parent.Id, "autokickspammer", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "autokickspammer", value, this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
+
+    [ColumnName("autokickaccountage"), ColumnType(ColumnTypes.BigInt), Default("0")]
+    public TimeSpan AutoKickAccountAge
+    {
+        get => this.Bot.DatabaseClient.GetValue<TimeSpan>("guilds", "serverid", this.Parent.Id, "autokickaccountage", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "autokickaccountage", value, this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
+
+    [ColumnName("autokicknoroletime"), ColumnType(ColumnTypes.BigInt), Default("0")]
+    public TimeSpan AutoKickNoRoleTime
+    {
+        get => this.Bot.DatabaseClient.GetValue<TimeSpan>("guilds", "serverid", this.Parent.Id, "autokicknoroletime", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "autokicknoroletime", value, this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
 }

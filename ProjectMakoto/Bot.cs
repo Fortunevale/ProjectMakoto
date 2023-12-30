@@ -102,6 +102,21 @@ public sealed class Bot
         {
             _logger.ChangeLogLevel(CustomLogLevel.Debug);
         }
+        
+        if (args.Contains("--debug2"))
+        {
+            _logger.ChangeLogLevel(CustomLogLevel.Debug2);
+        }
+
+        if (args.Contains("--trace"))
+        {
+            _logger.ChangeLogLevel(CustomLogLevel.Trace);
+        }
+
+        if (args.Contains("--trace2"))
+        {
+            _logger.ChangeLogLevel(CustomLogLevel.Trace2);
+        }
 
         _logger.LogDebug("Environment Details\n\n" +
                 "Dotnet Version: {Version}\n" +
