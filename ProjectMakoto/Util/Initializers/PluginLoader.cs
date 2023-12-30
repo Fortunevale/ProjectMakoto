@@ -58,15 +58,15 @@ internal static class PluginLoader
             }
 
             var referenceFiles = Directory.GetFiles("Plugins", "*.dll", SearchOption.AllDirectories).Where(x => !x.Contains(".OldPlugins")).ToArray();
-            ResolveEventHandler resolveAssemblyEvent = (obj, arg) =>
-                        {
-                            var name = $"{new AssemblyName(arg.Name).Name}.dll";
-                            var assemblyFile = referenceFiles.Where(x => x.EndsWith(name)).FirstOrDefault();
-                            if (assemblyFile != null)
-                                return Assembly.LoadFrom(assemblyFile);
+            Assembly? resolveAssemblyEvent(object? obj, ResolveEventArgs arg)
+            {
+                var name = $"{new AssemblyName(arg.Name).Name}.dll";
+                var assemblyFile = referenceFiles.Where(x => x.EndsWith(name)).FirstOrDefault();
+                if (assemblyFile != null)
+                    return Assembly.LoadFrom(assemblyFile);
 
-                            throw new Exception($"Could not locate: '{name}' ({arg.RequestingAssembly?.FullName})");
-                        };
+                throw new Exception($"Could not locate: '{name}' ({arg.RequestingAssembly?.FullName})");
+            }
 
             AppDomain.CurrentDomain.AssemblyResolve += resolveAssemblyEvent;
 
