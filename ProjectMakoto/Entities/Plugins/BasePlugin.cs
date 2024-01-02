@@ -54,6 +54,17 @@ public abstract class BasePlugin
     public bool DiscordCommandsRegistered
         => this.Bot.status.DiscordCommandsRegistered;
 
+    #region Events
+
+    /// <summary>
+    /// Raised on first successful log in to discord.
+    /// </summary>
+    public event EventHandler<EventArgs> Connected;
+    internal static Task RaiseConnected(Bot bot) => CallEvent<EventArgs>(bot, bot.Plugins?.Select(x => x.Value.Connected), EventArgs.Empty);
+
+    #endregion
+
+    #region Plugin Identity
     /// <summary>
     /// The name of this plugin.
     /// </summary>
@@ -95,7 +106,9 @@ public abstract class BasePlugin
     /// If the plugin is in a private repo, a login may be required.
     /// </summary>
     public virtual Credentials? UpdateUrlCredentials { get; }
+    #endregion
 
+    #region Plugin Init Logic
     /// <summary>
     /// Called upon loading dll.
     /// </summary>
@@ -122,15 +135,6 @@ public abstract class BasePlugin
     }
 
     /// <summary>
-    /// Called when Makoto is shuttin down.
-    /// </summary>
-    /// <returns></returns>
-    public virtual async Task Shutdown()
-    {
-        return;
-    }
-
-    /// <summary>
     /// Allows you to define Application Command Translations.
     /// </summary>
     /// <param name="ctx"></param>
@@ -140,6 +144,17 @@ public abstract class BasePlugin
         return;
     }
 
+    /// <summary>
+    /// Called when Makoto is shuttin down.
+    /// </summary>
+    /// <returns></returns>
+    public virtual async Task Shutdown()
+    {
+        return;
+    }
+    #endregion
+
+    #region Config Logic
     /// <summary>
     /// Gets your plugin's config object.
     /// </summary>
@@ -166,6 +181,32 @@ public abstract class BasePlugin
     /// <returns></returns>
     public bool CheckIfConfigExists()
         => this.Bot.status.LoadedConfig.PluginData.ContainsKey(this.Name);
+    #endregion
+
+    #region Internal Logic
+    /// <summary>
+    /// Calls an event for all plugin instances.
+    /// </summary>
+    /// <typeparam name="T">The type of event</typeparam>
+    /// <param name="bot">The event sender</param>
+    /// <param name="eventInstances">All event instances</param>
+    /// <param name="args">The arguments</param>
+    /// <returns></returns>
+    private static Task CallEvent<T>(Bot bot, IEnumerable<EventHandler<T>?> eventInstances, T? args)
+    {
+        if (eventInstances is null)
+            return Task.CompletedTask;
+
+        foreach (var e in eventInstances)
+        {
+            if (e is null)
+                continue;
+
+            e.Invoke(bot, args);
+        }
+
+        return Task.CompletedTask;
+    }
 
     internal async Task CheckForUpdates()
     {
@@ -223,5 +264,5 @@ public abstract class BasePlugin
         {
             this._logger.LogError("Could not check for a new version", ex);
         }
-    }
+    #endregion
 }

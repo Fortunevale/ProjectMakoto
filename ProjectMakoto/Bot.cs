@@ -252,6 +252,7 @@ public sealed class Bot
             _logger.LogInfo("Connected and authenticated with Discord as {User}.", this.DiscordClient.CurrentUser.GetUsernameWithIdentifier());
 
             this.status.DiscordInitialized = true;
+            await BasePlugin.RaiseConnected(this);
 
             await Util.Initializers.PostLoginTaskLoader.Load(this);
 
