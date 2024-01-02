@@ -15,7 +15,6 @@ public sealed class Status
 
     public DateTime startupTime { get; internal set; } = DateTime.UtcNow;
 
-    internal bool MigrationRequired { get; set; } = false;
     public string RunningVersion { get; internal set; }
 
     public bool DiscordInitialized { get; internal set; } = false;

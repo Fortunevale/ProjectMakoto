@@ -160,11 +160,6 @@ public sealed class Bot
                     Credentials = new Credentials(this.status.LoadedConfig.Secrets.Github.Token)
                 };
 
-                if (this.status.LoadedConfig.DontModify.LastStartedVersion == "8e5f2b2")
-                {
-                    this.status.MigrationRequired = true;
-                }
-
                 await Task.WhenAll(DatabaseClient.InitializeDatabase(this),
                                    Util.Initializers.ListLoader.Load(this), 
                                    Util.Initializers.TranslationLoader.Load(this), 

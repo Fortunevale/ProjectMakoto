@@ -264,30 +264,6 @@ public sealed partial class DatabaseClient : RequiresBotReference
             }
         }
 
-        if (bot.status.MigrationRequired)
-        {
-            _ = new Func<Task>(async () =>
-            {
-                foreach (var b in bot.Guilds.Keys)
-                {
-                    await databaseClient.SetValue("guilds", "serverid", b, "vccreator_channellist", "[]", databaseClient.mainDatabaseConnection);
-                    await databaseClient.SetValue("guilds", "serverid", b, "crosspost_ratelimits", "[]", databaseClient.mainDatabaseConnection);
-
-                    bot.Guilds[b].ReactionRoles = JsonConvert.DeserializeObject<List<KeyValuePair<ulong, DatabaseMigration.ReactionRoles>>>(
-                        databaseClient.GetValue<string>("guilds", "serverid", b, "reactionroles", databaseClient.mainDatabaseConnection))
-                        .Select(x => new ReactionRoleEntry
-                        {
-                            ChannelId = x.Value.ChannelId,
-                            EmojiId = x.Value.EmojiId,
-                            EmojiName = x.Value.EmojiName,
-                            MessageId = x.Key,
-                            RoleId = x.Value.RoleId,
-                            UUID = x.Value.UUID
-                        }).ToArray();
-                }
-            }).CreateScheduledTask(DateTime.UtcNow.AddSeconds(20));
-        }
-
         bot.DatabaseClient = databaseClient;
         _logger.LogInfo("Connected to database.");
         return databaseClient;
