@@ -264,5 +264,7 @@ public abstract class BasePlugin
         {
             this._logger.LogError("Could not check for a new version", ex);
         }
+    }
+
     #endregion
 }
