@@ -100,18 +100,10 @@ public abstract class BasePlugin
     /// Called upon loading dll.
     /// </summary>
     /// <param name="bot"></param>
-    public void Load(Bot bot)
+    internal void Load(Bot bot)
     {
         this.Bot = bot;
         _ = this.Initialize();
-
-        _ = _ = Task.Run(async () =>
-        {
-            while (!this.DiscordInitialized)
-            {
-                await Task.Delay(1000);
-            }
-        });
     }
 
     /// <summary>
