@@ -23,7 +23,7 @@ public sealed class Bot
 
     internal DatabaseClient DatabaseClient { get; set; }
 
-    public DiscordClient DiscordClient { get; internal set; }
+    public DiscordShardedClient DiscordClient { get; internal set; }
     internal LavalinkSession LavalinkSession;
 
     internal ScoreSaberClient ScoreSaberClient { get; set; }
@@ -247,7 +247,7 @@ public sealed class Bot
             await Util.Initializers.DisCatSharpExtensionsLoader.Load(this);
 
             _logger.LogInfo("Connecting and authenticating with Discord..");
-            await this.DiscordClient.ConnectAsync();
+            await this.DiscordClient.StartAsync();
             await Task.Delay(2000);
             _logger.LogInfo("Connected and authenticated with Discord as {User}.", this.DiscordClient.CurrentUser.GetUsernameWithIdentifier());
 
@@ -269,7 +269,7 @@ public sealed class Bot
                 this.status.LoadedConfig.DontModify.LastStartedVersion = this.status.RunningVersion;
                 this.status.LoadedConfig.Save();
 
-                var channel = await this.DiscordClient.GetChannelAsync(this.status.LoadedConfig.Channels.GithubLog);
+                var channel = await this.DiscordClient.GetFirstShard().GetChannelAsync(this.status.LoadedConfig.Channels.GithubLog);
                 _ = await channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
                     Color = EmbedColors.Success,
@@ -462,7 +462,7 @@ public sealed class Bot
                 while (!this.status.DiscordCommandsRegistered && sw.ElapsedMilliseconds < TimeSpan.FromMinutes(5).TotalMilliseconds)
                     await Task.Delay(500);
 
-                await Util.Initializers.SyncTasks.ExecuteSyncTasks(this, this.DiscordClient.Guilds);
+                await Util.Initializers.SyncTasks.ExecuteSyncTasks(this, this.DiscordClient);
             }
             catch (Exception ex)
             {
@@ -474,7 +474,7 @@ public sealed class Bot
                 _logger.LogInfo("Closing Discord Client..");
 
                 await this.DiscordClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
-                await this.DiscordClient.DisconnectAsync();
+                await this.DiscordClient.StopAsync();
 
                 _logger.LogDebug("Closed Discord Client.");
             }
@@ -510,7 +510,7 @@ public sealed class Bot
 
                     _ = this.Users.Remove(b.Key);
                     this.objectedUsers.Add(b.Key);
-                    foreach (var c in this.DiscordClient.Guilds.Where(x => x.Value.OwnerId == b.Key))
+                    foreach (var c in this.DiscordClient.GetGuilds().Where(x => x.Value.OwnerId == b.Key))
                     {
                         try
                         { _logger.LogInfo("Leaving guild '{guild}'..", c.Key); _ = c.Value.LeaveAsync().Add(this); }

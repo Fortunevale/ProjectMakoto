@@ -194,7 +194,7 @@ internal static class PluginLoader
         }
     }
 
-    internal static async Task LoadPluginCommands(Bot bot, CommandsNextExtension cNext, ApplicationCommandsExtension appCommands)
+    internal static async Task LoadPluginCommands(Bot bot, IReadOnlyDictionary<int, CommandsNextExtension> cNext, IReadOnlyDictionary<int, ApplicationCommandsExtension> appCommands)
     {
         var applicationHash = HashingExtensions.ComputeSHA256Hash(new FileInfo(Assembly.GetExecutingAssembly().Location));
 
@@ -472,7 +472,7 @@ internal static class PluginLoader
         bot.status.LoadedConfig.Save();
     }
 
-    private static void RegisterAssemblies(Bot _bot, CommandsNextExtension cNext, ApplicationCommandsExtension appCommands, BasePlugin plugin, Dictionary<Assembly, string> assemblyList)
+    private static void RegisterAssemblies(Bot _bot, IReadOnlyDictionary<int, CommandsNextExtension> cNext, IReadOnlyDictionary<int, ApplicationCommandsExtension> appCommands, BasePlugin plugin, Dictionary<Assembly, string> assemblyList)
     {
         foreach (var assembly in assemblyList)
         {

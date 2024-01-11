@@ -131,7 +131,7 @@ public sealed class PollSettings : RequiresParent<Guild>
 
                         this.RunningPolls = this.RunningPolls.Remove(x => x.SelectUUID, b);
 
-                        var channel = await this.Bot.DiscordClient.GetChannelAsync(b.ChannelId);
+                        var channel = await this.Bot.DiscordClient.GetShard(this.Parent.Id).GetChannelAsync(b.ChannelId);
                         var message = await channel.GetMessageAsync(b.MessageId, true);
 
                         Dictionary<string, int> votes = new();
@@ -158,7 +158,7 @@ public sealed class PollSettings : RequiresParent<Guild>
 
                     _ = Task.Run(async () =>
                     {
-                        var channel = await this.Bot.DiscordClient.GetChannelAsync(b.ChannelId);
+                        var channel = await this.Bot.DiscordClient.GetShard(this.Parent.Id).GetChannelAsync(b.ChannelId);
 
                         var lastVotes = "";
 

@@ -48,7 +48,7 @@ public sealed class ReminderSettings : RequiresParent<User>
 
                         this.ScheduledReminders = this.ScheduledReminders.Remove(x => x.ToString(), b);
 
-                        var user = await this.Bot.DiscordClient.Guilds.First<KeyValuePair<ulong, DiscordGuild>>(x => x.Value.Members.ContainsKey(this.Parent.Id)).Value.GetMemberAsync(this.Parent.Id);
+                        var user = await this.Bot.DiscordClient.GetFirstShard().GetUserAsync(this.Parent.Id);
 
                         var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
                             .WithDescription($"> {b.Description.FullSanitize()}\n" +

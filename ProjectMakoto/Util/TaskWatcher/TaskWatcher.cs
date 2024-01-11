@@ -197,7 +197,8 @@ public sealed class TaskWatcher
                         try
                         {
                             await Task.Delay(10000);
-                            await bot.DiscordClient.ConnectAsync();
+                            await bot.DiscordClient.StopAsync();
+                            await bot.DiscordClient.StartAsync();
                         }
                         catch (Exception ex)
                         {
@@ -227,7 +228,7 @@ public sealed class TaskWatcher
                             or "[111] Connection terminated (1001, 'CloudFlare WebSocket proxy restarting'), reconnecting")
                             break;
 
-                        var channel = bot.DiscordClient.Guilds[bot.status.LoadedConfig.Discord.DevelopmentGuild].GetChannel(bot.status.LoadedConfig.Channels.ExceptionLog);
+                        var channel = bot.DiscordClient.GetGuilds()[bot.status.LoadedConfig.Discord.DevelopmentGuild].GetChannel(bot.status.LoadedConfig.Channels.ExceptionLog);
 
                         if (channel is null)
                         {

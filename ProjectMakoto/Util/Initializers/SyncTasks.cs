@@ -39,7 +39,7 @@ internal static class SyncTasks
                                 {
                                     _logger.LogInfo("Fetching video length for '{Url}'", b.Url);
 
-                                    var loadResult = await bot.DiscordClient.GetLavalink().ConnectedSessions.First(x => x.Value.IsConnected).Value.LoadTracksAsync(LavalinkSearchType.Plain, b.Url);
+                                    var loadResult = await bot.DiscordClient.GetFirstShard().GetLavalink().ConnectedSessions.First(x => x.Value.IsConnected).Value.LoadTracksAsync(LavalinkSearchType.Plain, b.Url);
                                     var track = loadResult.GetResultAs<LavalinkTrack>();
 
                                     if (loadResult.LoadType != LavalinkLoadResultType.Track)
@@ -69,7 +69,7 @@ internal static class SyncTasks
 
                             if (!userCache.TryGetValue(b, out var victim))
                             {
-                                if (bot.DiscordClient.TryGetUser(b, out var fetched))
+                                if (bot.DiscordClient.GetFirstShard().TryGetUser(b, out var fetched))
                                     userCache.Add(b, fetched);
                                 else
                                     userCache.Add(b, null);
@@ -143,7 +143,7 @@ internal static class SyncTasks
 
             try
             {
-                await ExecuteSyncTasks(bot, bot.DiscordClient.Guilds);
+                await ExecuteSyncTasks(bot, bot.DiscordClient);
             }
             catch (Exception ex)
             {
@@ -182,7 +182,7 @@ internal static class SyncTasks
                                 }
                             }
 
-                            var lava = bot.DiscordClient.GetLavalink();
+                            var lava = bot.DiscordClient.GetShard(guild.Key).GetLavalink();
 
                             while (!lava.ConnectedSessions.Values.Any(x => x.IsConnected))
                                 await Task.Delay(1000);
@@ -210,7 +210,7 @@ internal static class SyncTasks
                             await Task.Delay(1000);
                             _ = await conn.SeekAsync(TimeSpan.FromSeconds(bot.Guilds[guild.Key].MusicModule.CurrentVideoPosition));
 
-                            bot.Guilds[guild.Key].MusicModule.QueueHandler(bot, bot.DiscordClient, node, conn);
+                            bot.Guilds[guild.Key].MusicModule.QueueHandler(bot, bot.DiscordClient.GetShard(guild.Key), node, conn);
                         }
                     }
                     catch (Exception ex)
@@ -225,8 +225,10 @@ internal static class SyncTasks
         }).Add(bot);
     }
 
-    internal static async Task ExecuteSyncTasks(Bot bot, IReadOnlyDictionary<ulong, DiscordGuild> Guilds)
+    internal static async Task ExecuteSyncTasks(Bot bot, DiscordShardedClient shardedClient)
     {
+        var Guilds = shardedClient.GetGuilds();
+
         ObservableList<Task> runningTasks = new();
 
         void runningTasksUpdated(object sender, ObservableListUpdate<Task> e)

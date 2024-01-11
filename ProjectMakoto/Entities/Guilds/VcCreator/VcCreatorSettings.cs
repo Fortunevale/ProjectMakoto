@@ -57,7 +57,7 @@ public sealed class VcCreatorSettings : RequiresParent<Guild>
             while (!this.Bot.status.DiscordGuildDownloadCompleted)
                 await Task.Delay(1000);
 
-            this.cachedGuild ??= await this.Bot.DiscordClient.GetGuildAsync(this.Parent.Id);
+            this.cachedGuild ??= await this.Bot.DiscordClient.GetShard(this.Parent.Id).GetGuildAsync(this.Parent.Id);
 
             await Task.Delay(5000);
 
@@ -139,7 +139,7 @@ public sealed class VcCreatorSettings : RequiresParent<Guild>
                         {
                             await Task.Delay(5000);
 
-                            var channel = await this.Bot.DiscordClient.GetChannelAsync(b.ChannelId);
+                            var channel = await this.Bot.DiscordClient.GetShard(this.Parent.Id).GetChannelAsync(b.ChannelId);
 
                             if (channel.Users.Count <= 0)
                             {

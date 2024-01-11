@@ -26,7 +26,7 @@ internal static class DisCatSharpExtensionsLoader
 
         _logger.LogDebug("Registering DiscordClient..");
 
-        bot.DiscordClient = new DiscordClient(new DiscordConfiguration
+        bot.DiscordClient = new DiscordShardedClient(new DiscordConfiguration
         {
             Token = bot.status.LoadedConfig.Secrets.Discord.Token,
             TokenType = TokenType.Bot,
@@ -39,14 +39,15 @@ internal static class DisCatSharpExtensionsLoader
             EnableSentry = true,
             ReportMissingFields = bot.status.LoadedConfig.IsDev,
             AttachUserInfo = true,
-            DeveloperUserId = 411950662662881290
+            DeveloperUserId = 411950662662881290,
+            DisableUpdateCheck = true,
         });
 
         bot.ExperienceHandler = new(bot);
 
         _logger.LogDebug("Registering CommandsNext..");
 
-        var cNext = bot.DiscordClient.UseCommandsNext(new CommandsNextConfiguration
+        var cNext = await bot.DiscordClient.UseCommandsNextAsync(new CommandsNextConfiguration
         {
             EnableDefaultHelp = false,
             EnableMentionPrefix = false,
@@ -75,11 +76,11 @@ internal static class DisCatSharpExtensionsLoader
             SocketEndpoint = endpoint
         };
 
-        _ = bot.DiscordClient.UseLavalink();
+        _ = await bot.DiscordClient.UseLavalinkAsync();
 
         _logger.LogDebug("Registering DisCatSharp TwoFactor..");
 
-        var tfa = bot.DiscordClient.UseTwoFactor(new TwoFactorConfiguration
+        var tfa = bot.DiscordClient.UseTwoFactorAsync(new TwoFactorConfiguration
         {
             ResponseConfiguration = new TwoFactorResponseConfiguration
             {
@@ -93,9 +94,9 @@ internal static class DisCatSharpExtensionsLoader
         bot.DiscordClient.GuildDownloadCompleted += bot.GuildDownloadCompleted;
 
         _logger.LogDebug("Registering Interactivity..");
-        _ = bot.DiscordClient.UseInteractivity(new InteractivityConfiguration { });
+        _ = await bot.DiscordClient.UseInteractivityAsync(new InteractivityConfiguration { });
 
-        var appCommands = bot.DiscordClient.UseApplicationCommands(new ApplicationCommandsConfiguration
+        var appCommands = await bot.DiscordClient.UseApplicationCommandsAsync(new ApplicationCommandsConfiguration
         {
             ServiceProvider = new ServiceCollection()
                                 .AddSingleton(bot)
@@ -315,7 +316,7 @@ internal static class DisCatSharpExtensionsLoader
             try
             {
                 _logger.LogInfo("Connecting and authenticating with Lavalink..");
-                bot.LavalinkSession = await bot.DiscordClient.GetLavalink().ConnectAsync(lavalinkConfig);
+                bot.LavalinkSession = await bot.DiscordClient.GetFirstShard().GetLavalink().ConnectAsync(lavalinkConfig);
                 _logger.LogInfo("Connected and authenticated with Lavalink.");
 
                 bot.status.LavalinkInitialized = true;
@@ -343,10 +344,11 @@ internal static class DisCatSharpExtensionsLoader
 
             _ = bot.DiscordClient.UpdateStatusAsync(userStatus: UserStatus.Online, activity: new DiscordActivity("Registering commands..", ActivityType.Custom));
 
-            while (bot.DiscordClient.GetApplicationCommands()?.RegisteredCommands?.Count == 0 && sw.ElapsedMilliseconds < TimeSpan.FromMinutes(5).TotalMilliseconds)
+            var applicationCommandsExtension = bot.DiscordClient.GetFirstShard().GetApplicationCommands();
+            while (applicationCommandsExtension?.RegisteredCommands?.Count == 0 && sw.ElapsedMilliseconds < TimeSpan.FromMinutes(5).TotalMilliseconds)
                 await Task.Delay(1000);
 
-            if (bot.DiscordClient.GetApplicationCommands()?.RegisteredCommands?.Count == 0)
+            if (applicationCommandsExtension?.RegisteredCommands?.Count == 0)
             {
                 _logger.LogFatal("Commands did not register.");
                 _ = bot.ExitApplication(true);
@@ -362,7 +364,7 @@ internal static class DisCatSharpExtensionsLoader
                     if (bot.DatabaseClient.Disposed)
                         return;
 
-                    await bot.DiscordClient.UpdateStatusAsync(activity: new DiscordActivity($"{bot.DiscordClient.Guilds.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} guilds | Up for {Math.Round((DateTime.UtcNow - bot.status.startupTime).TotalHours, 1).ToString(CultureInfo.CreateSpecificCulture("en-US"))}h", ActivityType.Custom));
+                    await bot.DiscordClient.UpdateStatusAsync(activity: new DiscordActivity($"{bot.DiscordClient.GetGuilds().Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} guilds | Up for {Math.Round((DateTime.UtcNow - bot.status.startupTime).TotalHours, 1).ToString(CultureInfo.CreateSpecificCulture("en-US"))}h", ActivityType.Custom));
                     await Task.Delay(30000);
                 }
                 catch (Exception ex)

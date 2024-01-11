@@ -16,6 +16,20 @@ internal static class DiscordExtensions
 {
     private static string? LoadedHtml = null;
 
+    public static IReadOnlyDictionary<ulong, DiscordGuild> GetGuilds(this DiscordShardedClient client)
+    {
+        var Guilds = new Dictionary<ulong, DiscordGuild>();
+
+        foreach (var shard in client.ShardClients)
+            foreach (var guild in shard.Value.Guilds)
+                Guilds.Add(guild.Key, guild.Value);
+
+        return Guilds.GroupBy(x => x.Key).Select(x => x.First()).ToDictionary().AsReadOnly();
+    }
+
+    public static DiscordClient? GetFirstShard(this DiscordShardedClient client)
+        => client.ShardClients.FirstOrDefault(_ => true, new KeyValuePair<int, DiscordClient>(0, null)).Value;
+
     public static string GenerateHtmlFromMessages(this IEnumerable<DiscordMessage> messages, Bot bot)
     {
         var sanitizer = new Ganss.Xss.HtmlSanitizer(new()
@@ -315,7 +329,7 @@ internal static class DiscordExtensions
         {
             try
             {
-                return $"<discord-mention>{bot.DiscordClient!.GetUserAsync(e.Groups[1].Value.ToUInt64()).GetAwaiter().GetResult().GetUsername()}</discord-mention>";
+                return $"<discord-mention>{bot.DiscordClient!.GetFirstShard().GetUserAsync(e.Groups[1].Value.ToUInt64()).GetAwaiter().GetResult().GetUsername()}</discord-mention>";
             }
             catch (Exception)
             {
@@ -327,7 +341,7 @@ internal static class DiscordExtensions
         {
             try
             {
-                var channel = bot.DiscordClient!.GetChannelAsync(e.Groups[1].Value.ToUInt64()).GetAwaiter().GetResult();
+                var channel = bot.DiscordClient!.GetFirstShard().GetChannelAsync(e.Groups[1].Value.ToUInt64()).GetAwaiter().GetResult();
                 var type = channel.Type switch
                 {
                     ChannelType.Voice => "voice",
@@ -358,7 +372,7 @@ internal static class DiscordExtensions
 
         md = Regex.Replace(md, @"(?<!\\)(?<!\&gt;)(?<!a):\w+?:", (e) =>
         {
-            if (!DiscordEmoji.TryFromName(bot.DiscordClient, e.Value, false, out var emoji))
+            if (!DiscordEmoji.TryFromName(bot.DiscordClient.GetFirstShard(), e.Value, false, out var emoji))
                 return e.Value;
             else
                 try

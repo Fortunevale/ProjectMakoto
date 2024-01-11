@@ -84,8 +84,8 @@ internal sealed class DiscordEventHandler : RequiresBotReference
         _bot.DiscordClient.ThreadListSynced += handler.ThreadListSynced;
         _bot.DiscordClient.UserUpdated += handler.UserUpdated;
 
-        _bot.DiscordClient.GetCommandsNext().CommandExecuted += handler.CommandExecuted;
-        _bot.DiscordClient.GetCommandsNext().CommandErrored += handler.CommandError;
+        _bot.DiscordClient.GetFirstShard().GetCommandsNext().CommandExecuted += handler.CommandExecuted;
+        _bot.DiscordClient.GetFirstShard().GetCommandsNext().CommandErrored += handler.CommandError;
     }
 
     GenericGuildEvents genericGuildEvents { get; set; }

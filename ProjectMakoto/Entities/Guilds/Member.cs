@@ -40,7 +40,7 @@ public sealed class Member : RequiresParent<Guild>
 
         try
         {
-            guild ??= await this.Bot.DiscordClient.GetGuildAsync(this.Parent.Id);
+            guild ??= await this.Bot.DiscordClient.GetShard(this.Parent.Id).GetGuildAsync(this.Parent.Id);
             member ??= await guild.GetMemberAsync(this.Id);
         }
         catch (Exception ex)

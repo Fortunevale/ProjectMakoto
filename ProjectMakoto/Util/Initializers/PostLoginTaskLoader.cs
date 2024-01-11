@@ -12,7 +12,7 @@ internal class PostLoginTaskLoader
 {
     public static async Task Load(Bot bot)
     {
-        var guild = await bot.DiscordClient.GetGuildAsync(bot.status.LoadedConfig.Discord.AssetsGuild);
+        var guild = await bot.DiscordClient.GetShard(bot.status.LoadedConfig.Discord.AssetsGuild).GetGuildAsync(bot.status.LoadedConfig.Discord.AssetsGuild);
         var emojis = await guild.GetEmojisAsync();
 
         foreach (var field in typeof(Config.EmojiConfig).GetFields())

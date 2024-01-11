@@ -64,7 +64,7 @@ public sealed class SharedCommandContext
     {
         this.CommandType = CommandType.Custom;
 
-        this.Client = _bot.DiscordClient;
+        this.Client = _bot.DiscordClient.GetShard(message.Guild);
         this.User = message.Author;
         this.Guild = message.Channel.Guild;
         this.Channel = message.Channel;
