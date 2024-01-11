@@ -421,10 +421,14 @@ public sealed class Bot
 
     internal async Task ExitApplication(bool Immediate = false)
     {
-        _ = Task.Delay(Immediate ? TimeSpan.FromSeconds(10) : TimeSpan.FromMinutes(5)).ContinueWith(x =>
+        _ = Task.Delay(Immediate ? TimeSpan.FromSeconds(10) : TimeSpan.FromMinutes(5)).ContinueWith(async x =>
         {
             if (x.IsCompletedSuccessfully)
+            {
                 Environment.Exit((int)ExitCodes.ExitTasksTimeout); // Fail-Safe in case the shutdown tasks lock up
+                await Task.Delay(5000);
+                Environment.FailFast(null);
+            }
         });
 
         if (this.DatabaseClient.Disposed || this.ExitCalled) // When the Database Client has been disposed, the Exit Call has already been made.

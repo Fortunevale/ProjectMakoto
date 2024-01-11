@@ -338,10 +338,20 @@ internal static class DisCatSharpExtensionsLoader
             while (!bot.status.DiscordInitialized)
                 await Task.Delay(100);
 
+            Stopwatch sw = new();
+            sw.Start();
+
             _ = bot.DiscordClient.UpdateStatusAsync(userStatus: UserStatus.Online, activity: new DiscordActivity("Registering commands..", ActivityType.Custom));
 
-            while (bot.DiscordClient.GetApplicationCommands()?.RegisteredCommands?.Count == 0)
+            while (bot.DiscordClient.GetApplicationCommands()?.RegisteredCommands?.Count == 0 && sw.ElapsedMilliseconds < TimeSpan.FromMinutes(5).TotalMilliseconds)
                 await Task.Delay(1000);
+
+            if (bot.DiscordClient.GetApplicationCommands()?.RegisteredCommands?.Count == 0)
+            {
+                _logger.LogFatal("Commands did not register.");
+                _ = bot.ExitApplication(true);
+                return;
+            }
 
             bot.status.DiscordCommandsRegistered = true;
 
