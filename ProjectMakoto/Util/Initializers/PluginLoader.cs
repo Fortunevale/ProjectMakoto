@@ -21,73 +21,47 @@ internal static class PluginLoader
 
     internal static async Task LoadPlugins(Bot bot)
     {
-        if (bot.status.LoadedConfig.EnablePlugins)
+        if (!bot.status.LoadedConfig.EnablePlugins)
+            return;
+
+        _logger.LogDebug("Loading Plugins..");
+        foreach (var pluginFile in Directory.GetFiles("Plugins").Where(x => x.EndsWith(".pmpl")))
         {
-            List<string> pluginsToExtract = new();
+            if (new DirectoryInfo(pluginFile).Name.StartsWith('.'))
+                continue;
 
-            if (Directory.Exists("Plugins"))
-                pluginsToExtract.AddRange(Directory.GetFiles("Plugins").Where(x => x.EndsWith(".pmpl")));
+            var pluginName = Path.GetFileName(pluginFile);
 
-            foreach (var plugin in pluginsToExtract)
-            {
-                var pluginName = Path.GetFileNameWithoutExtension(plugin);
-                var extractDir = $"Plugins/{pluginName}";
+            _logger.LogDebug("Loading Plugin '{Name}'..", pluginName);
 
-                if (Directory.Exists(extractDir))
-                {
-                    _ = Directory.CreateDirectory("Plugins/.OldPlugins");
+            using var pluginFileStream = new FileStream(pluginFile, FileMode.Open, FileAccess.ReadWrite);
+            using var zipArchive = new ZipArchive(pluginFileStream, ZipArchiveMode.Update);
 
-                    _logger.LogDebug("Plugin '{PluginName}' updated, moving old version to 'Plugins/.OldPlugins/'..", pluginName);
-                    Directory.Move(extractDir, $"Plugins/.OldPlugins/{pluginName}-{DateTime.UtcNow.Ticks}");
-                }
-
-                var stream = new FileStream(plugin, FileMode.Open, FileAccess.Read);
-                try
-                {
-                    using var zip = new ZipArchive(stream, ZipArchiveMode.Read);
-                    zip.ExtractToDirectory(extractDir);
-                }
-                finally
-                {
-                    stream.Dispose();
-                }
-
-                File.Delete(plugin);
-
-                _logger.LogInfo("Extracted Plugin '{PluginName}'!", pluginName);
-            }
-
-            var referenceFiles = Directory.GetFiles("Plugins", "*.dll", SearchOption.AllDirectories).Where(x => !x.Contains(".OldPlugins")).ToArray();
+            var referenceFiles = zipArchive.Entries;
             Assembly? resolveAssemblyEvent(object? obj, ResolveEventArgs arg)
             {
                 var name = $"{new AssemblyName(arg.Name).Name}.dll";
-                var assemblyFile = referenceFiles.Where(x => x.EndsWith(name)).FirstOrDefault();
+                var assemblyFile = referenceFiles.Where(x => x.Name.EndsWith(name)).FirstOrDefault();
                 if (assemblyFile != null)
-                    return Assembly.LoadFrom(assemblyFile);
+                {
+                    using var assemblyStream = assemblyFile.Open();
+                    return AssemblyLoadContext.Default.LoadFromStream(assemblyStream);
+                }
 
                 throw new Exception($"Could not locate: '{name}' ({arg.RequestingAssembly?.FullName})");
             }
 
             AppDomain.CurrentDomain.AssemblyResolve += resolveAssemblyEvent;
 
-
-            _logger.LogDebug("Loading Plugins..");
-            foreach (var pluginFolder in Directory.GetDirectories("Plugins"))
+            try
             {
-                if (new DirectoryInfo(pluginFolder).Name.StartsWith('.'))
-                    continue;
-
-                var pluginName = Path.GetFileName(pluginFolder);
-
-                _logger.LogDebug("Loading Plugin '{Name}'..", pluginName);
-
                 var count = 0;
 
-                foreach (var pluginPath in Directory.GetFiles(pluginFolder).Where(x => x.EndsWith(".dll")))
+                foreach (var assemblyEntry in referenceFiles.Where(x => x.Name.EndsWith(".dll")))
                 {
                     AssemblyLoadContext pluginLoadContext = new(null);
 
-                    var assemblyName = Path.GetFileNameWithoutExtension(pluginPath);
+                    var assemblyName = Path.GetFileNameWithoutExtension(assemblyEntry.Name);
 
                     if (AppDomain.CurrentDomain.GetAssemblies().Select(x => x.GetName()).Any(x => x.Name == assemblyName))
                     {
@@ -95,7 +69,8 @@ internal static class PluginLoader
                         continue;
                     }
 
-                    var assembly = Assembly.LoadFile(Path.GetFullPath(pluginPath));
+                    using var assemblyStream = assemblyEntry.Open();
+                    var assembly = AssemblyLoadContext.Default.LoadFromStream(assemblyStream);
 
                     try
                     {
@@ -103,25 +78,26 @@ internal static class PluginLoader
                         {
                             if (typeof(BasePlugin).IsAssignableFrom(type))
                             {
-                                _logger.LogDebug("Loading Plugin from '{0}'", pluginPath);
+                                _logger.LogDebug("Loading Plugin from '{0}'", assemblyEntry);
 
                                 count++;
                                 var result = Activator.CreateInstance(type) as BasePlugin;
-                                result.LoadedFile = new FileInfo(pluginPath);
+                                result.LoadedFile = new FileInfo(pluginFile);
 
                                 if (result.SupportedPluginApis == null || !result.SupportedPluginApis.Contains(BasePlugin.CurrentApiVersion))
                                     throw new IndexOutOfRangeException($"Plugin does not support Api Version {BasePlugin.CurrentApiVersion}");
 
-                                bot._Plugins.Add(Path.GetFileNameWithoutExtension(pluginPath), result);
+                                bot._Plugins.Add(assemblyName, result);
 
                                 UniversalExtensions.LoadAllReferencedAssemblies(assembly.GetReferencedAssemblies());
+                                break;
                             }
                         }
                     }
                     catch (Exception ex)
                     {
-                        _ = bot._Plugins.Remove(Path.GetFileNameWithoutExtension(pluginPath));
-                        _logger.LogError("Failed to load Plugin from '{0}'", ex, pluginPath);
+                        _ = bot._Plugins.Remove(assemblyName);
+                        _logger.LogError("Failed to load Plugin '{0}' from '{1}'", ex, assemblyName, assemblyEntry);
                     }
                 }
 
@@ -133,11 +109,13 @@ internal static class PluginLoader
 
                 _logger.LogInfo("Loaded Plugin from '{0}'", pluginName);
             }
-
-            AppDomain.CurrentDomain.AssemblyResolve -= resolveAssemblyEvent;
-
-            _logger.LogInfo("Loaded {0} Plugins.", bot.Plugins.Count);
+            finally
+            {
+                AppDomain.CurrentDomain.AssemblyResolve -= resolveAssemblyEvent;
+            }
         }
+
+        _logger.LogInfo("Loaded {0} Plugins.", bot.Plugins.Count);
 
         foreach (var b in bot.Plugins)
         {
