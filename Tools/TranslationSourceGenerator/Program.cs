@@ -33,6 +33,9 @@ internal class Program
 
 namespace {this.Namespace};
 
+#pragma warning disable CS8981
+#pragma warning disable CS8618
+#pragma warning disable IDE1006
 public class Translations : ITranslations
 {{
     public Dictionary<string, int> Progress = new();

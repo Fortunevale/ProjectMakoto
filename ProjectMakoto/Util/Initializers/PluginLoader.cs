@@ -169,6 +169,29 @@ internal static class PluginLoader
             {
                 _logger.LogError("Failed to check updates for '{PluginName}'", ex, b.Value.Name);
             }
+
+            try
+            {
+                var (path, type) = b.Value.LoadTranslations();
+
+                if (path != null)
+                {
+                    using var stream = b.Value.LoadedFile.Open(FileMode.Open);
+                    using var zip = new ZipArchive(stream);
+                    using var file = zip.GetEntry(path).Open();
+                    using var reader = new StreamReader(file);
+
+                    b.Value.UsesTranslations = true;
+                    b.Value.Translations = (ITranslations)JsonConvert.DeserializeObject(reader.ReadToEnd(), type);
+
+                    foreach (var item in b.Value.Translations.CommandList)
+                        bot.LoadedTranslations.CommandList = bot.LoadedTranslations.CommandList.Add(item);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed to load translations for '{PluginName}'", ex, b.Value.Name);
+            }
         }
     }
 

@@ -9,6 +9,7 @@
 
 using Octokit;
 using ProjectMakoto.Entities.Plugins.Commands;
+using ProjectMakoto.Util.Initializers;
 
 namespace ProjectMakoto.Plugins;
 
@@ -26,6 +27,8 @@ public abstract class BasePlugin
 
     internal FileInfo LoadedFile { get; set; }
 
+    internal bool UsesTranslations { get; set; } = false;
+
     /// <summary>
     /// Makoto Instance
     /// </summary>
@@ -35,6 +38,11 @@ public abstract class BasePlugin
     /// Allows you to log events.
     /// </summary>
     public PluginLoggerClient _logger { get; internal set; }
+
+    /// <summary>
+    /// Your Plugin's translations, load via <see cref="LoadTranslations"/>.
+    /// </summary>
+    public ITranslations Translations { get; internal set; }
 
     /// <summary>
     /// Whether the client logged into discord.
@@ -135,13 +143,12 @@ public abstract class BasePlugin
     }
 
     /// <summary>
-    /// Allows you to define Application Command Translations.
+    /// Allows you to define a translation file. Return <see langword="null"/> or empty string if none is present.
     /// </summary>
-    /// <param name="ctx"></param>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter")]
-    public void EnableCommandTranslations(ApplicationCommandsTranslationContext ctx)
+    /// <returns></returns>
+    public virtual (string? path, Type? type) LoadTranslations()
     {
-        return;
+        return (null, null);
     }
 
     /// <summary>
@@ -206,6 +213,23 @@ public abstract class BasePlugin
         }
 
         return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Enables AppCommand Translations if plugin provides any.
+    /// </summary>
+    /// <param name="ctx"></param>
+    internal void EnableCommandTranslations(ApplicationCommandsTranslationContext ctx)
+    {
+        DisCatSharpExtensionsLoader.GetCommandTranslations(ctx);
+
+        if (!this.UsesTranslations)
+        {
+            ctx.AddSingleTranslation(null);
+            ctx.AddGroupTranslation(null);
+        }
+
+        return;
     }
 
     internal async Task CheckForUpdates()
