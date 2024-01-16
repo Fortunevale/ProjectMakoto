@@ -12,8 +12,177 @@ using Microsoft.Extensions.Logging;
 namespace ProjectMakoto.Util.Initializers;
 internal static class DisCatSharpExtensionsLoader
 {
+    static Bot bot = null;
+
+    internal static void GetCommandTranslations(ApplicationCommandsTranslationContext x)
+    {
+        List<DisCatSharp.ApplicationCommands.Entities.CommandTranslator> singleCommandTranslations = new();
+        List<DisCatSharp.ApplicationCommands.Entities.GroupTranslator> groupCommandTranslations = new();
+
+        object CreateTranslationRecursively(Type typeToCreate, CommandTranslation translation)
+        {
+            try
+            {
+                var nameValues = translation.Names;
+
+                if (nameValues is null)
+                    return null;
+
+                var descriptionValues = translation.Descriptions;
+                var typeValue = translation.Type;
+                var optionsValues = translation.Options;
+                var choicesValues = translation.Choices;
+                var groupsValues = translation.Groups;
+                var commandsValues = translation.Commands;
+
+                _logger.LogTrace("Creating instance of '{type}'", typeToCreate.Name);
+                var translator = Activator.CreateInstance(typeToCreate);
+
+                var createTypeProperties = typeToCreate.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+                createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "name")).SetValue(translator, nameValues["en"]);
+
+                if (typeToCreate == typeof(DisCatSharp.ApplicationCommands.Entities.GroupTranslator) || typeToCreate == typeof(DisCatSharp.ApplicationCommands.Entities.CommandTranslator))
+                    createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "type")).SetValue(translator, (ApplicationCommandType?)typeValue);
+
+                if (createTypeProperties.Any(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "description")))
+                    createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "description")).SetValue(translator, descriptionValues["en"]);
+
+                Dictionary<string, string> NameTranslationDictionary = new();
+                foreach (var nameTranslation in nameValues ?? new())
+                {
+                    if (nameTranslation.Key == "en")
+                    {
+                        NameTranslationDictionary.Add("en-GB", nameTranslation.Value);
+                        NameTranslationDictionary.Add("en-US", nameTranslation.Value);
+                        continue;
+                    }
+
+                    NameTranslationDictionary.Add(nameTranslation.Key, nameTranslation.Value);
+                }
+                if (createTypeProperties.Any(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "name_translations")))
+                    createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "name_translations")).SetValue(translator, NameTranslationDictionary);
+
+                Dictionary<string, string> DescriptionTranslationDictionary = new();
+                foreach (var descriptionTranslations in descriptionValues ?? new())
+                {
+                    if (descriptionTranslations.Key == "en")
+                    {
+                        DescriptionTranslationDictionary.Add("en-GB", descriptionTranslations.Value);
+                        DescriptionTranslationDictionary.Add("en-US", descriptionTranslations.Value);
+                        continue;
+                    }
+
+                    DescriptionTranslationDictionary.Add(descriptionTranslations.Key, descriptionTranslations.Value);
+                }
+                if (createTypeProperties.Any(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "description_translations")))
+                    createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "description_translations")).SetValue(translator, DescriptionTranslationDictionary);
+
+                if (commandsValues is not null && createTypeProperties.Any(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "commands")))
+                {
+                    _logger.LogTrace("Creating sub-command translations for command '{name}'", nameValues.First());
+
+                    var commandProperty = createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "commands"));
+                    commandProperty.SetValue(translator, new List<DisCatSharp.ApplicationCommands.Entities.CommandTranslator>());
+                    foreach (var value in commandsValues)
+                    {
+                        var obj = (DisCatSharp.ApplicationCommands.Entities.CommandTranslator)CreateTranslationRecursively(typeof(DisCatSharp.ApplicationCommands.Entities.CommandTranslator), value);
+
+                        if (obj is null)
+                            continue;
+
+                        ((List<DisCatSharp.ApplicationCommands.Entities.CommandTranslator>)commandProperty.GetValue(translator)).Add(obj);
+                    }
+
+                    if (((List<DisCatSharp.ApplicationCommands.Entities.CommandTranslator>)commandProperty.GetValue(translator)).Count == 0)
+                        commandProperty.SetValue(translator, null);
+                }
+
+                if (optionsValues is not null && createTypeProperties.Any(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "options")))
+                {
+                    _logger.LogTrace("Creating option translations for command '{name}'", nameValues.First());
+
+                    var optionProperty = createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "options"));
+                    optionProperty.SetValue(translator, new List<DisCatSharp.ApplicationCommands.Entities.OptionTranslator>());
+                    foreach (var value in optionsValues)
+                    {
+                        var obj = (DisCatSharp.ApplicationCommands.Entities.OptionTranslator)CreateTranslationRecursively(typeof(DisCatSharp.ApplicationCommands.Entities.OptionTranslator), value);
+
+                        if (obj is null)
+                            continue;
+
+                        ((List<DisCatSharp.ApplicationCommands.Entities.OptionTranslator>)optionProperty.GetValue(translator)).Add(obj);
+                    }
+
+                    if (((List<DisCatSharp.ApplicationCommands.Entities.OptionTranslator>)optionProperty.GetValue(translator)).Count == 0)
+                        optionProperty.SetValue(translator, null);
+                }
+
+                if (choicesValues is not null && createTypeProperties.Any(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "choices")))
+                {
+                    _logger.LogTrace("Creating choice translations for command '{name}'", nameValues.First());
+
+                    var choiceProperty = createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "choices"));
+                    choiceProperty.SetValue(translator, new List<DisCatSharp.ApplicationCommands.Entities.ChoiceTranslator>());
+                    foreach (var value in choicesValues)
+                    {
+                        var obj = (DisCatSharp.ApplicationCommands.Entities.ChoiceTranslator)CreateTranslationRecursively(typeof(DisCatSharp.ApplicationCommands.Entities.ChoiceTranslator), value);
+
+                        if (obj is null)
+                            continue;
+
+                        ((List<DisCatSharp.ApplicationCommands.Entities.ChoiceTranslator>)choiceProperty.GetValue(translator)).Add(obj);
+                    }
+
+                    if (((List<DisCatSharp.ApplicationCommands.Entities.ChoiceTranslator>)choiceProperty.GetValue(translator)).Count == 0)
+                        choiceProperty.SetValue(translator, null);
+                }
+
+                if (groupsValues is not null && createTypeProperties.Any(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "groups")))
+                {
+                    _logger.LogTrace("Creating group translations for command '{name}'", nameValues.First());
+
+                    var groupProperty = createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "groups"));
+                    groupProperty.SetValue(translator, new List<DisCatSharp.ApplicationCommands.Entities.SubGroupTranslator>());
+
+                    foreach (var value in groupsValues)
+                    {
+                        var obj = (DisCatSharp.ApplicationCommands.Entities.SubGroupTranslator)CreateTranslationRecursively(typeof(DisCatSharp.ApplicationCommands.Entities.SubGroupTranslator), value);
+
+                        if (obj is null)
+                            continue;
+
+                        ((List<DisCatSharp.ApplicationCommands.Entities.SubGroupTranslator>)groupProperty.GetValue(translator)).Add(obj);
+                    }
+
+                    if (((List<DisCatSharp.ApplicationCommands.Entities.SubGroupTranslator>)groupProperty.GetValue(translator)).Count == 0)
+                        groupProperty.SetValue(translator, null);
+                }
+
+                return translator;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed to generate DCS-Compatible Translations", ex);
+                throw;
+            }
+        }
+
+        foreach (var translation in bot.LoadedTranslations.CommandList)
+            singleCommandTranslations.Add(
+                (DisCatSharp.ApplicationCommands.Entities.CommandTranslator)CreateTranslationRecursively(typeof(DisCatSharp.ApplicationCommands.Entities.CommandTranslator), translation));
+
+        foreach (var translation in bot.LoadedTranslations.CommandList)
+            groupCommandTranslations.Add(
+                (DisCatSharp.ApplicationCommands.Entities.GroupTranslator)CreateTranslationRecursively(typeof(DisCatSharp.ApplicationCommands.Entities.GroupTranslator), translation));
+
+        x.AddSingleTranslation(JsonConvert.SerializeObject(singleCommandTranslations));
+        x.AddGroupTranslation(JsonConvert.SerializeObject(groupCommandTranslations));
+    }
+
     public static async Task Load(Bot bot)
     {
+        DisCatSharpExtensionsLoader.bot = bot;
+
         if (bot.status.LoadedConfig.Secrets.Discord.Token.Length <= 0)
         {
             _logger.LogFatal("No discord token provided");
@@ -105,171 +274,6 @@ internal static class DisCatSharpExtensionsLoader
             EnableLocalization = true,
             DebugStartup = true
         });
-
-        void GetCommandTranslations(ApplicationCommandsTranslationContext x)
-        {
-            List<DisCatSharp.ApplicationCommands.Entities.CommandTranslator> singleCommandTranslations = new();
-            List<DisCatSharp.ApplicationCommands.Entities.GroupTranslator> groupCommandTranslations = new();
-
-            object CreateTranslationRecursively(Type typeToCreate, CommandTranslation translation)
-            {
-                try
-                {
-                    var nameValues = translation.Names;
-
-                    if (nameValues is null)
-                        return null;
-
-                    var descriptionValues = translation.Descriptions;
-                    var typeValue = translation.Type;
-                    var optionsValues = translation.Options;
-                    var choicesValues = translation.Choices;
-                    var groupsValues = translation.Groups;
-                    var commandsValues = translation.Commands;
-
-                    _logger.LogTrace("Creating instance of '{type}'", typeToCreate.Name);
-                    var translator = Activator.CreateInstance(typeToCreate);
-
-                    var createTypeProperties = typeToCreate.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-                    createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "name")).SetValue(translator, nameValues["en"]);
-
-                    if (typeToCreate == typeof(DisCatSharp.ApplicationCommands.Entities.GroupTranslator) || typeToCreate == typeof(DisCatSharp.ApplicationCommands.Entities.CommandTranslator))
-                        createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "type")).SetValue(translator, (ApplicationCommandType?)typeValue);
-
-                    if (createTypeProperties.Any(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "description")))
-                        createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "description")).SetValue(translator, descriptionValues["en"]);
-
-                    Dictionary<string, string> NameTranslationDictionary = new();
-                    foreach (var nameTranslation in nameValues ?? new())
-                    {
-                        if (nameTranslation.Key == "en")
-                        {
-                            NameTranslationDictionary.Add("en-GB", nameTranslation.Value);
-                            NameTranslationDictionary.Add("en-US", nameTranslation.Value);
-                            continue;
-                        }
-
-                        NameTranslationDictionary.Add(nameTranslation.Key, nameTranslation.Value);
-                    }
-                    if (createTypeProperties.Any(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "name_translations")))
-                        createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "name_translations")).SetValue(translator, NameTranslationDictionary);
-
-                    Dictionary<string, string> DescriptionTranslationDictionary = new();
-                    foreach (var descriptionTranslations in descriptionValues ?? new())
-                    {
-                        if (descriptionTranslations.Key == "en")
-                        {
-                            DescriptionTranslationDictionary.Add("en-GB", descriptionTranslations.Value);
-                            DescriptionTranslationDictionary.Add("en-US", descriptionTranslations.Value);
-                            continue;
-                        }
-
-                        DescriptionTranslationDictionary.Add(descriptionTranslations.Key, descriptionTranslations.Value);
-                    }
-                    if (createTypeProperties.Any(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "description_translations")))
-                        createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "description_translations")).SetValue(translator, DescriptionTranslationDictionary);
-
-                    if (commandsValues is not null && createTypeProperties.Any(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "commands")))
-                    {
-                        _logger.LogTrace("Creating sub-command translations for command '{name}'", nameValues.First());
-
-                        var commandProperty = createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "commands"));
-                        commandProperty.SetValue(translator, new List<DisCatSharp.ApplicationCommands.Entities.CommandTranslator>());
-                        foreach (var value in commandsValues)
-                        {
-                            var obj = (DisCatSharp.ApplicationCommands.Entities.CommandTranslator)CreateTranslationRecursively(typeof(DisCatSharp.ApplicationCommands.Entities.CommandTranslator), value);
-
-                            if (obj is null)
-                                continue;
-
-                            ((List<DisCatSharp.ApplicationCommands.Entities.CommandTranslator>)commandProperty.GetValue(translator)).Add(obj);
-                        }
-
-                        if (((List<DisCatSharp.ApplicationCommands.Entities.CommandTranslator>)commandProperty.GetValue(translator)).Count == 0)
-                            commandProperty.SetValue(translator, null);
-                    }
-
-                    if (optionsValues is not null && createTypeProperties.Any(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "options")))
-                    {
-                        _logger.LogTrace("Creating option translations for command '{name}'", nameValues.First());
-
-                        var optionProperty = createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "options"));
-                        optionProperty.SetValue(translator, new List<DisCatSharp.ApplicationCommands.Entities.OptionTranslator>());
-                        foreach (var value in optionsValues)
-                        {
-                            var obj = (DisCatSharp.ApplicationCommands.Entities.OptionTranslator)CreateTranslationRecursively(typeof(DisCatSharp.ApplicationCommands.Entities.OptionTranslator), value);
-
-                            if (obj is null)
-                                continue;
-
-                            ((List<DisCatSharp.ApplicationCommands.Entities.OptionTranslator>)optionProperty.GetValue(translator)).Add(obj);
-                        }
-
-                        if (((List<DisCatSharp.ApplicationCommands.Entities.OptionTranslator>)optionProperty.GetValue(translator)).Count == 0)
-                            optionProperty.SetValue(translator, null);
-                    }
-
-                    if (choicesValues is not null && createTypeProperties.Any(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "choices")))
-                    {
-                        _logger.LogTrace("Creating choice translations for command '{name}'", nameValues.First());
-
-                        var choiceProperty = createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "choices"));
-                        choiceProperty.SetValue(translator, new List<DisCatSharp.ApplicationCommands.Entities.ChoiceTranslator>());
-                        foreach (var value in choicesValues)
-                        {
-                            var obj = (DisCatSharp.ApplicationCommands.Entities.ChoiceTranslator)CreateTranslationRecursively(typeof(DisCatSharp.ApplicationCommands.Entities.ChoiceTranslator), value);
-
-                            if (obj is null)
-                                continue;
-
-                            ((List<DisCatSharp.ApplicationCommands.Entities.ChoiceTranslator>)choiceProperty.GetValue(translator)).Add(obj);
-                        }
-
-                        if (((List<DisCatSharp.ApplicationCommands.Entities.ChoiceTranslator>)choiceProperty.GetValue(translator)).Count == 0)
-                            choiceProperty.SetValue(translator, null);
-                    }
-
-                    if (groupsValues is not null && createTypeProperties.Any(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "groups")))
-                    {
-                        _logger.LogTrace("Creating group translations for command '{name}'", nameValues.First());
-
-                        var groupProperty = createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "groups"));
-                        groupProperty.SetValue(translator, new List<DisCatSharp.ApplicationCommands.Entities.SubGroupTranslator>());
-
-                        foreach (var value in groupsValues)
-                        {
-                            var obj = (DisCatSharp.ApplicationCommands.Entities.SubGroupTranslator)CreateTranslationRecursively(typeof(DisCatSharp.ApplicationCommands.Entities.SubGroupTranslator), value);
-
-                            if (obj is null)
-                                continue;
-
-                            ((List<DisCatSharp.ApplicationCommands.Entities.SubGroupTranslator>)groupProperty.GetValue(translator)).Add(obj);
-                        }
-
-                        if (((List<DisCatSharp.ApplicationCommands.Entities.SubGroupTranslator>)groupProperty.GetValue(translator)).Count == 0)
-                            groupProperty.SetValue(translator, null);
-                    }
-
-                    return translator;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError("Failed to generate DCS-Compatible Translations", ex);
-                    throw;
-                }
-            }
-
-            foreach (var translation in bot.LoadedTranslations.Commands.CommandList)
-                singleCommandTranslations.Add(
-                    (DisCatSharp.ApplicationCommands.Entities.CommandTranslator)CreateTranslationRecursively(typeof(DisCatSharp.ApplicationCommands.Entities.CommandTranslator), translation));
-            
-            foreach (var translation in bot.LoadedTranslations.Commands.CommandList)
-                groupCommandTranslations.Add(
-                    (DisCatSharp.ApplicationCommands.Entities.GroupTranslator)CreateTranslationRecursively(typeof(DisCatSharp.ApplicationCommands.Entities.GroupTranslator), translation));
-
-            x.AddSingleTranslation(JsonConvert.SerializeObject(singleCommandTranslations));
-            x.AddGroupTranslation(JsonConvert.SerializeObject(groupCommandTranslations));
-        }
 
         if (!bot.status.LoadedConfig.IsDev)
         {

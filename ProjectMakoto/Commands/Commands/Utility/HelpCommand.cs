@@ -55,7 +55,7 @@ internal sealed class HelpCommand : BaseCommand
 
                     try
                     {
-                        var commandKey = this.t.Commands.CommandList.FirstOrDefault(localized => localized.Names.Any(x => x.Value == appCommand.Name), null);
+                        var commandKey = this.t.CommandList.FirstOrDefault(localized => localized.Names.Any(x => x.Value == appCommand.Name), null);
 
                         string commandName;
                         string commandDescription;
