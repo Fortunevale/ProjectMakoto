@@ -19,7 +19,7 @@
 
 <p align="center"><img src="DocAssets/DownloadProject1.png" width=400 align="center"/></p>
 
-3. Load the Project and add the `ProjectMakoto.dll`, `Xorog.Logger.dll` and `Xorog.UniversalExtensions.dll` as dependencies.
+3. Load the Project and add the `ProjectMakoto.dll` as dependency.
 
 <p align="center"><img src="DocAssets/ComReference1.png" width=400 align="center"/></p>
 <p align="center"><img src="DocAssets/ComReference2.png" width=400 align="center"/></p>
