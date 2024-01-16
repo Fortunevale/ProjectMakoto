@@ -15,31 +15,31 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Entities\Translation\Translations.cs = Entities\Translation\Translations.cs
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xorog.Logger", "..\Xorog.Logger\Xorog.Logger.csproj", "{F89755B0-2F97-4098-813D-CD70524D8596}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xorog.Logger", "..\Dependencies\Xorog.Logger\Xorog.Logger.csproj", "{F89755B0-2F97-4098-813D-CD70524D8596}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xorog.UniversalExtensions", "..\Xorog.UniversalExtensions\Xorog.UniversalExtensions.csproj", "{906F9C70-17B3-4B6D-AFFF-976338D641C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xorog.UniversalExtensions", "..\Dependencies\Xorog.UniversalExtensions\Xorog.UniversalExtensions.csproj", "{906F9C70-17B3-4B6D-AFFF-976338D641C4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickChart", "..\quickchart-csharp\QuickChart\QuickChart.csproj", "{953F15E3-C11E-43FD-AF41-459AC1537232}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickChart", "..\Dependencies\quickchart-csharp\QuickChart\QuickChart.csproj", "{953F15E3-C11E-43FD-AF41-459AC1537232}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DisCatSharp", "..\DisCatSharp\DisCatSharp\DisCatSharp.csproj", "{8BD34631-4327-4533-8587-93E38D7A5DD9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DisCatSharp", "..\Dependencies\DisCatSharp\DisCatSharp\DisCatSharp.csproj", "{8BD34631-4327-4533-8587-93E38D7A5DD9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DisCatSharp.ApplicationCommands", "..\DisCatSharp\DisCatSharp.ApplicationCommands\DisCatSharp.ApplicationCommands.csproj", "{5C28FAB1-DBAE-4A92-ABF0-13ED9727DD39}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DisCatSharp.ApplicationCommands", "..\Dependencies\DisCatSharp\DisCatSharp.ApplicationCommands\DisCatSharp.ApplicationCommands.csproj", "{5C28FAB1-DBAE-4A92-ABF0-13ED9727DD39}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DisCatSharp.CommandsNext", "..\DisCatSharp\DisCatSharp.CommandsNext\DisCatSharp.CommandsNext.csproj", "{AC3138E2-3A59-4626-909D-332F67557188}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DisCatSharp.CommandsNext", "..\Dependencies\DisCatSharp\DisCatSharp.CommandsNext\DisCatSharp.CommandsNext.csproj", "{AC3138E2-3A59-4626-909D-332F67557188}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DisCatSharp.Common", "..\DisCatSharp\DisCatSharp.Common\DisCatSharp.Common.csproj", "{15738D6B-E031-4ABB-8DFC-CFAD764410D2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DisCatSharp.Common", "..\Dependencies\DisCatSharp\DisCatSharp.Common\DisCatSharp.Common.csproj", "{15738D6B-E031-4ABB-8DFC-CFAD764410D2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DisCatSharp.Configuration", "..\DisCatSharp\DisCatSharp.Configuration\DisCatSharp.Configuration.csproj", "{CD84C9A5-98B9-4395-83E8-51228DB57BA6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DisCatSharp.Configuration", "..\Dependencies\DisCatSharp\DisCatSharp.Configuration\DisCatSharp.Configuration.csproj", "{CD84C9A5-98B9-4395-83E8-51228DB57BA6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DisCatSharp.Experimental", "..\DisCatSharp\DisCatSharp.Experimental\DisCatSharp.Experimental.csproj", "{1A4822DE-C986-4400-B1AB-FA40C8AACB14}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DisCatSharp.Experimental", "..\Dependencies\DisCatSharp\DisCatSharp.Experimental\DisCatSharp.Experimental.csproj", "{1A4822DE-C986-4400-B1AB-FA40C8AACB14}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DisCatSharp.Interactivity", "..\DisCatSharp\DisCatSharp.Interactivity\DisCatSharp.Interactivity.csproj", "{020C24D8-DCD7-4AA1-A74A-2296E7CE490F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DisCatSharp.Interactivity", "..\Dependencies\DisCatSharp\DisCatSharp.Interactivity\DisCatSharp.Interactivity.csproj", "{020C24D8-DCD7-4AA1-A74A-2296E7CE490F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DisCatSharp.Lavalink", "..\DisCatSharp\DisCatSharp.Lavalink\DisCatSharp.Lavalink.csproj", "{1A20F445-0CE7-4DA0-91EA-8F3AEF89C496}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DisCatSharp.Lavalink", "..\Dependencies\DisCatSharp\DisCatSharp.Lavalink\DisCatSharp.Lavalink.csproj", "{1A20F445-0CE7-4DA0-91EA-8F3AEF89C496}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DisCatSharp.VoiceNext", "..\DisCatSharp\DisCatSharp.VoiceNext\DisCatSharp.VoiceNext.csproj", "{274E405C-AB90-4D5D-9AC6-3C7CF1819E60}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DisCatSharp.VoiceNext", "..\Dependencies\DisCatSharp\DisCatSharp.VoiceNext\DisCatSharp.VoiceNext.csproj", "{274E405C-AB90-4D5D-9AC6-3C7CF1819E60}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DisCatSharp.VoiceNext.Natives", "..\DisCatSharp\DisCatSharp.VoiceNext.Natives\DisCatSharp.VoiceNext.Natives.csproj", "{370E7196-9D06-43D6-B267-F63F8C38C33F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DisCatSharp.VoiceNext.Natives", "..\Dependencies\DisCatSharp\DisCatSharp.VoiceNext.Natives\DisCatSharp.VoiceNext.Natives.csproj", "{370E7196-9D06-43D6-B267-F63F8C38C33F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

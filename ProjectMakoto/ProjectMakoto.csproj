@@ -58,16 +58,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\quickchart-csharp\QuickChart\QuickChart.csproj" />
-    <ProjectReference Include="..\Xorog.Logger\Xorog.Logger.csproj" />
-    <ProjectReference Include="..\Xorog.UniversalExtensions\Xorog.UniversalExtensions.csproj" />
-    <ProjectReference Include="..\DisCatSharp\DisCatSharp\DisCatSharp.csproj" />
-    <ProjectReference Include="..\DisCatSharp\DisCatSharp.ApplicationCommands\DisCatSharp.ApplicationCommands.csproj" />
-    <ProjectReference Include="..\DisCatSharp\DisCatSharp.CommandsNext\DisCatSharp.CommandsNext.csproj" />
-    <ProjectReference Include="..\DisCatSharp\DisCatSharp.Common\DisCatSharp.Common.csproj" />
-    <ProjectReference Include="..\DisCatSharp\DisCatSharp.Experimental\DisCatSharp.Experimental.csproj" />
-    <ProjectReference Include="..\DisCatSharp\DisCatSharp.Interactivity\DisCatSharp.Interactivity.csproj" />
-    <ProjectReference Include="..\DisCatSharp\DisCatSharp.Lavalink\DisCatSharp.Lavalink.csproj" />
+    <ProjectReference Include="..\Dependencies\DisCatSharp\DisCatSharp.ApplicationCommands\DisCatSharp.ApplicationCommands.csproj" />
+    <ProjectReference Include="..\Dependencies\DisCatSharp\DisCatSharp.CommandsNext\DisCatSharp.CommandsNext.csproj" />
+    <ProjectReference Include="..\Dependencies\DisCatSharp\DisCatSharp.Common\DisCatSharp.Common.csproj" />
+    <ProjectReference Include="..\Dependencies\DisCatSharp\DisCatSharp.Configuration\DisCatSharp.Configuration.csproj" />
+    <ProjectReference Include="..\Dependencies\DisCatSharp\DisCatSharp.Experimental\DisCatSharp.Experimental.csproj" />
+    <ProjectReference Include="..\Dependencies\DisCatSharp\DisCatSharp.Interactivity\DisCatSharp.Interactivity.csproj" />
+    <ProjectReference Include="..\Dependencies\DisCatSharp\DisCatSharp.Lavalink\DisCatSharp.Lavalink.csproj" />
+    <ProjectReference Include="..\Dependencies\DisCatSharp\DisCatSharp.VoiceNext.Natives\DisCatSharp.VoiceNext.Natives.csproj" />
+    <ProjectReference Include="..\Dependencies\DisCatSharp\DisCatSharp.VoiceNext\DisCatSharp.VoiceNext.csproj" />
+    <ProjectReference Include="..\Dependencies\DisCatSharp\DisCatSharp\DisCatSharp.csproj" />
+    <ProjectReference Include="..\Dependencies\quickchart-csharp\QuickChart\QuickChart.csproj" />
+    <ProjectReference Include="..\Dependencies\Xorog.Logger\Xorog.Logger.csproj" />
+    <ProjectReference Include="..\Dependencies\Xorog.UniversalExtensions\Xorog.UniversalExtensions.csproj" />
   </ItemGroup>
 
   <ItemGroup>

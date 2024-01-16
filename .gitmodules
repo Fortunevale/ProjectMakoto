@@ -1,16 +1,16 @@
 [submodule "Xorog.Logger"]
-	path = Xorog.Logger
+	path = Dependencies/Xorog.Logger
 	url = https://github.com/Fortunevale/Xorog.Logger
 	branch = main
 [submodule "Xorog.UniversalExtensions"]
-	path = Xorog.UniversalExtensions
+	path = Dependencies/Xorog.UniversalExtensions
 	url = https://github.com/Fortunevale/Xorog.UniversalExtensions
 	branch = main
 [submodule "quickchart-csharp"]
-	path = quickchart-csharp
+	path = Dependencies/quickchart-csharp
 	url = https://github.com/TheXorog/quickchart-csharp
 	branch = applied-editorconfig
 [submodule "DisCatSharp"]
-	path = DisCatSharp
+	path = Dependencies/DisCatSharp
 	url = https://github.com/Aiko-IT-Systems/DisCatSharp
 	branch = main
