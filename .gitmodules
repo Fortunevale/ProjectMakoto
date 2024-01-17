@@ -14,3 +14,9 @@
 	path = Dependencies/DisCatSharp
 	url = https://github.com/Aiko-IT-Systems/DisCatSharp
 	branch = feat/discatsharp.applicationcommands-cooldowns
+[submodule "OfficialPlugins/Example"]
+	path = OfficialPlugins/Example
+	url = https://github.com/Fortunevale/ProjectMakoto.Plugins.Example
+[submodule "OfficialPlugins/Social"]
+	path = OfficialPlugins/Social
+	url = https://github.com/Fortunevale/ProjectMakoto.Plugins.Social

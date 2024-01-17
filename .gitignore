@@ -343,3 +343,4 @@ launchSettings.json
 !.vscode/extensions.json
 !.vscode/settings.json
 ProjectMakoto/Plugins/*
+OfficialPlugins/deps/
