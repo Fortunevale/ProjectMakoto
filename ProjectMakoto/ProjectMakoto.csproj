@@ -41,7 +41,7 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.28" />
-    <PackageReference Include="DisCatSharp.Extensions.TwoFactorCommands" Version="3.0.0" />
+    <PackageReference Include="DisCatSharp.Extensions.TwoFactorCommands" Version="3.0.1" />
     <PackageReference Include="FFMpegCore" Version="5.1.0" />
     <PackageReference Include="GenHTTP.Core" Version="8.1.0" />
     <PackageReference Include="GenHTTP.Modules.StaticWebsites" Version="8.1.0" />
