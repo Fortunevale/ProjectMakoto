@@ -94,6 +94,11 @@ public abstract class BasePlugin
     public abstract ulong? AuthorId { get; }
 
     /// <summary>
+    /// Loads the author from discord upon launch, null if failed to fetch.
+    /// </summary>
+    public DiscordUser? AuthorUser { get; internal set; }
+
+    /// <summary>
     /// The current version of this plugin.
     /// </summary>
     public abstract SemVer Version { get; }
@@ -230,6 +235,14 @@ public abstract class BasePlugin
         }
 
         return;
+    }
+
+    internal async Task PostLoginInternalInit()
+    {
+        Log._logger.LogDebug("Performing Post-Login tasks for {plugin}", this.Name);
+
+        if (this.Bot.DiscordClient.GetFirstShard().TryGetUser(this.AuthorId ?? 0, out var fetchedAuthor, true))
+            this.AuthorUser = fetchedAuthor;
     }
 
     internal async Task CheckForUpdates()

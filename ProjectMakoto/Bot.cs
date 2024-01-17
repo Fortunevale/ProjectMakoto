@@ -256,6 +256,9 @@ public sealed class Bot
 
             await Util.Initializers.PostLoginTaskLoader.Load(this);
 
+            foreach (var plugin in this.Plugins)
+                _ = plugin.Value.PostLoginInternalInit().Add(this);
+
             //foreach (var guild in this.DiscordClient.GetGuilds().Values)
             //    await this.DiscordClient.GetShard(guild.Id).BulkOverwriteGuildApplicationCommandsAsync(guild.Id, Array.Empty<DiscordApplicationCommand>()).ConfigureAwait(false);
 
