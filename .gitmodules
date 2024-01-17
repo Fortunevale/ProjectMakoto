@@ -13,4 +13,4 @@
 [submodule "DisCatSharp"]
 	path = Dependencies/DisCatSharp
 	url = https://github.com/Aiko-IT-Systems/DisCatSharp
-	branch = main
+	branch = feat/discatsharp.applicationcommands-cooldowns
