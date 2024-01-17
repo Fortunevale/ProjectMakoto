@@ -15,7 +15,7 @@
     <StartupObject>ProjectMakoto.Program</StartupObject>
     <SignAssembly>False</SignAssembly>
     <Copyright>Project-Makoto</Copyright>
-    <PackageProjectUrl>https://github.com/TheXorog/Project-Makoto</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/Fortunevale/ProjectMakoto</PackageProjectUrl>
     <AnalysisLevel>latest</AnalysisLevel>
     <NeutralLanguage>en</NeutralLanguage>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
