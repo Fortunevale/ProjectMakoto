@@ -137,12 +137,6 @@ internal static class PluginLoader
                 continue;
             }
 
-            if (b.Value.AuthorId is null)
-            {
-                _logger.LogWarn("Skipped loading Plugin '{0}': Missing AuthorId.", b.Key);
-                continue;
-            }
-
             if (b.Value.Version is null)
             {
                 _logger.LogWarn("Skipped loading Plugin '{0}': Missing Version.", b.Key);
