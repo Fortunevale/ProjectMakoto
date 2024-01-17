@@ -26,6 +26,7 @@ public sealed partial class DatabaseClient : RequiresBotReference
 
     internal MySqlConnectionInformation mainDatabaseConnection;
     internal MySqlConnectionInformation guildDatabaseConnection;
+    internal MySqlConnectionInformation pluginDatabaseConnection;
 
     public bool Disposed { get; private set; } = false;
 
@@ -61,6 +62,21 @@ public sealed partial class DatabaseClient : RequiresBotReference
                                                $"Connection Timeout=60;" +
                                                $"Connection Lifetime=30;" +
                                                $"Database={bot.status.LoadedConfig.Secrets.Database.GuildDatabaseName};");
+                return conn;
+            }
+        };
+        
+        databaseClient.pluginDatabaseConnection = new()
+        {
+            CreateConnection = () =>
+            {
+                var conn = new MySqlConnection($"Server={bot.status.LoadedConfig.Secrets.Database.Host};" +
+                                               $"Port={bot.status.LoadedConfig.Secrets.Database.Port};" +
+                                               $"User Id={bot.status.LoadedConfig.Secrets.Database.Username};" +
+                                               $"Password={bot.status.LoadedConfig.Secrets.Database.Password};" +
+                                               $"Connection Timeout=60;" +
+                                               $"Connection Lifetime=30;" +
+                                               $"Database={bot.status.LoadedConfig.Secrets.Database.PluginDatabaseName};");
                 return conn;
             }
         };

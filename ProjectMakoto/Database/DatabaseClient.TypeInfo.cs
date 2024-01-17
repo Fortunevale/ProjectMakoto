@@ -35,10 +35,6 @@ partial class DatabaseClient
             foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
             {
                 if (property.GetCustomAttribute<ColumnNameAttribute>() is null &&
-                    property.GetCustomAttribute<ColumnType>() is null &&
-                    property.GetCustomAttribute<MaxValueAttribute>() is null &&
-                    property.GetCustomAttribute<WithCollationAttribute>() is null &&
-                    property.GetCustomAttribute<NullableAttribute>() is null &&
                     property.GetCustomAttribute<ContainsValuesAttribute>() is null)
                     continue;
 

@@ -240,7 +240,7 @@ internal static class PluginLoader
                     var options = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary).WithOptimizationLevel(OptimizationLevel.Release);
                     var references = AppDomain.CurrentDomain.GetAssemblies().Where(x => !x.IsDynamic && !x.Location.IsNullOrWhiteSpace()).Select(x => MetadataReference.CreateFromFile(x.Location));
 
-                    _logger.LogInfo("Compiling {0} BasePluginCommands from Plugin from '{1}' ({2}).", pluginCommands.Count, plugin.Value.Name, plugin.Value.Version.ToString());
+                    _logger.LogInfo("Compiling {0} BasePluginCommands from Plugin from '{1}' ({2}).", pluginCommands.Count(), plugin.Value.Name, plugin.Value.Version.ToString());
 
                     Dictionary<CSharpCompilation, CompilationData> compilationList = new();
 

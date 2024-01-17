@@ -40,12 +40,10 @@ public sealed class Bot
     #endregion Clients
 
     #region Plugins
-    public IReadOnlyDictionary<string, BasePlugin> Plugins
-    => this._Plugins.AsReadOnly();
+    public IReadOnlyDictionary<string, BasePlugin> Plugins => this._Plugins.AsReadOnly();
     internal Dictionary<string, BasePlugin> _Plugins { get; set; } = [];
 
-    public IReadOnlyDictionary<string, List<BasePluginCommand>> PluginCommands
-        => this._PluginCommands.AsReadOnly();
+    public IReadOnlyDictionary<string, List<BasePluginCommand>> PluginCommands => this._PluginCommands.AsReadOnly();
     internal Dictionary<string, List<BasePluginCommand>> _PluginCommands { get; set; } = new();
     #endregion
 
@@ -160,11 +158,12 @@ public sealed class Bot
                     Credentials = new Credentials(this.status.LoadedConfig.Secrets.Github.Token)
                 };
 
-                await Task.WhenAll(DatabaseClient.InitializeDatabase(this),
-                                   Util.Initializers.ListLoader.Load(this), 
+                await Task.WhenAll(Util.Initializers.ListLoader.Load(this), 
                                    Util.Initializers.TranslationLoader.Load(this), 
                                    Util.Initializers.PluginLoader.LoadPlugins(this),
                                    Util.Initializers.DependencyLoader.Load(this));
+
+                _ = await DatabaseClient.InitializeDatabase(this);
 
                 _ = Directory.CreateDirectory("WebServer");
 

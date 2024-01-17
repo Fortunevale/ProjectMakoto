@@ -25,9 +25,20 @@ public abstract class BasePlugin
     /// </summary>
     internal static int CurrentApiVersion = 1;
 
+    /// <summary>
+    /// The file this plugin was loaded from.
+    /// </summary>
     internal FileInfo LoadedFile { get; set; }
 
+    /// <summary>
+    /// Whether this plugin has translations enabled.
+    /// </summary>
     internal bool UsesTranslations { get; set; } = false;
+
+    /// <summary>
+    /// A list of all the tables this plugin has access to.
+    /// </summary>
+    internal List<string> AllowedTables { get; set; } = new();
 
     /// <summary>
     /// Makoto Instance
@@ -104,7 +115,7 @@ public abstract class BasePlugin
     public abstract SemVer Version { get; }
 
     /// <summary>
-    /// The currently supported PluginApis. Current Plugin Api is <inheritdoc cref="BasePlugin.CurrentApiVersion"/>.
+    /// The currently supported PluginApis. Current Plugin Api is <inheritdoc cref="BasePlugin.CurrentApiVersion"/>
     /// <para>Gets changed every breaking change.</para>
     /// <code> = [ 1, 2 ]; // example </code>
     /// </summary>
@@ -125,7 +136,7 @@ public abstract class BasePlugin
     /// <summary>
     /// Called upon loading dll.
     /// </summary>
-    /// <param name="bot"></param>
+    /// <param name="bot">The loading Makoto instance.</param>
     internal void Load(Bot bot)
     {
         this.Bot = bot;
@@ -135,22 +146,31 @@ public abstract class BasePlugin
     /// <summary>
     /// Called when plugin was loaded into memory.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The plugin</returns>
     public abstract BasePlugin Initialize();
 
     /// <summary>
     /// Called after registering built-in commands.
     /// </summary>
-    /// <returns></returns>
-    public virtual async Task<List<BasePluginCommand>> RegisterCommands()
+    /// <returns>A list of all commands the plugin wants to register. (An empty list if none.)</returns>
+    public virtual async Task<IEnumerable<BasePluginCommand>> RegisterCommands()
     {
         return new List<BasePluginCommand>();
     }
 
     /// <summary>
+    /// Called when initializing the database connection. Allows you to register your own database tables.
+    /// </summary>
+    /// <returns>A list of all tables the plugin wants to register (or <see langword="null"/>).</returns>
+    public virtual async Task<IEnumerable<Type>?> RegisterTables()
+    {
+        return null;
+    }
+
+    /// <summary>
     /// Allows you to define a translation file. Return <see langword="null"/> or empty string if none is present.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A tuple of a string responsible for the path of the json and type to deserialize the json into.</returns>
     public virtual (string? path, Type? type) LoadTranslations()
     {
         return (null, null);
@@ -170,7 +190,7 @@ public abstract class BasePlugin
     /// <summary>
     /// Gets your plugin's config object.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The previously saved config or <see langword="null"/> if none exists yet.</returns>
     public object GetConfig()
         => (this.Bot.status.LoadedConfig.PluginData.TryGetValue(this.Name, out var val) ? val : null);
 
@@ -190,9 +210,26 @@ public abstract class BasePlugin
     /// <summary>
     /// Checks whether a config already exists.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Whether or not the a config has already been created.</returns>
     public bool CheckIfConfigExists()
         => this.Bot.status.LoadedConfig.PluginData.ContainsKey(this.Name);
+    #endregion
+
+    #region Helper Methods
+
+    /// <summary>
+    /// Checks if a user has objected to having their data processed.
+    /// </summary>
+    /// <param name="id">The user's id</param>
+    /// <returns></returns>
+    public bool HasUserObjected(ulong id)
+        => this.Bot.objectedUsers?.Contains(id) ?? false;
+
+    /// <inheritdoc cref="HasUserObjected(ulong)"/>
+    /// <param name="user">The user.</param>
+    public bool HasUserObjected(DiscordUser user)
+        => this.HasUserObjected(user?.Id ?? 0);
+
     #endregion
 
     #region Internal Logic

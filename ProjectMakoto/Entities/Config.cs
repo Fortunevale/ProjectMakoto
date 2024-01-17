@@ -183,6 +183,7 @@ public sealed class Config
 
             public string MainDatabaseName = "";
             public string GuildDatabaseName = "";
+            public string PluginDatabaseName = "";
 
             public string Collation = "utf8mb4_general_ci";
         }
