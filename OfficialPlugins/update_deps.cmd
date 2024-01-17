@@ -19,3 +19,12 @@ for /D %%i in (*) do (
 		)
 	)
 )
+
+set "original_dir=%CD%"
+cd /d "..\Dependencies"
+
+for /d /r %%i in (*deps*) do (
+    rd /s /q "%%i"
+)
+
+cd /d "%original_dir%"
