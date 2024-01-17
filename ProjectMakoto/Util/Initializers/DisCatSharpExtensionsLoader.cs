@@ -13,11 +13,17 @@ namespace ProjectMakoto.Util.Initializers;
 internal static class DisCatSharpExtensionsLoader
 {
     static Bot bot = null;
+    static List<DisCatSharp.ApplicationCommands.Entities.CommandTranslator> singleCommandTranslations = new();
+    static List<DisCatSharp.ApplicationCommands.Entities.GroupTranslator> groupCommandTranslations = new();
 
     internal static void GetCommandTranslations(ApplicationCommandsTranslationContext x)
     {
-        List<DisCatSharp.ApplicationCommands.Entities.CommandTranslator> singleCommandTranslations = new();
-        List<DisCatSharp.ApplicationCommands.Entities.GroupTranslator> groupCommandTranslations = new();
+        if (singleCommandTranslations.IsNotNullAndNotEmpty() && groupCommandTranslations.IsNotNullAndNotEmpty())
+        {
+            x.AddSingleTranslation(JsonConvert.SerializeObject(singleCommandTranslations));
+            x.AddGroupTranslation(JsonConvert.SerializeObject(groupCommandTranslations));
+            return;
+        }
 
         object CreateTranslationRecursively(Type typeToCreate, CommandTranslation translation)
         {
