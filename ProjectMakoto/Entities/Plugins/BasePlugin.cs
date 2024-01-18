@@ -8,7 +8,6 @@
 // but WITHOUT ANY WARRANTY
 
 using Octokit;
-using ProjectMakoto.Entities.Plugins.Commands;
 using ProjectMakoto.Util.Initializers;
 
 namespace ProjectMakoto.Plugins;

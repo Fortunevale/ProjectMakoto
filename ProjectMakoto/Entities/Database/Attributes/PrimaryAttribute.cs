@@ -7,7 +7,7 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-namespace ProjectMakoto.Entities.Database.ColumnAttributes;
+namespace ProjectMakoto.Database;
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
 public sealed class PrimaryAttribute(bool Primary = true) : Attribute

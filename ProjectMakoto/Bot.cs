@@ -11,7 +11,6 @@ using Octokit;
 using GenHTTP.Engine;
 using GenHTTP.Modules.IO;
 using GenHTTP.Modules.Practices;
-using ProjectMakoto.Entities.Plugins.Commands;
 using GenHTTP.Api.Infrastructure;
 using GenHTTP.Modules.StaticWebsites;
 

@@ -7,9 +7,6 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-using System.Web;
-using Newtonsoft.Json.Serialization;
-
 namespace ProjectMakoto.Util;
 
 internal static class DiscordExtensions

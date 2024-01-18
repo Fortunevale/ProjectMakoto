@@ -7,7 +7,6 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-using ProjectMakoto.Entities.Database.ColumnAttributes;
 using ProjectMakoto.Entities.Guilds;
 
 namespace ProjectMakoto.Entities;

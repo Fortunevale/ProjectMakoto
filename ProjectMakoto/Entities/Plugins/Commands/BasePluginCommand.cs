@@ -7,7 +7,7 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-namespace ProjectMakoto.Entities.Plugins.Commands;
+namespace ProjectMakoto.Plugins;
 
 public sealed class BasePluginCommand
 {

@@ -7,8 +7,6 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-using System.Runtime.Serialization;
-
 namespace ProjectMakoto.Exceptions;
 internal class InvalidCallException : Exception
 {

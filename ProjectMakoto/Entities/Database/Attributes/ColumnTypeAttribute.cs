@@ -7,15 +7,10 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-namespace ProjectMakoto.Entities.Database.ColumnAttributes;
+namespace ProjectMakoto.Database;
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-public sealed class ColumnTypeAttribute : Attribute
+public sealed class ColumnTypeAttribute(ColumnTypes type) : Attribute
 {
-    internal Enums.ColumnTypes Type { get; set; }
-
-    public ColumnTypeAttribute(Enums.ColumnTypes type)
-    { 
-        this.Type = type; 
-    }
+    internal ColumnTypes Type { get; set; } = type;
 }

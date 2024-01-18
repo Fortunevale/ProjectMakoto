@@ -61,7 +61,6 @@ global using ProjectMakoto.Plugins;
 global using ProjectMakoto.PrefixCommands;
 global using ProjectMakoto.Util.SystemMonitor;
 global using ProjectMakoto.Util.JsonSerializers;
-global using ProjectMakoto.Entities.Database.ColumnAttributes;
 global using static ProjectMakoto.Util.Log;
 
 global using Xorog.Logger;

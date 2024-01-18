@@ -8,7 +8,6 @@
 // but WITHOUT ANY WARRANTY
 
 using System.Collections.Concurrent;
-using ProjectMakoto.Entities.Database.ColumnAttributes;
 using ProjectMakoto.Entities.Guilds;
 
 namespace ProjectMakoto.Database;
@@ -177,7 +176,7 @@ public sealed partial class DatabaseClient : RequiresBotReference
             if (currentPluginTables.GroupBy(x => databaseClient.GetTableName(x)).Any(x => x.Count() >= 2))
                 throw new Exception("You cannot use the same tablename twice.");
 
-            if (currentPluginTables.Any(x => x.BaseType != typeof(Entities.Plugins.Database.PluginDatabaseTable)))
+            if (currentPluginTables.Any(x => x.BaseType != typeof(Plugins.PluginDatabaseTable)))
                 throw new Exception("One or more types do not inherit PluginDatabaseTable");
 
             if (currentPluginTables.Any(x => x.GetCustomAttribute<TableNameAttribute>() == null))

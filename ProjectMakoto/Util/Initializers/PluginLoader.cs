@@ -11,8 +11,6 @@ using System.Collections.Immutable;
 using System.Runtime.Loader;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Emit;
-using ProjectMakoto.Entities.Plugins.Commands;
 
 namespace ProjectMakoto.Util.Initializers;
 internal static class PluginLoader

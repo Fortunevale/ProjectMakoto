@@ -9,7 +9,6 @@
 
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
-using ProjectMakoto.Entities.Database.ColumnAttributes;
 
 namespace ProjectMakoto.Entities;
 

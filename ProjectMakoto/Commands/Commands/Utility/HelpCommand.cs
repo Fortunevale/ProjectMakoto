@@ -7,8 +7,6 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-using CommandType = ProjectMakoto.Enums.CommandType;
-
 namespace ProjectMakoto.Commands;
 
 internal sealed class HelpCommand : BaseCommand

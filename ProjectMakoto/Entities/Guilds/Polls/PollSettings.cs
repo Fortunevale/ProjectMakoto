@@ -7,8 +7,6 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-using ProjectMakoto.Entities.Database.ColumnAttributes;
-
 namespace ProjectMakoto.Entities.Guilds;
 
 public sealed class PollSettings : RequiresParent<Guild>

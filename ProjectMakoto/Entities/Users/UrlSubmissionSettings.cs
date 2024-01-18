@@ -7,8 +7,6 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-using ProjectMakoto.Entities.Database.ColumnAttributes;
-
 namespace ProjectMakoto.Entities.Users;
 
 public sealed class UrlSubmissionSettings(Bot bot, User parent) : RequiresParent<User>(bot, parent)
