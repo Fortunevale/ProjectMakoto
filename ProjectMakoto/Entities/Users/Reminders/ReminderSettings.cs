@@ -18,7 +18,7 @@ public sealed class ReminderSettings : RequiresParent<User>
         this.RemindersUpdated();
     }
 
-    [ColumnName("reminders"), ColumnType(ColumnTypes.LongText), WithCollation, Default("[]")]
+    [ColumnName("reminders"), ColumnType(ColumnTypes.LongText), Default("[]")]
     public ReminderItem[] ScheduledReminders
     {
         get => JsonConvert.DeserializeObject<ReminderItem[]>(this.Bot.DatabaseClient.GetValue<string>("users", "userid", this.Parent.Id, "reminders", this.Bot.DatabaseClient.mainDatabaseConnection));

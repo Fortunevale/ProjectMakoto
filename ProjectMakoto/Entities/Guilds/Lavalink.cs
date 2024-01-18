@@ -32,7 +32,7 @@ public sealed class Lavalink(Bot bot, Guild parent) : RequiresParent<Guild>(bot,
     public List<ulong> collectedDisconnectVotes = new();
     public List<ulong> collectedClearQueueVotes = new();
 
-    [ColumnName("lavalink_queue"), ColumnType(ColumnTypes.LongText), WithCollation, Default("[]")]
+    [ColumnName("lavalink_queue"), ColumnType(ColumnTypes.LongText), Default("[]")]
     public QueueInfo[] SongQueue
     {
         get => JsonConvert.DeserializeObject<QueueInfo[]>(this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Parent.Id, "lavalink_queue", this.Bot.DatabaseClient.mainDatabaseConnection));
@@ -46,7 +46,7 @@ public sealed class Lavalink(Bot bot, Guild parent) : RequiresParent<Guild>(bot,
         set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "lavalink_channel", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    [ColumnName("lavalink_currentvideo"), ColumnType(ColumnTypes.Text), WithCollation, Nullable]
+    [ColumnName("lavalink_currentvideo"), ColumnType(ColumnTypes.Text), Nullable]
     public string? CurrentVideo
     {
         get => this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Parent.Id, "lavalink_currentvideo", this.Bot.DatabaseClient.mainDatabaseConnection);

@@ -12,7 +12,7 @@ using ProjectMakoto.Entities.Database.ColumnAttributes;
 namespace ProjectMakoto.Entities.Guilds;
 public sealed class PrefixSettings(Bot bot, Guild parent) : RequiresParent<Guild>(bot, parent)
 {
-    [ColumnName("prefix"), ColumnType(ColumnTypes.Text), WithCollation, Default(";;")]
+    [ColumnName("prefix"), ColumnType(ColumnTypes.Text), Default(";;")]
     public string Prefix
     {
         get => this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Parent.Id, "prefix", this.Bot.DatabaseClient.mainDatabaseConnection);

@@ -42,7 +42,7 @@ public sealed class PhishingDetectionSettings(Bot bot, Guild parent) : RequiresP
     }
 
 
-    [ColumnName("phishing_reason"), ColumnType(ColumnTypes.Text), WithCollation, Default("%R")]
+    [ColumnName("phishing_reason"), ColumnType(ColumnTypes.Text), Default("%R")]
     public string CustomPunishmentReason
     {
         get => this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Parent.Id, "phishing_reason", this.Bot.DatabaseClient.mainDatabaseConnection);

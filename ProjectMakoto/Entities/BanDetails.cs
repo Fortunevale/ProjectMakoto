@@ -26,7 +26,7 @@ public sealed class BanDetails : RequiresBotReference
     [ColumnName("id"), ColumnType(ColumnTypes.BigInt), Primary]
     internal ulong Id { get; init; }
 
-    [ColumnName("reason"), ColumnType(ColumnTypes.LongText), WithCollation, Default("-")]
+    [ColumnName("reason"), ColumnType(ColumnTypes.LongText), Default("-")]
     public string Reason
     {
         get => this.Bot.DatabaseClient.GetValue<string>(this._tableName, "id", this.Id, "reason", this.Bot.DatabaseClient.mainDatabaseConnection);

@@ -13,7 +13,7 @@ namespace ProjectMakoto.Entities.Users;
 
 public sealed class AfkStatus(Bot bot, User parent) : RequiresParent<User>(bot, parent)
 {
-    [ColumnName("afk_reason"), ColumnType(ColumnTypes.Text), WithCollation, Nullable]
+    [ColumnName("afk_reason"), ColumnType(ColumnTypes.Text), Nullable]
     public string Reason
     {
         get => this.Bot.DatabaseClient.GetValue<string>("users", "userid", this.Parent.Id, "afk_reason", this.Bot.DatabaseClient.mainDatabaseConnection);
@@ -33,7 +33,7 @@ public sealed class AfkStatus(Bot bot, User parent) : RequiresParent<User>(bot, 
         set => _ = this.Bot.DatabaseClient.SetValue("users", "userid", this.Parent.Id, "afk_pingamount", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    [ColumnName("afk_pings"), ColumnType(ColumnTypes.Text), WithCollation, Default("[]")]
+    [ColumnName("afk_pings"), ColumnType(ColumnTypes.Text), Default("[]")]
     public MessageDetails[] Messages
     {
         get => JsonConvert.DeserializeObject<MessageDetails[]>(this.Bot.DatabaseClient.GetValue<string>("users", "userid", this.Parent.Id, "afk_pings", this.Bot.DatabaseClient.mainDatabaseConnection));

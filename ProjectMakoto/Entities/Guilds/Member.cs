@@ -106,7 +106,7 @@ public sealed class Member : RequiresParent<Guild>
     [ColumnName("userid"), ColumnType(ColumnTypes.BigInt), Primary]
     internal ulong Id { get; set; }
 
-    [ColumnName("saved_nickname"), ColumnType(ColumnTypes.Text), WithCollation, Nullable]
+    [ColumnName("saved_nickname"), ColumnType(ColumnTypes.Text), Nullable]
     public string? SavedNickname
     {
         get => this.Bot.DatabaseClient.GetValue<string>(this.Parent.Id.ToString(), "userid", this.Id, "saved_nickname", this.Bot.DatabaseClient.guildDatabaseConnection);
@@ -127,7 +127,7 @@ public sealed class Member : RequiresParent<Guild>
         set => _ = this.Bot.DatabaseClient.SetValue(this.Parent.Id.ToString(), "userid", this.Id, "last_leave", value, this.Bot.DatabaseClient.guildDatabaseConnection);
     }
 
-    [ColumnName("roles"), ColumnType(ColumnTypes.LongText), WithCollation, Default("[]")]
+    [ColumnName("roles"), ColumnType(ColumnTypes.LongText), Default("[]")]
     public MemberRole[] MemberRoles
     {
         get => JsonConvert.DeserializeObject<MemberRole[]>(this.Bot.DatabaseClient.GetValue<string>(this.Parent.Id.ToString(), "userid", this.Id, "roles", this.Bot.DatabaseClient.guildDatabaseConnection));

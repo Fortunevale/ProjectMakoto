@@ -23,7 +23,7 @@ internal class GlobalNote : RequiresBotReference
     internal ulong Id { get; init; }
     
     
-    [ColumnName("notes"), ColumnType(ColumnTypes.LongText), WithCollation, Default("[]")]
+    [ColumnName("notes"), ColumnType(ColumnTypes.LongText), Default("[]")]
     internal Note[] Notes
     {
         get => JsonConvert.DeserializeObject<Note[]>(this.Bot.DatabaseClient.GetValue<string>("globalnotes", "id", this.Id, "notes", this.Bot.DatabaseClient.mainDatabaseConnection));

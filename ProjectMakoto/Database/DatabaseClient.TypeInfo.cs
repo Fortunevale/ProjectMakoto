@@ -66,9 +66,17 @@ partial class DatabaseClient
             info.GetCustomAttribute<ColumnType>()?.Type ?? throw new InvalidOperationException("Not a valid column.").AddData("info", info),
             info.GetCustomAttribute<PrimaryAttribute>()?.Primary ?? false,
             info.GetCustomAttribute<MaxValueAttribute>()?.MaxValue ?? (this.GetDefaultMaxValue(info.GetCustomAttribute<ColumnType>().Type, out var max) ? max : null),
-            info.GetCustomAttribute<WithCollationAttribute>() is not null ? this.Bot.status.LoadedConfig.Secrets.Database.Collation : null,
+            this.UsesCollation(info.GetCustomAttribute<ColumnType>().Type) ? this.Bot.status.LoadedConfig.Secrets.Database.Collation : null,
             info.GetCustomAttribute<NullableAttribute>()?.Nullable ?? false,
             info.GetCustomAttribute<DefaultAttribute>()?.Default);
+
+    private bool UsesCollation(ColumnTypes columnType) 
+        => columnType switch
+        {
+            ColumnTypes.BigInt or ColumnTypes.Int or ColumnTypes.TinyInt => false,
+            ColumnTypes.LongText or ColumnTypes.Text or ColumnTypes.VarChar => true,
+            _ => throw new InvalidOperationException(),
+        };
 
     internal bool GetDefaultMaxValue(ColumnTypes type, out long maxValue)
     {
