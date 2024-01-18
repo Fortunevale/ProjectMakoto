@@ -235,6 +235,32 @@ public abstract class BasePlugin
     public bool HasUserObjected(DiscordUser user)
         => this.HasUserObjected(user?.Id ?? 0);
 
+    /// <summary>
+    /// Checks if a user has been banned from using this bot.
+    /// </summary>
+    /// <param name="id">The user's id</param>
+    /// <returns></returns>
+    public bool IsUserBanned(ulong id)
+        => this.Bot.bannedUsers?.ContainsKey(id) ?? false;
+
+    /// <inheritdoc cref="HasUserObjected(ulong)"/>
+    /// <param name="user">The user.</param>
+    public bool IsUserBanned(DiscordUser user)
+        => this.IsUserBanned(user?.Id ?? 0);
+
+    /// <summary>
+    /// Checks if a user has objected to having their data processed.
+    /// </summary>
+    /// <param name="id">The user's id</param>
+    /// <returns></returns>
+    public bool IsGuildBanned(ulong id)
+        => this.Bot.bannedGuilds?.ContainsKey(id) ?? false;
+
+    /// <inheritdoc cref="HasUserObjected(ulong)"/>
+    /// <param name="guild">The guild.</param>
+    public bool IsGuildBanned(DiscordGuild guild)
+        => this.IsGuildBanned(guild?.Id ?? 0);
+
     #endregion
 
     #region Internal Logic

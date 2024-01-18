@@ -13,7 +13,7 @@ namespace ProjectMakoto.Entities;
 
 public sealed class SharedCommandContext
 {
-    internal SharedCommandContext() { }
+    public SharedCommandContext() { }
 
     public SharedCommandContext(BaseCommand cmd, CommandContext ctx, Bot _bot)
     {
