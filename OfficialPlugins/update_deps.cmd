@@ -1,5 +1,9 @@
 @echo off
 
+pushd ..
+git submodule update --init --recursive
+popd
+
 rmdir /S /Q deps
 dotnet publish ..\ProjectMakoto\ProjectMakoto.sln --configuration RELEASE --runtime linux-x64 --no-self-contained --property:PublishDir="deps" --framework net8.0
 move ..\ProjectMakoto\deps deps
