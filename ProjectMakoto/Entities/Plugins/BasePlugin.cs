@@ -79,7 +79,13 @@ public abstract class BasePlugin
     /// Raised on first successful log in to discord.
     /// </summary>
     public event EventHandler<EventArgs> Connected;
-    internal static Task RaiseConnected(Bot bot) => CallEvent<EventArgs>(bot, bot.Plugins?.Select(x => x.Value.Connected), EventArgs.Empty);
+    internal static Task RaiseConnected(Bot bot) => Task.Run(() => CallEvent<EventArgs>(bot, bot.Plugins?.Select(x => x.Value.Connected), EventArgs.Empty));
+
+    /// <summary>
+    /// Raised on when database is initialized.
+    /// </summary>
+    public event EventHandler<EventArgs> DatabaseInitialized;
+    internal static Task RaiseDatabaseInitialized(Bot bot) => Task.Run(() => CallEvent<EventArgs>(bot, bot.Plugins?.Select(x => x.Value.DatabaseInitialized), EventArgs.Empty));
 
     #endregion
 
@@ -251,7 +257,14 @@ public abstract class BasePlugin
             if (e is null)
                 continue;
 
-            e.Invoke(bot, args);
+            try
+            {
+                e.Invoke(bot, args);
+            }
+            catch (Exception ex)
+            {
+                Log._logger.LogError("Failed to run event handler", ex);
+            }
         }
 
         return Task.CompletedTask;

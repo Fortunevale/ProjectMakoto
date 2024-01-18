@@ -16,8 +16,27 @@ namespace ProjectMakoto.Entities;
 /// Creates a new self filling dictionary. 
 /// </summary>
 /// <param name="newValuePredicate">A predicate to create the intended value. If null, will default to the default value of the value.</param>
-public sealed class SelfFillingDatabaseDictionary<T>(DatabaseClient client, string tableName, string primaryKey, bool useGuildConnection, Func<ulong, T>? newValuePredicate = null) : DatabaseDictionary<ulong, T>(client, tableName, primaryKey, useGuildConnection, newValuePredicate)
+public sealed class SelfFillingDatabaseDictionary<T> : DatabaseDictionary<ulong, T>
 {
+    public SelfFillingDatabaseDictionary(DatabaseClient client, string tableName, string primaryKey, DatabaseClient.MySqlConnectionInformation connection, Func<ulong, T>? newValuePredicate = null) : 
+        base(client, tableName, primaryKey, connection, newValuePredicate)
+    {
+    }
+
+    /// <summary>
+    /// Creates a new Dictionary with ulong as key. Constructor for plugins.
+    /// </summary>
+    /// <param name="bot"></param>
+    /// <param name="type"></param>
+    /// <param name="newValuePredicate"></param>
+    public SelfFillingDatabaseDictionary(BasePlugin plugin, Type type, Func<ulong, T>? newValuePredicate = null) :
+        base(plugin.Bot.DatabaseClient, 
+        (plugin.Bot.DatabaseClient.MakePluginTablePrefix(plugin) + plugin.Bot.DatabaseClient.GetTableName(type)).ToLower(), 
+         plugin.Bot.DatabaseClient.GetPrimaryKey(type).ColumnName, 
+         plugin.Bot.DatabaseClient.pluginDatabaseConnection, 
+         newValuePredicate)
+    {
+    }
 
     /// <summary>
     /// Gets a value from this dictionary, filling in values if not already present.

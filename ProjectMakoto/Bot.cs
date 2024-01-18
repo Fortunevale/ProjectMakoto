@@ -164,6 +164,7 @@ public sealed class Bot
                                    Util.Initializers.DependencyLoader.Load(this));
 
                 _ = await DatabaseClient.InitializeDatabase(this);
+                _ = BasePlugin.RaiseDatabaseInitialized(this);
 
                 _ = Directory.CreateDirectory("WebServer");
 
@@ -176,43 +177,43 @@ public sealed class Bot
 
                 this.objectedUsers = new(this.DatabaseClient, "objected_users", "id", false);
 
-                this.PhishingHosts = new(this.DatabaseClient, "scam_urls", "url", false, (id) =>
+                this.PhishingHosts = new(this.DatabaseClient, "scam_urls", "url", this.DatabaseClient.mainDatabaseConnection, (id) =>
                 {
                     return new PhishingUrlEntry(this, id);
                 });
                 
-                this.SubmittedHosts = new(this.DatabaseClient, "active_url_submissions", "messageid", false, (id) =>
+                this.SubmittedHosts = new(this.DatabaseClient, "active_url_submissions", "messageid", this.DatabaseClient.mainDatabaseConnection, (id) =>
                 {
                     return new SubmittedUrlEntry(this, id);
                 });
                 //this.PhishingHosts = new();
 
-                this.Users = new(this.DatabaseClient, "users", "userid", false, (id) =>
+                this.Users = new(this.DatabaseClient, "users", "userid", this.DatabaseClient.mainDatabaseConnection, (id) =>
                 {
                     return new Entities.User(this, id);
                 });
 
-                this.Guilds = new(this.DatabaseClient, "guilds", "serverid", false, (id) =>
+                this.Guilds = new(this.DatabaseClient, "guilds", "serverid", this.DatabaseClient.mainDatabaseConnection, (id) =>
                 {
                     return new Entities.Guild(this, id);
                 });
                 
-                this.globalNotes = new(this.DatabaseClient, "globalnotes", "id", false, (id) =>
+                this.globalNotes = new(this.DatabaseClient, "globalnotes", "id", this.DatabaseClient.mainDatabaseConnection, (id) =>
                 {
                     return new Entities.GlobalNote(this, id);
                 });
 
-                this.bannedUsers = new(this.DatabaseClient, "banned_users", "id", false, (id) =>
+                this.bannedUsers = new(this.DatabaseClient, "banned_users", "id", this.DatabaseClient.mainDatabaseConnection, (id) =>
                 {
                     return new BanDetails(this, "banned_users", id);
                 });
 
-                this.bannedGuilds = new(this.DatabaseClient, "banned_guilds", "id", false, (id) =>
+                this.bannedGuilds = new(this.DatabaseClient, "banned_guilds", "id", this.DatabaseClient.mainDatabaseConnection, (id) =>
                 {
                     return new BanDetails(this, "banned_guilds", id);
                 });
                 
-                this.globalBans = new(this.DatabaseClient, "globalbans", "id", false, (id) =>
+                this.globalBans = new(this.DatabaseClient, "globalbans", "id", this.DatabaseClient.mainDatabaseConnection, (id) =>
                 {
                     return new BanDetails(this, "globalbans", id);
                 });
