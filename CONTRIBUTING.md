@@ -41,8 +41,6 @@
         - Add a bot to the application and note down the bot token.
         - Makoto currently requires the `Presence`, `Server Members` and `Message Content` Intents.
         - I recommend disabling the `Public Bot` Option so no one can add your development client to their server.
-    - [kawaii.red](https://kawaii.red/)
-        - You'll find your api token on your user dashboard.
     - [AbuseIPDB API Key](https://www.abuseipdb.com/account)
         - After creating your account, you can create an api key [here](https://www.abuseipdb.com/account/api).
     - [Github](https://github.com/)
