@@ -23,7 +23,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
         _logger.LogDebug("Registering DisCatSharp EventHandler..");
         handler.genericGuildEvents = new(_bot);
         handler.commandEvents = new(_bot);
-        handler.afkEvents = new(_bot);
         handler.crosspostEvents = new(_bot);
         handler.phishingProtectionEvents = new(_bot);
         handler.submissionEvents = new(_bot);
@@ -42,7 +41,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
         handler.tokenLeakEvents = new(_bot);
         handler.vcCreatorEvents = new(_bot);
         handler.reminderEvents = new(_bot);
-        handler.userBlockEvents = new(_bot);
 
         _bot.DiscordClient.GuildCreated += handler.GuildCreated;
         _bot.DiscordClient.GuildUpdated += handler.GuildUpdated;
@@ -90,7 +88,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
 
     GenericGuildEvents genericGuildEvents { get; set; }
     CommandEvents commandEvents { get; set; }
-    AfkEvents afkEvents { get; set; }
     CrosspostEvents crosspostEvents { get; set; }
     PhishingProtectionEvents phishingProtectionEvents { get; set; }
     PhishingSubmissionEvents submissionEvents { get; set; }
@@ -109,7 +106,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     EmbedMessagesEvents embedMessagesEvents { get; set; }
     TokenLeakEvents tokenLeakEvents { get; set; }
     ReminderEvents reminderEvents { get; set; }
-    UserBlockEvents userBlockEvents { get; set; }
 
     internal async Task GuildMemberAdded(DiscordClient sender, GuildMemberAddEventArgs e)
     {
@@ -172,7 +168,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            _ = this.afkEvents.MessageCreated(sender, e).Add(this.Bot);
             _ = this.crosspostEvents.MessageCreated(sender, e).Add(this.Bot);
             _ = this.phishingProtectionEvents.MessageCreated(sender, e).Add(this.Bot);
             _ = this.bumpReminderEvents.MessageCreated(sender, e).Add(this.Bot);
@@ -350,7 +345,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
             _ = this.actionlogEvents.VoiceStateUpdated(sender, e).Add(this.Bot);
             _ = this.voicePrivacyEvents.VoiceStateUpdated(sender, e).Add(this.Bot);
             _ = this.vcCreatorEvents.VoiceStateUpdated(sender, e).Add(this.Bot);
-            _ = this.userBlockEvents.VoiceStateUpdated(sender, e).Add(this.Bot);
         }).Add(this.Bot);
     }
 

@@ -84,12 +84,7 @@ public sealed class Config
 
     public sealed class EmojiConfig
     {
-        public string[] JoinEvent = { "🙋‍", "🙋‍" };
-        public string Cuddle = "🅿";
-        public string Kiss = "🅿";
-        public string Slap = "🅿";
-        public string Proud = "🅿";
-        public string Hug = "🅿";
+        public string[] JoinEvent = ["🙋‍", "🙋‍"];
 
         public ulong DisabledRepeat = 0;
         public ulong DisabledShuffle = 0;
@@ -134,7 +129,6 @@ public sealed class Config
 
     public sealed class SecretsConfig
     {
-        public string KawaiiRedToken = "";
         public string AbuseIpDbToken = "";
         public string LibreTranslateHost = "127.0.0.1";
 

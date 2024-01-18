@@ -196,26 +196,6 @@ public sealed class UtilityPrefixCommands : BaseCommandModule
     public async Task Credits(CommandContext ctx)
         => _ = new CreditsCommand().ExecuteCommand(ctx, this._bot);
 
-    [Command("block-user"),
-    
-    Description("Allows you to block a user")]
-    public async Task BlockUser(CommandContext ctx, DiscordUser victim)
-    => _ = new BlockUserCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
-    {
-            { "victim", victim }
-    });
-
-
-    [Command("unblock-user"), 
-    
-    Description("Allows you to unblock a user")]
-    public async Task UnblockUser(CommandContext ctx, DiscordUser victim)
-        => _ = new UnblockUserCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
-        {
-            { "victim", victim }
-        });
-
-
     [Group("vcc"),
     
     Description("Allows you to modify your own voice channel.")]

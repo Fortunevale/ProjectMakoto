@@ -96,7 +96,6 @@ internal static class ConfigLoader
             bot.status.LoadedConfig.Secrets.Discord.Token,
             bot.status.LoadedConfig.Secrets.Telegram.Token,
             bot.status.LoadedConfig.Secrets.Lavalink.Password,
-            bot.status.LoadedConfig.Secrets.Github.Token,
-            bot.status.LoadedConfig.Secrets.KawaiiRedToken);
+            bot.status.LoadedConfig.Secrets.Github.Token);
     }
 }

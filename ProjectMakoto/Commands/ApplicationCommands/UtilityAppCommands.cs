@@ -204,21 +204,6 @@ public sealed class UtilityAppCommands : ApplicationCommandsModule
     public async Task Credits(InteractionContext ctx)
         => _ = new CreditsCommand().ExecuteCommand(ctx, this._bot);
 
-    [SlashCommand("block-user", "Allows you to block a user", dmPermission: false)]
-    public async Task BlockUser(InteractionContext ctx, [Option("target", "The user to block.")] DiscordUser victim)
-        => _ = new BlockUserCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
-        {
-            { "victim", victim }
-        });
-
-
-    [SlashCommand("unblock-user", "Allows you to block a user", dmPermission: false)]
-    public async Task UnblockUser(InteractionContext ctx, [Option("target", "The user to unblock.")] DiscordUser victim)
-        => _ = new UnblockUserCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
-        {
-            { "victim", victim }
-        });
-
     [SlashCommandGroup("vcc", "Allows you to modify your own voice channel.", dmPermission: false)]
     public sealed class VcCreatorManagement : ApplicationCommandsModule
     {

@@ -26,7 +26,6 @@ public sealed class User : RequiresBotReference
         this.Cooldown = new(bot, this);
 
         this.UrlSubmissions = new(bot, this);
-        this.AfkStatus = new(bot, this);
         this.ScoreSaber = new(bot, this);
         this.ExperienceUser = new(bot, this);
         this.Reminders = new(bot, this);
@@ -40,9 +39,6 @@ public sealed class User : RequiresBotReference
 
     [ContainsValues]
     public UrlSubmissionSettings UrlSubmissions { get; init; }
-
-    [ContainsValues]
-    public AfkStatus AfkStatus { get; init; }
 
     [ContainsValues]
     public ScoreSaberSettings ScoreSaber { get; init; }

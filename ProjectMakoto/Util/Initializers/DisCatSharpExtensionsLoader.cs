@@ -286,7 +286,6 @@ internal static class DisCatSharpExtensionsLoader
             appCommands.RegisterGlobalCommands<ApplicationCommands.MaintainersAppCommands>(GetCommandTranslations);
             appCommands.RegisterGlobalCommands<ApplicationCommands.ConfigurationAppCommands>(GetCommandTranslations);
             appCommands.RegisterGlobalCommands<ApplicationCommands.ModerationAppCommands>(GetCommandTranslations);
-            appCommands.RegisterGlobalCommands<ApplicationCommands.SocialAppCommands>(GetCommandTranslations);
             appCommands.RegisterGlobalCommands<ApplicationCommands.ScoreSaberAppCommands>(GetCommandTranslations);
             appCommands.RegisterGlobalCommands<ApplicationCommands.MusicAppCommands>(GetCommandTranslations);
             appCommands.RegisterGlobalCommands<ApplicationCommands.UtilityAppCommands>(GetCommandTranslations);
@@ -297,7 +296,6 @@ internal static class DisCatSharpExtensionsLoader
             appCommands.RegisterGuildCommands<ApplicationCommands.MaintainersAppCommands>(bot.status.LoadedConfig.Discord.DevelopmentGuild, GetCommandTranslations);
             appCommands.RegisterGuildCommands<ApplicationCommands.ConfigurationAppCommands>(bot.status.LoadedConfig.Discord.DevelopmentGuild, GetCommandTranslations);
             appCommands.RegisterGuildCommands<ApplicationCommands.ModerationAppCommands>(bot.status.LoadedConfig.Discord.DevelopmentGuild, GetCommandTranslations);
-            appCommands.RegisterGuildCommands<ApplicationCommands.SocialAppCommands>(bot.status.LoadedConfig.Discord.DevelopmentGuild, GetCommandTranslations);
             appCommands.RegisterGuildCommands<ApplicationCommands.ScoreSaberAppCommands>(bot.status.LoadedConfig.Discord.DevelopmentGuild, GetCommandTranslations);
             appCommands.RegisterGuildCommands<ApplicationCommands.MusicAppCommands>(bot.status.LoadedConfig.Discord.DevelopmentGuild, GetCommandTranslations);
         }
@@ -305,7 +303,6 @@ internal static class DisCatSharpExtensionsLoader
         _logger.LogDebug("Registering Commands..");
         cNext.RegisterCommands<PrefixCommands.UtilityPrefixCommands>();
         cNext.RegisterCommands<PrefixCommands.MusicPrefixCommands>();
-        cNext.RegisterCommands<PrefixCommands.SocialPrefixCommands>();
         cNext.RegisterCommands<PrefixCommands.ScoreSaberPrefixCommands>();
         cNext.RegisterCommands<PrefixCommands.ModerationPrefixCommands>();
         cNext.RegisterCommands<PrefixCommands.ConfigurationPrefixCommands>();

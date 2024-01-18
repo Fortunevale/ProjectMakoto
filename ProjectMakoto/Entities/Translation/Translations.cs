@@ -7,6 +7,9 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 namespace ProjectMakoto.Entities;
+#pragma warning disable CS8981
+#pragma warning disable CS8618
+#pragma warning disable IDE1006
 public class Translations : ITranslations
 {
     public Dictionary<string, int> Progress = new();
@@ -967,76 +970,6 @@ public class Translations : ITranslations
             public SingleTranslationKey ForbiddenError;
             public SingleTranslationKey InternalServerError;
         }
-        public social Social;
-        public sealed class social
-        {
-            public slap Slap;
-            public sealed class slap
-            {
-                public MultiTranslationKey Self;
-                public MultiTranslationKey Other;
-            }
-            public pat Pat;
-            public sealed class pat
-            {
-                public MultiTranslationKey Self;
-                public MultiTranslationKey Other;
-            }
-            public kiss Kiss;
-            public sealed class kiss
-            {
-                public MultiTranslationKey Self;
-                public MultiTranslationKey Other;
-            }
-            public kill Kill;
-            public sealed class kill
-            {
-                public MultiTranslationKey Self;
-                public MultiTranslationKey Other;
-            }
-            public hug Hug;
-            public sealed class hug
-            {
-                public MultiTranslationKey Self;
-                public MultiTranslationKey Other;
-            }
-            public highFive HighFive;
-            public sealed class highFive
-            {
-                public MultiTranslationKey Self;
-                public MultiTranslationKey Other;
-            }
-            public cuddle Cuddle;
-            public sealed class cuddle
-            {
-                public MultiTranslationKey Self;
-                public MultiTranslationKey Other;
-            }
-            public boop Boop;
-            public sealed class boop
-            {
-                public MultiTranslationKey Self;
-                public MultiTranslationKey Other;
-            }
-            public SingleTranslationKey BlockedByVictim;
-            public SingleTranslationKey BlockedVictim;
-            public afk Afk;
-            public sealed class afk
-            {
-                public SingleTranslationKey SetAfk;
-                public SingleTranslationKey Title;
-                public events Events;
-                public sealed class events
-                {
-                    public SingleTranslationKey CurrentlyAfk;
-                    public SingleTranslationKey AndMore;
-                    public SingleTranslationKey MessageListing;
-                    public SingleTranslationKey Message;
-                    public SingleTranslationKey MissedTitle;
-                    public SingleTranslationKey NoLongerAfk;
-                }
-            }
-        }
         public utility Utility;
         public sealed class utility
         {
@@ -1139,19 +1072,6 @@ public class Translations : ITranslations
                     public SingleTranslationKey Fetching;
                     public SingleTranslationKey TimeError;
                 }
-            }
-            public unblockUser UnblockUser;
-            public sealed class unblockUser
-            {
-                public SingleTranslationKey Unblocked;
-                public SingleTranslationKey NotBlocked;
-            }
-            public blockUser BlockUser;
-            public sealed class blockUser
-            {
-                public SingleTranslationKey CannotBlock;
-                public MultiTranslationKey Blocked;
-                public SingleTranslationKey AlreadyBlocked;
             }
             public userInfo UserInfo;
             public sealed class userInfo
