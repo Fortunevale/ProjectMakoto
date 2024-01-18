@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Util;
 
-internal static class PreMadeEmbedsExtensions
+public static class PreMadeEmbedsExtensions
 {
     public static DiscordEmbedBuilder AsLoading(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
     {

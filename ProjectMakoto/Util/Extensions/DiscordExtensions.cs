@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Util;
 
-internal static class DiscordExtensions
+public static class DiscordExtensions
 {
     private static string? LoadedHtml = null;
 
@@ -240,7 +240,7 @@ internal static class DiscordExtensions
             .Replace("<!-- Messages -->", string.Join("\n", messageStrings));
     }
 
-    internal static string ConvertMarkdownToHtml(this string? md, Bot bot, bool isEmbed = false)
+    public static string ConvertMarkdownToHtml(this string? md, Bot bot, bool isEmbed = false)
     {
         if (md.IsNullOrWhiteSpace())
             return md;
@@ -393,19 +393,19 @@ internal static class DiscordExtensions
         return md; // .ReplaceLineEndings("<br />")
     }
 
-    internal static Permissions[] GetEnumeration(this Permissions perms)
+    public static Permissions[] GetEnumeration(this Permissions perms)
         => Enum.GetValues(perms.GetType()).Cast<Enum>().Where(x => perms.HasFlag(x)).Select(x => (Permissions)x.ToInt64()).ToArray();
 
-    internal static Guild GetDbEntry(this DiscordGuild guild, Bot bot)
+    public static Guild GetDbEntry(this DiscordGuild guild, Bot bot)
         => bot.Guilds[guild.Id];
 
-    internal static User GetDbEntry(this DiscordUser user, Bot bot)
+    public static User GetDbEntry(this DiscordUser user, Bot bot)
         => bot.Users[user.Id];
 
-    internal static bool HasAnyPermission(this Permissions permissions, params Permissions[] list)
+    public static bool HasAnyPermission(this Permissions permissions, params Permissions[] list)
         => list.Any(x => permissions.HasPermission(x));
 
-    internal static string GetGuildPrefix(this DiscordGuild guild, Bot bot)
+    public static string GetGuildPrefix(this DiscordGuild guild, Bot bot)
     {
         try
         {
@@ -418,24 +418,24 @@ internal static class DiscordExtensions
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "DCS0101:[Discord] InExperiment", Justification = "<Pending>")]
-    internal static string GetUsername(this DiscordUser user)
+    public static string GetUsername(this DiscordUser user)
         => user.IsMigrated ? user.GlobalName : user.Username;
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "DCS0101:[Discord] InExperiment", Justification = "<Pending>")]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "DCS0102:[Discord] Deprecated", Justification = "<Pending>")]
-    internal static string GetUsernameWithIdentifier(this DiscordUser user)
+    public static string GetUsernameWithIdentifier(this DiscordUser user)
         => user.IsMigrated ? $"{user.GlobalName} ({user.Username})" : user.UsernameWithDiscriminator;
 
-    internal static string ToTranslatedPermissionString(this Permissions perm, Guild guild, Bot _bot)
+    public static string ToTranslatedPermissionString(this Permissions perm, Guild guild, Bot _bot)
         => GetTranslationObject(perm, _bot) == _bot.LoadedTranslations.Common.MissingTranslation ? perm.ToPermissionString().Log(CustomLogLevel.Warn, "Missing Translation") : GetTranslationObject(perm, _bot).Get(guild);
 
-    internal static string ToTranslatedPermissionString(this Permissions perm, DiscordGuild guild, Bot _bot)
+    public static string ToTranslatedPermissionString(this Permissions perm, DiscordGuild guild, Bot _bot)
         => GetTranslationObject(perm, _bot) == _bot.LoadedTranslations.Common.MissingTranslation ? perm.ToPermissionString().Log(CustomLogLevel.Warn, "Missing Translation") : GetTranslationObject(perm, _bot).Get(guild);
 
-    internal static string ToTranslatedPermissionString(this Permissions perm, User user, Bot _bot)
+    public static string ToTranslatedPermissionString(this Permissions perm, User user, Bot _bot)
         => GetTranslationObject(perm, _bot) == _bot.LoadedTranslations.Common.MissingTranslation ? perm.ToPermissionString().Log(CustomLogLevel.Warn, "Missing Translation") : GetTranslationObject(perm, _bot).Get(user);
 
-    internal static string ToTranslatedPermissionString(this Permissions perm, DiscordUser user, Bot _bot)
+    public static string ToTranslatedPermissionString(this Permissions perm, DiscordUser user, Bot _bot)
         => GetTranslationObject(perm, _bot) == _bot.LoadedTranslations.Common.MissingTranslation ? perm.ToPermissionString().Log(CustomLogLevel.Warn, "Missing Translation") : GetTranslationObject(perm, _bot).Get(user);
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "DCS0101:[Discord] InExperiment", Justification = "<Pending>")]
@@ -495,57 +495,57 @@ internal static class DiscordExtensions
             _ => _bot.LoadedTranslations.Common.MissingTranslation,
         };
 
-    internal static DiscordEmoji UnicodeToEmoji(this string str)
+    public static DiscordEmoji UnicodeToEmoji(this string str)
         => DiscordEmoji.FromUnicode(str);
 
-    internal static string GetCustomId(this InteractivityResult<ComponentInteractionCreateEventArgs> e)
+    public static string GetCustomId(this InteractivityResult<ComponentInteractionCreateEventArgs> e)
         => e.Result.GetCustomId();
 
-    internal static string GetCustomId(this ComponentInteractionCreateEventArgs e)
+    public static string GetCustomId(this ComponentInteractionCreateEventArgs e)
         => e.Interaction.Data.CustomId;
 
-    internal static DiscordComponentEmoji ToComponent(this DiscordEmoji emoji)
+    public static DiscordComponentEmoji ToComponent(this DiscordEmoji emoji)
         => new(emoji);
 
-    internal static Task<DiscordMessage> Refetch(this DiscordMessage msg)
+    public static Task<DiscordMessage> Refetch(this DiscordMessage msg)
         => msg.Channel.GetMessageAsync(msg.Id, true);
 
-    internal static int GetRoleHighestPosition(this DiscordMember member)
+    public static int GetRoleHighestPosition(this DiscordMember member)
         => member is null ? -1 : (member.IsOwner ? 9999 : (!member.Roles.Any() ? 0 : member.Roles.OrderByDescending(x => x.Position).First().Position));
 
-    internal static string GetUniqueDiscordName(this DiscordEmoji emoji)
+    public static string GetUniqueDiscordName(this DiscordEmoji emoji)
         => $"{emoji.GetDiscordName().Replace(":", "")}:{emoji.Id}";
 
-    internal static DiscordEmoji ToEmote(this bool b, Bot client)
+    public static DiscordEmoji ToEmote(this bool b, Bot client)
         => b ? DiscordEmoji.FromUnicode("✅") : EmojiTemplates.GetError(client);
 
-    internal static DiscordEmoji ToPillEmote(this bool b, Bot client)
+    public static DiscordEmoji ToPillEmote(this bool b, Bot client)
         => b ? EmojiTemplates.GetPillOn(client) : EmojiTemplates.GetPillOff(client);
 
-    internal static string ToEmotes(this long i)
+    public static string ToEmotes(this long i)
         => DigitsToEmotes(i.ToString());
 
-    internal static string ToEmotes(this int i)
+    public static string ToEmotes(this int i)
         => DigitsToEmotes(i.ToString());
 
-    internal static string ToTimestamp(this DateTime dateTime, TimestampFormat format = TimestampFormat.RelativeTime)
+    public static string ToTimestamp(this DateTime dateTime, TimestampFormat format = TimestampFormat.RelativeTime)
         => Formatter.Timestamp(dateTime, format);
 
-    internal static string ToTimestamp(this DateTimeOffset dateTime, TimestampFormat format = TimestampFormat.RelativeTime)
+    public static string ToTimestamp(this DateTimeOffset dateTime, TimestampFormat format = TimestampFormat.RelativeTime)
         => Formatter.Timestamp(dateTime, format);
 
-    internal static string GetCommandMention(this DiscordClient client, Bot bot, string command)
+    public static string GetCommandMention(this DiscordClient client, Bot bot, string command)
         => (bot.status.LoadedConfig.IsDev ?
         client.GetApplicationCommands().GuildCommands.FirstOrDefault(x => x.Key == bot.status.LoadedConfig.Discord.DevelopmentGuild).Value.ToList() :
         client.GetApplicationCommands().GlobalCommands.ToList())
         .First(x => x.Name == command).Mention;
 
-    internal static IReadOnlyList<DiscordApplicationCommand> GetCommandList(this DiscordClient client, Bot bot)
+    public static IReadOnlyList<DiscordApplicationCommand> GetCommandList(this DiscordClient client, Bot bot)
         => (bot.status.LoadedConfig.IsDev ?
         client.GetApplicationCommands().GuildCommands.FirstOrDefault(x => x.Key == bot.status.LoadedConfig.Discord.DevelopmentGuild).Value :
         client.GetApplicationCommands().GlobalCommands);
 
-    internal static string GetIcon(this DiscordChannel discordChannel) => discordChannel.Type switch
+    public static string GetIcon(this DiscordChannel discordChannel) => discordChannel.Type switch
     {
         ChannelType.Text => "#",
         ChannelType.Voice => "🔊",
@@ -560,7 +560,7 @@ internal static class DiscordExtensions
         _ => "❔",
     };
 
-    internal static List<Tuple<ulong, string, bool>>? GetEmotes(this string content)
+    public static List<Tuple<ulong, string, bool>>? GetEmotes(this string content)
     {
         if (Regex.IsMatch(content, @"<(a?):([\w]*):(\d*)>", RegexOptions.ExplicitCapture))
         {
@@ -571,12 +571,12 @@ internal static class DiscordExtensions
             return new List<Tuple<ulong, string, bool>>();
     }
 
-    internal static List<string>? GetMentions(this string content)
+    public static List<string>? GetMentions(this string content)
     {
         return Regex.IsMatch(content, @"(<@\d*>)") ? Regex.Matches(content, @"(<@\d*>)").Select(x => x.Value).ToList() : (List<string>)null;
     }
 
-    internal static List<KeyValuePair<string, string>> PrepareEmbedFields(this List<KeyValuePair<string, string>> list, string startingText = "", string endingText = "")
+    public static List<KeyValuePair<string, string>> PrepareEmbedFields(this List<KeyValuePair<string, string>> list, string startingText = "", string endingText = "")
     {
         if (startingText.Length > 1024)
             throw new Exception("startingText cant be more than 1024 characters");
@@ -616,7 +616,7 @@ internal static class DiscordExtensions
         return fields;
     }
 
-    internal static List<DiscordEmbedBuilder> PrepareEmbeds(this List<KeyValuePair<string, string>> embedFields, DiscordEmbedBuilder template = null, bool InvisibleOnDuplicateTitles = false)
+    public static List<DiscordEmbedBuilder> PrepareEmbeds(this List<KeyValuePair<string, string>> embedFields, DiscordEmbedBuilder template = null, bool InvisibleOnDuplicateTitles = false)
     {
         template ??= new();
 
@@ -661,7 +661,7 @@ internal static class DiscordExtensions
         return embeds;
     }
 
-    internal static DiscordEmoji GetClosestColorEmoji(this DiscordColor discordColor, DiscordClient client)
+    public static DiscordEmoji GetClosestColorEmoji(this DiscordColor discordColor, DiscordClient client)
     {
         Dictionary<Color, string> colorArray = new()
         {
@@ -681,7 +681,7 @@ internal static class DiscordExtensions
         return DiscordEmoji.FromName(client, colorArray[color]);
     }
 
-    internal static bool TryGetMessage(this DiscordChannel channel, ulong id, out DiscordMessage discordMessage)
+    public static bool TryGetMessage(this DiscordChannel channel, ulong id, out DiscordMessage discordMessage)
     {
         try
         {
@@ -706,7 +706,7 @@ internal static class DiscordExtensions
         }
     }
 
-    internal static bool TryParseMessageLink(this string link, out ulong GuildId, out ulong ChannelId, out ulong MessageId)
+    public static bool TryParseMessageLink(this string link, out ulong GuildId, out ulong ChannelId, out ulong MessageId)
     {
         try
         {

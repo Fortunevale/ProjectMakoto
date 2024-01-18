@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace ProjectMakoto.Util;
 
-internal static class GenericExtensions
+public static class GenericExtensions
 {
     public static void AddRange<T>(this List<T> list, params T[] items)
         => list.AddRange(items);
@@ -84,13 +84,13 @@ internal static class GenericExtensions
             : value.Length <= maxLength ? value : $"{value[..(maxLength - customString.Length)]}{customString}";
     }
 
-    internal static Exception AddData(this Exception exception, string key, object? data)
+    public static Exception AddData(this Exception exception, string key, object? data)
     {
         exception.Data.Add(key, data);
         return exception;
     }
 
-    internal static bool ContainsTask(this IReadOnlyList<ScheduledTask>? tasks, string type, ulong snowflake, string id) 
+    public static bool ContainsTask(this IReadOnlyList<ScheduledTask>? tasks, string type, ulong snowflake, string id) 
         => tasks.Where(x =>
         {
             if (x.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier)
@@ -102,7 +102,7 @@ internal static class GenericExtensions
             return scheduledTaskIdentifier.Snowflake == snowflake;
         }).Any(x => ((ScheduledTaskIdentifier)x.CustomData).Id == id);
 
-    internal static bool EqualsTask(this ScheduledTask? task, string type, ulong snowflake, string id)
+    public static bool EqualsTask(this ScheduledTask? task, string type, ulong snowflake, string id)
     {
         if (task.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier)
             return false;
@@ -117,7 +117,7 @@ internal static class GenericExtensions
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2254:Template should be a static expression", Justification = "<Pending>")]
-    internal static string Log(this string str, CustomLogLevel lvl, string additionalInfo)
+    public static string Log(this string str, CustomLogLevel lvl, string additionalInfo)
     {
         switch (lvl)
         {
@@ -154,17 +154,17 @@ internal static class GenericExtensions
         return str;
     }
 
-    internal static string FileSizeToHumanReadable(this int size)
+    public static string FileSizeToHumanReadable(this int size)
         => GetHumanReadableSize((long)size);
 
-    internal static string FileSizeToHumanReadable(this uint size)
+    public static string FileSizeToHumanReadable(this uint size)
     => GetHumanReadableSize((long)size);
 
-    internal static string FileSizeToHumanReadable(this long size)
+    public static string FileSizeToHumanReadable(this long size)
         => GetHumanReadableSize((long)size);
 
-    internal static string FileSizeToHumanReadable(this ulong size)
-    => GetHumanReadableSize((long)size);
+    public static string FileSizeToHumanReadable(this ulong size)
+        => GetHumanReadableSize((long)size);
 
     private static string GetHumanReadableSize(this long size)
     {
@@ -178,7 +178,7 @@ internal static class GenericExtensions
         return String.Format("{0:0.##} {1}", size, sizes[order]);
     }
 
-    internal static string GetSHA256(this string value)
+    public static string GetSHA256(this string value)
     {
         StringBuilder Sb = new();
         var enc = Encoding.UTF8;
@@ -190,7 +190,7 @@ internal static class GenericExtensions
         return Sb.ToString();
     }
 
-    internal static bool TryGetCustomAttribute<T>(this PropertyInfo collection, Type type, out T? attribute)
+    public static bool TryGetCustomAttribute<T>(this PropertyInfo collection, Type type, out T? attribute)
     {
         var objects = collection.GetCustomAttributes(false);
         if (objects.Any(x => x.GetType() == type))
@@ -203,22 +203,22 @@ internal static class GenericExtensions
         return false;
     }
 
-    internal static string IsValidHexColor(this string str, string Default = "#FFFFFF")
+    public static string IsValidHexColor(this string str, string Default = "#FFFFFF")
         => !str.IsNullOrWhiteSpace() && Regex.IsMatch(str, @"^(#([a-fA-f0-9]{6}))$") ? str : Default;
 
-    internal static string ToHex(this DiscordColor c)
+    public static string ToHex(this DiscordColor c)
         => ColorTools.ToHex(c.R, c.G, c.B);
 
-    internal static string SanitizeForCode(this string str)
+    public static string SanitizeForCode(this string str)
         => str.Replace("`", "´");
 
-    internal static string TruncateAt(this string str, params char[] chars)
+    public static string TruncateAt(this string str, params char[] chars)
         => str.TruncateAt(false, chars);
 
-    internal static string TruncateAt(this string str, params string[] strings)
+    public static string TruncateAt(this string str, params string[] strings)
         => str.TruncateAt(false, strings);
 
-    internal static string TruncateAt(this string str, bool Reverse, params char[] chars)
+    public static string TruncateAt(this string str, bool Reverse, params char[] chars)
     {
         if (!chars.IsNotNullAndNotEmpty() || !chars.Any(x => str.Contains(x)))
             return str;
@@ -228,7 +228,7 @@ internal static class GenericExtensions
         return str[..(!Reverse ? indexes.Min(x => x.Value) : indexes.Max(x => x.Value))];
     }
 
-    internal static string TruncateAt(this string str, bool Reverse, params string[] strings)
+    public static string TruncateAt(this string str, bool Reverse, params string[] strings)
     {
         if (!strings.IsNotNullAndNotEmpty() || !strings.Any(x => str.Contains(x)))
             return str;
@@ -238,7 +238,7 @@ internal static class GenericExtensions
         return str[..(!Reverse ? indexes.Min(x => x.Value) : indexes.Max(x => x.Value))];
     }
 
-    internal static string FullSanitize(this string str)
+    public static string FullSanitize(this string str)
     {
         var proc = str;
 
@@ -257,7 +257,7 @@ internal static class GenericExtensions
         return Formatter.Sanitize(proc);
     }
 
-    internal static Stream ToStream(this string s)
+    public static Stream ToStream(this string s)
     {
         var stream = new MemoryStream();
         var writer = new StreamWriter(stream);

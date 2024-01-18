@@ -14,11 +14,11 @@ namespace ProjectMakoto.Util;
 public static class TranslationUtil
 {
     /// <inheritdoc cref="Build(string, bool, TVar[])">/>
-    internal static string Build(this string str)
+    public static string Build(this string str)
         => str.Build(false, null);
 
     /// <inheritdoc cref="Build(string, bool, TVar[])">/>
-    internal static string Build(this string str, params TVar[] vars)
+    public static string Build(this string str, params TVar[] vars)
         => str.Build(false, vars);
 
     /// <summary>
@@ -28,7 +28,7 @@ public static class TranslationUtil
     /// <param name="Code">Whether to embed the string as inline code</param>
     /// <param name="vars">A list of variables to replace.</param>
     /// <returns></returns>
-    internal static string Build(this string str, bool Code = false, params TVar[] vars)
+    public static string Build(this string str, bool Code = false, params TVar[] vars)
     {
         if (str.IsNullOrEmpty())
             return str;
@@ -92,11 +92,11 @@ public static class TranslationUtil
     }
 
     /// <inheritdoc cref="Build(string[], bool, bool, TVar[])"/>
-    internal static string Build(this string[] array)
+    public static string Build(this string[] array)
         => array.Build(false, false, null);
     
     /// <inheritdoc cref="Build(string[], bool, bool, TVar[])"/>
-    internal static string Build(this string[] array, params TVar[] vars)
+    public static string Build(this string[] array, params TVar[] vars)
         => array.Build(false, false, vars);
 
     /// <summary>
@@ -106,7 +106,7 @@ public static class TranslationUtil
     /// <param name="Code">Whether to prefix and suffix ` on non-empty lines.</param>
     /// <param name="UseBoldMarker">Whether to make lines prefixing ** bold.</param>
     /// <returns></returns>
-    internal static string Build(this string[] array, bool Code = false, bool UseBoldMarker = false, params TVar[] Tvars)
+    public static string Build(this string[] array, bool Code = false, bool UseBoldMarker = false, params TVar[] Tvars)
         => string.Join("\n", array.Select(x =>
         {
             var boldLine = false;
@@ -131,7 +131,7 @@ public static class TranslationUtil
     /// <param name="old"></param>
     /// <param name="new"></param>
     /// <returns></returns>
-    internal static string[] Replace(this string[] array, string old, object @new)
+    public static string[] Replace(this string[] array, string old, object @new)
         => array.Select(x => x.Replace(old, @new)).ToArray();
 
     /// <summary>
@@ -140,7 +140,7 @@ public static class TranslationUtil
     /// <param name="user"></param>
     /// <param name="pairs"></param>
     /// <returns></returns>
-    internal static int CalculatePadding(User user, params SingleTranslationKey[] pairs)
+    public static int CalculatePadding(User user, params SingleTranslationKey[] pairs)
     {
         var pad = 0;
 
@@ -155,7 +155,7 @@ public static class TranslationUtil
         return pad;
     }
 
-    internal static HumanReadableTimeFormatConfig GetTranslatedHumanReadableConfig(User user, Bot bot, bool MustIncludeAll = false)
+    public static HumanReadableTimeFormatConfig GetTranslatedHumanReadableConfig(User user, Bot bot, bool MustIncludeAll = false)
         => new()
         {
             DaysString = bot.LoadedTranslations.Common.Time.Days.Get(user),
@@ -166,7 +166,7 @@ public static class TranslationUtil
             MustIncludeSeconds = MustIncludeAll,
         };
 
-    internal static HumanReadableTimeFormatConfig GetTranslatedHumanReadableConfig(Guild guild, Bot bot, bool MustIncludeAll = false)
+    public static HumanReadableTimeFormatConfig GetTranslatedHumanReadableConfig(Guild guild, Bot bot, bool MustIncludeAll = false)
         => new()
         {
             DaysString = bot.LoadedTranslations.Common.Time.Days.Get(guild),

@@ -9,32 +9,32 @@
 
 namespace ProjectMakoto.Util;
 
-internal static class UserExtensions
+public static class UserExtensions
 {
-    internal static bool IsTeamOwner(this DiscordMember member, Status _status)
+    public static bool IsTeamOwner(this DiscordMember member, Status _status)
     => (member as DiscordUser).IsTeamOwner(_status);
 
-    internal static bool IsTeamOwner(this DiscordUser user, Status _status)
+    public static bool IsTeamOwner(this DiscordUser user, Status _status)
     {
         return _status.TeamOwner == user.Id;
     }
 
-    internal static bool IsMaintenance(this DiscordMember member, Status _status)
+    public static bool IsMaintenance(this DiscordMember member, Status _status)
         => (member as DiscordUser).IsMaintenance(_status);
 
-    internal static bool IsMaintenance(this DiscordUser user, Status _status)
+    public static bool IsMaintenance(this DiscordUser user, Status _status)
     {
         return _status.TeamMembers.Contains(user.Id);
     }
 
-    internal static bool IsAdmin(this DiscordMember member, Status _status)
+    public static bool IsAdmin(this DiscordMember member, Status _status)
     {
         return (member.Roles.Any(x => x.CheckPermission(Permissions.Administrator) == PermissionLevel.Allowed || x.CheckPermission(Permissions.ManageGuild) == PermissionLevel.Allowed)) ||
             (member.IsMaintenance(_status)) ||
             member.IsOwner;
     }
 
-    internal static bool IsDJ(this DiscordMember member, Status _status)
+    public static bool IsDJ(this DiscordMember member, Status _status)
     {
         return member.IsAdmin(_status) || member.Roles.Any(x => x.Name.ToLower() == "dj");
     }
