@@ -35,7 +35,7 @@ public class DatabaseDictionary<T1, T2>
         this._newValuePredicate = newValuePredicate;
     }
 
-    public DatabaseDictionary(BasePlugin plugin, Type type, Func<ulong, T>? newValuePredicate = null)
+    public DatabaseDictionary(BasePlugin plugin, Type type, Func<T1, T2>? newValuePredicate = null)
     {
         if (typeof(T2).GetCustomAttribute<TableNameAttribute>() is null || !this.Try(() => { _ = plugin.Bot.DatabaseClient.GetPrimaryKey(typeof(T2)); }))
             throw new ArgumentException("The given type is not a valid database type. A valid database type needs to have the 'TableName' attribute.");
