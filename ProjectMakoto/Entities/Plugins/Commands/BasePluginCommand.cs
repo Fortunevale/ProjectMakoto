@@ -109,7 +109,7 @@ public sealed class BasePluginCommand
 
     /// <summary>
     /// <para>Whether to use the default help for command groups.</para>
-    /// Defaults to <see cref="true"/>.
+    /// Defaults to <see langword="true"/>.
     /// </summary>
     public bool UseDefaultHelp { get; internal set; } = true;
 
@@ -155,7 +155,7 @@ public sealed class BasePluginCommand
     /// <summary>
     /// <para>Whether to allow running this command in Direct Messages.</para>
     /// <para>Make sure to adjust your command to accommodate for usage in direct messages. </para>
-    /// Defaults to <see cref="false"/>.
+    /// Defaults to <see langword="false"/>.
     /// </summary>
     public bool AllowPrivateUsage { get; internal set; } = false;
 
@@ -178,7 +178,7 @@ public sealed class BasePluginCommand
     /// <summary>
     /// <para>Whether the command should be marked as NSFW.</para>
     /// <para><b>This does not ensure that the command is only run by adult users. It only hides this command in the application command list when the user does not fulfill the requirement.</b></para>
-    /// Defaults to <see cref="false"/>.
+    /// Defaults to <see langword="false"/>.
     /// </summary>
     public bool IsNsfw { get; internal set; } = false;
 
@@ -217,6 +217,28 @@ public sealed class BasePluginCommand
             throw new InvalidOperationException("The command is already registered. It can no longer be modified.");
 
         this.SupportedCommands = SupportedCommands;
+        return this;
+    }
+
+    /// <summary>
+    /// <para>Whether to run this command with an ephemeral message when ran via slash command.</para>
+    /// Defaults to <see langword="true"/>.
+    /// </summary>
+    public bool IsEphemeral { get; internal set; } = true;
+
+    /// <summary>
+    /// Updates the <see cref="IsEphemeral"/> value.
+    /// <inheritdoc cref="IsEphemeral"/>
+    /// </summary>
+    /// <param name="SupportedCommands">The new <see cref="SupportedCommands"/> value.</param>
+    /// <returns>This <see cref="BasePluginCommand"/> with the updated value.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if the command is already registered.</exception>
+    public BasePluginCommand WithIsEphemeral(bool useEphemeral)
+    {
+        if (this.Registered)
+            throw new InvalidOperationException("The command is already registered. It can no longer be modified.");
+
+        this.IsEphemeral = useEphemeral;
         return this;
     }
 }

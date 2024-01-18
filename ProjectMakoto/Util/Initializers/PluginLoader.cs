@@ -553,7 +553,7 @@ internal static class PluginLoader
                         { ctx, _bot, new Dictionary<string, object>
                             {
                                 {{string.Join(",\n", Command.Overloads.Select(x => $"{{ \"{x.Name}\", {x.Name} }}"))}}
-                            }{{(ContextName == typeof(InteractionContext).FullName ? ", true, true, false" : "")}}
+                            }{{(ContextName == typeof(InteractionContext).FullName ? $", {Command.IsEphemeral.ToString().ToLower()}, true, false" : "")}}
                         });
 
                     t.Add(_bot, ctx);
@@ -608,7 +608,7 @@ internal static class PluginLoader
                             { ctx, _bot, new Dictionary<string, object>
                                 {
                                     {{string.Join(",\n", Command.Overloads.Select(x => $"{{ \"{x.Name}\", {x.Name} }}"))}}
-                                }{{(ContextName == typeof(InteractionContext).FullName ? ", true, true, false" : "")}}
+                                }{{(ContextName == typeof(InteractionContext).FullName ? $", {Command.IsEphemeral.ToString().ToLower()}, true, false" : "")}}
                             });
                     
                     t.Add(_bot, ctx);
