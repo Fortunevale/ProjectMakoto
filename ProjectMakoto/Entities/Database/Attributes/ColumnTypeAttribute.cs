@@ -10,11 +10,11 @@
 namespace ProjectMakoto.Entities.Database.ColumnAttributes;
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-internal sealed class ColumnType : Attribute
+public sealed class ColumnTypeAttribute : Attribute
 {
     internal Enums.ColumnTypes Type { get; set; }
 
-    internal ColumnType(Enums.ColumnTypes type)
+    public ColumnTypeAttribute(Enums.ColumnTypes type)
     { 
         this.Type = type; 
     }

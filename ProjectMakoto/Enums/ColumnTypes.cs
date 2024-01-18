@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Enums;
 
-internal enum ColumnTypes
+public enum ColumnTypes
 {
     Unknown,
     BigInt,

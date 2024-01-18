@@ -1,6 +1,7 @@
 @echo off
 
 call update_deps.cmd
+del /q *.pmpl
 
 for /D %%i in (*) do (
 	if /I "%%i" neq "deps" (

@@ -344,3 +344,4 @@ launchSettings.json
 !.vscode/settings.json
 ProjectMakoto/Plugins/*
 OfficialPlugins/deps/
+*.pmpl

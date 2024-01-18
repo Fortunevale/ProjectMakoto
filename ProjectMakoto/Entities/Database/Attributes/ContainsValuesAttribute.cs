@@ -10,7 +10,7 @@
 namespace ProjectMakoto.Entities.Database.ColumnAttributes;
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-internal sealed class ContainsValuesAttribute(bool containsValues = true) : Attribute
+public sealed class ContainsValuesAttribute(bool containsValues = true) : Attribute
 {
     public bool ContainsValues { get; set; } = containsValues;
 }

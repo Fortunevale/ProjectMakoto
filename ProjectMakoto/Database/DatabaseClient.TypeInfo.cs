@@ -63,10 +63,10 @@ partial class DatabaseClient
     /// <exception cref="InvalidOperationException"></exception>
     internal (string ColumnName, ColumnTypes ColumnType, bool Primary, long? MaxValue, string? Collation, bool Nullable, string Default) GetPropertyInfo(PropertyInfo info) 
         => (info.GetCustomAttribute<ColumnNameAttribute>()?.Name ?? throw new InvalidOperationException("Not a valid column.").AddData("info", info),
-            info.GetCustomAttribute<ColumnType>()?.Type ?? throw new InvalidOperationException("Not a valid column.").AddData("info", info),
+            info.GetCustomAttribute<ColumnTypeAttribute>()?.Type ?? throw new InvalidOperationException("Not a valid column.").AddData("info", info),
             info.GetCustomAttribute<PrimaryAttribute>()?.Primary ?? false,
-            info.GetCustomAttribute<MaxValueAttribute>()?.MaxValue ?? (this.GetDefaultMaxValue(info.GetCustomAttribute<ColumnType>().Type, out var max) ? max : null),
-            this.UsesCollation(info.GetCustomAttribute<ColumnType>().Type) ? this.Bot.status.LoadedConfig.Secrets.Database.Collation : null,
+            info.GetCustomAttribute<MaxValueAttribute>()?.MaxValue ?? (this.GetDefaultMaxValue(info.GetCustomAttribute<ColumnTypeAttribute>().Type, out var max) ? max : null),
+            this.UsesCollation(info.GetCustomAttribute<ColumnTypeAttribute>().Type) ? this.Bot.status.LoadedConfig.Secrets.Database.Collation : null,
             info.GetCustomAttribute<NullableAttribute>()?.Nullable ?? false,
             info.GetCustomAttribute<DefaultAttribute>()?.Default);
 

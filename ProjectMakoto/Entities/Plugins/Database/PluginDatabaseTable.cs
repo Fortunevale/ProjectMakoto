@@ -40,7 +40,7 @@ public class PluginDatabaseTable : RequiresBotReference
     public Task CreateRow(object identifierValue)
     {
         var type = this.GetType();
-        var tableName = type.GetCustomAttribute<TableNameAttribute>().Name;
+        var tableName = (this.Bot.DatabaseClient.MakePluginTablePrefix(this.Plugin) + type.GetCustomAttribute<TableNameAttribute>().Name).ToLower();
         return this.Plugin.Bot.DatabaseClient.CreateRow(tableName, type, identifierValue, this.Plugin.Bot.DatabaseClient.pluginDatabaseConnection);
     }
 
@@ -55,7 +55,7 @@ public class PluginDatabaseTable : RequiresBotReference
     public T GetValue<T>(object identifierValue, string columnName)
     {
         var type = this.GetType();
-        var tableName = type.GetCustomAttribute<TableNameAttribute>().Name;
+        var tableName = (this.Bot.DatabaseClient.MakePluginTablePrefix(this.Plugin) + type.GetCustomAttribute<TableNameAttribute>().Name).ToLower();
         var uniqueValueColumn = this.Plugin.Bot.DatabaseClient.GetPrimaryKey(type);
 
         return this.Plugin.Bot.DatabaseClient.GetValue<T>(tableName, uniqueValueColumn.ColumnName, identifierValue, columnName, this.Plugin.Bot.DatabaseClient.pluginDatabaseConnection);
@@ -72,7 +72,7 @@ public class PluginDatabaseTable : RequiresBotReference
     public Task SetValue(object identifierValue, string columnName, object newColumnData)
     {
         var type = this.GetType();
-        var tableName = type.GetCustomAttribute<TableNameAttribute>().Name;
+        var tableName = (this.Bot.DatabaseClient.MakePluginTablePrefix(this.Plugin) + type.GetCustomAttribute<TableNameAttribute>().Name).ToLower();
         var uniqueValueColumn = this.Plugin.Bot.DatabaseClient.GetPrimaryKey(type);
 
         return this.Plugin.Bot.DatabaseClient.SetValue(tableName, uniqueValueColumn.ColumnName, identifierValue, columnName, newColumnData, this.Bot.DatabaseClient.pluginDatabaseConnection);
@@ -93,7 +93,7 @@ public class PluginDatabaseTable : RequiresBotReference
         if (!validProperties.IsNotNullAndNotEmpty())
             throw new ArgumentException("Specified type has to have properties with ColumnNameAttribute");
 
-        if (!this.Plugin.AllowedTables.Contains(nameAttr.Name))
+        if (!this.Plugin.AllowedTables.Contains(this.Bot.DatabaseClient.MakePluginTablePrefix(this.Plugin) + nameAttr.Name))
             throw new ArgumentException("Your plugin is not allowed to use this table name. This may be because the database name is already in use by Makoto or another plugin already registered this table.");
     }
 
