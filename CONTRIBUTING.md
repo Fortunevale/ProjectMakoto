@@ -1,7 +1,6 @@
 <h1 align="center">Makoto</h1>
 <p align="center"><img src="ProjectMakoto/Assets/Prod.png" width=250 align="center"></p>
 <p align="center" style="font-weight:bold;">A feature packed discord bot!</p>
-<a href="#getting-makoto" ><p align="center"><img src="ProjectMakoto/Assets/AddToServer.png" width=350 align="center"></p></a>
 
 <p align="center"><img src="https://github.com/Fortunevale/ProjectMakoto/actions/workflows/dev.yml/badge.svg?branch=dev" align="center">
 <p align="center"><img src="https://img.shields.io/github/contributors/Fortunevale/ProjectMakoto" align="center"> <img src="https://img.shields.io/github/issues-raw/Fortunevale/ProjectMakoto" align="center"></p>
@@ -12,12 +11,11 @@
 ## Step by Step Guide on how to set up a Development Environment
 
 1. Install the following applications. These should get you started with a basic environment for C# development.
-    - [Github Desktop](https://desktop.github.com/)
+    - [Git CLI](https://www.git-scm.com/downloads)
     - [Visual Studio 2022](https://visualstudio.microsoft.com/vs/)
         - Select .NET desktop development
-2. Log into your Github Account on Github Desktop and clone the following repository:
+2. Log into your Github Account with the Git CLI and clone the following repository:
     - `Fortunevale/ProjectMakoto`
-        - You'll also need the project's submodules.
         - To clone `ProjectMakoto` with it's submodules run: `git clone --recurse-submodules "https://github.com/Fortunevale/ProjectMakoto.git"`
     - _You can skip this step if you're developing a plugin._
 3. With this completed, you can already start developing for Makoto. To be able to debug Makoto, follow the guide below.
@@ -31,6 +29,7 @@
         - To learn how to setup Lavalink, you can check out **[this handy article](https://docs.dcs.aitsys.dev/articles/modules/audio/lavalink_v4/setup)** made by the DisCatSharp Team.
     - [MariaDB Server](https://mariadb.org/download/)
         - After installing the MariaDB Server, create 2 new databases: One for the main tables (guilds, users, scam_urls, etc.) and one for server members.
+        - You'll need a third database if you're using plugins.
 
 2. Create an account on the following sites:
     - [Discord](https://discord.com)

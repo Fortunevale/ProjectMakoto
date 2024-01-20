@@ -1,7 +1,6 @@
 <h1 align="center">Makoto</h1>
 <p align="center"><img src="ProjectMakoto/Assets/Prod.png" width=250 align="center"></p>
 <p align="center" style="font-weight:bold;">A feature packed discord bot!</p>
-<a href="#getting-makoto" ><p align="center"><img src="ProjectMakoto/Assets/AddToServer.png" width=350 align="center"></p></a>
 
 <p align="center"><img src="https://github.com/Fortunevale/ProjectMakoto/actions/workflows/dev.yml/badge.svg?branch=dev" align="center">
 <p align="center"><img src="https://img.shields.io/github/contributors/Fortunevale/ProjectMakoto" align="center"> <img src="https://img.shields.io/github/issues-raw/Fortunevale/ProjectMakoto" align="center"></p>
