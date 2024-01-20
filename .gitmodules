@@ -26,3 +26,6 @@
 	path = OfficialPlugins/Translations
 	url = https://github.com/Fortunevale/ProjectMakoto.Plugins.Translations
 	branch = main
+[submodule "Tools"]
+	path = Tools
+	url = https://github.com/Fortunevale/ProjectMakoto.Tools
