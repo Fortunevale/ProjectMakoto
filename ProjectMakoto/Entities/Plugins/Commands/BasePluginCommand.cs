@@ -14,6 +14,32 @@ public sealed class BasePluginCommand
     private BasePluginCommand() { }
 
     /// <summary>
+    /// Creates a new Plugin Context Menu Command.
+    /// </summary>
+    /// <param name="Name">The name of the command to be registered.</param>
+    /// <param name="Description">The description of the command to be registered.</param>
+    /// <param name="Command">The command to be executed.</param>
+    /// <param name="RegisterPrefixAlternative">Whether or not this command should have a equivalent prefix command.</param>
+    /// <exception cref="ArgumentNullException">Thrown if any required argument is <see langword="null"/> or consists only of whitespaces.</exception>
+    public BasePluginCommand(ApplicationCommandType type, string Name, string Description, BaseCommand Command, bool RegisterPrefixAlternative)
+    {
+        if (Name.IsNullOrWhiteSpace())
+            throw new ArgumentNullException(nameof(Name));
+
+        if (Command is null)
+            throw new ArgumentNullException(nameof(Command));
+
+        if (type is not ApplicationCommandType.Message and not ApplicationCommandType.User)
+            throw new InvalidOperationException("The ApplicationCommandType has to be Message or User!");
+
+        this.ContextMenuType = type;
+        this.Name = Name.Trim();
+        this.Description = Description.Trim();
+        this.Command = Command;
+        this.SupportedCommandTypes = RegisterPrefixAlternative ? new[] { PluginCommandType.ContextMenu, PluginCommandType.PrefixCommand } : new[] { PluginCommandType.ContextMenu };
+    }
+
+    /// <summary>
     /// Create a new Plugin Command.
     /// </summary>
     /// <param name="Name">The name of the command to be registered.</param>
@@ -114,6 +140,11 @@ public sealed class BasePluginCommand
     public bool UseDefaultHelp { get; internal set; } = true;
 
     /// <summary>
+    /// The Context Menu Type, only usable if <see cref="SupportedCommandTypes"/> includes <see cref="PluginCommandType.ContextMenu"/>
+    /// </summary>
+    public ApplicationCommandType? ContextMenuType { get; internal set; } = null;
+
+    /// <summary>
     /// Updates the <see cref="UseDefaultHelp"/> value.
     /// <inheritdoc cref="UseDefaultHelp"/>
     /// </summary>
@@ -124,6 +155,9 @@ public sealed class BasePluginCommand
     {
         if (this.Registered)
             throw new InvalidOperationException("The command is already registered. It can no longer be modified.");
+
+        if (!this.IsGroup)
+            throw new InvalidOperationException("The command is not a group.");
 
         this.UseDefaultHelp = UseDefaultHelp;
         return this;
@@ -202,21 +236,27 @@ public sealed class BasePluginCommand
     /// <para>Which command types are supported.</para>
     /// Defaults to <see cref="PluginCommandType.PrefixCommand"/> and  <see cref="PluginCommandType.SlashCommand"/>.
     /// </summary>
-    public IReadOnlyList<PluginCommandType> SupportedCommands { get; internal set; } = new List<PluginCommandType>() { PluginCommandType.PrefixCommand, PluginCommandType.SlashCommand }.AsReadOnly();
+    public IReadOnlyList<PluginCommandType> SupportedCommandTypes { get; internal set; } = new List<PluginCommandType>() { PluginCommandType.PrefixCommand, PluginCommandType.SlashCommand }.AsReadOnly();
 
     /// <summary>
-    /// Updates the <see cref="SupportedCommands"/> value.
-    /// <inheritdoc cref="SupportedCommands"/>
+    /// Updates the <see cref="SupportedCommandTypes"/> value.
+    /// <inheritdoc cref="SupportedCommandTypes"/>
     /// </summary>
-    /// <param name="SupportedCommands">The new <see cref="SupportedCommands"/> value.</param>
+    /// <param name="SupportedCommands">The new <see cref="SupportedCommandTypes"/> value.</param>
     /// <returns>This <see cref="BasePluginCommand"/> with the updated value.</returns>
-    /// <exception cref="InvalidOperationException">Thrown if the command is already registered.</exception>
-    public BasePluginCommand WithSupportedCommands(params PluginCommandType[] SupportedCommands)
+    /// <exception cref="InvalidOperationException">Thrown if the command is already registered or the type cannot be changed.</exception>
+    public BasePluginCommand WithSupportedCommandTypes(params PluginCommandType[] SupportedCommands)
     {
         if (this.Registered)
             throw new InvalidOperationException("The command is already registered. It can no longer be modified.");
 
-        this.SupportedCommands = SupportedCommands;
+        if (SupportedCommands.Contains(PluginCommandType.ContextMenu))
+            throw new InvalidOperationException("You cannot use ContextMenu or ContextMenuWithoutPrefix as supported CommandType, please use the constructor instead.");
+
+        if (this.SupportedCommandTypes.Any(x => x == PluginCommandType.ContextMenu))
+            throw new InvalidOperationException("You cannot modify the supported command types on context menus.");
+
+        this.SupportedCommandTypes = SupportedCommands;
         return this;
     }
 
@@ -230,7 +270,7 @@ public sealed class BasePluginCommand
     /// Updates the <see cref="IsEphemeral"/> value.
     /// <inheritdoc cref="IsEphemeral"/>
     /// </summary>
-    /// <param name="SupportedCommands">The new <see cref="SupportedCommands"/> value.</param>
+    /// <param name="SupportedCommands">The new <see cref="SupportedCommandTypes"/> value.</param>
     /// <returns>This <see cref="BasePluginCommand"/> with the updated value.</returns>
     /// <exception cref="InvalidOperationException">Thrown if the command is already registered.</exception>
     public BasePluginCommand WithIsEphemeral(bool useEphemeral)

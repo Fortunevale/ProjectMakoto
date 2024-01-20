@@ -12,4 +12,5 @@ public enum PluginCommandType
 {
     SlashCommand = 0,
     PrefixCommand = 1,
+    ContextMenu = 2,
 }

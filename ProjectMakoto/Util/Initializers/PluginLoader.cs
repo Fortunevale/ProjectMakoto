@@ -235,142 +235,255 @@ internal static class PluginLoader
 
                 if (pluginCommands.IsNotNullAndNotEmpty())
                 {
-                    var options = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary).WithOptimizationLevel(OptimizationLevel.Release);
-                    var references = AppDomain.CurrentDomain.GetAssemblies().Where(x => !x.IsDynamic && !x.Location.IsNullOrWhiteSpace()).Select(x => MetadataReference.CreateFromFile(x.Location));
+                    var options = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                        .WithOptimizationLevel(OptimizationLevel.Release)
+                        .WithDeterministic(true);
+                    
+                    var references = AppDomain.CurrentDomain.GetAssemblies()
+                        .Where(x => !x.IsDynamic && !x.Location.IsNullOrWhiteSpace())
+                        .Select(x => MetadataReference.CreateFromFile(x.Location));
 
                     _logger.LogInfo("Compiling {0} BasePluginCommands from Plugin from '{1}' ({2}).", pluginCommands.Count(), plugin.Value.Name, plugin.Value.Version.ToString());
 
-                    Dictionary<CSharpCompilation, CompilationData> compilationList = new();
+                    var compilationList = new Dictionary<CSharpCompilation, CompilationData>();
+
+                    Dictionary<string, string> getClassCode(BasePluginCommand command)
+                    {
+                        var rawCodeList = new Dictionary<string, string>();
+
+                        foreach (var supportedType in command.SupportedCommandTypes)
+                        {
+                            string createCodeWithDefaultClass(string code)
+                            {
+                                var inheritType = supportedType switch
+                                {
+                                    PluginCommandType.SlashCommand or PluginCommandType.ContextMenu => typeof(ApplicationCommandsModule),
+                                    PluginCommandType.PrefixCommand => typeof(BaseCommandModule),
+                                    _ => throw new NotImplementedException()
+                                };
+
+                                return $$"""
+                                    {{classUsings}}
+
+                                    public sealed class {{GetUniqueCodeCompatibleName()}} : {{inheritType.FullName}}
+                                    {
+                                        {{code}}
+                                    }
+                                    """;
+                            }
+
+                            string getAttribute(BasePluginCommand command)
+                            {
+                                switch (supportedType)
+                                {
+                                    case PluginCommandType.SlashCommand:
+                                        if (command.IsGroup)
+                                            return $$"""
+                                                [{{typeof(SlashCommandGroupAttribute).FullName}}("{{command.Name}}", "{{command.Description}}"{{(command.RequiredPermissions is null ? "" : $", {(long)command.RequiredPermissions}")}}, dmPermission: {{command.AllowPrivateUsage.ToString().ToLower()}}, isNsfw: {{command.IsNsfw.ToString().ToLower()}})]
+                                                """;
+                                        else
+                                            return $$"""
+                                                [{{typeof(SlashCommandAttribute).FullName}}("{{command.Name}}", "{{command.Description}}"{{(command.RequiredPermissions is null ? "" : $", {(long)command.RequiredPermissions}")}}, dmPermission: {{command.AllowPrivateUsage.ToString().ToLower()}}, isNsfw: {{command.IsNsfw.ToString().ToLower()}})]
+                                                """;
+                                    case PluginCommandType.PrefixCommand:
+                                        if (command.IsGroup)
+                                            return $$"""
+                                                [{{typeof(GroupAttribute).FullName}}("{{command.Name}}"), {{typeof(DescriptionAttribute).FullName}}("{{command.Description}}")]
+                                                """;
+                                        else
+                                            return $$"""
+                                                [{{typeof(CommandAttribute).FullName}}("{{command.Name}}"), {{typeof(DescriptionAttribute).FullName}}("{{command.Description}}")]
+                                                """;
+                                    case PluginCommandType.ContextMenu:
+                                        return $$"""
+                                                [{{typeof(ContextMenuAttribute).FullName}}({{typeof(ApplicationCommandType).FullName}}.{{Enum.GetName(typeof(ApplicationCommandType), command.ContextMenuType)}}, "{{command.Name}}", dmPermission: {{command.AllowPrivateUsage.ToString().ToLower()}}, isNsfw: {{command.IsNsfw.ToString().ToLower()}})]
+                                                """;
+
+                                    default:
+                                        throw new NotImplementedException();
+                                }
+                            }
+
+                            string getMethodDefinition(BasePluginCommand command, BasePluginCommand? parent)
+                            {
+                                var TaskName = GetUniqueCodeCompatibleName();
+
+                                string getPopulationMethods()
+                                {
+                                    var contextType = supportedType switch
+                                    {
+                                        PluginCommandType.SlashCommand => typeof(InteractionContext),
+                                        PluginCommandType.PrefixCommand => typeof(CommandContext),
+                                        PluginCommandType.ContextMenu => typeof(ContextMenuContext),
+                                        _ => throw new NotImplementedException(),
+                                    };
+
+                                    return $$"""
+                                        private static {{typeof(Type).FullName}} {{TaskName}}_CommandType { get; set; }
+                                        private static {{typeof(MethodInfo).FullName}} {{TaskName}}_CommandMethod { get; set; }
+                                        public static void Populate_{{TaskName}}({{typeof(Bot).FullName}} _bot)
+                                        {
+                                            _logger.LogDebug("Populating execution properties for '{CommandName}':'{taskname}'", "{{command.Name}}","{{TaskName}}");
+                                            {{(parent is null ? $"{TaskName}_CommandType = _bot.PluginCommands[\"{plugin.Key}\"].First(x => x.Name == \"{command.Name}\").Command.GetType();" : $"{TaskName}_CommandType = _bot.PluginCommands[\"{plugin.Key}\"].First(x => x.Name == \"{parent.Name}\").SubCommands.First(x => x.Name == \"{command.Name}\").Command.GetType();")}}
+                                            {{TaskName}}_CommandMethod = {{TaskName}}_CommandType.GetMethods().First(x => x.Name == "ExecuteCommand" && x.GetParameters().Any(param => param.ParameterType == typeof({{contextType.FullName}})));
+                                        }
+                                        """;
+                                }
+
+                                switch (supportedType)
+                                {
+                                    case PluginCommandType.SlashCommand:
+                                        if (command.IsGroup)
+                                            return $$"""
+                                                {{getAttribute(command)}}
+                                                public sealed class {{GetUniqueCodeCompatibleName()}} : {{typeof(ApplicationCommandsModule).FullName}}
+                                                {
+                                                    public {{typeof(Bot).FullName}} _bot { private get; set; }
+                                                
+                                                    {{string.Join("\n\n", command.SubCommands.Select(x => $$"""
+                                                        {{getMethodDefinition(x, command)}}
+                                                    """))}}
+                                                }
+                                                """;
+                                        else
+                                            return $$"""
+                                                {{getAttribute(command)}}
+                                                public {{typeof(Task).FullName}} {{TaskName}}_Execute({{typeof(InteractionContext).FullName}} ctx{{(command.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", command.Overloads.Select(x => $"[{typeof(OptionAttribute).FullName}(\"{x.Name}\", \"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
+                                                {
+                                                    try
+                                                    {
+                                                        {{typeof(Task).FullName}} t = ({{typeof(Task).FullName}}){{TaskName}}_CommandMethod.Invoke({{typeof(Activator).FullName}}.CreateInstance({{TaskName}}_CommandType),
+                                                            new {{typeof(object[]).FullName}} 
+                                                            { ctx, _bot, new Dictionary<string, object>
+                                                                {
+                                                                    {{string.Join(",\n", command.Overloads.Select(x => $"{{ \"{x.Name}\", {x.Name} }}"))}}
+                                                                }, {{command.IsEphemeral.ToString().ToLower()}}, true, false
+                                                            });
+                                                
+                                                        t.Add(_bot, ctx);
+                                                    }
+                                                    catch ({{typeof(Exception).FullName}} ex)
+                                                    {
+                                                        _logger.LogError($"Failed to execute plugin's application command", ex);
+                                                    }
+                                                
+                                                    return {{typeof(Task).FullName}}.CompletedTask;
+                                                }
+                                                
+                                                {{getPopulationMethods()}}
+                                                """;
+                                    case PluginCommandType.PrefixCommand:
+                                        if (command.IsGroup)
+                                            return $$"""
+                                                {{getAttribute(command)}}
+                                                public sealed class {{GetUniqueCodeCompatibleName()}} : {{typeof(BaseCommandModule).FullName}}
+                                                {
+                                                    public {{typeof(Bot).FullName}} _bot { private get; set; }
+                                                
+                                                    {{(command.UseDefaultHelp ? $$"""
+                                                    
+                                                    [{{typeof(GroupCommandAttribute).FullName}}, {{typeof(CommandAttribute).FullName}}("help"), {{typeof(DescriptionAttribute).FullName}}("Sends a list of available sub-commands")]
+                                                    public async {{typeof(Task).FullName}} Help({{typeof(CommandContext).FullName}} ctx)
+                                                        => {{typeof(PrefixCommandUtil).FullName}}.SendGroupHelp(_bot, ctx, "{{command.Name}}").Add(_bot, ctx);
+                                                    """ : "")}}
+
+                                                    {{string.Join("\n\n", command.SubCommands.Select(x => $$"""
+                                                        {{getMethodDefinition(x, command)}}
+                                                    """))}}
+                                                }
+                                                """;
+                                        else
+                                            return $$"""
+                                                {{getAttribute(command)}}
+                                                public {{typeof(Task).FullName}} {{TaskName}}_Execute({{typeof(CommandContext).FullName}} ctx{{(command.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", command.Overloads.Select(x => $"{(x.UseRemainingString ? $"[{typeof(RemainingTextAttribute).FullName}]" : "")} [{typeof(DescriptionAttribute).FullName}(\"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
+                                                {
+                                                    try
+                                                    {
+                                                        {{typeof(Task).FullName}} t = ({{typeof(Task).FullName}}){{TaskName}}_CommandMethod.Invoke({{typeof(Activator).FullName}}.CreateInstance({{TaskName}}_CommandType),
+                                                        new {{typeof(object[]).FullName}} 
+                                                        { ctx, _bot, new Dictionary<string, object>
+                                                            {
+                                                                {{string.Join(",\n", command.Overloads.Select(x => $"{{ \"{x.Name}\", {x.Name} }}"))}}
+                                                            }
+                                                        });
+
+                                                        t.Add(_bot, ctx);
+                                                    }
+                                                    catch ({{typeof(Exception).FullName}} ex)
+                                                    {
+                                                        _logger.LogError($"Failed to execute plugin's command", ex);
+                                                    }
+
+                                                    return {{typeof(Task).FullName}}.CompletedTask;
+                                                }
+
+                                                {{getPopulationMethods()}}
+                                                """;
+                                    case PluginCommandType.ContextMenu:
+                                        return $$"""
+                                                {{getAttribute(command)}}
+                                                public {{typeof(Task).FullName}} {{TaskName}}_Execute({{typeof(ContextMenuContext).FullName}} ctx)
+                                                {
+                                                        try
+                                                    {
+                                                        {{typeof(Task).FullName}} t = ({{typeof(Task).FullName}}){{TaskName}}_CommandMethod.Invoke({{typeof(Activator).FullName}}.CreateInstance({{TaskName}}_CommandType),
+                                                        new {{typeof(object[]).FullName}} 
+                                                        { ctx, _bot, new Dictionary<string, object>
+                                                            {
+                                                                {{(command.ContextMenuType == ApplicationCommandType.Message ? "{ \"message\", ctx.TargetMessage }" : "{ \"user\", ctx.TargetMember ?? ctx.TargetUser }")}}
+                                                            }
+                                                        });
+                                                
+                                                        t.Add(_bot, ctx);
+                                                    }
+                                                    catch ({{typeof(Exception).FullName}} ex)
+                                                    {
+                                                        _logger.LogError($"Failed to execute plugin's command", ex);
+                                                    }
+                                                
+                                                    return {{typeof(Task).FullName}}.CompletedTask;
+                                                }
+
+                                                {{getPopulationMethods()}}
+                                                """;
+
+                                    default:
+                                        throw new NotImplementedException();
+                                }
+                            }
+
+                            var currentCode = $$"""
+                                public {{typeof(Bot).FullName}} _bot { private get; set; }
+
+                                {{getMethodDefinition(command, null)}}
+                                """;
+
+                            string getDefinition(PluginCommandType type) 
+                                => type switch
+                                {
+                                    PluginCommandType.ContextMenu or PluginCommandType.SlashCommand => "app",
+                                    PluginCommandType.PrefixCommand => "prefix",
+                                    _ => throw new NotImplementedException(),
+                                };
+
+                            var value = createCodeWithDefaultClass(currentCode);
+                            rawCodeList.Add($"{getDefinition(supportedType)}_{(command.IsGroup ? "group" : "single")}", value);
+                        }
+
+                        return rawCodeList;
+                    }
 
                     foreach (var rawCommand in pluginCommands)
                     {
                         rawCommand.Registered = true;
-
-                        if (rawCommand.SupportedCommands.Contains(PluginCommandType.PrefixCommand))
-                            if (rawCommand.IsGroup)
-                            {
-                                var code =
-                                $$"""
-                                {{classUsings}}
-
-                                [{{typeof(GroupAttribute).FullName}}("{{rawCommand.Name}}"), {{typeof(DescriptionAttribute).FullName}}("{{rawCommand.Description}}")]
-                                public sealed class {{GetUniqueCodeCompatibleName()}} : {{typeof(BaseCommandModule).FullName}}
-                                {
-                                    public {{typeof(Bot).FullName}} _bot { private get; set; }
-
-                                    // EntryPoint
-                                }
-                                """;
-
-                                var IndexPath = $"// EntryPoint";
-                                int InsertPosition = InsertPosition = code.IndexOf(IndexPath) + IndexPath.Length;
-
-                                foreach (var rawSubCommand in rawCommand.SubCommands)
-                                {
-                                    rawSubCommand.Registered = true;
-
-                                    if (rawSubCommand.Name.ToLower() == "help")
-                                        continue;
-
-                                    rawSubCommand.Parent = rawCommand;
-                                    code = code.Insert(InsertPosition, GetGroupMethodCode(plugin, typeof(CommandContext).FullName, rawSubCommand, rawCommand));
-                                }
-
-                                if (rawCommand.UseDefaultHelp)
-                                {
-                                    code = code.Insert(InsertPosition,
-                                    $$"""
-
-                                    [{{typeof(GroupCommandAttribute).FullName}}, {{typeof(CommandAttribute).FullName}}("help"), {{typeof(DescriptionAttribute).FullName}}("Sends a list of available sub-commands")]
-                                    public async {{typeof(Task).FullName}} Help({{typeof(CommandContext).FullName}} ctx)
-                                        => {{typeof(PrefixCommandUtil).FullName}}.SendGroupHelp(_bot, ctx, "{{rawCommand.Name}}").Add(_bot, ctx);
-                                    """);
-                                }
-
-                                _logger.LogTrace($"\n{code}");
-
-                                compilationList.Add(CSharpCompilation.Create(GetUniqueCodeCompatibleName())
-                                    .AddSyntaxTrees(SyntaxFactory.ParseSyntaxTree(code))
-                                    .AddReferences(references)
-                                        .WithOptions(options),
-                                        new CompilationData("prefix_group", code, rawCommand));
-                            }
-                            else
-                            {
-                                var code =
-                                $$"""
-                                {{classUsings}}
-
-                                public sealed class {{GetUniqueCodeCompatibleName()}} : {{typeof(BaseCommandModule).FullName}}
-                                {
-                                    public {{typeof(Bot).FullName}} _bot { private get; set; }
-
-                                    {{GetSingleMethodCode(plugin, typeof(CommandContext).FullName, rawCommand)}}
-                                }
-                                """;
-
-                                compilationList.Add(CSharpCompilation.Create(GetUniqueCodeCompatibleName())
-                                    .AddSyntaxTrees(SyntaxFactory.ParseSyntaxTree(code))
-                                    .AddReferences(references)
-                                        .WithOptions(options),
-                                        new CompilationData("prefix_single", code, rawCommand));
-                            }
-
-                        if (rawCommand.SupportedCommands.Contains(PluginCommandType.SlashCommand))
-                            if (rawCommand.IsGroup)
-                            {
-                                var code =
-                                $$"""
-                                {{classUsings}}
-
-                                public sealed class {{GetUniqueCodeCompatibleName()}} : {{typeof(ApplicationCommandsModule).FullName}}
-                                {
-                                    [{{typeof(SlashCommandGroupAttribute).FullName}}("{{rawCommand.Name}}", "{{rawCommand.Description}}"{{(rawCommand.RequiredPermissions is null ? "" : $", {(long)rawCommand.RequiredPermissions}")}}, dmPermission: {{rawCommand.AllowPrivateUsage.ToString().ToLower()}}, isNsfw: {{rawCommand.IsNsfw.ToString().ToLower()}})]
-                                    public sealed class {{GetUniqueCodeCompatibleName()}} : {{typeof(ApplicationCommandsModule).FullName}}
-                                    {
-                                        public {{typeof(Bot).FullName}} _bot { private get; set; }
-
-                                        // EntryPoint
-                                    }
-                                }
-                                """;
-
-                                foreach (var rawSubCommand in rawCommand.SubCommands)
-                                {
-                                    rawSubCommand.Parent = rawCommand;
-
-                                    var IndexPath = $"// EntryPoint";
-                                    int InsertPosition = InsertPosition = code.IndexOf(IndexPath) + IndexPath.Length;
-
-                                    code = code.Insert(InsertPosition, GetGroupMethodCode(plugin, typeof(InteractionContext).FullName, rawSubCommand, rawCommand));
-                                }
-
-                                compilationList.Add(CSharpCompilation.Create(GetUniqueCodeCompatibleName())
-                                    .AddSyntaxTrees(SyntaxFactory.ParseSyntaxTree(code))
+                        foreach (var b in getClassCode(rawCommand))
+                        {
+                            compilationList.Add(CSharpCompilation.Create(GetUniqueCodeCompatibleName())
+                                    .AddSyntaxTrees(SyntaxFactory.ParseSyntaxTree(b.Value))
                                     .AddReferences(references)
                                     .WithOptions(options),
-                                        new CompilationData("app_group", code, rawCommand));
-                            }
-                            else
-                            {
-                                var code =
-                                $$"""
-                                {{classUsings}}
-
-                                public sealed class {{GetUniqueCodeCompatibleName()}} : {{typeof(ApplicationCommandsModule).FullName}}
-                                {
-                                    public {{typeof(Bot).FullName}} _bot { private get; set; }
-
-                                    {{GetSingleMethodCode(plugin, typeof(InteractionContext).FullName, rawCommand)}}
-                                }
-                                """;
-
-                                compilationList.Add(CSharpCompilation.Create(GetUniqueCodeCompatibleName())
-                                    .AddSyntaxTrees(SyntaxFactory.ParseSyntaxTree(code))
-                                    .AddReferences(references)
-                                    .WithOptions(options),
-                                        new CompilationData("app_single", code, rawCommand));
-                            }
+                                        new CompilationData(b.Key, b.Value, rawCommand));
+                        }
                     }
 
                     foreach (var compilation in compilationList)
@@ -447,7 +560,9 @@ internal static class PluginLoader
 
                                 Console.Write(compilation.Value.code[i]);
                             }
-                            Console.WriteLine();
+                            Console.WriteLine(); 
+
+                            _ = Console.ReadLine();
                         }
                     }
 
@@ -521,116 +636,6 @@ internal static class PluginLoader
 
     private static string GetUniqueCodeCompatibleName()
         => $"a{Guid.NewGuid().ToString().ToLower().Replace("-", "")}";
-
-    private static string GetSingleMethodCode(KeyValuePair<string, BasePlugin> PluginIdentifier, string ContextName, BasePluginCommand Command)
-    {
-        var TaskName = GetUniqueCodeCompatibleName();
-
-        string GetMethodLine()
-        {
-            if (ContextName == typeof(InteractionContext).FullName)
-                return
-                    $$"""
-                    [{{typeof(SlashCommandAttribute).FullName}}("{{Command.Name}}", "{{Command.Description}}"{{(Command.RequiredPermissions is null ? "" : $", {(long)Command.RequiredPermissions}")}}, dmPermission: {{Command.AllowPrivateUsage.ToString().ToLower()}}, isNsfw: {{Command.IsNsfw.ToString().ToLower()}})]
-                    public {{typeof(Task).FullName}} {{TaskName}}_Execute({{typeof(InteractionContext).FullName}} ctx{{(Command.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", Command.Overloads.Select(x => $"[{typeof(OptionAttribute).FullName}(\"{x.Name}\", \"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
-                    """;
-            else
-                return ContextName == typeof(CommandContext).FullName
-                ? $$"""
-                    [{{typeof(CommandAttribute).FullName}}("{{Command.Name}}"), {{typeof(DescriptionAttribute).FullName}}("{{Command.Description}}")]
-                    public {{typeof(Task).FullName}} a{{TaskName}}_Execute({{typeof(CommandContext).FullName}} ctx{{(Command.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", Command.Overloads.Select(x => $"{(x.UseRemainingString ? $"[{typeof(RemainingTextAttribute).FullName}]" : "")} [{typeof(DescriptionAttribute).FullName}(\"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
-                    """
-                : throw new NotImplementedException();
-        }
-        return $$"""
-
-            {{GetMethodLine()}}
-            {
-                try
-                {
-                    {{typeof(Task).FullName}} t = ({{typeof(Task).FullName}}){{TaskName}}_CommandMethod.Invoke({{typeof(Activator).FullName}}.CreateInstance({{TaskName}}_CommandType),
-                        new {{typeof(object[]).FullName}} 
-                        { ctx, _bot, new Dictionary<string, object>
-                            {
-                                {{string.Join(",\n", Command.Overloads.Select(x => $"{{ \"{x.Name}\", {x.Name} }}"))}}
-                            }{{(ContextName == typeof(InteractionContext).FullName ? $", {Command.IsEphemeral.ToString().ToLower()}, true, false" : "")}}
-                        });
-
-                    t.Add(_bot, ctx);
-                }
-                catch ({{typeof(Exception).FullName}} ex)
-                {
-                    _logger.LogError($"Failed to execute plugin's application command", ex);
-                }
-
-                return {{typeof(Task).FullName}}.CompletedTask;
-            }
-
-            private static {{typeof(Type).FullName}} {{TaskName}}_CommandType { get; set; }
-            private static {{typeof(MethodInfo).FullName}} {{TaskName}}_CommandMethod { get; set; }
-            public static void Populate_{{TaskName}}({{typeof(Bot).FullName}} _bot)
-            {
-                _logger.LogDebug("Populating execution properties for '{CommandName}':'{taskname}'", "{{Command.Name}}","{{TaskName}}");
-                {{TaskName}}_CommandType = _bot.PluginCommands["{{PluginIdentifier.Key}}"].First(x => x.Name == "{{Command.Name}}").Command.GetType();
-                {{TaskName}}_CommandMethod = {{TaskName}}_CommandType.GetMethods().First(x => x.Name == "ExecuteCommand" && x.GetParameters().Any(param => param.ParameterType == typeof({{ContextName}})));
-            }
-            """;
-    }
-
-    private static string GetGroupMethodCode(KeyValuePair<string, BasePlugin> PluginIdentifier, string ContextName, BasePluginCommand Command, BasePluginCommand Parent)
-    {
-        var TaskName = GetUniqueCodeCompatibleName();
-
-        string GetMethodLine()
-        {
-            if (ContextName == typeof(InteractionContext).FullName)
-                return
-                    $$"""
-                    [{{typeof(SlashCommandAttribute).FullName}}("{{Command.Name}}", "{{Command.Description}}")]
-                    public {{typeof(Task).FullName}} {{TaskName}}_Execute({{typeof(InteractionContext).FullName}} ctx{{(Command.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", Command.Overloads.Select(x => $"[{typeof(OptionAttribute).FullName}(\"{x.Name}\", \"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
-                    """;
-            else
-                return ContextName == typeof(CommandContext).FullName
-                ? $$"""
-                    [{{typeof(CommandAttribute).FullName}}("{{Command.Name}}"), {{typeof(DescriptionAttribute).FullName}}("{{Command.Description}}")]
-                    public {{typeof(Task).FullName}} a{{TaskName}}_Execute({{typeof(CommandContext).FullName}} ctx{{(Command.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", Command.Overloads.Select(x => $"{(x.UseRemainingString ? $"[{typeof(RemainingTextAttribute).FullName}]" : "")} [{typeof(DescriptionAttribute).FullName}(\"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
-                    """
-                : throw new NotImplementedException();
-        }
-        return $$"""
-
-            {{GetMethodLine()}}
-            {
-                try
-                {
-                    {{typeof(Task).FullName}} t = ({{typeof(Task).FullName}}){{TaskName}}_CommandMethod.Invoke({{typeof(Activator).FullName}}.CreateInstance({{TaskName}}_CommandType), 
-                            new object[] 
-                            { ctx, _bot, new Dictionary<string, object>
-                                {
-                                    {{string.Join(",\n", Command.Overloads.Select(x => $"{{ \"{x.Name}\", {x.Name} }}"))}}
-                                }{{(ContextName == typeof(InteractionContext).FullName ? $", {Command.IsEphemeral.ToString().ToLower()}, true, false" : "")}}
-                            });
-                    
-                    t.Add(_bot, ctx);
-                }
-                catch ({{typeof(Exception).FullName}} ex)
-                {
-                    _logger.LogError($"Failed to execute plugin's prefix command", ex);
-                }
-                    
-                return {{typeof(Task).FullName}}.CompletedTask;
-            }
-
-            private static {{typeof(Type).FullName}} {{TaskName}}_CommandType { get; set; }
-            private static {{typeof(MethodInfo).FullName}} {{TaskName}}_CommandMethod { get; set; }
-            public static void Populate_{{TaskName}}({{typeof(Bot).FullName}} _bot)
-            {
-                _logger.LogDebug("Populating execution properties for '{ParentCommandName} {CommandName}':'{taskname}'", "{{Parent.Name}}", "{{Command.Name}}","{{TaskName}}");
-                {{TaskName}}_CommandType = _bot.PluginCommands["{{PluginIdentifier.Key}}"].First(x => x.Name == "{{Parent.Name}}").SubCommands.First(x => x.Name == "{{Command.Name}}").Command.GetType();
-                {{TaskName}}_CommandMethod = {{TaskName}}_CommandType.GetMethods().First(x => x.Name == "ExecuteCommand" && x.GetParameters().Any(param => param.ParameterType == typeof({{ContextName}})));
-            }
-            """;
-    }
 }
 
 internal record CompilationData(string type, string code, BasePluginCommand command);
