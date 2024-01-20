@@ -204,7 +204,8 @@ internal static class PluginLoader
                 if (bot.status.LoadedConfig.PluginCache.TryGetValue(plugin.Key, out var pluginInfo) &&
                     pluginHash == pluginInfo.LastKnownHash &&
                     applicationHash == bot.status.LoadedConfig.DontModify.LastKnownHash &&
-                    pluginInfo.CompiledCommands.All(x => File.Exists(x.Key)))
+                    pluginInfo.CompiledCommands.All(x => File.Exists(x.Key)) &&
+                    pluginInfo.CompiledCommands.Count != 0)
                 {
                     _logger.LogInfo("Loading {0} Commands from Plugin from '{1}' ({2}) from compiled assemblies..", pluginInfo.CompiledCommands.Count, plugin.Value.Name, plugin.Value.Version.ToString());
 
@@ -292,7 +293,7 @@ internal static class PluginLoader
                                                 """;
                                         else
                                             return $$"""
-                                                [{{typeof(CommandAttribute).FullName}}("{{command.Name}}"), {{typeof(DescriptionAttribute).FullName}}("{{command.Description}}")]
+                                                [{{typeof(CommandAttribute).FullName}}("{{command.AlternativeName ?? command.Name}}"), {{typeof(DescriptionAttribute).FullName}}("{{command.Description}}")]
                                                 """;
                                     case PluginCommandType.ContextMenu:
                                         return $$"""
@@ -348,7 +349,7 @@ internal static class PluginLoader
                                         else
                                             return $$"""
                                                 {{getAttribute(command)}}
-                                                public {{typeof(Task).FullName}} {{TaskName}}_Execute({{typeof(InteractionContext).FullName}} ctx{{(command.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", command.Overloads.Select(x => $"[{typeof(OptionAttribute).FullName}(\"{x.Name}\", \"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
+                                                public {{typeof(Task).FullName}} {{TaskName}}_Execute({{typeof(InteractionContext).FullName}} ctx{{(command.Overloads?.Length > 0 ? ", " : "")}}{{string.Join(", ", command.Overloads?.Select(x => $"[{typeof(OptionAttribute).FullName}(\"{x.Name}\", \"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
                                                 {
                                                     try
                                                     {
@@ -356,7 +357,7 @@ internal static class PluginLoader
                                                             new {{typeof(object[]).FullName}} 
                                                             { ctx, _bot, new Dictionary<string, object>
                                                                 {
-                                                                    {{string.Join(",\n", command.Overloads.Select(x => $"{{ \"{x.Name}\", {x.Name} }}"))}}
+                                                                    {{string.Join(",\n", command.Overloads?.Select(x => $"{{ \"{x.Name}\", {x.Name} }}"))}}
                                                                 }, {{command.IsEphemeral.ToString().ToLower()}}, true, false
                                                             });
                                                 
@@ -395,7 +396,7 @@ internal static class PluginLoader
                                         else
                                             return $$"""
                                                 {{getAttribute(command)}}
-                                                public {{typeof(Task).FullName}} {{TaskName}}_Execute({{typeof(CommandContext).FullName}} ctx{{(command.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", command.Overloads.Select(x => $"{(x.UseRemainingString ? $"[{typeof(RemainingTextAttribute).FullName}]" : "")} [{typeof(DescriptionAttribute).FullName}(\"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
+                                                public {{typeof(Task).FullName}} {{TaskName}}_Execute({{typeof(CommandContext).FullName}} ctx{{(command.Overloads?.Length > 0 ? ", " : "")}}{{string.Join(", ", command.Overloads?.Select(x => $"{(x.UseRemainingString ? $"[{typeof(RemainingTextAttribute).FullName}]" : "")} [{typeof(DescriptionAttribute).FullName}(\"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}") ?? [])}})
                                                 {
                                                     try
                                                     {
@@ -403,7 +404,7 @@ internal static class PluginLoader
                                                         new {{typeof(object[]).FullName}} 
                                                         { ctx, _bot, new Dictionary<string, object>
                                                             {
-                                                                {{string.Join(",\n", command.Overloads.Select(x => $"{{ \"{x.Name}\", {x.Name} }}"))}}
+                                                                {{string.Join(",\n", command.Overloads?.Select(x => $"{{ \"{x.Name}\", {x.Name} }}") ?? [])}}
                                                             }
                                                         });
 
@@ -421,6 +422,7 @@ internal static class PluginLoader
                                                 """;
                                     case PluginCommandType.ContextMenu:
                                         return $$"""
+                                                {{(!command.AlternativeName.IsNullOrWhiteSpace() ? $"[{typeof(PrefixCommandAlternativeAttribute).FullName}(\"{command.AlternativeName}\")]" : "")}}
                                                 {{getAttribute(command)}}
                                                 public {{typeof(Task).FullName}} {{TaskName}}_Execute({{typeof(ContextMenuContext).FullName}} ctx)
                                                 {
@@ -431,7 +433,7 @@ internal static class PluginLoader
                                                         { ctx, _bot, new Dictionary<string, object>
                                                             {
                                                                 {{(command.ContextMenuType == ApplicationCommandType.Message ? "{ \"message\", ctx.TargetMessage }" : "{ \"user\", ctx.TargetMember ?? ctx.TargetUser }")}}
-                                                            }
+                                                            }, {{command.IsEphemeral.ToString().ToLower()}}, true, false
                                                         });
                                                 
                                                         t.Add(_bot, ctx);

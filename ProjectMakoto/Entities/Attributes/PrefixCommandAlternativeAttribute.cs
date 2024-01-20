@@ -10,7 +10,7 @@
 namespace ProjectMakoto.Entities;
 
 [AttributeUsage(AttributeTargets.Method)]
-internal class PrefixCommandAlternativeAttribute(string prefixCommand) : Attribute
+public class PrefixCommandAlternativeAttribute(string prefixCommand) : Attribute
 {
     public string PrefixCommand { get; init; } = prefixCommand;
 }

@@ -29,9 +29,6 @@
         - **You need [Java](https://jdk.java.net/18/) to run Lavalink**
             - While i prefer running Lavalink on the host, you can also use a [Docker container](https://github.com/lavalink-devs/Lavalink#docker).
         - To learn how to setup Lavalink, you can check out **[this handy article](https://docs.dcs.aitsys.dev/articles/modules/audio/lavalink_v4/setup)** made by the DisCatSharp Team.
-    - [LibreTranslate](https://github.com/LibreTranslate/LibreTranslate)
-        - **By far easiest way to set up a LibreTranslate instance is by using [Docker](https://www.docker.com/)**
-        - After installing Docker, run: `docker run -ti --rm -p 5000:5000 libretranslate/libretranslate`
     - [MariaDB Server](https://mariadb.org/download/)
         - After installing the MariaDB Server, create 2 new databases: One for the main tables (guilds, users, scam_urls, etc.) and one for server members.
 

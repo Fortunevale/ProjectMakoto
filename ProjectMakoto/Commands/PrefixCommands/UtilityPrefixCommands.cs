@@ -116,11 +116,11 @@ public sealed class UtilityPrefixCommands : BaseCommandModule
 
 
 
-    [Command("translate"),
+    //[Command("translate"),
     
-    Description("Allows you to translate a message. Reply to a message to select it.")]
-    public async Task Translate(CommandContext ctx)
-        => _ = new TranslateCommand().ExecuteCommand(ctx, this._bot);
+    //Description("Allows you to translate a message. Reply to a message to select it.")]
+    //public async Task Translate(CommandContext ctx)
+    //    => _ = new TranslateCommand().ExecuteCommand(ctx, this._bot);
 
 
 

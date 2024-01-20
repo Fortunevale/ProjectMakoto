@@ -29,7 +29,6 @@ public sealed class User : RequiresBotReference
         this.ScoreSaber = new(bot, this);
         this.ExperienceUser = new(bot, this);
         this.Reminders = new(bot, this);
-        this.Translation = new(bot, this);
         this.TranslationReports = new(bot, this);
         this.Data = new(bot, this);
     }
@@ -48,9 +47,6 @@ public sealed class User : RequiresBotReference
 
     [ContainsValues]
     public ReminderSettings Reminders { get; init; }
-
-    [ContainsValues]
-    public TranslationSettings Translation { get; init; }
 
     [ContainsValues]
     public TranslationReportSettings TranslationReports { get; init; }

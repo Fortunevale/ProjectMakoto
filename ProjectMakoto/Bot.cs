@@ -26,7 +26,6 @@ public sealed class Bot
     internal LavalinkSession LavalinkSession;
 
     internal ScoreSaberClient ScoreSaberClient { get; set; }
-    public GoogleTranslateClient TranslationClient { get; internal set; }
     public ThreadJoinClient ThreadJoinClient { get; internal set; }
     public AbuseIpDbClient AbuseIpDbClient { get; internal set; }
     public MonitorClient MonitorClient { get; internal set; }
@@ -146,7 +145,6 @@ public sealed class Bot
             {
                 await Util.Initializers.ConfigLoader.Load(this);
                 this.ScoreSaberClient = new ScoreSaberClient(this);
-                this.TranslationClient = new GoogleTranslateClient(this);
                 this.ThreadJoinClient = new ThreadJoinClient();
                 this.MonitorClient = new MonitorClient(this);
                 this.AbuseIpDbClient = new AbuseIpDbClient(this);
@@ -158,10 +156,10 @@ public sealed class Bot
                 };
 
                 await Task.WhenAll(Util.Initializers.ListLoader.Load(this), 
-                                   Util.Initializers.TranslationLoader.Load(this), 
-                                   Util.Initializers.PluginLoader.LoadPlugins(this),
+                                   Util.Initializers.TranslationLoader.Load(this),
                                    Util.Initializers.DependencyLoader.Load(this));
 
+                await Util.Initializers.PluginLoader.LoadPlugins(this);
                 _ = await DatabaseClient.InitializeDatabase(this);
                 _ = BasePlugin.RaiseDatabaseInitialized(this);
 

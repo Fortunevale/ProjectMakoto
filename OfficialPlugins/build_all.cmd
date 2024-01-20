@@ -1,6 +1,9 @@
 @echo off
 
+set "current_dir=%CD%"
 call update_deps.cmd
+cd /d "%current_dir%"
+
 del /q *.pmpl
 
 for /D %%i in (*) do (

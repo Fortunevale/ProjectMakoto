@@ -130,7 +130,6 @@ public sealed class Config
     public sealed class SecretsConfig
     {
         public string AbuseIpDbToken = "";
-        public string LibreTranslateHost = "127.0.0.1";
 
         public QuickChartSecrets QuickChart = new();
         public DiscordSecrets Discord = new();

@@ -376,17 +376,6 @@
     {
       "Type": 3,
       "Names": {
-        "en": "Translate Message",
-        "de": "Nachricht übersetzen"
-      },
-      "Descriptions": {
-        "en": "Allows you to translate a selected message.",
-        "de": "Erlaubt es dir eine ausgewählte Nachricht zu übersetzen."
-      }
-    },
-    {
-      "Type": 3,
-      "Names": {
         "en": "Add a Reaction Role",
         "de": "Eine Reaktionsrolle hinzufügen"
       },
@@ -3094,50 +3083,6 @@
         "ReportSubmitted": {
           "en": "Your report has been submitted. We will check your report as soon as possible. Please remember, we may follow up on this report for more information.",
           "de": "Deine Meldung wurde eingereicht. Wir werden die Meldung überprüfen sobald es uns möglich ist. Bitte denk daran dass wir eventuell mehr Information benötigen und dich auf Grund dessen kontaktieren."
-        }
-      },
-      "TranslateMessage": {
-        "NoContent": {
-          "en": "There is no content to translate in the message you selected.",
-          "de": "In der gewählten Nachricht gibt es keinen Text zum übersetzen."
-        },
-        "SelectProvider": {
-          "en": "What provider do you want to use?",
-          "de": "Welchen Anbieter möchtest du verwenden?"
-        },
-        "SelectSource": {
-          "en": "Please select the language to translate from.",
-          "de": "Bitte wähle die Sprache aus der du übersetzen möchtest."
-        },
-        "SelectSourceDropdown": {
-          "en": "Select the Source Language..",
-          "de": "Sprache auswählen.."
-        },
-        "SelectTarget": {
-          "en": "Okay! Translating from {Source}. Now select the language to translate to.",
-          "de": "Okay! Übersetze aus {Source}. Wähle nun die Sprache zu der du übersetzen möchtest."
-        },
-        "SelectTargetDropdown": {
-          "en": "Select the Target Language..",
-          "de": "Sprache auswählen.."
-        },
-        "Translating": {
-          "en": "Translating..",
-          "de": "Übersetze.."
-        },
-        "Queue": {
-          "en": [
-            "Your translation request is currently in queue at position {Position}. This might take a moment to finish..",
-            "Your request will be executed, approximately, {Timestamp}."
-          ],
-          "de": [
-            "Deine Übersetzungsanfrage ist aktuell in der Warteschlange an Position {Position}. Bitte warte einen Moment..",
-            "Deine Anfrage wird ungefähr {Timestamp} ausgeführt."
-          ]
-        },
-        "Translated": {
-          "en": "Translated from {Source} to {Target} using {Provider}",
-          "de": "Übersetzt aus {Source} zu {Target} durch {Provider}"
         }
       },
       "Upload": {

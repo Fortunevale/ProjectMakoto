@@ -1149,19 +1149,6 @@ public class Translations : ITranslations
                 public SingleTranslationKey AlreadyUploaded;
                 public SingleTranslationKey NoInteraction;
             }
-            public translateMessage TranslateMessage;
-            public sealed class translateMessage
-            {
-                public SingleTranslationKey Translated;
-                public MultiTranslationKey Queue;
-                public SingleTranslationKey Translating;
-                public SingleTranslationKey SelectTargetDropdown;
-                public SingleTranslationKey SelectTarget;
-                public SingleTranslationKey SelectSourceDropdown;
-                public SingleTranslationKey SelectSource;
-                public SingleTranslationKey SelectProvider;
-                public SingleTranslationKey NoContent;
-            }
             public reportTranslation ReportTranslation;
             public sealed class reportTranslation
             {

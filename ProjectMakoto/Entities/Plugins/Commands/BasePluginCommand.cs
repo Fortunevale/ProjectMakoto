@@ -16,15 +16,15 @@ public sealed class BasePluginCommand
     /// <summary>
     /// Creates a new Plugin Context Menu Command.
     /// </summary>
-    /// <param name="Name">The name of the command to be registered.</param>
+    /// <param name="ContextName">The name of the command to be registered.</param>
     /// <param name="Description">The description of the command to be registered.</param>
     /// <param name="Command">The command to be executed.</param>
-    /// <param name="RegisterPrefixAlternative">Whether or not this command should have a equivalent prefix command.</param>
+    /// <param name="PrefixAlternativeName">If not set, no prefix alternative for the command will be set.</param>
     /// <exception cref="ArgumentNullException">Thrown if any required argument is <see langword="null"/> or consists only of whitespaces.</exception>
-    public BasePluginCommand(ApplicationCommandType type, string Name, string Description, BaseCommand Command, bool RegisterPrefixAlternative)
+    public BasePluginCommand(ApplicationCommandType type, string ContextName, string Description, BaseCommand Command, string? PrefixAlternativeName = null)
     {
-        if (Name.IsNullOrWhiteSpace())
-            throw new ArgumentNullException(nameof(Name));
+        if (ContextName.IsNullOrWhiteSpace())
+            throw new ArgumentNullException(nameof(ContextName));
 
         if (Command is null)
             throw new ArgumentNullException(nameof(Command));
@@ -33,10 +33,11 @@ public sealed class BasePluginCommand
             throw new InvalidOperationException("The ApplicationCommandType has to be Message or User!");
 
         this.ContextMenuType = type;
-        this.Name = Name.Trim();
+        this.Name = ContextName.Trim();
+        this.AlternativeName = PrefixAlternativeName;
         this.Description = Description.Trim();
         this.Command = Command;
-        this.SupportedCommandTypes = RegisterPrefixAlternative ? new[] { PluginCommandType.ContextMenu, PluginCommandType.PrefixCommand } : new[] { PluginCommandType.ContextMenu };
+        this.SupportedCommandTypes = !PrefixAlternativeName.IsNullOrWhiteSpace() ? new[] { PluginCommandType.ContextMenu, PluginCommandType.PrefixCommand } : new[] { PluginCommandType.ContextMenu };
     }
 
     /// <summary>
@@ -101,6 +102,11 @@ public sealed class BasePluginCommand
     /// The command's name.
     /// </summary>
     public string Name { get; internal set; }
+
+    /// <summary>
+    /// If using Context Menu, this sets the alternative command name for prefix commands.
+    /// </summary>
+    public string? AlternativeName { get; internal set; }
 
     /// <summary>
     /// The command's description.

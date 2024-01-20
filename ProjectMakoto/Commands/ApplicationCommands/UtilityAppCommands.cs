@@ -276,11 +276,11 @@ public sealed class UtilityAppCommands : ApplicationCommandsModule
             { "message", ctx.TargetMessage }
         });
 
-    [PrefixCommandAlternative("translate")]
-    [ContextMenu(ApplicationCommandType.Message, "Translate Message", dmPermission: false)]
-    public async Task Translate(ContextMenuContext ctx)
-        => _ = new TranslateCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
-        {
-            { "message", ctx.TargetMessage }
-        });
+    //[PrefixCommandAlternative("translate")]
+    //[ContextMenu(ApplicationCommandType.Message, "Translate Message", dmPermission: false)]
+    //public async Task Translate(ContextMenuContext ctx)
+    //    => _ = new TranslateCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+    //    {
+    //        { "message", ctx.TargetMessage }
+    //    });
 }
