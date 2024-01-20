@@ -8,7 +8,7 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Entities;
-internal static class Resources
+public static class Resources
 {
     public static readonly IReadOnlyList<Permissions> ProtectedPermissions = new List<Permissions>()
     {
