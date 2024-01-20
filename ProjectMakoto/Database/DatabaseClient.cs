@@ -65,20 +65,21 @@ public sealed partial class DatabaseClient : RequiresBotReference
             }
         };
         
-        databaseClient.pluginDatabaseConnection = new()
-        {
-            CreateConnection = () =>
+        if (bot.status.LoadedConfig.EnablePlugins)
+            databaseClient.pluginDatabaseConnection = new()
             {
-                var conn = new MySqlConnection($"Server={bot.status.LoadedConfig.Secrets.Database.Host};" +
-                                               $"Port={bot.status.LoadedConfig.Secrets.Database.Port};" +
-                                               $"User Id={bot.status.LoadedConfig.Secrets.Database.Username};" +
-                                               $"Password={bot.status.LoadedConfig.Secrets.Database.Password};" +
-                                               $"Connection Timeout=60;" +
-                                               $"Connection Lifetime=30;" +
-                                               $"Database={bot.status.LoadedConfig.Secrets.Database.PluginDatabaseName};");
-                return conn;
-            }
-        };        
+                CreateConnection = () =>
+                {
+                    var conn = new MySqlConnection($"Server={bot.status.LoadedConfig.Secrets.Database.Host};" +
+                                                   $"Port={bot.status.LoadedConfig.Secrets.Database.Port};" +
+                                                   $"User Id={bot.status.LoadedConfig.Secrets.Database.Username};" +
+                                                   $"Password={bot.status.LoadedConfig.Secrets.Database.Password};" +
+                                                   $"Connection Timeout=60;" +
+                                                   $"Connection Lifetime=30;" +
+                                                   $"Database={bot.status.LoadedConfig.Secrets.Database.PluginDatabaseName};");
+                    return conn;
+                }
+            };
 
         await databaseClient.SyncStandardTable(new KeyValuePair<Type, string>[]
         {
@@ -165,52 +166,54 @@ public sealed partial class DatabaseClient : RequiresBotReference
 
         var pluginTables = new List<KeyValuePair<Type, string>>();
 
-        foreach (var plugin in bot.Plugins)
-        {
-            var prefix = databaseClient.MakePluginTablePrefix(plugin.Value);
-            var currentPluginTables = await plugin.Value.RegisterTables();
+        if (bot.status.LoadedConfig.EnablePlugins)
+            foreach (var plugin in bot.Plugins)
+            {
+                var prefix = databaseClient.MakePluginTablePrefix(plugin.Value);
+                var currentPluginTables = await plugin.Value.RegisterTables();
 
-            if (currentPluginTables.GroupBy(x => x.FullName).Any(x => x.Count() >= 2))
-                throw new Exception("You cannot use the same type twice.");
+                if (currentPluginTables.GroupBy(x => x.FullName).Any(x => x.Count() >= 2))
+                    throw new Exception("You cannot use the same type twice.");
             
-            if (currentPluginTables.GroupBy(x => databaseClient.GetTableName(x)).Any(x => x.Count() >= 2))
-                throw new Exception("You cannot use the same tablename twice.");
+                if (currentPluginTables.GroupBy(x => databaseClient.GetTableName(x)).Any(x => x.Count() >= 2))
+                    throw new Exception("You cannot use the same tablename twice.");
 
-            if (currentPluginTables.Any(x => x.BaseType != typeof(Plugins.PluginDatabaseTable)))
-                throw new Exception("One or more types do not inherit PluginDatabaseTable");
+                if (currentPluginTables.Any(x => x.BaseType != typeof(Plugins.PluginDatabaseTable)))
+                    throw new Exception("One or more types do not inherit PluginDatabaseTable");
 
-            if (currentPluginTables.Any(x => x.GetCustomAttribute<TableNameAttribute>() == null))
-                throw new ArgumentException("One or more types is missing the TableNameAttribute");
+                if (currentPluginTables.Any(x => x.GetCustomAttribute<TableNameAttribute>() == null))
+                    throw new ArgumentException("One or more types is missing the TableNameAttribute");
 
-            if (currentPluginTables.Any(x => databaseClient.GetValidProperties(x).Length == 0))
-                throw new ArgumentException("One or more types is missing a property with ColumnNameAttribute");
+                if (currentPluginTables.Any(x => databaseClient.GetValidProperties(x).Length == 0))
+                    throw new ArgumentException("One or more types is missing a property with ColumnNameAttribute");
 
-            try
-            {
-                var primaryKeys = currentPluginTables.Select(x => databaseClient.GetPrimaryKey(x)).ToList();
+                try
+                {
+                    var primaryKeys = currentPluginTables.Select(x => databaseClient.GetPrimaryKey(x)).ToList();
+                }
+                catch (Exception)
+                {
+                    throw new ArgumentException("One or more types is missing a property with PrimaryAttribute");
+                }
+
+                foreach (var table in currentPluginTables)
+                {
+                    var requestedTableName = databaseClient.GetTableName(table);
+                    var newTableName = $"{prefix}{requestedTableName}".ToLower();
+
+                    if (!Regex.IsMatch(newTableName, @"^[a-zA-Z_][a-zA-Z0-9_$]*$", RegexOptions.Compiled))
+                        throw new ArgumentException($"Created invalid table name: {newTableName} ({requestedTableName}). Please make sure that the name starts with a letter or an underscore and only contains letters, underscores, digits and dollar signs.");
+
+                    if (pluginTables.Any(x => x.Value == newTableName))
+                        throw new Exception($"The specified plugin tablename '{newTableName}' ({requestedTableName}) already exists.");
+
+                    pluginTables.Add(new KeyValuePair<Type, string>(table, newTableName));
+                    plugin.Value.AllowedTables.Add(newTableName);
+                }
             }
-            catch (Exception)
-            {
-                throw new ArgumentException("One or more types is missing a property with PrimaryAttribute");
-            }
 
-            foreach (var table in currentPluginTables)
-            {
-                var requestedTableName = databaseClient.GetTableName(table);
-                var newTableName = $"{prefix}{requestedTableName}".ToLower();
-
-                if (!Regex.IsMatch(newTableName, @"^[a-zA-Z_][a-zA-Z0-9_$]*$", RegexOptions.Compiled))
-                    throw new ArgumentException($"Created invalid table name: {newTableName} ({requestedTableName}). Please make sure that the name starts with a letter or an underscore and only contains letters, underscores, digits and dollar signs.");
-
-                if (pluginTables.Any(x => x.Value == newTableName))
-                    throw new Exception($"The specified plugin tablename '{newTableName}' ({requestedTableName}) already exists.");
-
-                pluginTables.Add(new KeyValuePair<Type, string>(table, newTableName));
-                plugin.Value.AllowedTables.Add(newTableName);
-            }
-        }
-
-        await databaseClient.SyncStandardTable(pluginTables, databaseClient.pluginDatabaseConnection);
+        if (bot.status.LoadedConfig.EnablePlugins)
+            await databaseClient.SyncStandardTable(pluginTables, databaseClient.pluginDatabaseConnection);
 
         bot.DatabaseClient = databaseClient;
         _logger.LogInfo("Connected to database.");
