@@ -8,7 +8,7 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Exceptions;
-internal class InvalidCallException : Exception
+public class InvalidCallException : Exception
 {
     public InvalidCallException()
     {

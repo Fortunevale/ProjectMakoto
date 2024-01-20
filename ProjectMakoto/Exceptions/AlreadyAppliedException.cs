@@ -9,6 +9,6 @@
 
 namespace ProjectMakoto.Exceptions;
 
-internal sealed class AlreadyAppliedException(string message) : Exception(message)
+public sealed class AlreadyAppliedException(string message) : Exception(message)
 {
 }

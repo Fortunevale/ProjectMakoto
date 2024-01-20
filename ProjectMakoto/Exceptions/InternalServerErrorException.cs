@@ -8,6 +8,6 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Exceptions;
-internal sealed class InternalServerErrorException(string message = "") : Exception(message)
+public sealed class InternalServerErrorException(string message = "") : Exception(message)
 {
 }

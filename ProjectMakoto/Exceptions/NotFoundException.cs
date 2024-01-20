@@ -8,6 +8,6 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Exceptions;
-internal sealed class NotFoundException(string message = "") : Exception(message)
+public sealed class NotFoundException(string message = "") : Exception(message)
 {
 }

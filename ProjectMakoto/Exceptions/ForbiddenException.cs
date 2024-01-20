@@ -8,6 +8,6 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Exceptions;
-internal sealed class ForbiddenException(string message = "") : Exception(message)
+public sealed class ForbiddenException(string message = "") : Exception(message)
 {
 }
