@@ -91,6 +91,7 @@ public sealed partial class DatabaseClient : RequiresBotReference
             new(typeof(BanDetails), "banned_guilds"),
             new(typeof(BanDetails), "banned_users"),
             new(typeof(BanDetails), "globalbans"),
+            new(typeof(DatabaseULongList), "objected_users")
         }, databaseClient.mainDatabaseConnection);
 
         var remoteTables = databaseClient.ListTables(databaseClient.guildDatabaseConnection);
