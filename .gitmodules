@@ -29,3 +29,6 @@
 [submodule "Tools"]
 	path = Tools
 	url = https://github.com/Fortunevale/ProjectMakoto.Tools
+[submodule "OfficialPlugins/AbuseIPDB"]
+	path = OfficialPlugins/AbuseIPDB
+	url = https://github.com/Fortunevale/ProjectMakoto.Plugins.AbuseIPDB
