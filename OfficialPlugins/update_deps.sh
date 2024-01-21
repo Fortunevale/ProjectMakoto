@@ -38,7 +38,7 @@ for i in */; do
 			rm temp.bat
 		  else
 			# Assume Linux
-			ln -sr "../deps" "$i/deps"
+			ln -s "../deps" "$i/deps"
 		  fi
       fi
       
