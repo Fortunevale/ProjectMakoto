@@ -11,5 +11,6 @@ namespace ProjectMakoto.Entities;
 
 public class RequiresParent<T>(Bot bot, T parent) : RequiresBotReference(bot)
 {
+    [JsonIgnore]
     public T Parent { get; set; } = parent;
 }

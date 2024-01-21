@@ -11,5 +11,6 @@ namespace ProjectMakoto.Entities;
 
 public abstract class RequiresBotReference(Bot bot)
 {
-    internal Bot Bot { get; set; } = bot;
+    [JsonIgnore]
+    public Bot Bot { get; set; } = bot;
 }
