@@ -196,7 +196,7 @@ internal static class PluginLoader
             try
             {
                 var pluginHash = HashingExtensions.ComputeSHA256Hash(plugin.Value.LoadedFile);
-                Dictionary<Assembly, string> assemblyList = new();
+                List<(Assembly compiledCommands, CompilationType type)> assemblyList = new();
 
                 var pluginCommands = await plugin.Value.RegisterCommands();
                 bot._PluginCommands.Add(plugin.Key, pluginCommands.ToList());
@@ -215,7 +215,7 @@ internal static class PluginLoader
                         using var file = new FileStream(b.Key, FileMode.Open, FileAccess.Read);
                         var assembly = pluginLoadContext.LoadFromStream(file);
 
-                        assemblyList.Add(assembly, b.Value);
+                        assemblyList.Add((assembly, b.Value));
                     }
 
                     RegisterAssemblies(bot, cNext, appCommands, plugin.Value, assemblyList);
@@ -248,30 +248,34 @@ internal static class PluginLoader
 
                     var compilationList = new Dictionary<CSharpCompilation, CompilationData>();
 
-                    Dictionary<string, string> getClassCode(BasePluginCommand command)
+                    List<(string Code, CompilationType Type)> getClassCode(IEnumerable<BasePluginCommand> commandList)
                     {
-                        var rawCodeList = new Dictionary<string, string>();
+                        var rawCodeList = new List<(string Code, CompilationType Type)>();
 
-                        foreach (var supportedType in command.SupportedCommandTypes)
+                        string createCodeWithDefaultClass(IEnumerable<string> code, PluginCommandType supportedType)
                         {
-                            string createCodeWithDefaultClass(string code)
+                            var inheritType = supportedType switch
                             {
-                                var inheritType = supportedType switch
-                                {
-                                    PluginCommandType.SlashCommand or PluginCommandType.ContextMenu => typeof(ApplicationCommandsModule),
-                                    PluginCommandType.PrefixCommand => typeof(BaseCommandModule),
-                                    _ => throw new NotImplementedException()
-                                };
+                                PluginCommandType.SlashCommand or PluginCommandType.ContextMenu => typeof(ApplicationCommandsModule),
+                                PluginCommandType.PrefixCommand => typeof(BaseCommandModule),
+                                _ => throw new NotImplementedException()
+                            };
 
-                                return $$"""
+                            return $$"""
                                     {{classUsings}}
 
                                     public sealed class {{GetUniqueCodeCompatibleName()}} : {{inheritType.FullName}}
                                     {
-                                        {{code}}
+                                        public {{typeof(Bot).FullName}} _bot { private get; set; }
+
+                                        {{string.Join("\n\n", code)}}
                                     }
                                     """;
-                            }
+                        }
+
+                        string getMethodDefinition(BasePluginCommand command, BasePluginCommand? parent, PluginCommandType supportedType)
+                        {
+                            command.Registered = true;
 
                             string getAttribute(BasePluginCommand command)
                             {
@@ -305,21 +309,19 @@ internal static class PluginLoader
                                 }
                             }
 
-                            string getMethodDefinition(BasePluginCommand command, BasePluginCommand? parent)
+                            var TaskName = GetUniqueCodeCompatibleName();
+
+                            string getPopulationMethods()
                             {
-                                var TaskName = GetUniqueCodeCompatibleName();
-
-                                string getPopulationMethods()
+                                var contextType = supportedType switch
                                 {
-                                    var contextType = supportedType switch
-                                    {
-                                        PluginCommandType.SlashCommand => typeof(InteractionContext),
-                                        PluginCommandType.PrefixCommand => typeof(CommandContext),
-                                        PluginCommandType.ContextMenu => typeof(ContextMenuContext),
-                                        _ => throw new NotImplementedException(),
-                                    };
+                                    PluginCommandType.SlashCommand => typeof(InteractionContext),
+                                    PluginCommandType.PrefixCommand => typeof(CommandContext),
+                                    PluginCommandType.ContextMenu => typeof(ContextMenuContext),
+                                    _ => throw new NotImplementedException(),
+                                };
 
-                                    return $$"""
+                                return $$"""
                                         private static {{typeof(Type).FullName}} {{TaskName}}_CommandType { get; set; }
                                         private static {{typeof(MethodInfo).FullName}} {{TaskName}}_CommandMethod { get; set; }
                                         public static void Populate_{{TaskName}}({{typeof(Bot).FullName}} _bot)
@@ -329,25 +331,25 @@ internal static class PluginLoader
                                             {{TaskName}}_CommandMethod = {{TaskName}}_CommandType.GetMethods().First(x => x.Name == "ExecuteCommand" && x.GetParameters().Any(param => param.ParameterType == typeof({{contextType.FullName}})));
                                         }
                                         """;
-                                }
+                            }
 
-                                switch (supportedType)
-                                {
-                                    case PluginCommandType.SlashCommand:
-                                        if (command.IsGroup)
-                                            return $$"""
+                            switch (supportedType)
+                            {
+                                case PluginCommandType.SlashCommand:
+                                    if (command.IsGroup)
+                                        return $$"""
                                                 {{getAttribute(command)}}
                                                 public sealed class {{GetUniqueCodeCompatibleName()}} : {{typeof(ApplicationCommandsModule).FullName}}
                                                 {
                                                     public {{typeof(Bot).FullName}} _bot { private get; set; }
                                                 
                                                     {{string.Join("\n\n", command.SubCommands.Select(x => $$"""
-                                                        {{getMethodDefinition(x, command)}}
+                                                        {{getMethodDefinition(x, command, supportedType)}}
                                                     """))}}
                                                 }
                                                 """;
-                                        else
-                                            return $$"""
+                                    else
+                                        return $$"""
                                                 {{getAttribute(command)}}
                                                 public {{typeof(Task).FullName}} {{TaskName}}_Execute({{typeof(InteractionContext).FullName}} ctx{{(command.Overloads?.Length > 0 ? ", " : "")}}{{string.Join(", ", command.Overloads?.Select(x => $"[{typeof(OptionAttribute).FullName}(\"{x.Name}\", \"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
                                                 {
@@ -373,9 +375,9 @@ internal static class PluginLoader
                                                 
                                                 {{getPopulationMethods()}}
                                                 """;
-                                    case PluginCommandType.PrefixCommand:
-                                        if (command.IsGroup)
-                                            return $$"""
+                                case PluginCommandType.PrefixCommand:
+                                    if (command.IsGroup)
+                                        return $$"""
                                                 {{getAttribute(command)}}
                                                 public sealed class {{GetUniqueCodeCompatibleName()}} : {{typeof(BaseCommandModule).FullName}}
                                                 {
@@ -389,12 +391,12 @@ internal static class PluginLoader
                                                     """ : "")}}
 
                                                     {{string.Join("\n\n", command.SubCommands.Select(x => $$"""
-                                                        {{getMethodDefinition(x, command)}}
+                                                        {{getMethodDefinition(x, command, supportedType)}}
                                                     """))}}
                                                 }
                                                 """;
-                                        else
-                                            return $$"""
+                                    else
+                                        return $$"""
                                                 {{getAttribute(command)}}
                                                 public {{typeof(Task).FullName}} {{TaskName}}_Execute({{typeof(CommandContext).FullName}} ctx{{(command.Overloads?.Length > 0 ? ", " : "")}}{{string.Join(", ", command.Overloads?.Select(x => $"{(x.UseRemainingString ? $"[{typeof(RemainingTextAttribute).FullName}]" : "")} [{typeof(DescriptionAttribute).FullName}(\"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}") ?? [])}})
                                                 {
@@ -420,8 +422,8 @@ internal static class PluginLoader
 
                                                 {{getPopulationMethods()}}
                                                 """;
-                                    case PluginCommandType.ContextMenu:
-                                        return $$"""
+                                case PluginCommandType.ContextMenu:
+                                    return $$"""
                                                 {{(!command.AlternativeName.IsNullOrWhiteSpace() ? $"[{typeof(PrefixCommandAlternativeAttribute).FullName}(\"{command.AlternativeName}\")]" : "")}}
                                                 {{getAttribute(command)}}
                                                 public {{typeof(Task).FullName}} {{TaskName}}_Execute({{typeof(ContextMenuContext).FullName}} ctx)
@@ -449,43 +451,42 @@ internal static class PluginLoader
                                                 {{getPopulationMethods()}}
                                                 """;
 
-                                    default:
-                                        throw new NotImplementedException();
-                                }
+                                default:
+                                    throw new NotImplementedException();
                             }
-
-                            var currentCode = $$"""
-                                public {{typeof(Bot).FullName}} _bot { private get; set; }
-
-                                {{getMethodDefinition(command, null)}}
-                                """;
-
-                            string getDefinition(PluginCommandType type) 
-                                => type switch
-                                {
-                                    PluginCommandType.ContextMenu or PluginCommandType.SlashCommand => "app",
-                                    PluginCommandType.PrefixCommand => "prefix",
-                                    _ => throw new NotImplementedException(),
-                                };
-
-                            var value = createCodeWithDefaultClass(currentCode);
-                            rawCodeList.Add($"{getDefinition(supportedType)}_{(command.IsGroup ? "group" : "single")}", value);
                         }
+
+                        var rawSlashCommandList = commandList
+                            .Where(x => x.SupportedCommandTypes.Any(x => x is PluginCommandType.SlashCommand))
+                            .Select(x => getMethodDefinition(x, null, PluginCommandType.SlashCommand)).ToList();
+
+                        var rawPrefixCommandList = commandList
+                            .Where(x => x.SupportedCommandTypes.Any(x => x is PluginCommandType.PrefixCommand))
+                            .Select(x => getMethodDefinition(x, null, PluginCommandType.PrefixCommand)).ToList();
+
+                        var rawContextCommandList = commandList
+                            .Where(x => x.SupportedCommandTypes.Any(x => x is PluginCommandType.ContextMenu))
+                            .Select(x => getMethodDefinition(x, null, PluginCommandType.ContextMenu)).ToList();
+
+                        if (rawSlashCommandList.Count != 0)
+                            rawCodeList.Add((createCodeWithDefaultClass(rawSlashCommandList, PluginCommandType.SlashCommand), CompilationType.App));
+
+                        if (rawContextCommandList.Count != 0)
+                            rawCodeList.Add((createCodeWithDefaultClass(rawContextCommandList, PluginCommandType.ContextMenu), CompilationType.App));
+
+                        if (rawPrefixCommandList.Count != 0)
+                            rawCodeList.Add((createCodeWithDefaultClass(rawPrefixCommandList, PluginCommandType.PrefixCommand), CompilationType.Prefix));
 
                         return rawCodeList;
                     }
 
-                    foreach (var rawCommand in pluginCommands)
+                    foreach (var b in getClassCode(pluginCommands))
                     {
-                        rawCommand.Registered = true;
-                        foreach (var b in getClassCode(rawCommand))
-                        {
-                            compilationList.Add(CSharpCompilation.Create(GetUniqueCodeCompatibleName())
-                                    .AddSyntaxTrees(SyntaxFactory.ParseSyntaxTree(b.Value))
-                                    .AddReferences(references)
-                                    .WithOptions(options),
-                                        new CompilationData(b.Key, b.Value, rawCommand));
-                        }
+                        compilationList.Add(CSharpCompilation.Create(GetUniqueCodeCompatibleName())
+                                .AddSyntaxTrees(SyntaxFactory.ParseSyntaxTree(b.Code))
+                                .AddReferences(references)
+                                .WithOptions(options),
+                                    new CompilationData(b.Type, b.Code, pluginCommands, plugin.Value));
                     }
 
                     foreach (var compilation in compilationList)
@@ -507,7 +508,7 @@ internal static class PluginLoader
 
                                 var assemblyBytes = stream.ToArray();
                                 var assembly = Assembly.Load(assemblyBytes);
-                                assemblyList.Add(assembly, compilation.Value.type);
+                                assemblyList.Add((assembly, compilation.Value.type));
 
                                 _ = Directory.CreateDirectory("CompiledPluginCommands");
 
@@ -521,7 +522,7 @@ internal static class PluginLoader
                                     pluginInfo.CompiledCommands.Add(path, compilation.Value.type);
                                 }
 
-                                _logger.LogDebug("Compiled class for command '{command}' of type '{type}'", compilation.Value.command.Name, compilation.Value.type);
+                                _logger.LogDebug("Compiled class with {cmdCount} commands for '{plugin}' of type '{type}'", compilation.Value.commandList.Count(), compilation.Value.plugin.Name, compilation.Value.type);
                                 _logger.LogTrace($"\n{compilation.Value.code}");
                             }
                         }
@@ -582,11 +583,11 @@ internal static class PluginLoader
         bot.status.LoadedConfig.Save();
     }
 
-    private static void RegisterAssemblies(Bot _bot, IReadOnlyDictionary<int, CommandsNextExtension> cNext, IReadOnlyDictionary<int, ApplicationCommandsExtension> appCommands, BasePlugin plugin, Dictionary<Assembly, string> assemblyList)
+    private static void RegisterAssemblies(Bot _bot, IReadOnlyDictionary<int, CommandsNextExtension> cNext, IReadOnlyDictionary<int, ApplicationCommandsExtension> appCommands, BasePlugin plugin, List<(Assembly compiledAssembly, CompilationType type)> assemblyList)
     {
-        foreach (var assembly in assemblyList)
+        foreach (var (compiledAssembly, type) in assemblyList)
         {
-            foreach (var parentType in assembly.Key.GetTypes())
+            foreach (var parentType in compiledAssembly.GetTypes())
             {
                 foreach (var method in parentType.GetMethods())
                 {
@@ -605,21 +606,19 @@ internal static class PluginLoader
             }
         }
 
-        foreach (var assembly in assemblyList)
+        foreach (var (compiledAssembly, type) in assemblyList)
         {
-            switch (assembly.Value)
+            switch (type)
             {
-                case "prefix_single":
-                case "prefix_group":
-                    cNext.RegisterCommands(assembly.Key.GetTypes().First(x => x.BaseType == typeof(BaseCommandModule)));
+                case CompilationType.Prefix:
+                    cNext.RegisterCommands(compiledAssembly.GetTypes().First(x => x.BaseType == typeof(BaseCommandModule)));
                     break;
 
-                case "app_single":
-                case "app_group":
+                case CompilationType.App:
                     if (_bot.status.LoadedConfig.IsDev)
-                        appCommands.RegisterGuildCommands(assembly.Key.GetTypes().First(x => x.BaseType == typeof(ApplicationCommandsModule)), _bot.status.LoadedConfig.Discord.DevelopmentGuild, plugin.EnableCommandTranslations);
+                        appCommands.RegisterGuildCommands(compiledAssembly.GetTypes().First(x => x.BaseType == typeof(ApplicationCommandsModule)), _bot.status.LoadedConfig.Discord.DevelopmentGuild, plugin.EnableCommandTranslations);
                     else
-                        appCommands.RegisterGlobalCommands(assembly.Key.GetTypes().First(x => x.BaseType == typeof(ApplicationCommandsModule)), plugin.EnableCommandTranslations);
+                        appCommands.RegisterGlobalCommands(compiledAssembly.GetTypes().First(x => x.BaseType == typeof(ApplicationCommandsModule)), plugin.EnableCommandTranslations);
                     break;
             }
         }
@@ -640,4 +639,10 @@ internal static class PluginLoader
         => $"a{Guid.NewGuid().ToString().ToLower().Replace("-", "")}";
 }
 
-internal record CompilationData(string type, string code, BasePluginCommand command);
+internal record CompilationData(CompilationType type, string code, IEnumerable<BasePluginCommand> commandList, BasePlugin plugin);
+
+public enum CompilationType
+{
+    App,
+    Prefix
+}

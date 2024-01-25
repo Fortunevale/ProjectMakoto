@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Util.Initializers;
+
 namespace ProjectMakoto.Entities;
 
 public sealed class Config
@@ -198,6 +200,6 @@ public sealed class Config
     public sealed class PluginInfo
     {
         public string? LastKnownHash = null;
-        public Dictionary<string, string> CompiledCommands = new();
+        public Dictionary<string, CompilationType> CompiledCommands = new();
     }
 }
