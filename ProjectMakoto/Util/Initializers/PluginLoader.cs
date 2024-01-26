@@ -15,8 +15,6 @@ using Microsoft.CodeAnalysis.CSharp;
 namespace ProjectMakoto.Util.Initializers;
 internal static class PluginLoader
 {
-    private static string CachedUsings = "";
-
     internal static async Task LoadPlugins(Bot bot)
     {
         if (!bot.status.LoadedConfig.EnablePlugins)
@@ -190,9 +188,24 @@ internal static class PluginLoader
     internal static async Task LoadPluginCommands(Bot bot, IReadOnlyDictionary<int, CommandsNextExtension> cNext, IReadOnlyDictionary<int, ApplicationCommandsExtension> appCommands)
     {
         var applicationHash = HashingExtensions.ComputeSHA256Hash(new FileInfo(Assembly.GetExecutingAssembly().Location));
+        var CachedUsings = string.Empty;
 
         foreach (var plugin in bot.Plugins)
         {
+            string GetUsings()
+            {
+                if (CachedUsings.IsNullOrWhiteSpace())
+                    CachedUsings = """
+                                    namespace ProjectMakoto;
+
+                                    """ + string.Join("\n", File.ReadAllText("Global.cs").ReplaceLineEndings("\n").Split("\n").Where(x => !x.StartsWith("//"))).Replace("global ", "");
+
+                return CachedUsings;
+            }
+
+            string GetUniqueCodeCompatibleName()
+                => $"a{Guid.NewGuid().ToString().ToLower().Replace("-", "")}";
+
             try
             {
                 var pluginHash = HashingExtensions.ComputeSHA256Hash(plugin.Value.LoadedFile);
@@ -245,8 +258,6 @@ internal static class PluginLoader
                         .Select(x => MetadataReference.CreateFromFile(x.Location));
 
                     _logger.LogInfo("Compiling {0} BasePluginCommands from Plugin from '{1}' ({2}).", pluginCommands.Count(), plugin.Value.Name, plugin.Value.Version.ToString());
-
-                    var compilationList = new Dictionary<CSharpCompilation, CompilationData>();
 
                     List<(string Code, CompilationType Type)> getClassCode(IEnumerable<BasePluginCommand> commandList)
                     {
@@ -480,26 +491,24 @@ internal static class PluginLoader
                         return rawCodeList;
                     }
 
-                    foreach (var b in getClassCode(pluginCommands))
+                    foreach (var commandCode in getClassCode(pluginCommands))
                     {
-                        compilationList.Add(CSharpCompilation.Create(GetUniqueCodeCompatibleName())
-                                .AddSyntaxTrees(SyntaxFactory.ParseSyntaxTree(b.Code))
+                        var compilation = CSharpCompilation.Create(GetUniqueCodeCompatibleName())
+                                .AddSyntaxTrees(SyntaxFactory.ParseSyntaxTree(commandCode.Code))
                                 .AddReferences(references)
-                                .WithOptions(options),
-                                    new CompilationData(b.Type, b.Code, pluginCommands, plugin.Value));
-                    }
+                                .WithOptions(options);
 
-                    foreach (var compilation in compilationList)
-                    {
+                        var data = new CompilationData(commandCode.Type, commandCode.Code, pluginCommands, plugin.Value);
+
                         try
                         {
                             using (var stream = new MemoryStream())
                             {
-                                var result = compilation.Key.Emit(stream);
+                                var result = compilation.Emit(stream);
                                 if (!result.Success)
                                 {
                                     _logger.LogError("Failed to emit compilation\n{diagnostics}",
-                                        JsonConvert.SerializeObject(result.Diagnostics.Select(x => $"{x.Id}: {x.Location}: {compilation.Value.code[x.Location.SourceSpan.Start..x.Location.SourceSpan.End]}"), Formatting.Indented));
+                                        JsonConvert.SerializeObject(result.Diagnostics.Select(x => $"{x.Id}: {x.GetMessage()}: {x.Location}: {data.code[x.Location.SourceSpan.Start..x.Location.SourceSpan.End]}"), Formatting.Indented));
 
                                     Exception exception = new();
                                     exception.Data.Add("diagnostics", result.Diagnostics);
@@ -508,7 +517,7 @@ internal static class PluginLoader
 
                                 var assemblyBytes = stream.ToArray();
                                 var assembly = Assembly.Load(assemblyBytes);
-                                assemblyList.Add((assembly, compilation.Value.type));
+                                assemblyList.Add((assembly, data.type));
 
                                 _ = Directory.CreateDirectory("CompiledPluginCommands");
 
@@ -519,24 +528,24 @@ internal static class PluginLoader
                                     await stream.CopyToAsync(fileStream);
                                     await fileStream.FlushAsync();
 
-                                    pluginInfo.CompiledCommands.Add(path, compilation.Value.type);
+                                    pluginInfo.CompiledCommands.Add(path, data.type);
                                 }
 
-                                _logger.LogDebug("Compiled class with {cmdCount} commands for '{plugin}' of type '{type}'", compilation.Value.commandList.Count(), compilation.Value.plugin.Name, compilation.Value.type);
-                                _logger.LogTrace($"\n{compilation.Value.code}");
+                                _logger.LogDebug("Compiled class with {cmdCount} commands for '{plugin}' of type '{type}'", data.commandList.Count(), data.plugin.Name, data.type);
+                                _logger.LogTrace($"\n{data.code}");
                             }
                         }
                         catch (Exception ex)
                         {
                             var diagnostics = (ImmutableArray<Diagnostic>)ex.Data["diagnostics"];
 
-                            _logger.LogError("Failed Compilation of class type '{type}'", compilation.Value.type);
-                            _logger.LogTrace($"\n{compilation.Value.code}");
+                            _logger.LogError("Failed Compilation of class type '{type}'", data.type);
+                            _logger.LogTrace($"\n{data.code}");
 
                             await Task.Delay(1000);
 
                             Console.WriteLine();
-                            for (var i = 0; i < compilation.Value.code.Length; i++)
+                            for (var i = 0; i < data.code.Length; i++)
                             {
                                 var foundDiagnostic = diagnostics.FirstOrDefault(x => i >= x.Location.SourceSpan.Start && i <= x.Location.SourceSpan.End, null);
 
@@ -561,7 +570,7 @@ internal static class PluginLoader
                                 else
                                     Console.ForegroundColor = ConsoleColor.White;
 
-                                Console.Write(compilation.Value.code[i]);
+                                Console.Write(data.code[i]);
                             }
                             Console.WriteLine(); 
 
@@ -623,20 +632,6 @@ internal static class PluginLoader
             }
         }
     }
-
-    private static string GetUsings()
-    {
-        if (CachedUsings.IsNullOrWhiteSpace())
-            CachedUsings = """
-            namespace ProjectMakoto;
-
-            """ + string.Join("\n", File.ReadAllText("Global.cs").ReplaceLineEndings("\n").Split("\n").Where(x => !x.StartsWith("//"))).Replace("global ", "");
-
-        return CachedUsings;
-    }
-
-    private static string GetUniqueCodeCompatibleName()
-        => $"a{Guid.NewGuid().ToString().ToLower().Replace("-", "")}";
 }
 
 internal record CompilationData(CompilationType type, string code, IEnumerable<BasePluginCommand> commandList, BasePlugin plugin);
