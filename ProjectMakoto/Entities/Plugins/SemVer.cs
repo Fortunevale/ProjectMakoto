@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Plugins;
 
-public sealed class SemVer
+public sealed class SemVer : IComparable<SemVer>
 {
     public SemVer(int major, int minor, int patch)
     {
@@ -30,12 +30,20 @@ public sealed class SemVer
         this.Patch = regex.Groups[3].Value.ToInt32();
     }
 
-    public int Major { get; set; }
-    public int Minor { get; set; }
-    public int Patch { get; set; }
+    public int Major { get; init; }
+    public int Minor { get; init; }
+    public int Patch { get; init; }
 
     public override string ToString()
         => $"{this.Major}.{this.Minor}.{this.Patch}";
+
+    public int CompareTo(SemVer? other)
+    {
+        if (other is null)
+            return 1;
+
+        return ((int)this).CompareTo((int)other);
+    }
 
     public static implicit operator string(SemVer v)
         => $"{v.Major}.{v.Minor}.{v.Patch}";
