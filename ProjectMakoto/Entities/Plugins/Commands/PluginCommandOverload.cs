@@ -16,7 +16,7 @@ namespace ProjectMakoto.Plugins;
 /// <param name="Description">The description of the overload to use.</param>
 /// <param name="Required">If the overload should be required.</param>
 /// <param name="UseRemainingString">If the remaining string of the triggering message should be used as the last argument.</param>
-public sealed class BaseOverload(Type Type, string Name, string Description, bool Required = true, bool UseRemainingString = false)
+public sealed class PluginCommandOverload(Type Type, string Name, string Description, bool Required = true, bool UseRemainingString = false)
 {
 
     /// <summary>

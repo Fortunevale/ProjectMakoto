@@ -9,9 +9,9 @@
 
 namespace ProjectMakoto.Plugins;
 
-public sealed class BasePluginCommand
+public sealed class PluginCommand
 {
-    private BasePluginCommand() { }
+    private PluginCommand() { }
 
     /// <summary>
     /// Creates a new Plugin Context Menu Command.
@@ -21,7 +21,7 @@ public sealed class BasePluginCommand
     /// <param name="Command">The command to be executed.</param>
     /// <param name="PrefixAlternativeName">If not set, no prefix alternative for the command will be set.</param>
     /// <exception cref="ArgumentNullException">Thrown if any required argument is <see langword="null"/> or consists only of whitespaces.</exception>
-    public BasePluginCommand(ApplicationCommandType type, string ContextName, string Description, BaseCommand Command, string? PrefixAlternativeName = null)
+    public PluginCommand(ApplicationCommandType type, string ContextName, string Description, BaseCommand Command, string? PrefixAlternativeName = null)
     {
         if (ContextName.IsNullOrWhiteSpace())
             throw new ArgumentNullException(nameof(ContextName));
@@ -48,7 +48,7 @@ public sealed class BasePluginCommand
     /// <param name="Command">The command to be executed.</param>
     /// <param name="Overloads">The required overloads of the command to be registered.</param>
     /// <exception cref="ArgumentNullException">Thrown if any required argument is <see langword="null"/> or consists only of whitespaces.</exception>
-    public BasePluginCommand(string Name, string Description, BaseCommand Command, params BaseOverload[] Overloads)
+    public PluginCommand(string Name, string Description, BaseCommand Command, params PluginCommandOverload[] Overloads)
     {
         if (Name.IsNullOrWhiteSpace())
             throw new ArgumentNullException(nameof(Name));
@@ -62,7 +62,7 @@ public sealed class BasePluginCommand
         this.Name = Name.Trim();
         this.Description = Description.Trim();
         this.Command = Command;
-        this.Overloads = Overloads?.ToArray() ?? Array.Empty<BaseOverload>();
+        this.Overloads = Overloads?.ToArray() ?? Array.Empty<PluginCommandOverload>();
     }
 
     /// <summary>
@@ -71,7 +71,7 @@ public sealed class BasePluginCommand
     /// <param name="Name">The name of this plugin group.</param>
     /// <param name="Description">The description of this plugin group.</param>
     /// <param name="Commands">The commands of this group.</param>
-    public BasePluginCommand(string Name, string Description, params BasePluginCommand[] Commands)
+    public PluginCommand(string Name, string Description, params PluginCommand[] Commands)
     {
         if (Name.IsNullOrWhiteSpace())
             throw new ArgumentNullException(nameof(Name));
@@ -88,7 +88,7 @@ public sealed class BasePluginCommand
         this.Name = Name.Trim();
         this.Description = Description.Trim();
         this.SubCommands = Commands;
-        this.Overloads = this.Overloads?.ToArray() ?? Array.Empty<BaseOverload>();
+        this.Overloads = this.Overloads?.ToArray() ?? Array.Empty<PluginCommandOverload>();
         this.UseDefaultHelp = true;
     }
 
@@ -116,7 +116,7 @@ public sealed class BasePluginCommand
     /// <summary>
     /// This command's parent, if group.
     /// </summary>
-    public BasePluginCommand? Parent { get; internal set; }
+    public PluginCommand? Parent { get; internal set; }
 
     /// <summary>
     /// Whether this command is a group.
@@ -132,12 +132,12 @@ public sealed class BasePluginCommand
     /// <summary>
     /// The command's sub commands, if group.
     /// </summary>
-    public BasePluginCommand[]? SubCommands { get; internal set; }
+    public PluginCommand[]? SubCommands { get; internal set; }
 
     /// <summary>
     /// The required overloads.
     /// </summary>
-    public BaseOverload[] Overloads { get; internal set; }
+    public PluginCommandOverload[] Overloads { get; internal set; }
 
     /// <summary>
     /// <para>Whether to use the default help for command groups.</para>
@@ -155,9 +155,9 @@ public sealed class BasePluginCommand
     /// <inheritdoc cref="UseDefaultHelp"/>
     /// </summary>
     /// <param name="UseDefaultHelp">The new <see cref="UseDefaultHelp"/> value.</param>
-    /// <returns>This <see cref="BasePluginCommand"/> with the updated value.</returns>
+    /// <returns>This <see cref="PluginCommand"/> with the updated value.</returns>
     /// <exception cref="InvalidOperationException">Thrown if the command is already registered.</exception>
-    public BasePluginCommand WithUseDefaultHelp(bool UseDefaultHelp)
+    public PluginCommand WithUseDefaultHelp(bool UseDefaultHelp)
     {
         if (this.Registered)
             throw new InvalidOperationException("The command is already registered. It can no longer be modified.");
@@ -181,9 +181,9 @@ public sealed class BasePluginCommand
     /// <inheritdoc cref="RequiredPermissions"/>
     /// </summary>
     /// <param name="RequiredPermissions">The new <see cref="RequiredPermissions"/> value.</param>
-    /// <returns>This <see cref="BasePluginCommand"/> with the updated value.</returns>
+    /// <returns>This <see cref="PluginCommand"/> with the updated value.</returns>
     /// <exception cref="InvalidOperationException">Thrown if the command is already registered.</exception>
-    public BasePluginCommand WithRequiredPermissions(Permissions RequiredPermissions)
+    public PluginCommand WithRequiredPermissions(Permissions RequiredPermissions)
     {
         if (this.Registered)
             throw new InvalidOperationException("The command is already registered. It can no longer be modified.");
@@ -204,9 +204,9 @@ public sealed class BasePluginCommand
     /// <inheritdoc cref="AllowPrivateUsage"/>
     /// </summary>
     /// <param name="AllowPrivateUsage">The new <see cref="AllowPrivateUsage"/> value.</param>
-    /// <returns>This <see cref="BasePluginCommand"/> with the updated value.</returns>
+    /// <returns>This <see cref="PluginCommand"/> with the updated value.</returns>
     /// <exception cref="InvalidOperationException">Thrown if the command is already registered.</exception>
-    public BasePluginCommand WithAllowPrivateUsage(bool AllowPrivateUsage)
+    public PluginCommand WithAllowPrivateUsage(bool AllowPrivateUsage)
     {
         if (this.Registered)
             throw new InvalidOperationException("The command is already registered. It can no longer be modified.");
@@ -227,9 +227,9 @@ public sealed class BasePluginCommand
     /// <inheritdoc cref="IsNsfw"/>
     /// </summary>
     /// <param name="IsNsfw">The new <see cref="IsNsfw"/> value.</param>
-    /// <returns>This <see cref="BasePluginCommand"/> with the updated value.</returns>
+    /// <returns>This <see cref="PluginCommand"/> with the updated value.</returns>
     /// <exception cref="InvalidOperationException">Thrown if the command is already registered.</exception>
-    public BasePluginCommand WithIsNsfw(bool IsNsfw)
+    public PluginCommand WithIsNsfw(bool IsNsfw)
     {
         if (this.Registered)
             throw new InvalidOperationException("The command is already registered. It can no longer be modified.");
@@ -249,9 +249,9 @@ public sealed class BasePluginCommand
     /// <inheritdoc cref="SupportedCommandTypes"/>
     /// </summary>
     /// <param name="SupportedCommands">The new <see cref="SupportedCommandTypes"/> value.</param>
-    /// <returns>This <see cref="BasePluginCommand"/> with the updated value.</returns>
+    /// <returns>This <see cref="PluginCommand"/> with the updated value.</returns>
     /// <exception cref="InvalidOperationException">Thrown if the command is already registered or the type cannot be changed.</exception>
-    public BasePluginCommand WithSupportedCommandTypes(params PluginCommandType[] SupportedCommands)
+    public PluginCommand WithSupportedCommandTypes(params PluginCommandType[] SupportedCommands)
     {
         if (this.Registered)
             throw new InvalidOperationException("The command is already registered. It can no longer be modified.");
@@ -277,9 +277,9 @@ public sealed class BasePluginCommand
     /// <inheritdoc cref="IsEphemeral"/>
     /// </summary>
     /// <param name="SupportedCommands">The new <see cref="SupportedCommandTypes"/> value.</param>
-    /// <returns>This <see cref="BasePluginCommand"/> with the updated value.</returns>
+    /// <returns>This <see cref="PluginCommand"/> with the updated value.</returns>
     /// <exception cref="InvalidOperationException">Thrown if the command is already registered.</exception>
-    public BasePluginCommand WithIsEphemeral(bool useEphemeral)
+    public PluginCommand WithIsEphemeral(bool useEphemeral)
     {
         if (this.Registered)
             throw new InvalidOperationException("The command is already registered. It can no longer be modified.");

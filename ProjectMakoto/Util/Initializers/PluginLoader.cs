@@ -259,7 +259,7 @@ internal static class PluginLoader
 
                     _logger.LogInfo("Compiling {0} BasePluginCommands from Plugin from '{1}' ({2}).", pluginCommands.Count(), plugin.Value.Name, plugin.Value.Version.ToString());
 
-                    List<(string Code, CompilationType Type)> getClassCode(IEnumerable<BasePluginCommand> commandList)
+                    List<(string Code, CompilationType Type)> getClassCode(IEnumerable<PluginCommand> commandList)
                     {
                         var rawCodeList = new List<(string Code, CompilationType Type)>();
 
@@ -284,11 +284,11 @@ internal static class PluginLoader
                                     """;
                         }
 
-                        string getMethodDefinition(BasePluginCommand command, BasePluginCommand? parent, PluginCommandType supportedType)
+                        string getMethodDefinition(PluginCommand command, PluginCommand? parent, PluginCommandType supportedType)
                         {
                             command.Registered = true;
 
-                            string getAttribute(BasePluginCommand command)
+                            string getAttribute(PluginCommand command)
                             {
                                 switch (supportedType)
                                 {
@@ -634,7 +634,7 @@ internal static class PluginLoader
     }
 }
 
-internal record CompilationData(CompilationType type, string code, IEnumerable<BasePluginCommand> commandList, BasePlugin plugin);
+internal record CompilationData(CompilationType type, string code, IEnumerable<PluginCommand> commandList, BasePlugin plugin);
 
 public enum CompilationType
 {

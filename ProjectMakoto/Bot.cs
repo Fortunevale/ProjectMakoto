@@ -41,8 +41,8 @@ public sealed class Bot
     public IReadOnlyDictionary<string, BasePlugin> Plugins => this._Plugins.AsReadOnly();
     internal Dictionary<string, BasePlugin> _Plugins { get; set; } = [];
 
-    public IReadOnlyDictionary<string, List<BasePluginCommand>> PluginCommands => this._PluginCommands.AsReadOnly();
-    internal Dictionary<string, List<BasePluginCommand>> _PluginCommands { get; set; } = new();
+    public IReadOnlyDictionary<string, List<PluginCommand>> PluginCommands => this._PluginCommands.AsReadOnly();
+    internal Dictionary<string, List<PluginCommand>> _PluginCommands { get; set; } = new();
     #endregion
 
     #region Util
