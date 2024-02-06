@@ -56,7 +56,7 @@ jobs:
           stringToTruncate: ${{ github.sha }}
           maxLength: 10
       - name: Create Release
-        uses: ncipollo/release-action@v1.12.0
+        uses: ncipollo/release-action@v1.14.0
         with:
           artifacts: "ProjectMakoto/ProjectMakoto/Release.zip"
           generateReleaseNotes: true
