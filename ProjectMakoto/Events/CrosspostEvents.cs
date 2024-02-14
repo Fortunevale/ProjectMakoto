@@ -16,10 +16,6 @@ internal sealed class CrosspostEvents(Bot bot) : RequiresTranslation(bot)
         if (e.Guild is null || e.Channel.IsPrivate)
             return;
 
-        foreach (var b in this.Bot.Guilds[e.Guild.Id].Crosspost.CrosspostChannels.ToList())
-            if (!e.Guild.Channels.ContainsKey(b))
-                this.Bot.Guilds[e.Guild.Id].Crosspost.CrosspostChannels = this.Bot.Guilds[e.Guild.Id].Crosspost.CrosspostChannels.Remove(x => x.ToString(), b);
-
         if (!this.Bot.Guilds[e.Guild.Id].Crosspost.CrosspostChannels.Contains(e.Channel.Id))
             return;
 

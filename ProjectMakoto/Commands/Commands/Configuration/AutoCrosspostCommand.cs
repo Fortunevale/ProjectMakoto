@@ -34,7 +34,7 @@ internal sealed class AutoCrosspostCommand : BaseCommand
 
                 return $"🤖 `{CommandKey.ExcludeBots.Get(ctx.DbUser).PadRight(pad)}`: {ctx.DbGuild.Crosspost.ExcludeBots.ToEmote(ctx.Bot)}\n" +
                        $"🕒 `{CommandKey.DelayBeforePosting.Get(ctx.DbUser).PadRight(pad)}`: `{TimeSpan.FromSeconds(ctx.DbGuild.Crosspost.DelayBeforePosting).GetHumanReadable()}`\n\n" +
-                       $"{(ctx.DbGuild.Crosspost.CrosspostChannels.Length != 0 ? string.Join("\n\n", ctx.DbGuild.Crosspost.CrosspostChannels.Select(x => $"<#{x}> `[#{ctx.Guild.GetChannel(x).Name}]`")) : CommandKey.NoCrosspostChannels.Get(ctx.DbUser).Build(true))}";
+                       $"{(ctx.DbGuild.Crosspost.CrosspostChannels.Length != 0 ? string.Join("\n\n", ctx.DbGuild.Crosspost.CrosspostChannels.Where(x => ctx.Guild.Channels.ContainsKey(x)).Select(x => $"<#{x}> `[#{ctx.Guild.GetChannel(x).Name}]`")) : CommandKey.NoCrosspostChannels.Get(ctx.DbUser).Build(true))}";
             }
 
             var embed = new DiscordEmbedBuilder()
@@ -190,6 +190,7 @@ internal sealed class AutoCrosspostCommand : BaseCommand
                 }
 
                 var ChannelResult = await this.PromptCustomSelection(ctx.DbGuild.Crosspost.CrosspostChannels
+                        .Where(x => ctx.Guild.Channels.ContainsKey(x))
                         .Select(x => new DiscordStringSelectComponentOption($"#{ctx.Guild.GetChannel(x).Name} ({x})", x.ToString(), $"{(ctx.Guild.GetChannel(x).Parent is not null ? $"{ctx.Guild.GetChannel(x).Parent.Name}" : "")}")).ToList());
 
                 if (ChannelResult.TimedOut)
