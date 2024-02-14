@@ -303,7 +303,19 @@ public sealed class SharedCommandContext
     /// <summary>
     /// The current member the bot uses.
     /// </summary>
-    public DiscordMember CurrentMember { get; set; }
+    public DiscordMember CurrentMember
+    {
+        get
+        {
+            if (this._member is null && this.Guild is not null)
+                _member = this.Guild.GetMemberAsync(this._member.Id).Result;
+
+            return _member;
+        }
+        set => this._member = value;
+    }
+
+    private DiscordMember? _member;
 
     /// <summary>
     /// The current user the bot uses.
