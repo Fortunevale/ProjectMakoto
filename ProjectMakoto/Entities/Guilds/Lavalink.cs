@@ -8,6 +8,7 @@
 // but WITHOUT ANY WARRANTY
 
 using ProjectMakoto.Entities.Database.ColumnAttributes;
+using Xorog.UniversalExtensions;
 
 namespace ProjectMakoto.Entities.Guilds;
 
@@ -231,7 +232,7 @@ public sealed class Lavalink(Bot bot, Guild parent) : RequiresParent<Guild>(bot,
                     if (LastPlayedTrack is not null && 
                         _bot.Guilds[this.Guild.Id].MusicModule.Repeat && 
                         _bot.Guilds[this.Guild.Id].MusicModule.SongQueue.IsNotNullAndNotEmpty() && 
-                        _bot.Guilds[this.Guild.Id].MusicModule.SongQueue.Contains(LastPlayedTrack))
+                        _bot.Guilds[this.Guild.Id].MusicModule.SongQueue.Any(x => x?.UUID == LastPlayedTrack?.UUID))
                     {
                         skipSongs = Array.IndexOf(_bot.Guilds[this.Guild.Id].MusicModule.SongQueue, LastPlayedTrack) + 1;
 
