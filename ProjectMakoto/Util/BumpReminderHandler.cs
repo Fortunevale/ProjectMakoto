@@ -76,7 +76,7 @@ internal sealed class BumpReminderHandler(Bot bot) : RequiresBotReference(bot)
 
             if (!Guild.Channels.ContainsKey(this.Bot.Guilds[ServerId].BumpReminder.ChannelId) || this.Bot.Guilds[ServerId].BumpReminder.BumpsMissed > 168)
             {
-                _logger.LogDebug("'{Guild}' hasn't bumped 169 times. Disabling bump reminder..", ServerId);
+                _logger.LogDebug("'{Guild}' has deleted their bump channel or hasn't bumped 169 times. Disabling bump reminder..", ServerId);
                 this.Bot.Guilds[ServerId].BumpReminder.Reset();
                 return;
             }
