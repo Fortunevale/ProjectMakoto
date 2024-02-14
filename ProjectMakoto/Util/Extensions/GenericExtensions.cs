@@ -65,30 +65,91 @@ public static class GenericExtensions
         return dic;
     }
 
+    /// <summary>
+    /// Adds an element to the given array and returns a new array.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="array"></param>
+    /// <param name="addObject"></param>
+    /// <returns></returns>
     public static T[] Add<T>(this T[] array, T addObject)
         => array.Append(addObject).ToArray();
     
+    /// <summary>
+    /// Adds a range of elements to the given array and returns a new array.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="array"></param>
+    /// <param name="addObjects"></param>
+    /// <returns></returns>
     public static T[] AddRange<T>(this T[] array, IEnumerable<T> addObjects)
         => array.Concat(addObjects).ToArray();
 
+    /// <summary>
+    /// Updates an element in the given array and returns a new array.
+    /// <para>If element is not in the list, adds it.</para>
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="array"></param>
+    /// <param name="equalPredicate">The predicate to get a unique identifier from <typeparamref name="T"/>.</param>
+    /// <param name="newObject">The object to look for and update.</param>
+    /// <returns></returns>
     public static T[] Update<T>(this T[] array, Func<T, string> equalPredicate, T newObject)
         => array.Where(x => equalPredicate.Invoke(x) != equalPredicate.Invoke(newObject)).Append(newObject).ToArray();
-    
+
+    /// <summary>
+    /// <inheritdoc cref="Update{T}(T[], Func{T, string}, T)"/>
+    /// <para>Default predicate of <typeparamref name="T"/>.ToString()</para>
+    /// </summary>
+    public static T[] Update<T>(this T[] array, T newObject)
+        => Update<T>(array, x => x.ToString(), newObject);
+
+    /// <summary>
+    /// Removes an object from a given array and returns a new array.
+    /// <para>Does nothing if element is not in the list.</para>
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="array"></param>
+    /// <param name="equalPredicate">The predicate to get a unique identifier from <typeparamref name="T"/>.</param>
+    /// <param name="removeObject">The object to look for and remove.</param>
+    /// <returns></returns>
     public static T[] Remove<T>(this T[] array, Func<T, string> equalPredicate, T removeObject)
         => array.Where(x => equalPredicate.Invoke(x) != equalPredicate.Invoke(removeObject)).ToArray();
 
-    public static string TruncateWithIndication(this string value, int maxLength, string customString = "..")
+    /// <summary>
+    /// <inheritdoc cref="Remove{T}(T[], Func{T, string}, T)"/>
+    /// <para>Default predicate of <typeparamref name="T"/>.ToString()</para>
+    /// </summary>
+    public static T[] Remove<T>(this T[] array, T removeObject)
+        => Remove<T>(array, x => x.ToString(), removeObject);
+
+    /// <summary>
+    /// Shortens the string to the specified length and adds, by default, a '..' at the end if the string was shortened.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="maxLength"></param>
+    /// <param name="customFinish"></param>
+    /// <returns></returns>
+    public static string TruncateWithIndication(this string value, int maxLength, string customFinish = "..")
     {
         return string.IsNullOrEmpty(value)
             ? value
-            : value.Length <= maxLength ? value : $"{value[..(maxLength - customString.Length)]}{customString}";
+            : value.Length <= maxLength ? value : $"{value[..(maxLength - customFinish.Length)]}{customFinish}";
     }
 
+    /// <summary>
+    /// Adds data to the Data dictionary and returns the original exception.
+    /// </summary>
+    /// <param name="exception"></param>
+    /// <param name="key"></param>
+    /// <param name="data"></param>
+    /// <returns></returns>
     public static Exception AddData(this Exception exception, string key, object? data)
     {
         exception.Data.Add(key, data);
         return exception;
     }
+
 
     public static bool ContainsTask(this IReadOnlyList<ScheduledTask>? tasks, string type, ulong snowflake, string id) 
         => tasks.Where(x =>
@@ -116,6 +177,14 @@ public static class GenericExtensions
         return true;
     }
 
+    /// <summary>
+    /// Logs a given string and returns it for easier debugging.
+    /// </summary>
+    /// <param name="str"></param>
+    /// <param name="lvl"></param>
+    /// <param name="additionalInfo"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2254:Template should be a static expression", Justification = "<Pending>")]
     public static string Log(this string str, CustomLogLevel lvl, string additionalInfo)
     {
@@ -178,6 +247,11 @@ public static class GenericExtensions
         return String.Format("{0:0.##} {1}", size, sizes[order]);
     }
 
+    /// <summary>
+    /// Gets a SHA256 hash of a given string.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
     public static string GetSHA256(this string value)
     {
         StringBuilder Sb = new();
@@ -188,19 +262,6 @@ public static class GenericExtensions
             _ = Sb.Append(b.ToString("x2"));
 
         return Sb.ToString();
-    }
-
-    public static bool TryGetCustomAttribute<T>(this PropertyInfo collection, Type type, out T? attribute)
-    {
-        var objects = collection.GetCustomAttributes(false);
-        if (objects.Any(x => x.GetType() == type))
-        {
-            attribute = (T)objects.First(x => x.GetType() == type);
-            return true;
-        }
-
-        attribute = default;
-        return false;
     }
 
     public static string IsValidHexColor(this string str, string Default = "#FFFFFF")
@@ -218,6 +279,13 @@ public static class GenericExtensions
     public static string TruncateAt(this string str, params string[] strings)
         => str.TruncateAt(false, strings);
 
+    /// <summary>
+    /// Truncates a given string at the first (or last if <paramref name="Reverse"/> is <see langword="true"/>) instance of any of the specified <paramref name="chars"/>.
+    /// </summary>
+    /// <param name="str"></param>
+    /// <param name="Reverse"></param>
+    /// <param name="chars"></param>
+    /// <returns></returns>
     public static string TruncateAt(this string str, bool Reverse, params char[] chars)
     {
         if (!chars.IsNotNullAndNotEmpty() || !chars.Any(x => str.Contains(x)))
@@ -228,6 +296,14 @@ public static class GenericExtensions
         return str[..(!Reverse ? indexes.Min(x => x.Value) : indexes.Max(x => x.Value))];
     }
 
+
+    /// <summary>
+    /// Truncates a given string at the first (or last if <paramref name="Reverse"/> is <see langword="true"/>) instance of any of the specified <paramref name="strings"/>.
+    /// </summary>
+    /// <param name="str"></param>
+    /// <param name="Reverse"></param>
+    /// <param name="chars"></param>
+    /// <returns></returns>
     public static string TruncateAt(this string str, bool Reverse, params string[] strings)
     {
         if (!strings.IsNotNullAndNotEmpty() || !strings.Any(x => str.Contains(x)))
@@ -238,6 +314,12 @@ public static class GenericExtensions
         return str[..(!Reverse ? indexes.Min(x => x.Value) : indexes.Max(x => x.Value))];
     }
 
+    /// <summary>
+    /// Fully sanitizes a string.
+    /// <para>Escapes all markdown, removes all mentions and replaces ` with ´.</para>
+    /// </summary>
+    /// <param name="str"></param>
+    /// <returns></returns>
     public static string FullSanitize(this string str)
     {
         var proc = str;
@@ -257,6 +339,11 @@ public static class GenericExtensions
         return Formatter.Sanitize(proc);
     }
 
+    /// <summary>
+    /// Creates a new stream of the given string.
+    /// </summary>
+    /// <param name="s"></param>
+    /// <returns></returns>
     public static Stream ToStream(this string s)
     {
         var stream = new MemoryStream();
