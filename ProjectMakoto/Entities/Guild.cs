@@ -103,7 +103,7 @@ public sealed class Guild : RequiresBotReference
     }
 
     [ColumnName("levelrewards"), ColumnType(ColumnTypes.LongText), Default("[]")]
-    public LevelRewardEntry[] LevelRewards // todo
+    public LevelRewardEntry[] LevelRewards
     {
         get => JsonConvert.DeserializeObject<LevelRewardEntry[]>(this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Id, "levelrewards", this.Bot.DatabaseClient.mainDatabaseConnection));
         set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Id, "levelrewards", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);
