@@ -178,18 +178,11 @@ public sealed class Lavalink(Bot bot, Guild parent) : RequiresParent<Guild>(bot,
                     this.CurrentVideoPosition = (Convert.ToInt64(e.State?.Position.TotalSeconds ?? -1d));
                 }
 
-                var TrackEnded = false;
-                async Task TrackEnd(LavalinkGuildPlayer sender, LavalinkTrackEndedEventArgs e)
-                {
-                    TrackEnded = true;
-                }
-
                 _logger.LogDebug("Initializing VoiceStateUpdated Event for {Guild}..", this.Guild.Id);
                 sender.VoiceStateUpdated += VoiceStateUpdated;
 
                 _logger.LogDebug("Initializing PlayerUpdated Event for {Guild}..", this.Guild.Id);
                 guildPlayer.StateUpdated += StateUpdated;
-                guildPlayer.TrackEnded += TrackEnd;
 
                 QueueInfo LastPlayedTrack = null;
 
@@ -197,7 +190,7 @@ public sealed class Lavalink(Bot bot, Guild parent) : RequiresParent<Guild>(bot,
                 {
                     var WaitSeconds = 30;
 
-                    while ((guildPlayer.CurrentTrack is not null || _bot.Guilds[this.Guild.Id].MusicModule.SongQueue.Length <= 0) && !TrackEnded && !this.Disposed)
+                    while ((guildPlayer.CurrentTrack is not null || _bot.Guilds[this.Guild.Id].MusicModule.SongQueue.Length <= 0) && !this.Disposed)
                     {
                         if (guildPlayer.CurrentTrack is null && _bot.Guilds[this.Guild.Id].MusicModule.SongQueue.Length <= 0)
                         {
@@ -218,13 +211,11 @@ public sealed class Lavalink(Bot bot, Guild parent) : RequiresParent<Guild>(bot,
                         _logger.LogDebug("Destroying Player for {Guild}..", this.Guild.Id);
                         sender.VoiceStateUpdated -= VoiceStateUpdated;
                         guildPlayer.StateUpdated -= StateUpdated;
-                        guildPlayer.TrackEnded -= TrackEnd;
 
                         _ = guildPlayer.DisconnectAsync();
                         return;
                     }
 
-                    TrackEnded = false;
                     QueueInfo Track;
 
                     var skipSongs = 0;
@@ -232,7 +223,7 @@ public sealed class Lavalink(Bot bot, Guild parent) : RequiresParent<Guild>(bot,
                     if (LastPlayedTrack is not null && 
                         _bot.Guilds[this.Guild.Id].MusicModule.Repeat && 
                         _bot.Guilds[this.Guild.Id].MusicModule.SongQueue.IsNotNullAndNotEmpty() && 
-                        _bot.Guilds[this.Guild.Id].MusicModule.SongQueue.Any(x => x?.UUID == LastPlayedTrack?.UUID))
+                        _bot.Guilds[this.Guild.Id].MusicModule.SongQueue.Contains(LastPlayedTrack))
                     {
                         skipSongs = Array.IndexOf(_bot.Guilds[this.Guild.Id].MusicModule.SongQueue, LastPlayedTrack) + 1;
 
