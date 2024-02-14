@@ -21,6 +21,9 @@ internal sealed class ActionLogCommand : BaseCommand
             {
                 var CommandKey = ctx.Bot.LoadedTranslations.Commands.Config.ActionLog;
 
+                if (!ctx.Guild.Channels.ContainsKey(ctx.DbGuild.ActionLog.Channel))
+                    ctx.DbGuild.ActionLog.Channel = 0;
+
                 if (ctx.DbGuild.ActionLog.Channel == 0)
                     return $"❌ {CommandKey.ActionlogDisabled.Get(ctx.DbUser).Build(true)}";
 

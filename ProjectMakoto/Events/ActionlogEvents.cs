@@ -11,22 +11,10 @@ namespace ProjectMakoto.Events;
 
 internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
 {
-    internal async Task<bool> ValidateServer(DiscordGuild guild)
-    {
-        if (guild is null)
-            return false;
-
-        if (this.Bot.Guilds[guild.Id].ActionLog.Channel == 0)
-            return false;
-
-        if (!guild.Channels.ContainsKey(this.Bot.Guilds[guild.Id].ActionLog.Channel))
-        {
-            this.Bot.Guilds[guild.Id].ActionLog.Channel = 0;
-            return false;
-        }
-
-        return true;
-    }
+    internal async Task<bool> ValidateServer(DiscordGuild guild) 
+        => guild is not null
+            && this.Bot.Guilds[guild.Id].ActionLog.Channel != 0
+            && guild.Channels.ContainsKey(this.Bot.Guilds[guild.Id].ActionLog.Channel);
 
     Translations.events.actionlog tKey => this.t.Events.Actionlog;
 
