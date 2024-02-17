@@ -27,6 +27,8 @@ for /D %%i in (*) do (
 			
 			echo Syncing git submodules in %%i
 			git submodule update --init --depth 0
+			
+			cd ..
 		)
 	)
 )
