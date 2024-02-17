@@ -16,10 +16,10 @@ for i in */; do
   if [ "$i" != "deps/" ] && [ "$i" != "Example/" ]; then
     # Check if .build.sh file exists and is executable
     if [ -x "$i.build.sh" ]; then
-      pushd "$i"
+      cd "$i"
       echo "Running .build.sh in $i"
-      "./.build.sh"
-      popd
+      ./.build.sh
+      cd ..
       
       # Move pmpl files to parent directory
       mv "$i"/*.pmpl .

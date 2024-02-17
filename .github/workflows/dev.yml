@@ -25,7 +25,7 @@ jobs:
 
     - name: Check spelling
       uses: crate-ci/typos@master
-  build:
+  testbuild:
     name: Build Project
     runs-on: self-hosted
     steps:
@@ -41,13 +41,16 @@ jobs:
           submodules: recursive
           path: ProjectMakotoTest
           token: ${{ secrets.Access_token }}
-      - name: Remove TranslationSourceGenerator from Build
-        run: dotnet sln remove ../TranslationSourceGenerator/TranslationSourceGenerator.csproj
-        working-directory: ProjectMakotoTest/ProjectMakoto/
       - name: Install dependencies
         run: dotnet restore
         working-directory: ProjectMakotoTest/ProjectMakoto/
       - name: Test Build Makoto
-        run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained --framework net8.0 -v n
+        run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained --framework net8.0
         working-directory: ProjectMakotoTest/ProjectMakoto/
         timeout-minutes: 5
+      - name: Mark .sh files as executable
+        run: find . -type f -name "*.sh" -exec chmod +x {} +
+        working-directory: ProjectMakotoTest/OfficialPlugins/
+      - name: Test Build Makoto Plugins
+        run: sh build_all.sh
+        working-directory: ProjectMakotoTest/OfficialPlugins/
