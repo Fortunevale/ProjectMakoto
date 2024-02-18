@@ -21,6 +21,10 @@ internal static class PluginLoader
             return;
 
         _logger.LogDebug("Loading Plugins..");
+
+        if (!Directory.Exists("Plugins"))
+            Directory.CreateDirectory("Plugins");
+
         foreach (var pluginFile in Directory.GetFiles("Plugins").Where(x => x.EndsWith(".pmpl")))
         {
             if (new DirectoryInfo(pluginFile).Name.StartsWith('.'))
