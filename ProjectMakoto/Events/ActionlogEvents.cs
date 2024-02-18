@@ -430,33 +430,30 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
             _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
         }
 
-        //if (e.TimeoutBefore != e.TimeoutAfter)
-        //{
-        //    // Timeouts don't seem to fire the member updated event, will keep this code for potential future updates.
+        if (e.TimeoutBefore != e.TimeoutAfter)
+        {
+            var timeAfter = (e.TimeoutAfter ?? DateTime.Today.AddDays(-300)).ToUniversalTime();
+            var timeBefore = (e.TimeoutBefore ?? DateTime.Today.AddDays(-300)).ToUniversalTime();
 
-        //    if (e.TimeoutAfter?.ToUniversalTime() > e.TimeoutBefore?.ToUniversalTime())
-        //        _ = SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
-        //        {
-        //            Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = AuditLogIcons.UserBanned, Name = $"User timed out" },
-        //            Color = EmbedColors.Error,
-        //            Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
-        //            Timestamp = DateTime.UtcNow,
-        //            Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
-        //            Description = $"**User**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`\n" +
-        //                            $"**Timed out until**: {Formatter.Timestamp((DateTime)(e.TimeoutAfter?.ToUniversalTime().DateTime), TimestampFormat.LongDateTime)} ({Formatter.Timestamp((DateTime)(e.TimeoutAfter?.ToUniversalTime().DateTime), TimestampFormat.RelativeTime)})"
-        //        }));
+            if (timeAfter > timeBefore)
+                _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                    .WithAuthor(this.tKey.TimedOut.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.UserBanned)
+                        .WithColor(EmbedColors.Error)
+                        .WithFooter($"{this.tKey.UserId.Get(this.Bot.Guilds[e.Guild.Id])}: {e.Member.Id}")
+                        .WithTimestamp(DateTime.UtcNow)
+                        .WithThumbnail(e.Member.AvatarUrl)
+                        .WithDescription($"**{this.tKey.User.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`\n" +
+                                         $"**{this.tKey.TimedOutUntil.Get(this.Bot.Guilds[e.Guild.Id])}**: {timeAfter.Timestamp(TimestampFormat.LongDateTime)} ({timeAfter.Timestamp()})")));
 
-        //    if (e.TimeoutAfter?.ToUniversalTime() < e.TimeoutBefore?.ToUniversalTime())
-        //        _ = SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
-        //        {
-        //            Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = AuditLogIcons.UserBanRemoved, Name = $"User timeout removed" },
-        //            Color = EmbedColors.Success,
-        //            Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
-        //            Timestamp = DateTime.UtcNow,
-        //            Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
-        //            Description = $"**User**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`"
-        //        }));
-        //}
+            if (timeAfter < timeBefore)
+                _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                    .WithAuthor(this.tKey.TimeoutRemoved.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.UserBanRemoved)
+                        .WithColor(EmbedColors.Success)
+                        .WithFooter($"{this.tKey.UserId.Get(this.Bot.Guilds[e.Guild.Id])}: {e.Member.Id}")
+                        .WithTimestamp(DateTime.UtcNow)
+                        .WithThumbnail(e.Member.AvatarUrl)
+                        .WithDescription($"**{this.tKey.User.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`")));
+        }
 
         if (e.PendingBefore != e.PendingAfter)
         {

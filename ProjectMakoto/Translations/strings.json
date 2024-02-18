@@ -5870,6 +5870,18 @@
         "en": "Member Guild Profile Picture updated",
         "de": "Profilbild des Servermitglieds aktualisiert"
       },
+      "TimedOut": {
+        "en": "User timed out",
+        "de": "Nutzer in den Timeout versetzt"
+      },
+      "TimedOutUntil": {
+        "en": "Timed out until",
+        "de": "Timeout gültig bis"
+      },
+      "TimeoutRemoved": {
+        "en": "User timeout removed",
+        "de": "Timeout vom Nutzer entfernt"
+      },
       "Integration": {
         "en": "Integration",
         "de": "Integration"

@@ -1,5 +1,5 @@
 // Project Makoto
-// Copyright (C) 2024  Fortunevale
+// Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -170,6 +170,9 @@ public class Translations : ITranslations
             public SingleTranslationKey RoleCreated;
             public SingleTranslationKey ServerBooster;
             public SingleTranslationKey Integration;
+            public SingleTranslationKey TimeoutRemoved;
+            public SingleTranslationKey TimedOutUntil;
+            public SingleTranslationKey TimedOut;
             public SingleTranslationKey GuildProfilePictureUpdated;
             public SingleTranslationKey MembershipApproved;
             public SingleTranslationKey RolesRemoved;
