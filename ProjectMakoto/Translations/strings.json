@@ -6364,7 +6364,11 @@
       },
       "RedirectCheckTimeoutError": {
         "en": "Couldn't check this link for malicious redirects. Please proceed with caution.",
-        "de": "Es konnte nicht überprüft werden, ob dieser Link bösartige Weiterleitungen enthält. Bitte gehee vorsichtig vor."
+        "de": "Es konnte nicht überprüft werden, ob dieser Link bösartige Weiterleitungen enthält. Bitte gehe vorsichtig vor."
+      },
+      "RedirectDepthLimitError": {
+        "en": "This link redirects an excessive amount and the unshortening attempt was cancelled. Please proceed with caution.",
+        "de": "Dieser Link leitet in übermäßigem Maße um, und der Versuch, ihn zu entkürzen, wurde abgebrochen. Bitte gehe vorsichtig vor."
       },
       "RedirectCheckTimeoutUnknownError": {
         "en": "An unknown error occurred while trying to check for malicious redirects. Please proceed with caution.",

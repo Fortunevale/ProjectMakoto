@@ -38,6 +38,7 @@ public class Translations : ITranslations
             public SingleTranslationKey DetectedMaliciousHost;
             public SingleTranslationKey FoundRedirects;
             public SingleTranslationKey RedirectCheckTimeoutUnknownError;
+            public SingleTranslationKey RedirectDepthLimitError;
             public SingleTranslationKey RedirectCheckTimeoutError;
             public SingleTranslationKey OpenInBrowser;
             public SingleTranslationKey DomainName;
