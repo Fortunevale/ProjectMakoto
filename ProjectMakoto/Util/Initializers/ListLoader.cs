@@ -34,7 +34,7 @@ internal static class ListLoader
             });
         }
 
-        _logger.LogDebug("Loaded {Count} countries", bot.CountryCodes.List.Count);
+        Log.Debug("Loaded {Count} countries", bot.CountryCodes.List.Count);
 
         bot.LanguageCodes = new();
         var lc = JsonConvert.DeserializeObject<List<string[]>>(await File.ReadAllTextAsync("Assets/Languages.json"));
@@ -46,9 +46,9 @@ internal static class ListLoader
                 Name = b[1],
             });
         }
-        _logger.LogDebug("Loaded {Count} languages", bot.LanguageCodes.List.Count);
+        Log.Debug("Loaded {Count} languages", bot.LanguageCodes.List.Count);
 
         bot.ProfanityList = JsonConvert.DeserializeObject<List<string>>(await new HttpClient().GetStringAsync("https://raw.githubusercontent.com/zacanger/profane-words/master/words.json"));
-        _logger.LogDebug("Loaded {Count} profanity words", bot.ProfanityList.Count);
+        Log.Debug("Loaded {Count} profanity words", bot.ProfanityList.Count);
     }
 }

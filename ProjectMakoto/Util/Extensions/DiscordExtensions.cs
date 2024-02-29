@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using Serilog.Events;
+
 namespace ProjectMakoto.Util;
 
 public static class DiscordExtensions
@@ -226,7 +228,7 @@ public static class DiscordExtensions
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
                     Error = (serializer, err) =>
                     {
-                        _logger.LogError("Failed to serialize member '{member}' at '{path}'", err.ErrorContext.Error, err.ErrorContext.Member, err.ErrorContext.Path);
+                        Log.Error(err.ErrorContext.Error, "Failed to serialize member '{member}' at '{path}'", err.ErrorContext.Member, err.ErrorContext.Path);
                         err.ErrorContext.Handled = true;
                     },
                 })))
@@ -427,16 +429,16 @@ public static class DiscordExtensions
         => user.IsMigrated ? $"{user.GlobalName} ({user.Username})" : user.UsernameWithDiscriminator;
 
     public static string ToTranslatedPermissionString(this Permissions perm, Guild guild, Bot _bot)
-        => GetTranslationObject(perm, _bot) == _bot.LoadedTranslations.Common.MissingTranslation ? perm.ToPermissionString().Log(CustomLogLevel.Warn, "Missing Translation") : GetTranslationObject(perm, _bot).Get(guild);
+        => GetTranslationObject(perm, _bot) == _bot.LoadedTranslations.Common.MissingTranslation ? perm.ToPermissionString().LogString(LogEventLevel.Warning, "Missing Translation") : GetTranslationObject(perm, _bot).Get(guild);
 
     public static string ToTranslatedPermissionString(this Permissions perm, DiscordGuild guild, Bot _bot)
-        => GetTranslationObject(perm, _bot) == _bot.LoadedTranslations.Common.MissingTranslation ? perm.ToPermissionString().Log(CustomLogLevel.Warn, "Missing Translation") : GetTranslationObject(perm, _bot).Get(guild);
+        => GetTranslationObject(perm, _bot) == _bot.LoadedTranslations.Common.MissingTranslation ? perm.ToPermissionString().LogString(LogEventLevel.Warning, "Missing Translation") : GetTranslationObject(perm, _bot).Get(guild);
 
     public static string ToTranslatedPermissionString(this Permissions perm, User user, Bot _bot)
-        => GetTranslationObject(perm, _bot) == _bot.LoadedTranslations.Common.MissingTranslation ? perm.ToPermissionString().Log(CustomLogLevel.Warn, "Missing Translation") : GetTranslationObject(perm, _bot).Get(user);
+        => GetTranslationObject(perm, _bot) == _bot.LoadedTranslations.Common.MissingTranslation ? perm.ToPermissionString().LogString(LogEventLevel.Warning, "Missing Translation") : GetTranslationObject(perm, _bot).Get(user);
 
     public static string ToTranslatedPermissionString(this Permissions perm, DiscordUser user, Bot _bot)
-        => GetTranslationObject(perm, _bot) == _bot.LoadedTranslations.Common.MissingTranslation ? perm.ToPermissionString().Log(CustomLogLevel.Warn, "Missing Translation") : GetTranslationObject(perm, _bot).Get(user);
+        => GetTranslationObject(perm, _bot) == _bot.LoadedTranslations.Common.MissingTranslation ? perm.ToPermissionString().LogString(LogEventLevel.Warning, "Missing Translation") : GetTranslationObject(perm, _bot).Get(user);
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "DCS0101:[Discord] InExperiment", Justification = "<Pending>")]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "DCS0103:[Discord] Unreleased", Justification = "<Pending>")]
@@ -727,7 +729,7 @@ public static class DiscordExtensions
         }
         catch (Exception ex)
         {
-            _logger.LogError("Failed to process channel link", ex);
+            Log.Error(ex, "Failed to process channel link");
 
             GuildId = 0;
             ChannelId = 0;

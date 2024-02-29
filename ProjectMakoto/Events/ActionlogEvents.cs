@@ -244,7 +244,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
         }
         catch (Exception ex)
         {
-            _logger.LogError("Failed to generate html from messages", ex);
+            Log.Error(ex, "Failed to generate html from messages");
 
             FileName = $"{Guid.NewGuid()}.json";
             Messages = JsonConvert.SerializeObject(e.Messages.OrderBy(x => x.Id.GetSnowflakeTime().Ticks), new JsonSerializerSettings
@@ -253,7 +253,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
                 Error = (serializer, err) =>
                 {
-                    _logger.LogError("Failed to serialize member '{member}' at '{path}'", err.ErrorContext.Error, err.ErrorContext.Member, err.ErrorContext.Path);
+                    Log.Error(err.ErrorContext.Error, "Failed to serialize member '{member}' at '{path}'", err.ErrorContext.Member, err.ErrorContext.Path);
                     err.ErrorContext.Handled = true;
                 },
             });

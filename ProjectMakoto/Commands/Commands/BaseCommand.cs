@@ -165,14 +165,14 @@ public abstract class BaseCommand
     {
         if (this.t is null)
         {
-            _logger.LogWarn($"The translation were not set before the BasePreExecutionCheck()!");
+            Log.Warning($"The translation were not set before the BasePreExecutionCheck()!");
             this.t = this.ctx.Bot.LoadedTranslations;
         }
 
         if (this.ctx.Bot.Users.ContainsKey(this.ctx.User.Id) && !this.ctx.User.Locale.IsNullOrWhiteSpace() && this.ctx.DbUser.CurrentLocale != this.ctx.User.Locale)
         {
             this.ctx.DbUser.CurrentLocale = this.ctx.User.Locale;
-            _logger.LogDebug("Updated language for User '{User}' to '{Locale}'", this.ctx.User.Id, this.ctx.User.Locale);
+            Log.Debug("Updated language for User '{User}' to '{Locale}'", this.ctx.User.Id, this.ctx.User.Locale);
         }
 
         if (this.ctx.Bot.status.LoadedConfig.Discord.DisabledCommands.Contains(this.ctx.ParentCommandName))
@@ -192,7 +192,7 @@ public abstract class BaseCommand
             if (this.ctx.Bot.Guilds.ContainsKey(this.ctx.Guild.Id) && !this.ctx.Guild.PreferredLocale.IsNullOrWhiteSpace() && this.ctx.Bot.Guilds[this.ctx.Guild.Id].CurrentLocale != this.ctx.Guild.PreferredLocale)
             {
                 this.ctx.Bot.Guilds[this.ctx.Guild.Id].CurrentLocale = this.ctx.Guild.PreferredLocale;
-                _logger.LogDebug("Updated language for Guild '{Guild}' to '{Locale}'", this.ctx.Guild.Id, this.ctx.Guild.PreferredLocale);
+                Log.Debug("Updated language for Guild '{Guild}' to '{Locale}'", this.ctx.Guild.Id, this.ctx.Guild.PreferredLocale);
             }
 
             if (!(await this.CheckOwnPermissions(Permissions.SendMessages)))

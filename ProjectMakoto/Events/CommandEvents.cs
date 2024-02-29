@@ -13,7 +13,7 @@ internal sealed class CommandEvents(Bot bot) : RequiresTranslation(bot)
 {
     internal async Task CommandExecuted(CommandsNextExtension sender, CommandExecutionEventArgs e)
     {
-        _logger.LogDebug("Successfully started execution of '{Prefix}{Name}' for {User} on {Guild} ({ResponseTime}ms)",
+        Log.Debug("Successfully started execution of '{Prefix}{Name}' for {User} on {Guild} ({ResponseTime}ms)",
         e.Context.Prefix,
         (e.Command.Parent is not null ? $"{e.Command.Parent.Name} " : "") + e.Command.Name,
         e.Context.User.Id,
@@ -42,7 +42,7 @@ internal sealed class CommandEvents(Bot bot) : RequiresTranslation(bot)
             if (e.Exception.GetType() == typeof(ArgumentException))
             {
                 if (e.Command is not null)
-                    _logger.LogWarn("Failed to execute '{Prefix}{Name}' for {User} on {Guild} ({ResponseTime}ms)",
+                    Log.Warning("Failed to execute '{Prefix}{Name}' for {User} on {Guild} ({ResponseTime}ms)",
                         e.Context.Prefix,
                         (e.Command.Parent is not null ? $"{e.Command.Parent.Name} " : "") + e.Command.Name,
                         e.Context.User.Id,
@@ -62,7 +62,7 @@ internal sealed class CommandEvents(Bot bot) : RequiresTranslation(bot)
             }
             else
             {
-                _logger.LogError("Failed to execute '{Prefix}{Name}' for {User} on {Guild} ({ResponseTime}ms)",
+                Log.Error("Failed to execute '{Prefix}{Name}' for {User} on {Guild} ({ResponseTime}ms)",
                     e.Context.Prefix,
                     (e.Command.Parent is not null ? $"{e.Command.Parent.Name} " : "") + e.Command.Name,
                     e.Context.User.Id,

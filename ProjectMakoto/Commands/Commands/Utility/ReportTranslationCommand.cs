@@ -144,7 +144,7 @@ internal sealed class ReportTranslationCommand : BaseCommand
             }
             catch (Exception ex)
             {
-                _logger.LogWarn("Failed to update labels on reported issue", ex);
+                Log.Warning(ex, "Failed to update labels on reported issue");
             }
 
             _ = await this.RespondOrEdit(new DiscordEmbedBuilder()

@@ -125,7 +125,7 @@ internal static class MusicModuleAbstractions
 
         if (loadResult.LoadType == LavalinkLoadResultType.Error)
         {
-            _logger.LogError("An exception occurred while trying to load lavalink track.");
+            Log.Error("An exception occurred while trying to load lavalink track.");
             embed.Description = t.Commands.Music.Play.FailedToLoad.Get(ctx.DbUser).Build(true,
                 new TVar("Search", searchQuery));
             _ = embed.AsError(ctx);

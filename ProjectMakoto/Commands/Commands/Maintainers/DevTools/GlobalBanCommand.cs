@@ -82,7 +82,7 @@ internal sealed class GlobalBanCommand : BaseCommand
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError("Exception occurred while trying to ban user from {guild}", ex, b.Key);
+                        Log.Error(ex, "Exception occurred while trying to ban user from {guild}", b.Key);
                         Failed++;
                     }
                 }

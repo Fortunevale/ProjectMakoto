@@ -17,13 +17,13 @@ internal sealed class LogCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var Level = (CustomLogLevel)arguments["Level"];
+            var Level = (int)arguments["Level"];
 
-            if (Level > CustomLogLevel.Trace2)
+            if (Level is > ((int)LogEventLevel.Fatal) or < ((int)LogEventLevel.Verbose))
                 throw new Exception("Invalid Log Level");
 
-            _logger.ChangeLogLevel(Level);
-            _ = await this.RespondOrEdit($"`Changed LogLevel to '{(CustomLogLevel)Level}'`");
+            ctx.Bot.loggingLevel.MinimumLevel = (LogEventLevel)Level;
+            _ = await this.RespondOrEdit($"`Changed LogLevel to '{Level}'`");
         });
     }
 }

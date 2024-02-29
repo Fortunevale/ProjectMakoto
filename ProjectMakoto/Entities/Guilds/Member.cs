@@ -29,10 +29,10 @@ public sealed class Member : RequiresParent<Guild>
 
         if (retryCount >= 3)
         {
-            _logger.LogError("Failed to perform auto kick checks for {id}", this.Id);
+            Log.Error("Failed to perform auto kick checks for {id}", this.Id);
 
             foreach (var b in exceptions)
-                _logger.LogError("Auto Kick Error", b);
+                Log.Error(b, "Auto Kick Error");
 
             throw exceptions.Last();
         }
@@ -56,7 +56,7 @@ public sealed class Member : RequiresParent<Guild>
             (member.Flags.Value.HasFlag(UserFlags.Spammer) || member.Flags.Value.HasFlag(UserFlags.DisabledSuspiciousActivity)))
         {
             await member.RemoveAsync(this.Bot.LoadedTranslations.Commands.Config.Join.AutoKickSpammerReason.Get(this.Parent));
-            _logger.LogDebug("Kicked {User} from {Guild}: Account is likely spammer", this.Id, this.Parent.Id);
+            Log.Debug("Kicked {User} from {Guild}: Account is likely spammer", this.Id, this.Parent.Id);
             return;
         }
 
@@ -64,7 +64,7 @@ public sealed class Member : RequiresParent<Guild>
             member.CreationTimestamp.GetTimespanSince() < this.Parent.Join.AutoKickAccountAge)
         {
             await member.RemoveAsync(this.Bot.LoadedTranslations.Commands.Config.Join.AutoKickAccountAgeReason.Get(this.Parent));
-            _logger.LogDebug("Kicked {User} from {Guild}: Account is too young", this.Id, this.Parent.Id);
+            Log.Debug("Kicked {User} from {Guild}: Account is too young", this.Id, this.Parent.Id);
             return;
         }
 
@@ -83,7 +83,7 @@ public sealed class Member : RequiresParent<Guild>
                     if (member.Roles.Count == 0)
                     {
                         await member.RemoveAsync(this.Bot.LoadedTranslations.Commands.Config.Join.AutoKickNoRolesReason.Get(this.Parent));
-                        _logger.LogDebug("Kicked {User} from {Guild}: User did not pick roles after {Time}", this.Id, this.Parent.Id, this.Parent.Join.AutoKickNoRoleTime.GetHumanReadable());
+                        Log.Debug("Kicked {User} from {Guild}: User did not pick roles after {Time}", this.Id, this.Parent.Id, this.Parent.Join.AutoKickNoRoleTime.GetHumanReadable());
                     }
                 }
                 catch (DisCatSharp.Exceptions.NotFoundException)
@@ -92,7 +92,7 @@ public sealed class Member : RequiresParent<Guild>
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError("Auto Kick Error", ex);
+                    Log.Error(ex, "Auto Kick Error");
                     return;
                 }
             }).CreateScheduledTask(member.JoinedAt.Add(this.Parent.Join.AutoKickNoRoleTime).UtcDateTime, 

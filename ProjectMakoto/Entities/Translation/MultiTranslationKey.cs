@@ -113,10 +113,8 @@ public sealed class MultiTranslationKey : IDictionary<string, string[]>
         var callingFrame = stackFrames[1];
         var method = callingFrame.GetMethod();
 
-        _logger.LogError("Key with english text '{text}' was incorrectly accessed. Defaulting to english translation.", new InvalidCallException()
-                                                                                                                            .AddData("StackTrace", stackTrace)
-                                                                                                                            .AddData("DeclaryingType", method.DeclaringType)
-                                                                                                                            .AddData("Method", method), this.t["en"].Build());
+        Log.Error(new InvalidCallException().AddData("StackTrace", stackTrace).AddData("DeclaryingType", method.DeclaringType).AddData("Method", method),
+            "Key with english text '{text}' was incorrectly accessed. Defaulting to english translation.", this.t["en"].Build());
         return this.t["en"].Build();
     }
 }

@@ -371,7 +371,7 @@ public sealed class MaintainersAppCommands : ApplicationCommandsModule
 
                         await new Commands.DevTools.LogCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
                         {
-                            { "Level", (CustomLogLevel)Enum.Parse(typeof(CustomLogLevel), argument1) },
+                            { "Level", (LogEventLevel)Enum.Parse(typeof(LogEventLevel), argument1) },
                         });
                     });
                     break;

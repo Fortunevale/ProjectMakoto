@@ -20,10 +20,10 @@ internal static class PluginLoader
         if (!bot.status.LoadedConfig.EnablePlugins)
             return;
 
-        _logger.LogDebug("Loading Plugins..");
+        Log.Debug("Loading Plugins..");
 
         if (!Directory.Exists("Plugins"))
-            Directory.CreateDirectory("Plugins");
+            _ = Directory.CreateDirectory("Plugins");
 
         foreach (var pluginFile in Directory.GetFiles("Plugins").Where(x => x.EndsWith(".pmpl")))
         {
@@ -32,7 +32,7 @@ internal static class PluginLoader
 
             var pluginName = Path.GetFileName(pluginFile);
 
-            _logger.LogDebug("Loading Plugin '{Name}'..", pluginName);
+            Log.Debug("Loading Plugin '{Name}'..", pluginName);
 
             using var pluginFileStream = new FileStream(pluginFile, FileMode.Open, FileAccess.ReadWrite);
             using var zipArchive = new ZipArchive(pluginFileStream, ZipArchiveMode.Update);
@@ -65,7 +65,7 @@ internal static class PluginLoader
 
                     if (AppDomain.CurrentDomain.GetAssemblies().Select(x => x.GetName()).Any(x => x.Name == assemblyName))
                     {
-                        _logger.LogTrace("{Assembly} already loaded, skipping", assemblyName);
+                        Log.Verbose("{Assembly} already loaded, skipping", assemblyName);
                         continue;
                     }
 
@@ -78,7 +78,7 @@ internal static class PluginLoader
                         {
                             if (typeof(BasePlugin).IsAssignableFrom(type))
                             {
-                                _logger.LogDebug("Loading Plugin from '{0}'", assemblyEntry);
+                                Log.Debug("Loading Plugin from '{0}'", assemblyEntry);
 
                                 count++;
                                 var result = Activator.CreateInstance(type) as BasePlugin;
@@ -97,17 +97,17 @@ internal static class PluginLoader
                     catch (Exception ex)
                     {
                         _ = bot._Plugins.Remove(assemblyName);
-                        _logger.LogError("Failed to load Plugin '{0}' from '{1}'", ex, assemblyName, assemblyEntry);
+                        Log.Error(ex, "Failed to load Plugin '{0}' from '{1}'", assemblyName, assemblyEntry);
                     }
                 }
 
                 if (count == 0)
                 {
-                    _logger.LogWarn("Cannot load Plugin '{0}': Plugin Assembly does not contain type that inherits BasePlugin.", pluginName);
+                    Log.Warning("Cannot load Plugin '{0}': Plugin Assembly does not contain type that inherits BasePlugin.", pluginName);
                     continue;
                 }
 
-                _logger.LogInfo("Loaded Plugin from '{0}'", pluginName);
+                Log.Information("Loaded Plugin from '{0}'", pluginName);
             }
             finally
             {
@@ -115,44 +115,44 @@ internal static class PluginLoader
             }
         }
 
-        _logger.LogInfo("Loaded {0} Plugins.", bot.Plugins.Count);
+        Log.Information("Loaded {0} Plugins.", bot.Plugins.Count);
 
         foreach (var b in bot.Plugins)
         {
             if (b.Value.Name.IsNullOrWhiteSpace())
             {
-                _logger.LogWarn("Skipped loading Plugin '{0}': Missing Name.", b.Key);
+                Log.Warning("Skipped loading Plugin '{0}': Missing Name.", b.Key);
                 continue;
             }
 
             if (b.Value.Description.IsNullOrWhiteSpace())
             {
-                _logger.LogWarn("Skipped loading Plugin '{0}': Missing Description.", b.Key);
+                Log.Warning("Skipped loading Plugin '{0}': Missing Description.", b.Key);
                 continue;
             }
 
             if (b.Value.Author.IsNullOrWhiteSpace())
             {
-                _logger.LogWarn("Skipped loading Plugin '{0}': Missing Author.", b.Key);
+                Log.Warning("Skipped loading Plugin '{0}': Missing Author.", b.Key);
                 continue;
             }
 
             if (b.Value.Version is null)
             {
-                _logger.LogWarn("Skipped loading Plugin '{0}': Missing Version.", b.Key);
+                Log.Warning("Skipped loading Plugin '{0}': Missing Version.", b.Key);
                 continue;
             }
 
-            _logger.LogDebug("Initializing Plugin '{0}' ({1})..", b.Value.Name, b.Key);
+            Log.Debug("Initializing Plugin '{0}' ({1})..", b.Value.Name, b.Key);
 
             try
             {
                 b.Value.Load(bot);
-                _logger.LogInfo("Initialized Plugin from '{0}': '{1}' (v{2}).", b.Key, b.Value.Name, b.Value.Version.ToString());
+                Log.Information("Initialized Plugin from '{0}': '{1}' (v{2}).", b.Key, b.Value.Name, b.Value.Version.ToString());
             }
             catch (Exception ex)
             {
-                _logger.LogError("Failed to initialize Plugin from '{0}': '{1}' (v{2}).", ex, b.Key, b.Value.Name, b.Value.Version.ToString());
+                Log.Error(ex, "Failed to initialize Plugin from '{0}': '{1}' (v{2}).", b.Key, b.Value.Name, b.Value.Version.ToString());
             }
 
             try
@@ -161,7 +161,7 @@ internal static class PluginLoader
             }
             catch (Exception ex)
             {
-                _logger.LogError("Failed to check updates for '{PluginName}'", ex, b.Value.Name);
+                Log.Error(ex, "Failed to check updates for '{PluginName}'", b.Value.Name);
             }
 
             try
@@ -184,7 +184,7 @@ internal static class PluginLoader
             }
             catch (Exception ex)
             {
-                _logger.LogError("Failed to load translations for '{PluginName}'", ex, b.Value.Name);
+                Log.Error(ex, "Failed to load translations for '{PluginName}'", b.Value.Name);
             }
         }
     }
@@ -224,7 +224,7 @@ internal static class PluginLoader
                     pluginInfo.CompiledCommands.All(x => File.Exists(x.Key)) &&
                     pluginInfo.CompiledCommands.Count != 0)
                 {
-                    _logger.LogInfo("Loading {0} Commands from Plugin from '{1}' ({2}) from compiled assemblies..", pluginInfo.CompiledCommands.Count, plugin.Value.Name, plugin.Value.Version.ToString());
+                    Log.Information("Loading {0} Commands from Plugin from '{1}' ({2}) from compiled assemblies..", pluginInfo.CompiledCommands.Count, plugin.Value.Name, plugin.Value.Version.ToString());
 
                     foreach (var b in pluginInfo.CompiledCommands)
                     {
@@ -261,7 +261,7 @@ internal static class PluginLoader
                         .Where(x => !x.IsDynamic && !x.Location.IsNullOrWhiteSpace())
                         .Select(x => MetadataReference.CreateFromFile(x.Location));
 
-                    _logger.LogInfo("Compiling {0} BasePluginCommands from Plugin from '{1}' ({2}).", pluginCommands.Count(), plugin.Value.Name, plugin.Value.Version.ToString());
+                    Log.Information("Compiling {0} BasePluginCommands from Plugin from '{1}' ({2}).", pluginCommands.Count(), plugin.Value.Name, plugin.Value.Version.ToString());
 
                     List<(string Code, CompilationType Type)> getClassCode(IEnumerable<PluginCommand> commandList)
                     {
@@ -341,7 +341,7 @@ internal static class PluginLoader
                                         private static {{typeof(MethodInfo).FullName}} {{TaskName}}_CommandMethod { get; set; }
                                         public static void Populate_{{TaskName}}({{typeof(Bot).FullName}} _bot)
                                         {
-                                            _logger.LogDebug("Populating execution properties for '{CommandName}':'{taskname}'", "{{command.Name}}","{{TaskName}}");
+                                            Log.Debug("Populating execution properties for '{CommandName}':'{taskname}'", "{{command.Name}}","{{TaskName}}");
                                             {{(parent is null ? $"{TaskName}_CommandType = _bot.PluginCommands[\"{plugin.Key}\"].First(x => x.Name == \"{command.Name}\").Command.GetType();" : $"{TaskName}_CommandType = _bot.PluginCommands[\"{plugin.Key}\"].First(x => x.Name == \"{parent.Name}\").SubCommands.First(x => x.Name == \"{command.Name}\").Command.GetType();")}}
                                             {{TaskName}}_CommandMethod = {{TaskName}}_CommandType.GetMethods().First(x => x.Name == "ExecuteCommand" && x.GetParameters().Any(param => param.ParameterType == typeof({{contextType.FullName}})));
                                         }
@@ -382,7 +382,7 @@ internal static class PluginLoader
                                                     }
                                                     catch ({{typeof(Exception).FullName}} ex)
                                                     {
-                                                        _logger.LogError($"Failed to execute plugin's application command", ex);
+                                                        Log.Error(ex, $"Failed to execute plugin's application command");
                                                     }
                                                 
                                                     return {{typeof(Task).FullName}}.CompletedTask;
@@ -429,7 +429,7 @@ internal static class PluginLoader
                                                     }
                                                     catch ({{typeof(Exception).FullName}} ex)
                                                     {
-                                                        _logger.LogError($"Failed to execute plugin's command", ex);
+                                                        Log.Error(ex, $"Failed to execute plugin's command");
                                                     }
 
                                                     return {{typeof(Task).FullName}}.CompletedTask;
@@ -457,7 +457,7 @@ internal static class PluginLoader
                                                     }
                                                     catch ({{typeof(Exception).FullName}} ex)
                                                     {
-                                                        _logger.LogError($"Failed to execute plugin's command", ex);
+                                                        Log.Error(ex, $"Failed to execute plugin's command");
                                                     }
                                                 
                                                     return {{typeof(Task).FullName}}.CompletedTask;
@@ -511,7 +511,7 @@ internal static class PluginLoader
                                 var result = compilation.Emit(stream);
                                 if (!result.Success)
                                 {
-                                    _logger.LogError("Failed to emit compilation\n{diagnostics}",
+                                    Log.Error("Failed to emit compilation\n{diagnostics}",
                                         JsonConvert.SerializeObject(result.Diagnostics.Select(x => $"{x.Id}: {x.GetMessage()}: {x.Location}: {data.code[x.Location.SourceSpan.Start..x.Location.SourceSpan.End]}"), Formatting.Indented));
 
                                     Exception exception = new();
@@ -535,16 +535,16 @@ internal static class PluginLoader
                                     pluginInfo.CompiledCommands.Add(path, data.type);
                                 }
 
-                                _logger.LogDebug("Compiled class with {cmdCount} commands for '{plugin}' of type '{type}'", data.commandList.Count(), data.plugin.Name, data.type);
-                                _logger.LogTrace($"\n{data.code}");
+                                Log.Debug("Compiled class with {cmdCount} commands for '{plugin}' of type '{type}'", data.commandList.Count(), data.plugin.Name, data.type);
+                                Log.Verbose($"\n{data.code}");
                             }
                         }
                         catch (Exception ex)
                         {
                             var diagnostics = (ImmutableArray<Diagnostic>)ex.Data["diagnostics"];
 
-                            _logger.LogError("Failed Compilation of class type '{type}'", data.type);
-                            _logger.LogTrace($"\n{data.code}");
+                            Log.Error("Failed Compilation of class type '{type}'", data.type);
+                            Log.Verbose($"\n{data.code}");
 
                             await Task.Delay(1000);
 
@@ -587,8 +587,8 @@ internal static class PluginLoader
             }
             catch (Exception ex)
             {
-                _logger.LogError("Failed to load commands", ex);
-                _logger.LogError("Affected plugin: {0}", plugin.Value.Name);
+                Log.Error(ex, "Failed to load commands");
+                Log.Error("Affected plugin: {0}", plugin.Value.Name);
             }
         }
 

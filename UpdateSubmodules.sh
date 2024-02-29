@@ -1,5 +1,5 @@
 echo "Updating submodules.."
-git submodule update --recursive --remote
+git submodule update --depth 1 --remote
 echo "Done"
 sleep 10
 exit

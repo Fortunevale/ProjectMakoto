@@ -33,7 +33,7 @@ internal sealed class BanGuildCommand : BaseCommand
 
             foreach (var b in ctx.Client.Guilds.Where(x => x.Key == guild))
             {
-                _logger.LogInfo("Leaving guild '{guild}'..", b.Key);
+                Log.Information("Leaving guild '{guild}'..", b.Key);
                 await b.Value.LeaveAsync();
             }
 

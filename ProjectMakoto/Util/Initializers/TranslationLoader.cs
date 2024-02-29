@@ -13,14 +13,14 @@ internal static class TranslationLoader
     internal static async Task Load(Bot _bot)
     {
         _bot.LoadedTranslations = JsonConvert.DeserializeObject<Translations>(await File.ReadAllTextAsync("Translations/strings.json"), new JsonSerializerSettings { NullValueHandling = NullValueHandling.Include });
-        _logger.LogDebug("Loaded translations");
+        Log.Debug("Loaded translations");
 
         Dictionary<string, int> CalculateTranslationProgress(object? obj, string name, bool isCommandList = false)
         {
             if (obj is null)
             {
                 if (!isCommandList)
-                    _logger.LogWarn("A Translation Group was not loaded: {name}.", name);
+                    Log.Warning("A Translation Group was not loaded: {name}.", name);
                 return new Dictionary<string, int>();
             }
 
@@ -98,6 +98,6 @@ internal static class TranslationLoader
             return counts;
         }
         _bot.LoadedTranslations.Progress = CalculateTranslationProgress(_bot.LoadedTranslations, "root");
-        _logger.LogDebug("Loaded translations: {0}", string.Join("; ", _bot.LoadedTranslations.Progress.Select(x => $"{x.Key}:{x.Value}")));
+        Log.Debug("Loaded translations: {0}", string.Join("; ", _bot.LoadedTranslations.Progress.Select(x => $"{x.Key}:{x.Value}")));
     }
 }

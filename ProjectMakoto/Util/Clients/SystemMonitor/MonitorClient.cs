@@ -87,7 +87,7 @@ public sealed class MonitorClient : RequiresBotReference
         {
             if (!new System.Security.Principal.WindowsPrincipal(System.Security.Principal.WindowsIdentity.GetCurrent()).IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator))
             {
-                _logger.LogWarn("Running under windows, system monitor unavailable.");
+                Log.Warning("Running under windows, system monitor unavailable.");
                 return;
             }
         }
@@ -101,7 +101,7 @@ public sealed class MonitorClient : RequiresBotReference
                     this.LastScanStart = DateTime.UtcNow;
                     var sensors = await this.ReadSystemInfoAsync();
 
-                    _logger.LogDebug(JsonConvert.SerializeObject(sensors, Formatting.Indented));
+                    Log.Debug(JsonConvert.SerializeObject(sensors, Formatting.Indented));
 
                     while (this.History.Any(x => x.Key.GetTimespanSince() > TimeSpan.FromDays(1)))
                         _ = this.History.Remove(this.History.Min(x => x.Key));
@@ -113,7 +113,7 @@ public sealed class MonitorClient : RequiresBotReference
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarn("Failed to fetch system info", ex);
+                    Log.Warning(ex, "Failed to fetch system info");
 
                     this.LastScanStart = DateTime.UtcNow;
                 }
@@ -161,7 +161,7 @@ public sealed class MonitorClient : RequiresBotReference
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarn("Failed to execute/parse sensors", ex);
+                    Log.Warning(ex, "Failed to execute/parse sensors");
                 }
 
                 try
@@ -184,7 +184,7 @@ public sealed class MonitorClient : RequiresBotReference
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarn("Failed to execute cpu usage", ex);
+                    Log.Warning(ex, "Failed to execute cpu usage");
                 }
 
                 try
@@ -195,14 +195,14 @@ public sealed class MonitorClient : RequiresBotReference
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarn("Failed to execute memory usage", ex);
+                    Log.Warning(ex, "Failed to execute memory usage");
                 }
 
                 return systemInfo;
             }
             else
             {
-                _logger.LogWarn("Running on unknown operating system, system monitor not supported.");
+                Log.Warning("Running on unknown operating system, system monitor not supported.");
                 return systemInfo;
             }
         });

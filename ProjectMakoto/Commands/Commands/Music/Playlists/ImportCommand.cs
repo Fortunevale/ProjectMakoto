@@ -205,7 +205,7 @@ internal sealed class ImportCommand : BaseCommand
                         Description = this.GetString(this.t.Commands.Music.Playlists.Import.ImportFailed, true),
                     }.AsError(ctx, this.GetString(this.t.Commands.Music.Playlists.Title))));
 
-                    _logger.LogError("Failed to import a playlist", ex);
+                    Log.Error(ex, "Failed to import a playlist");
 
                     return;
                 }

@@ -8,6 +8,8 @@
 // but WITHOUT ANY WARRANTY
 
 using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Events;
 
 namespace ProjectMakoto.Util;
 
@@ -186,36 +188,27 @@ public static class GenericExtensions
     /// <returns></returns>
     /// <exception cref="NotImplementedException"></exception>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2254:Template should be a static expression", Justification = "<Pending>")]
-    public static string Log(this string str, CustomLogLevel lvl, string additionalInfo)
+    public static string LogString(this string str, LogEventLevel lvl, string additionalInfo)
     {
         switch (lvl)
         {
-            case CustomLogLevel.None:
-                _logger.LogNone($"String {{0}} logged: {additionalInfo}", str);
+            case LogEventLevel.Fatal:
+                Log.Fatal($"String {{0}} logged: {additionalInfo}", str);
                 break;
-            case CustomLogLevel.Fatal:
-                _logger.LogFatal($"String {{0}} logged: {additionalInfo}", str);
+            case LogEventLevel.Error:
+                Log.Error($"String {{0}} logged: {additionalInfo}", str);
                 break;
-            case CustomLogLevel.Error:
-                _logger.LogError($"String {{0}} logged: {additionalInfo}", str);
+            case LogEventLevel.Warning:
+                Log.Warning($"String {{0}} logged: {additionalInfo}", str);
                 break;
-            case CustomLogLevel.Warn:
-                _logger.LogWarn($"String {{0}} logged: {additionalInfo}", str);
+            case LogEventLevel.Information:
+                Log.Information($"String {{0}} logged: {additionalInfo}", str);
                 break;
-            case CustomLogLevel.Info:
-                _logger.LogInfo($"String {{0}} logged: {additionalInfo}", str);
+            case LogEventLevel.Debug:
+                Log.Debug($"String {{0}} logged: {additionalInfo}", str);
                 break;
-            case CustomLogLevel.Debug:
-                _logger.LogDebug($"String {{0}} logged: {additionalInfo}", str);
-                break;
-            case CustomLogLevel.Debug2:
-                _logger.LogDebug2($"String {{0}} logged: {additionalInfo}", str);
-                break;
-            case CustomLogLevel.Trace:
-                _logger.LogTrace($"String {{0}} logged: {additionalInfo}", str);
-                break;
-            case CustomLogLevel.Trace2:
-                _logger.Log(LogLevel.Trace, $"String {{str}} logged: {additionalInfo}", str);
+            case LogEventLevel.Verbose:
+                Log.Verbose($"String {{0}} logged: {additionalInfo}", str);
                 break;
             default:
                 throw new NotImplementedException("The specified log level is not implemented");

@@ -240,7 +240,7 @@ internal sealed class ModifyCommand : BaseCommand
                                 }
                                 catch (Exception ex)
                                 {
-                                    _logger.LogError("An exception occurred while trying to import thumbnail", ex);
+                                    Log.Error(ex, "An exception occurred while trying to import thumbnail");
 
                                     embed.Description = this.GetString(this.t.Commands.Music.Playlists.Modify.ThumbnailError, true);
                                     _ = embed.AsError(ctx, this.GetString(this.t.Commands.Music.Playlists.Title));

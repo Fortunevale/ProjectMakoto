@@ -43,7 +43,7 @@ public static class TranslationUtil
         foreach (var b in vars)
         {
             if (b.Replacement is null)
-                _logger.LogWarn("TVar is null on ValueName {0}", b.ValName);
+                Log.Warning("TVar is null on ValueName {0}", b.ValName);
 
             var newText = b.Replacement?.ToString() ?? "";
 

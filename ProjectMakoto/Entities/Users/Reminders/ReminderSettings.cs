@@ -67,7 +67,7 @@ public sealed class ReminderSettings : RequiresParent<User>
 
                     _ = task.CreateScheduledTask(b.DueTime, new ScheduledTaskIdentifier(this.Parent.Id, b.UUID, "reminder"));
 
-                    _logger.LogDebug("Created scheduled task for reminder by '{User}'", this.Parent.Id);
+                    Log.Debug("Created scheduled task for reminder by '{User}'", this.Parent.Id);
                 }
 
             foreach (var b in ScheduledTaskExtensions.GetScheduledTasks())
@@ -79,7 +79,7 @@ public sealed class ReminderSettings : RequiresParent<User>
                 {
                     b.Delete();
 
-                    _logger.LogDebug("Deleted scheduled task for reminder by '{User}'", this.Parent.Id);
+                    Log.Debug("Deleted scheduled task for reminder by '{User}'", this.Parent.Id);
                 }
             }
         });

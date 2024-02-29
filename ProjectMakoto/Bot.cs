@@ -13,6 +13,10 @@ using GenHTTP.Modules.IO;
 using GenHTTP.Modules.Practices;
 using GenHTTP.Api.Infrastructure;
 using GenHTTP.Modules.StaticWebsites;
+using Serilog;
+using Microsoft.Extensions.Logging;
+using Serilog.Events;
+using Serilog.Core;
 
 namespace ProjectMakoto;
 
@@ -81,40 +85,42 @@ public sealed class Bot
     internal string RawFetchedPrivacyPolicy = "";
     internal string Prefix { get; private set; } = ";;";
 
+    internal ILoggerFactory msLoggerFactory;
+    internal Microsoft.Extensions.Logging.ILogger msLogger;
+    internal LoggingLevelSwitch loggingLevel;
+
     internal async Task Init(string[] args)
     {
-        _logger = LoggerClient.StartLogger($"logs/{DateTime.UtcNow:dd-MM-yyyy_HH-mm-ss}.log", CustomLogLevel.Info, DateTime.UtcNow.AddDays(-3), false);
-        _logger.LogRaised += this.LogHandler;
+        var sink = new LogsSink(this);
+
+        loggingLevel = new LoggingLevelSwitch();
+
+        var loggingTemplate = "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {Level:u3}] {Message:lj}{NewLine}{Exception}";
+
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.ControlledBy(this.loggingLevel)
+            .WriteTo.Console(outputTemplate: loggingTemplate)
+            .WriteTo.File($"logs/{DateTime.UtcNow:dd-MM-yyyy_HH-mm-ss}.log", LogEventLevel.Debug, outputTemplate: loggingTemplate)
+            .WriteTo.Sink(sink)
+            .CreateLogger();
+
+        this.msLoggerFactory = new LoggerFactory().AddSerilog();
+        this.msLogger = msLoggerFactory.CreateLogger("ms");
 
         ScheduledTaskExtensions.TaskStarted += this.TaskStarted;
-        UniversalExtensions.AttachLogger(_logger);
+        UniversalExtensions.AttachLogger(msLogger);
 
         RenderAsciiArt();
 
         this.status.RunningVersion = (File.Exists("LatestGitPush.cfg") ? await File.ReadAllLinesAsync("LatestGitPush.cfg") : new string[] { "Development-Build" })[0].Trim();
-        _logger.LogInfo("Starting up Makoto {RunningVersion}..\n", this.status.RunningVersion);
+        Log.Information("Starting up Makoto {RunningVersion}..\n", this.status.RunningVersion);
 
-        if (args.Contains("--debug"))
-        {
-            _logger.ChangeLogLevel(CustomLogLevel.Debug);
-        }
-        
-        if (args.Contains("--debug2"))
-        {
-            _logger.ChangeLogLevel(CustomLogLevel.Debug2);
-        }
+        if (args.Contains("--verbose"))
+            this.loggingLevel.MinimumLevel = LogEventLevel.Verbose;
+        else if (args.Contains("--debug"))
+            this.loggingLevel.MinimumLevel = LogEventLevel.Debug;
 
-        if (args.Contains("--trace"))
-        {
-            _logger.ChangeLogLevel(CustomLogLevel.Trace);
-        }
-
-        if (args.Contains("--trace2"))
-        {
-            _logger.ChangeLogLevel(CustomLogLevel.Trace2);
-        }
-
-        _logger.LogDebug("Environment Details\n\n" +
+        Log.Debug("Environment Details\n\n" +
                 "Dotnet Version: {Version}\n" +
                 "OS & Version: {OSVersion}\n\n" +
                 "OS 64x: {Is64BitOperatingSystem}\n" +
@@ -219,7 +225,7 @@ public sealed class Bot
             }
             catch (Exception ex)
             {
-                _logger.LogFatal("An exception occurred while initializing data", ex);
+                Log.Fatal(ex, "An exception occurred while initializing data");
                 await Task.Delay(5000);
                 Environment.Exit((int)ExitCodes.FailedDatabaseLogin);
             }
@@ -235,7 +241,7 @@ public sealed class Bot
             {
                 if (!this.status.DiscordInitialized)
                 {
-                    _logger.LogError("An exception occurred while trying to log into discord: {0}", "The log in took longer than 60 seconds");
+                    Log.Error("An exception occurred while trying to log into discord: {0}", "The log in took longer than 60 seconds");
                     Environment.FailFast("An exception occurred while trying to log into discord: The log in took longer than 60 seconds");
                     return;
                 }
@@ -243,10 +249,10 @@ public sealed class Bot
 
             await Util.Initializers.DisCatSharpExtensionsLoader.Load(this);
 
-            _logger.LogInfo("Connecting and authenticating with Discord..");
+            Log.Information("Connecting and authenticating with Discord..");
             await this.DiscordClient.StartAsync();
             await Task.Delay(2000);
-            _logger.LogInfo("Connected and authenticated with Discord as {User}.", this.DiscordClient.CurrentUser.GetUsernameWithIdentifier());
+            Log.Information("Connected and authenticated with Discord as {User}.", this.DiscordClient.CurrentUser.GetUsernameWithIdentifier());
 
             this.status.DiscordInitialized = true;
             await BasePlugin.RaiseConnected(this);
@@ -282,14 +288,14 @@ public sealed class Bot
                 try
                 {
                     this.status.TeamOwner = this.DiscordClient.CurrentApplication.Team.Owner.Id;
-                    _logger.LogInfo("Set {TeamOwner} as owner of the bot", this.status.TeamOwner);
+                    Log.Information("Set {TeamOwner} as owner of the bot", this.status.TeamOwner);
 
                     this.status._TeamMembers.AddRange(this.DiscordClient.CurrentApplication.Team.Members.Select(x => x.User.Id));
-                    _logger.LogInfo("Added {Count} users to administrator list", this.status.TeamMembers.Count);
+                    Log.Information("Added {Count} users to administrator list", this.status.TeamMembers.Count);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError("An exception occurred trying to add team members to administrator list. Is the current bot registered in a team?", ex);
+                    Log.Error(ex, "An exception occurred trying to add team members to administrator list. Is the current bot registered in a team?");
                 }
 
                 try
@@ -301,7 +307,7 @@ public sealed class Bot
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError("An exception occurred while trying to fetch the privacy policy", ex);
+                    Log.Error(ex, "An exception occurred while trying to fetch the privacy policy");
                 }
             });
 
@@ -313,14 +319,14 @@ public sealed class Bot
 
         if (!loadDatabase.Task.IsCompletedSuccessfully)
         {
-            _logger.LogFatal("An uncaught exception occurred while initializing the database.", loadDatabase.Task.Exception);
+            Log.Fatal("An uncaught exception occurred while initializing the database.", loadDatabase.Task.Exception);
             await Task.Delay(1000);
             Environment.Exit((int)ExitCodes.FailedDatabaseLoad);
         }
 
         if (!logInToDiscord.Task.IsCompletedSuccessfully)
         {
-            _logger.LogFatal("An uncaught exception occurred while initializing the discord client.", logInToDiscord.Task.Exception);
+            Log.Fatal("An uncaught exception occurred while initializing the discord client.", logInToDiscord.Task.Exception);
             await Task.Delay(1000);
             Environment.Exit((int)ExitCodes.FailedDiscordLogin);
         }
@@ -332,7 +338,7 @@ public sealed class Bot
 
         Console.CancelKeyPress += delegate
         {
-            _logger.LogInfo("Exiting, please wait..");
+            Log.Information("Exiting, please wait..");
             this.ExitApplication().Wait();
         };
 
@@ -386,7 +392,7 @@ public sealed class Bot
         }
         catch (Exception ex)
         {
-            _logger.LogError("Failed to render ASCII art", ex);
+            Log.Error(ex, "Failed to render ASCII art");
         }
 
         Console.ResetColor();
@@ -432,7 +438,7 @@ public sealed class Bot
 
         this.ExitCalled = true;
 
-        _logger.LogInfo("Preparing to shut down Makoto..");
+        Log.Information("Preparing to shut down Makoto..");
 
         _ = this.WebServer.Stop();
 
@@ -440,12 +446,12 @@ public sealed class Bot
         {
             try
             {
-                _logger.LogInfo("Shutting down '{0}'..", b.Value.Name);
+                Log.Information("Shutting down '{0}'..", b.Value.Name);
                 await b.Value.Shutdown();
             }
             catch (Exception ex)
             {
-                _logger.LogError("Failed to shutdown", ex, b.Value.Name);
+                Log.Error(ex, "Failed to shutdown", b.Value.Name);
             }
         }
 
@@ -457,7 +463,7 @@ public sealed class Bot
                 sw.Start();
 
                 if (!this.status.DiscordCommandsRegistered)
-                    _logger.LogWarn("Startup is incomplete. Waiting for Startup to finish to shutdown..");
+                    Log.Warning("Startup is incomplete. Waiting for Startup to finish to shutdown..");
 
                 while (!this.status.DiscordCommandsRegistered && sw.ElapsedMilliseconds < TimeSpan.FromMinutes(5).TotalMilliseconds)
                     await Task.Delay(500);
@@ -466,26 +472,26 @@ public sealed class Bot
             }
             catch (Exception ex)
             {
-                _logger.LogError("Failed to run sync tasks", ex);
+                Log.Error(ex, "Failed to run sync tasks");
             }
 
             try
             {
-                _logger.LogInfo("Closing Discord Client..");
+                Log.Information("Closing Discord Client..");
 
                 await this.DiscordClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
                 await this.DiscordClient.StopAsync();
 
-                _logger.LogDebug("Closed Discord Client.");
+                Log.Debug("Closed Discord Client.");
             }
             catch (Exception ex)
             {
-                _logger.LogError("Failed to close Discord Client gracefully.", ex);
+                Log.Error(ex, "Failed to close Discord Client gracefully.");
             }
         }
 
         await Task.Delay(500);
-        _logger.LogInfo("Goodbye!");
+        Log.Information("Goodbye!");
 
         await Task.Delay(500);
         Environment.Exit(0);
@@ -506,14 +512,14 @@ public sealed class Bot
             {
                 if ((b.Value?.Data?.DeletionRequested ?? false) && b.Value?.Data?.DeletionRequestDate.GetTimespanUntil() < TimeSpan.Zero)
                 {
-                    _logger.LogInfo("Deleting profile of '{Key}'", b.Key);
+                    Log.Information("Deleting profile of '{Key}'", b.Key);
 
                     _ = this.Users.Remove(b.Key);
                     this.objectedUsers.Add(b.Key);
                     foreach (var c in this.DiscordClient.GetGuilds().Where(x => x.Value.OwnerId == b.Key))
                     {
                         try
-                        { _logger.LogInfo("Leaving guild '{guild}'..", c.Key); _ = c.Value.LeaveAsync().Add(this); }
+                        { Log.Information("Leaving guild '{guild}'..", c.Key); _ = c.Value.LeaveAsync().Add(this); }
                         catch { }
                     }
                 }
@@ -523,9 +529,6 @@ public sealed class Bot
 
     internal Task GuildDownloadCompleted(DiscordClient sender, GuildDownloadCompletedEventArgs e)
         => Util.Initializers.SyncTasks.GuildDownloadCompleted(this, sender, e);
-
-    internal void LogHandler(object? sender, LogMessageEventArgs e)
-        => this.Watcher.LogHandler(this, sender, e);
 
     internal void TaskStarted(object? sender, Xorog.UniversalExtensions.EventArgs.ScheduledTaskStartedEventArgs e)
         => this.Watcher.TaskStarted(this, sender, e);

@@ -61,7 +61,7 @@ internal sealed class TokenLeakEvents(Bot bot) : RequiresTranslation(bot)
 
             if (botUser is null)
             {
-                _logger.LogDebug("Not uploading detected token, no bot user was fetched.");
+                Log.Debug("Not uploading detected token, no bot user was fetched.");
                 continue;
             }
 
@@ -71,7 +71,7 @@ internal sealed class TokenLeakEvents(Bot bot) : RequiresTranslation(bot)
 
             if (this.Bot.TokenInvalidator.SearchForString(token.Value).Item1)
             {
-                _logger.LogDebug("Not uploading detected token, token already present in repository.");
+                Log.Debug("Not uploading detected token, token already present in repository.");
                 continue;
             }
 

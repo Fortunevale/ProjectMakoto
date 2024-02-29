@@ -83,7 +83,7 @@ internal sealed class ExperienceHandler : RequiresTranslation
 
         if (this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Points is > (long.MaxValue - 10000) or < (long.MinValue + 10000))
         {
-            _logger.LogWarn("Member '{User}' on '{Guild}' is within 10000 points of the experience limit. Resetting.", user.Id, guild.Id);
+            Log.Warning("Member '{User}' on '{Guild}' is within 10000 points of the experience limit. Resetting.", user.Id, guild.Id);
             this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Points = 1;
         }
 

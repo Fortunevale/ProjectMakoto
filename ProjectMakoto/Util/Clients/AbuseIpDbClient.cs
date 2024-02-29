@@ -52,13 +52,13 @@ public sealed class AbuseIpDbClient : RequiresBotReference
                     var now = DateTimeOffset.UtcNow;
                     var tomorrow = new DateTimeOffset(now.Year, now.Month, now.Day, 0, 0, 0, TimeSpan.Zero).AddDays(1);
 
-                    _logger.LogWarn("Daily Ratelimit reached for AbuseIPDB. Waiting until {tomorrow}..", tomorrow);
+                    Log.Warning("Daily Ratelimit reached for AbuseIPDB. Waiting until {tomorrow}..", tomorrow);
                     var delay = tomorrow - DateTimeOffset.UtcNow;
 
                     if (delay > TimeSpan.Zero)
                         await Task.Delay(delay);
 
-                    _logger.LogInfo("Ratelimit cleared for AbuseIPDB.");
+                    Log.Information("Ratelimit cleared for AbuseIPDB.");
                     this.RequestsRemaining = 1;
                 }
 
@@ -90,7 +90,7 @@ public sealed class AbuseIpDbClient : RequiresBotReference
                         if (response.StatusCode == HttpStatusCode.TooManyRequests)
                         {
                             this.RequestsRemaining = 0;
-                            _logger.LogError("Daily Ratelimit hit for AbuseIPDB.");
+                            Log.Error("Daily Ratelimit hit for AbuseIPDB.");
                             continue;
                         }
 
@@ -98,7 +98,7 @@ public sealed class AbuseIpDbClient : RequiresBotReference
                     }
 
                     this.RequestsRemaining = response.Headers.First(x => x.Key == "X-RateLimit-Remaining").Value.First().ToInt32();
-                    _logger.LogDebug("{RequestsRemaining} AbuseIPDB requests remaining.", this.RequestsRemaining);
+                    Log.Debug("{RequestsRemaining} AbuseIPDB requests remaining.", this.RequestsRemaining);
 
                     this.Queue[b.Key].Response = await response.Content.ReadAsStringAsync();
                     this.Queue[b.Key].Resolved = true;

@@ -64,7 +64,7 @@ internal sealed class PhishingUrlHandler(Bot bot) : RequiresBotReference(bot)
         }
         catch (Exception ex)
         {
-            _logger.LogError("Failed to update Phishing Urls", ex);
+            Log.Error(ex, "Failed to update Phishing Urls");
         }
     }
 
@@ -104,7 +104,7 @@ internal sealed class PhishingUrlHandler(Bot bot) : RequiresBotReference(bot)
             catch (Exception ex)
             {
                 listFailed = true;
-                _logger.LogWarn("An exception occurred while trying to download URLs from '{url}'", ex, url);
+                Log.Warning(ex, "An exception occurred while trying to download URLs from '{url}'", url);
             }
         }
 

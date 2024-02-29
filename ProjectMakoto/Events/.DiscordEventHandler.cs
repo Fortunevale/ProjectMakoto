@@ -20,7 +20,7 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         DiscordEventHandler handler = new(_bot);
 
-        _logger.LogDebug("Registering DisCatSharp EventHandler..");
+        Log.Debug("Registering DisCatSharp EventHandler..");
         handler.genericGuildEvents = new(_bot);
         handler.commandEvents = new(_bot);
         handler.crosspostEvents = new(_bot);

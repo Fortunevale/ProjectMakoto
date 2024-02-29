@@ -110,7 +110,7 @@ internal sealed class EmojiStealerCommand : BaseCommand
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogError("Failed to download an emote", ex);
+                            Log.Error(ex, "Failed to download an emote");
 
                             _ = SanitizedEmoteList.Remove(b.Key);
                         }
@@ -157,7 +157,7 @@ internal sealed class EmojiStealerCommand : BaseCommand
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogError("Failed to download an emote", ex);
+                            Log.Error(ex, "Failed to download an emote");
 
                             _ = SanitizedEmoteList.Remove(b.Id);
                         }

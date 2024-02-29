@@ -58,7 +58,7 @@ internal sealed class GlobalUnbanCommand : BaseCommand
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogError("Exception occurred while trying to unban user from {guild}", ex, b.Key);
+                            Log.Error(ex, "Exception occurred while trying to unban user from {guild}", b.Key);
                             Failed++;
                         }
                     }

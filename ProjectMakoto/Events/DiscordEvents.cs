@@ -19,7 +19,7 @@ internal sealed class DiscordEvents(Bot bot) : RequiresTranslation(bot)
         if (this.Bot.objectedUsers.Contains(e.Guild.OwnerId) || this.Bot.bannedUsers.ContainsKey(e.Guild.OwnerId) || this.Bot.bannedGuilds.ContainsKey(e.Guild?.Id ?? 0))
         {
             await Task.Delay(1000);
-            _logger.LogInfo("Leaving guild '{Guild}'..", e.Guild.Id);
+            Log.Information("Leaving guild '{Guild}'..", e.Guild.Id);
             await e.Guild.LeaveAsync();
             return;
         }

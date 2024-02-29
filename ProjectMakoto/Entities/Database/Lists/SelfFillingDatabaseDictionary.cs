@@ -48,12 +48,12 @@ public sealed class SelfFillingDatabaseDictionary<T> : DatabaseDictionary<ulong,
             {
                 if (_newValuePredicate is not null)
                 {
-                    _logger.LogTrace("Creating '{id}' of type '{type}'", key, typeof(T).Name);
+                    Log.Verbose("Creating '{id}' of type '{type}'", key, typeof(T).Name);
                     this.Add(key, _newValuePredicate.Invoke(key));
                 }
                 else
                 {
-                    _logger.LogWarn("Creating '{id}' of type '{type}' with default value", key, typeof(T).Name);
+                    Log.Warning("Creating '{id}' of type '{type}' with default value", key, typeof(T).Name);
                     this.Add(key, default);
                 }
             }

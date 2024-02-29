@@ -187,7 +187,7 @@ internal sealed class PhishingProtectionEvents(Bot bot) : RequiresTranslation(bo
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError("An exception occurred while trying to unshorten url '{url}'", ex, match);
+                    Log.Error(ex, "An exception occurred while trying to unshorten url '{url}'", match);
 
                     if (this.Bot.Guilds[guild.Id].PhishingDetection.WarnOnRedirect)
                         _ = e.RespondAsync(embed: new DiscordEmbedBuilder

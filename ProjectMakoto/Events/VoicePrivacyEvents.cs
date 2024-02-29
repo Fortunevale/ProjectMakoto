@@ -39,7 +39,7 @@ internal sealed class VoicePrivacyEvents : RequiresTranslation
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarn("Failed to run queue item", ex);
+                    Log.Warning(ex, "Failed to run queue item");
                 }
             }
         }).Add(this.Bot);
@@ -99,7 +99,7 @@ internal sealed class VoicePrivacyEvents : RequiresTranslation
                                 }
                                 catch (Exception ex)
                                 {
-                                    _logger.LogWarn("An exception occurred while trying to get messages from a channel ({failcount}/{max})", ex, failcount, 3);
+                                    Log.Warning(ex, "An exception occurred while trying to get messages from a channel ({failcount}/{max})", failcount, 3);
 
                                     await Task.Delay(10000);
                                     failcount++;
@@ -133,7 +133,7 @@ internal sealed class VoicePrivacyEvents : RequiresTranslation
                                     }
                                     catch (Exception ex)
                                     {
-                                        _logger.LogWarn("An exception occurred while trying to bulk delete messages from a channel ({failcount}/{max})", ex, failcount, 3);
+                                        Log.Warning(ex, "An exception occurred while trying to bulk delete messages from a channel ({failcount}/{max})", failcount, 3);
 
                                         await Task.Delay(30000);
                                         failcount++;
@@ -160,7 +160,7 @@ internal sealed class VoicePrivacyEvents : RequiresTranslation
                                     }
                                     catch (Exception ex)
                                     {
-                                        _logger.LogWarn("An exception occurred while trying to delete a message from a channel ({failcount}/{max})", ex, failcount, 3);
+                                        Log.Warning(ex, "An exception occurred while trying to delete a message from a channel ({failcount}/{max})", failcount, 3);
 
                                         await Task.Delay(30000);
                                         failcount++;
@@ -177,7 +177,7 @@ internal sealed class VoicePrivacyEvents : RequiresTranslation
                 catch (DisCatSharp.Exceptions.UnauthorizedException) { }
                 catch (Exception ex)
                 {
-                    _logger.LogError("Failed to execute a In-Voice Text Privacy Cleaner", ex);
+                    Log.Error(ex, "Failed to execute a In-Voice Text Privacy Cleaner");
                 }
 
                 return;

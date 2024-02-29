@@ -46,7 +46,7 @@ public class ScoreSaberClient : RequiresBotReference
 
                 try
                 {
-                    _logger.LogTrace("Sending Request to '{Url}'..", b.Value.Url);
+                    Log.Verbose("Sending Request to '{Url}'..", b.Value.Url);
                     var response = await client.GetAsync(b.Value.Url);
 
                     this.Queue[b.Key].StatusCode = response.StatusCode;

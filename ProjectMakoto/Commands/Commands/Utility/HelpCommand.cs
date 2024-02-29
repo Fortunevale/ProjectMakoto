@@ -145,7 +145,7 @@ internal sealed class HelpCommand : BaseCommand
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError("Failed to generate help", ex);
+                        Log.Error(ex, "Failed to generate help");
                     }
                 }
                 catch { }

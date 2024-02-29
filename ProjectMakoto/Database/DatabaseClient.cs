@@ -31,40 +31,41 @@ public sealed partial class DatabaseClient : RequiresBotReference
 
     internal static async Task<DatabaseClient> InitializeDatabase(Bot bot)
     {
-        _logger.LogInfo("Connecting to database..");
+        Log.Information("Connecting to database..");
 
-        var databaseClient = new DatabaseClient(bot);
-
-        databaseClient.mainDatabaseConnection = new()
+        var databaseClient = new DatabaseClient(bot)
         {
-            CreateConnection = () =>
+            mainDatabaseConnection = new()
             {
-                var conn = new MySqlConnection($"Server={bot.status.LoadedConfig.Secrets.Database.Host};" +
-                                               $"Port={bot.status.LoadedConfig.Secrets.Database.Port};" +
-                                               $"User Id={bot.status.LoadedConfig.Secrets.Database.Username};" +
-                                               $"Password={bot.status.LoadedConfig.Secrets.Database.Password};" +
-                                               $"Connection Timeout=60;" +
-                                               $"Connection Lifetime=30;" +
-                                               $"Database={bot.status.LoadedConfig.Secrets.Database.MainDatabaseName};");
-                return conn;
+                CreateConnection = () =>
+                {
+                    var conn = new MySqlConnection($"Server={bot.status.LoadedConfig.Secrets.Database.Host};" +
+                                                   $"Port={bot.status.LoadedConfig.Secrets.Database.Port};" +
+                                                   $"User Id={bot.status.LoadedConfig.Secrets.Database.Username};" +
+                                                   $"Password={bot.status.LoadedConfig.Secrets.Database.Password};" +
+                                                   $"Connection Timeout=60;" +
+                                                   $"Connection Lifetime=30;" +
+                                                   $"Database={bot.status.LoadedConfig.Secrets.Database.MainDatabaseName};");
+                    return conn;
+                }
+            },
+
+            guildDatabaseConnection = new()
+            {
+                CreateConnection = () =>
+                {
+                    var conn = new MySqlConnection($"Server={bot.status.LoadedConfig.Secrets.Database.Host};" +
+                                                   $"Port={bot.status.LoadedConfig.Secrets.Database.Port};" +
+                                                   $"User Id={bot.status.LoadedConfig.Secrets.Database.Username};" +
+                                                   $"Password={bot.status.LoadedConfig.Secrets.Database.Password};" +
+                                                   $"Connection Timeout=60;" +
+                                                   $"Connection Lifetime=30;" +
+                                                   $"Database={bot.status.LoadedConfig.Secrets.Database.GuildDatabaseName};");
+                    return conn;
+                }
             }
         };
-        
-        databaseClient.guildDatabaseConnection = new()
-        {
-            CreateConnection = () =>
-            {
-                var conn = new MySqlConnection($"Server={bot.status.LoadedConfig.Secrets.Database.Host};" +
-                                               $"Port={bot.status.LoadedConfig.Secrets.Database.Port};" +
-                                               $"User Id={bot.status.LoadedConfig.Secrets.Database.Username};" +
-                                               $"Password={bot.status.LoadedConfig.Secrets.Database.Password};" +
-                                               $"Connection Timeout=60;" +
-                                               $"Connection Lifetime=30;" +
-                                               $"Database={bot.status.LoadedConfig.Secrets.Database.GuildDatabaseName};");
-                return conn;
-            }
-        };
-        
+
         if (bot.status.LoadedConfig.EnablePlugins)
             databaseClient.pluginDatabaseConnection = new()
             {
@@ -102,7 +103,7 @@ public sealed partial class DatabaseClient : RequiresBotReference
 
             if (!remoteTables.Contains(tableName))
             {
-                _logger.LogWarn("Missing table '{Name}'. Creating..", tableName);
+                Log.Warning("Missing table '{Name}'. Creating..", tableName);
 
                 _ = databaseClient.CreateTable(tableName, internalTable, databaseClient.guildDatabaseConnection);
             }
@@ -127,7 +128,7 @@ public sealed partial class DatabaseClient : RequiresBotReference
 
                 if (!remoteColumns.Any(x => x.Name.ToLower() == columnInfo.ColumnName.ToLower()))
                 {
-                    _logger.LogWarn("Missing column '{Column}' in '{Table}'. Creating..", columnInfo.ColumnName, tableName);
+                    Log.Warning("Missing column '{Column}' in '{Table}'. Creating..", columnInfo.ColumnName, tableName);
 
                     databaseClient.AddColumn(databaseClient.guildDatabaseConnection, tableName, internalColumn, columnInfo);
                     remoteColumns = databaseClient.ListColumns(tableName, databaseClient.guildDatabaseConnection);
@@ -141,7 +142,7 @@ public sealed partial class DatabaseClient : RequiresBotReference
 
                 if (!typeMatches || !nullabilityMatches || !defaultMatches)
                 {
-                    _logger.LogWarn("Wrong data type for column '{Column}' in '{Table}'\nType: {TypeMatch} ({Type1}:{Type2})\nNullable: {NullableMatch}\nDefault: {Default} ({Default1}:{Default2})",
+                    Log.Warning("Wrong data type for column '{Column}' in '{Table}'\nType: {TypeMatch} ({Type1}:{Type2})\nNullable: {NullableMatch}\nDefault: {Default} ({Default1}:{Default2})",
                         columnInfo.ColumnName,
                         tableName,
                         typeMatches, remoteColumn.Type.ToLower(), columnInfo.ColumnType.GetName().ToLower() + (columnInfo.MaxValue is not null ? $"({columnInfo.MaxValue})" : ""),
@@ -157,7 +158,7 @@ public sealed partial class DatabaseClient : RequiresBotReference
             {
                 if (!propertyList.Any(x => x.GetCustomAttribute<ColumnNameAttribute>()?.Name == remoteColumn.Name))
                 {
-                    _logger.LogWarn("Invalid column '{Column}' in '{Table}'", remoteColumn.Name, tableName);
+                    Log.Warning("Invalid column '{Column}' in '{Table}'", remoteColumn.Name, tableName);
 
                     databaseClient.DropColumn(databaseClient.guildDatabaseConnection, tableName, remoteColumn.Name);
                     remoteColumns = databaseClient.ListColumns(tableName, databaseClient.guildDatabaseConnection);
@@ -217,7 +218,7 @@ public sealed partial class DatabaseClient : RequiresBotReference
             await databaseClient.SyncStandardTable(pluginTables, databaseClient.pluginDatabaseConnection);
 
         bot.DatabaseClient = databaseClient;
-        _logger.LogInfo("Connected to database.");
+        Log.Information("Connected to database.");
         return databaseClient;
     }
 
@@ -237,7 +238,7 @@ public sealed partial class DatabaseClient : RequiresBotReference
 
             _ = this.RunCommand(cmd);
 
-            _logger.LogInfo("Created column '{Column}' in '{Table}'.", columnInfo.ColumnName, tableName);
+            Log.Information("Created column '{Column}' in '{Table}'.", columnInfo.ColumnName, tableName);
         }
     }
 
@@ -252,7 +253,7 @@ public sealed partial class DatabaseClient : RequiresBotReference
 
             _ = this.RunCommand(cmd);
 
-            _logger.LogInfo("Changed column '{Column}' in '{Table}' to datatype '{NewDataType}'.",
+            Log.Information("Changed column '{Column}' in '{Table}' to datatype '{NewDataType}'.",
                 columnInfo.ColumnName,
                 tableName,
                 Enum.GetName(internalColumn.GetCustomAttribute<ColumnTypeAttribute>().Type).ToUpper());
@@ -282,7 +283,7 @@ public sealed partial class DatabaseClient : RequiresBotReference
 
             if (!remoteTables.Contains(tableName))
             {
-                _logger.LogWarn("Missing table '{Name}'. Creating..", tableName);
+                Log.Warning("Missing table '{Name}'. Creating..", tableName);
 
                 _ = this.CreateTable(tableName, internalTable, connection);
             }
@@ -307,7 +308,7 @@ public sealed partial class DatabaseClient : RequiresBotReference
 
                 if (!remoteColumns.Any(x => x.Name.ToLower() == columnInfo.ColumnName.ToLower()))
                 {
-                    _logger.LogWarn("Missing column '{Column}' in '{Table}'. Creating..", columnInfo.ColumnName, tableName);
+                    Log.Warning("Missing column '{Column}' in '{Table}'. Creating..", columnInfo.ColumnName, tableName);
 
                     this.AddColumn(connection, tableName, internalColumn, columnInfo);
                     remoteColumns = this.ListColumns(tableName, connection);
@@ -321,7 +322,7 @@ public sealed partial class DatabaseClient : RequiresBotReference
 
                 if (!typeMatches || !nullabilityMatches || !defaultMatches)
                 {
-                    _logger.LogWarn("Wrong data type for column '{Column}' in '{Table}'\nType: {TypeMatch} ({Type1}:{Type2})\nNullable: {NullableMatch}\nDefault: {Default} ({Default1}:{Default2})",
+                    Log.Warning("Wrong data type for column '{Column}' in '{Table}'\nType: {TypeMatch} ({Type1}:{Type2})\nNullable: {NullableMatch}\nDefault: {Default} ({Default1}:{Default2})",
                         columnInfo.ColumnName,
                         tableName,
                         typeMatches, remoteColumn.Type.ToLower(), columnInfo.ColumnType.GetName().ToLower() + (columnInfo.MaxValue is not null ? $"({columnInfo.MaxValue})" : ""),
@@ -337,7 +338,7 @@ public sealed partial class DatabaseClient : RequiresBotReference
             {
                 if (!propertyList.Any(x => x.GetCustomAttribute<ColumnNameAttribute>()?.Name == remoteColumn.Name))
                 {
-                    _logger.LogWarn("Invalid column '{Column}' in '{Table}'", remoteColumn.Name, tableName);
+                    Log.Warning("Invalid column '{Column}' in '{Table}'", remoteColumn.Name, tableName);
 
                     this.DropColumn(connection, tableName, remoteColumn.Name);
                     remoteColumns = this.ListColumns(tableName, connection);
@@ -361,7 +362,7 @@ public sealed partial class DatabaseClient : RequiresBotReference
         {
             cmd.Connection.Open();
 
-            _logger.LogTrace("Executing command on database '{database}': {command}", cmd.Connection.Database, cmd.CommandText.Truncate(300));
+            Log.Verbose("Executing command on database '{database}': {command}", cmd.Connection.Database, cmd.CommandText.Truncate(300));
 
             _ = cmd.ExecuteNonQuery();
 
@@ -526,7 +527,7 @@ public sealed partial class DatabaseClient : RequiresBotReference
             cmd.CommandText = sql;
 
             _ = this.RunCommand(cmd);
-            _logger.LogInfo("Created table '{Name}'.", tableName); 
+            Log.Information("Created table '{Name}'.", tableName); 
         }
 
         return true;
@@ -706,7 +707,7 @@ public sealed partial class DatabaseClient : RequiresBotReference
                 }
             }
 
-            //_logger.LogDebug("Column exists: {tableName}:{columnKey} = {columnValue}:{Exists}", tableName, columnKey, columnValue, Exists);
+            //Log.Debug("Column exists: {tableName}:{columnKey} = {columnValue}:{Exists}", tableName, columnKey, columnValue, Exists);
             this.GetCache[$"{tableName}-{columnKey}-{columnValue}-exists"] = new CacheItem(Exists, DateTime.UtcNow);
             return Exists;
         }

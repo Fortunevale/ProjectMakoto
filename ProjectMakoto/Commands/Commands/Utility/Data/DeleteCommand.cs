@@ -51,7 +51,7 @@ internal sealed class DeleteCommand : BaseCommand
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError("An exception occurred while trying to remove a user from the objection list", ex);
+                        Log.Error(ex, "An exception occurred while trying to remove a user from the objection list");
 
                         _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                         {

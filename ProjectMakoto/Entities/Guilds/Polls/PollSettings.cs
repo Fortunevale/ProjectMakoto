@@ -191,7 +191,7 @@ public sealed class PollSettings : RequiresParent<Guild>
                     this.Bot.DiscordClient.MessageDeleted += MessageDeletionHandling;
                     this.Bot.DiscordClient.ChannelDeleted += ChannelDeletionHandling;
 
-                    _logger.LogDebug("Created scheduled task for poll by '{Guild}'", this.Parent.Id);
+                    Log.Debug("Created scheduled task for poll by '{Guild}'", this.Parent.Id);
                 }
 
             foreach (var b in ScheduledTaskExtensions.GetScheduledTasks())
@@ -203,7 +203,7 @@ public sealed class PollSettings : RequiresParent<Guild>
                 {
                     b.Delete();
 
-                    _logger.LogDebug("Deleted scheduled task for poll by '{Guild}'", this.Parent.Id);
+                    Log.Debug("Deleted scheduled task for poll by '{Guild}'", this.Parent.Id);
                 }
             }
         });

@@ -112,7 +112,7 @@ internal sealed class PurgeCommand : BaseCommand
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError("Failed to delete messages", ex);
+                    Log.Error(ex, "Failed to delete messages");
                     throw;
                 }
 

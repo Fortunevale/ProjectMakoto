@@ -97,7 +97,7 @@ internal sealed class BumpReminderEvents(Bot bot) : RequiresTranslation(bot)
 
         //                this.Bot.BumpReminder.ScheduleBump(sender, e.Guild.Id);
         //            }
-        //            catch (Exception ex) { _logger.LogDebug(ex.ToString()); }
+        //            catch (Exception ex) { Log.Debug(ex.ToString()); }
         //        }
         //    }
         //}

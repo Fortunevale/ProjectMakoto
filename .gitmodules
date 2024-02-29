@@ -1,7 +1,3 @@
-[submodule "Xorog.Logger"]
-	path = Dependencies/Xorog.Logger
-	url = https://github.com/Fortunevale/Xorog.Logger
-	branch = main
 [submodule "Xorog.UniversalExtensions"]
 	path = Dependencies/Xorog.UniversalExtensions
 	url = https://github.com/Fortunevale/Xorog.UniversalExtensions

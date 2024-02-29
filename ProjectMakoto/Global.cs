@@ -61,15 +61,14 @@ global using ProjectMakoto.Plugins;
 global using ProjectMakoto.PrefixCommands;
 global using ProjectMakoto.Util.SystemMonitor;
 global using ProjectMakoto.Util.JsonSerializers;
-global using static ProjectMakoto.Util.Log;
-
-global using Xorog.Logger;
-global using Xorog.Logger.EventArgs;
 
 global using Xorog.UniversalExtensions;
 global using Xorog.UniversalExtensions.Entities;
 global using Xorog.UniversalExtensions.Enums;
 global using Xorog.UniversalExtensions.Converters;
+
+global using Serilog;
+global using Serilog.Events;
 
 global using Dapper;
 global using MySqlConnector;

@@ -41,7 +41,7 @@ internal static class DisCatSharpExtensionsLoader
                 var groupsValues = translation.Groups;
                 var commandsValues = translation.Commands;
 
-                _logger.LogTrace("Creating instance of '{type}'", typeToCreate.Name);
+                Log.Verbose("Creating instance of '{type}'", typeToCreate.Name);
                 var translator = Activator.CreateInstance(typeToCreate);
 
                 var createTypeProperties = typeToCreate.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
@@ -85,7 +85,7 @@ internal static class DisCatSharpExtensionsLoader
 
                 if (commandsValues is not null && createTypeProperties.Any(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "commands")))
                 {
-                    _logger.LogTrace("Creating sub-command translations for command '{name}'", nameValues.First());
+                    Log.Verbose("Creating sub-command translations for command '{name}'", nameValues.First());
 
                     var commandProperty = createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "commands"));
                     commandProperty.SetValue(translator, new List<DisCatSharp.ApplicationCommands.Entities.CommandTranslator>());
@@ -105,7 +105,7 @@ internal static class DisCatSharpExtensionsLoader
 
                 if (optionsValues is not null && createTypeProperties.Any(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "options")))
                 {
-                    _logger.LogTrace("Creating option translations for command '{name}'", nameValues.First());
+                    Log.Verbose("Creating option translations for command '{name}'", nameValues.First());
 
                     var optionProperty = createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "options"));
                     optionProperty.SetValue(translator, new List<DisCatSharp.ApplicationCommands.Entities.OptionTranslator>());
@@ -125,7 +125,7 @@ internal static class DisCatSharpExtensionsLoader
 
                 if (choicesValues is not null && createTypeProperties.Any(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "choices")))
                 {
-                    _logger.LogTrace("Creating choice translations for command '{name}'", nameValues.First());
+                    Log.Verbose("Creating choice translations for command '{name}'", nameValues.First());
 
                     var choiceProperty = createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "choices"));
                     choiceProperty.SetValue(translator, new List<DisCatSharp.ApplicationCommands.Entities.ChoiceTranslator>());
@@ -145,7 +145,7 @@ internal static class DisCatSharpExtensionsLoader
 
                 if (groupsValues is not null && createTypeProperties.Any(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "groups")))
                 {
-                    _logger.LogTrace("Creating group translations for command '{name}'", nameValues.First());
+                    Log.Verbose("Creating group translations for command '{name}'", nameValues.First());
 
                     var groupProperty = createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "groups"));
                     groupProperty.SetValue(translator, new List<DisCatSharp.ApplicationCommands.Entities.SubGroupTranslator>());
@@ -168,7 +168,7 @@ internal static class DisCatSharpExtensionsLoader
             }
             catch (Exception ex)
             {
-                _logger.LogError("Failed to generate DCS-Compatible Translations", ex);
+                Log.Error(ex, "Failed to generate DCS-Compatible Translations");
                 throw;
             }
         }
@@ -191,15 +191,13 @@ internal static class DisCatSharpExtensionsLoader
 
         if (bot.status.LoadedConfig.Secrets.Discord.Token.Length <= 0)
         {
-            _logger.LogFatal("No discord token provided");
+            Log.Fatal("No discord token provided");
             await Task.Delay(1000);
             Environment.Exit((int)ExitCodes.NoToken);
             return;
         }
 
-        _logger.AddLogLevelBlacklist(CustomLogLevel.Trace2);
-
-        _logger.LogDebug("Registering DiscordClient..");
+        Log.Debug("Registering DiscordClient..");
 
         bot.DiscordClient = new DiscordShardedClient(new DiscordConfiguration
         {
@@ -208,7 +206,7 @@ internal static class DisCatSharpExtensionsLoader
             MinimumLogLevel = Microsoft.Extensions.Logging.LogLevel.Trace,
             Intents = DiscordIntents.All,
             AutoReconnect = true,
-            LoggerFactory = new LoggerFactory(new ILoggerProvider[] { _logger.Provider }),
+            LoggerFactory = bot.msLoggerFactory,
             HttpTimeout = TimeSpan.FromSeconds(60),
             MessageCacheSize = 4096,
             EnableSentry = true,
@@ -220,7 +218,7 @@ internal static class DisCatSharpExtensionsLoader
 
         bot.ExperienceHandler = new(bot);
 
-        _logger.LogDebug("Registering CommandsNext..");
+        Log.Debug("Registering CommandsNext..");
 
         var cNext = await bot.DiscordClient.UseCommandsNextAsync(new CommandsNextConfiguration
         {
@@ -236,7 +234,7 @@ internal static class DisCatSharpExtensionsLoader
 
 
 
-        _logger.LogDebug("Registering Lavalink..");
+        Log.Debug("Registering Lavalink..");
 
         var endpoint = new ConnectionEndpoint
         {
@@ -253,7 +251,7 @@ internal static class DisCatSharpExtensionsLoader
 
         _ = await bot.DiscordClient.UseLavalinkAsync();
 
-        _logger.LogDebug("Registering DisCatSharp TwoFactor..");
+        Log.Debug("Registering DisCatSharp TwoFactor..");
 
         var tfa = bot.DiscordClient.UseTwoFactorAsync(new TwoFactorConfiguration
         {
@@ -268,7 +266,7 @@ internal static class DisCatSharpExtensionsLoader
         DiscordEventHandler.SetupEvents(bot);
         bot.DiscordClient.GuildDownloadCompleted += bot.GuildDownloadCompleted;
 
-        _logger.LogDebug("Registering Interactivity..");
+        Log.Debug("Registering Interactivity..");
         _ = await bot.DiscordClient.UseInteractivityAsync(new InteractivityConfiguration { });
 
         var appCommands = await bot.DiscordClient.UseApplicationCommandsAsync(new ApplicationCommandsConfiguration
@@ -300,14 +298,14 @@ internal static class DisCatSharpExtensionsLoader
             appCommands.RegisterGuildCommands<ApplicationCommands.MusicAppCommands>(bot.status.LoadedConfig.Discord.DevelopmentGuild, GetCommandTranslations);
         }
 
-        _logger.LogDebug("Registering Commands..");
+        Log.Debug("Registering Commands..");
         cNext.RegisterCommands<PrefixCommands.UtilityPrefixCommands>();
         cNext.RegisterCommands<PrefixCommands.MusicPrefixCommands>();
         cNext.RegisterCommands<PrefixCommands.ScoreSaberPrefixCommands>();
         cNext.RegisterCommands<PrefixCommands.ModerationPrefixCommands>();
         cNext.RegisterCommands<PrefixCommands.ConfigurationPrefixCommands>();
 
-        _logger.LogDebug("Registering Command Converters..");
+        Log.Debug("Registering Command Converters..");
         cNext.RegisterConverter(new CustomArgumentConverter.BoolConverter());
 
         var commandsNextTypes = new List<Type>();
@@ -322,21 +320,21 @@ internal static class DisCatSharpExtensionsLoader
 
             try
             {
-                _logger.LogInfo("Connecting and authenticating with Lavalink..");
+                Log.Information("Connecting and authenticating with Lavalink..");
                 bot.LavalinkSession = await bot.DiscordClient.GetFirstShard().GetLavalink().ConnectAsync(lavalinkConfig);
-                _logger.LogInfo("Connected and authenticated with Lavalink.");
+                Log.Information("Connected and authenticated with Lavalink.");
 
                 bot.status.LavalinkInitialized = true;
 
                 try
                 {
-                    _logger.LogInfo("Lavalink is running on {Version}.", (await bot.LavalinkSession.GetLavalinkInfoAsync()).Version.Semver);
+                    Log.Information("Lavalink is running on {Version}.", (await bot.LavalinkSession.GetLavalinkInfoAsync()).Version.Semver);
                 }
                 catch { }
             }
             catch (Exception ex)
             {
-                _logger.LogError("An exception occurred while trying to log into Lavalink", ex);
+                Log.Error(ex, "An exception occurred while trying to log into Lavalink");
                 return;
             }
         });
@@ -357,7 +355,7 @@ internal static class DisCatSharpExtensionsLoader
 
             if (applicationCommandsExtension?.RegisteredCommands?.Count == 0)
             {
-                _logger.LogFatal("Commands did not register.");
+                Log.Fatal("Commands did not register.");
                 _ = bot.ExitApplication(true);
                 return;
             }
@@ -376,7 +374,7 @@ internal static class DisCatSharpExtensionsLoader
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError("Failed to update user status", ex);
+                    Log.Error(ex, "Failed to update user status");
                     await Task.Delay(30000);
                 }
             }

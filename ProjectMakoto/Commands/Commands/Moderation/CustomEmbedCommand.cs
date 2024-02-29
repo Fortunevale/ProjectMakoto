@@ -743,7 +743,7 @@ internal sealed class CustomEmbedCommand : BaseCommand
                         return;
                     }
                 }
-                catch (Exception ex) { _logger.LogError("Failed to change an embed", ex); }
+                catch (Exception ex) { Log.Error(ex, "Failed to change an embed"); }
             }
         });
     }

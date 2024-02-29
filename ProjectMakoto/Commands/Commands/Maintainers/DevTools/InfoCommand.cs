@@ -149,7 +149,7 @@ internal sealed class InfoCommand : BaseCommand
             }
             catch (Exception ex)
             {
-                _logger.LogError("Failed to generate cpu usage graph", ex);
+                Log.Error(ex, "Failed to generate cpu usage graph");
                 cpuEmbed1.ImageUrl = "attachment://1.png";
             }
             finally
@@ -178,7 +178,7 @@ internal sealed class InfoCommand : BaseCommand
             }
             catch (Exception ex)
             {
-                _logger.LogError("Failed to generate memory graph", ex);
+                Log.Error(ex, "Failed to generate memory graph");
                 memoryEmbed.ImageUrl = "attachment://1.png";
             }
             finally

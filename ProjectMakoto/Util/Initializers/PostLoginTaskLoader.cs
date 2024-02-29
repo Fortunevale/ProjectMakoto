@@ -29,14 +29,14 @@ internal class PostLoginTaskLoader
             {
                 if (emojis.Any(x => x.Name == field.Name))
                 {
-                    _logger.LogInfo("Missing '{emojiName}' Emoji but Guild '{guild}' contains emoji with same name. Using that..", field.Name, guild.Name);
+                    Log.Information("Missing '{emojiName}' Emoji but Guild '{guild}' contains emoji with same name. Using that..", field.Name, guild.Name);
 
                     field.SetValue(bot.status.LoadedConfig.Emojis, emojis.First(x => x.Name == field.Name).Id);
                     bot.status.LoadedConfig.Save();
                     continue;
                 }
 
-                _logger.LogInfo("Uploading '{emojiName}' Emoji to '{guild}'..", field.Name, guild.Name);
+                Log.Information("Uploading '{emojiName}' Emoji to '{guild}'..", field.Name, guild.Name);
 
                 var fileName = $"Assets/Emojis/Upload/{field.Name}.png";
 
@@ -61,7 +61,7 @@ internal class PostLoginTaskLoader
             }
             catch (Exception ex)
             {
-                _logger.LogError("Could not upload emoji", ex);
+                Log.Error(ex, "Could not upload emoji");
             }
         }
     }

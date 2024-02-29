@@ -99,7 +99,7 @@ internal sealed class UrbanDictionaryCommand : BaseCommand
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError("a", ex);
+                    Log.Error(ex, string.Empty);
                 }
 
                 if (!Definitions.IsNotNullAndNotEmpty())

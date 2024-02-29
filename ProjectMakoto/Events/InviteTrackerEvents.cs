@@ -15,13 +15,13 @@ internal sealed class InviteTrackerEvents(Bot bot) : RequiresTranslation(bot)
 {
     public async static Task UpdateCachedInvites(Bot bot, DiscordGuild guild)
     {
-        _logger.LogDebug("Fetching invites for {Guild}", guild.Id);
+        Log.Debug("Fetching invites for {Guild}", guild.Id);
 
         var Invites = await guild.GetInvitesAsync();
 
         bot.Guilds[guild.Id].InviteTracker.Cache = Invites.Select(x => new InviteTrackerCacheItem { Code = x.Code, CreatorId = x.Inviter?.Id ?? 0, Uses = x.Uses }).ToArray();
 
-        _logger.LogDebug("Fetched {Count} invites for {Guild}", bot.Guilds[guild.Id].InviteTracker.Cache.Length, guild.Id);
+        Log.Debug("Fetched {Count} invites for {Guild}", bot.Guilds[guild.Id].InviteTracker.Cache.Length, guild.Id);
     }
 
 
@@ -55,7 +55,7 @@ internal sealed class InviteTrackerEvents(Bot bot) : RequiresTranslation(bot)
         if (!this.Bot.Guilds[e.Guild.Id].InviteTracker.Enabled)
             return;
 
-        _logger.LogDebug("User '{User}' joined '{Guild}', trying to track invite used..", e.Member.Id, e.Guild.Id);
+        Log.Debug("User '{User}' joined '{Guild}', trying to track invite used..", e.Member.Id, e.Guild.Id);
 
         List<InviteTrackerCacheItem> InvitesBefore = new();
         List<InviteTrackerCacheItem> InvitesAfter = new();
@@ -74,7 +74,7 @@ internal sealed class InviteTrackerEvents(Bot bot) : RequiresTranslation(bot)
             {
                 this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code = b.Code;
                 this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.UserId = b.CreatorId;
-                _logger.LogDebug("User '{User}' joined '{Guild}' with now deleted '{Code}' created by '{Creator}'", e.Member.Id, e.Guild.Id, b.Code, b.CreatorId);
+                Log.Debug("User '{User}' joined '{Guild}' with now deleted '{Code}' created by '{Creator}'", e.Member.Id, e.Guild.Id, b.Code, b.CreatorId);
                 return;
             }
 
@@ -82,11 +82,11 @@ internal sealed class InviteTrackerEvents(Bot bot) : RequiresTranslation(bot)
             {
                 this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code = b.Code;
                 this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.UserId = b.CreatorId;
-                _logger.LogDebug("User '{User}' joined '{Guild}' with '{Code}' created by '{Creator}'", e.Member.Id, e.Guild.Id, b.Code, b.CreatorId);
+                Log.Debug("User '{User}' joined '{Guild}' with '{Code}' created by '{Creator}'", e.Member.Id, e.Guild.Id, b.Code, b.CreatorId);
                 return;
             }
         }
 
-        _logger.LogDebug("Could not track invite for user '{User}' who joined '{Guild}'", e.Member.Id, e.Guild.Id);
+        Log.Debug("Could not track invite for user '{User}' who joined '{Guild}'", e.Member.Id, e.Guild.Id);
     }
 }
