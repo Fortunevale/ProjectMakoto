@@ -16,7 +16,7 @@ public abstract class BasePlugin
 {
     public BasePlugin()
     {
-        this._logger = Log.Logger;
+        this._logger = new(Log.Logger, this);
     }
 
     /// <summary>
@@ -47,7 +47,7 @@ public abstract class BasePlugin
     /// <summary>
     /// Allows you to log events.
     /// </summary>
-    public ILogger _logger { get; internal set; }
+    public PluginLoggerClient _logger { get; internal set; }
 
     /// <summary>
     /// Your Plugin's translations, load via <see cref="LoadTranslations"/>.
@@ -314,7 +314,7 @@ public abstract class BasePlugin
 
     internal async Task PostLoginInternalInit()
     {
-        Log.Debug("Performing Post-Login tasks for {plugin}", this.Name);
+        this._logger.LogDebug("Performing Post-Login tasks for {plugin}", this.Name);
 
         if (this.Bot.DiscordClient.GetFirstShard().TryGetUser(this.AuthorId ?? 0, out var fetchedAuthor, true))
             this.AuthorUser = fetchedAuthor;
@@ -346,11 +346,11 @@ public abstract class BasePlugin
 
             if ((int)latestVersion > (int)currentVersion)
             {
-                Log.Warning("Update found. The installed version is '{CurrentVersion}' and the latest version is '{LatestVersion}'.", currentVersion, latestVersion);
+                this._logger.LogWarn("Update found. The installed version is '{CurrentVersion}' and the latest version is '{LatestVersion}'.", currentVersion, latestVersion);
 
                 if (this.UpdateUrlCredentials is not null)
                 {
-                    Log.Information("Private repository detected. Downloading latest version to 'UpdatedPlugins' Directory..");
+                    this._logger.LogInfo("Private repository detected. Downloading latest version to 'UpdatedPlugins' Directory..");
                     _ = Directory.CreateDirectory("UpdatedPlugins");
                     HttpClient downloadClient = new();
 
@@ -364,17 +364,17 @@ public abstract class BasePlugin
                 }
                 else
                 {
-                    Log.Warning("You can download the update at '{LatestReleaseUrl}'", release.HtmlUrl);
+                    this._logger.LogWarn("You can download the update at '{LatestReleaseUrl}'", release.HtmlUrl);
                 }
             }
         }
         catch (Octokit.ApiException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
         {
-            Log.Error("The repository could not be found at '{RepoUrl}', is the repo private, the credentials outdated or no release published?", this.UpdateUrl);
+            this._logger.LogError("The repository could not be found at '{RepoUrl}', is the repo private, the credentials outdated or no release published?", this.UpdateUrl);
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "Could not check for a new version");
+            this._logger.LogError(ex, "Could not check for a new version");
         }
     }
 
