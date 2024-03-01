@@ -170,6 +170,8 @@ internal sealed class HelpCommand : BaseCommand
                 if (!PreviousButton.Disabled || !NextButton.Disabled)
                     _ = builder.AddComponents(PreviousButton, NextButton);
 
+                _ = builder.AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot));
+
                 _ = await this.RespondOrEdit(builder);
 
                 if (PreviousButton.Disabled && NextButton.Disabled)
@@ -190,10 +192,15 @@ internal sealed class HelpCommand : BaseCommand
                     Page--;
                     continue;
                 }
-                else
+                else if (Menu.GetCustomId() == NextButton.CustomId)
                 {
                     Page++;
                     continue;
+                }
+                else
+                {
+                    this.DeleteOrInvalidate();
+                    return;
                 }
             }
         });
