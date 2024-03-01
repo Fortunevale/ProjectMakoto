@@ -95,7 +95,7 @@ public sealed class Bot
 
         loggingLevel = new LoggingLevelSwitch();
 
-        var loggingTemplate = "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {Level:u3}] {Message:lj}{NewLine}{Exception}";
+        var loggingTemplate = "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u3}] {Message:lj}{NewLine}{Exception}";
 
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.ControlledBy(this.loggingLevel)
