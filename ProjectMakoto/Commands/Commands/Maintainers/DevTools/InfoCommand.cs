@@ -102,7 +102,11 @@ internal sealed class InfoCommand : BaseCommand
                 .AddField(new DiscordEmbedField("Server uptime", $"`{(ServerUptime.IsNullOrWhiteSpace() ? "Currently unavailable" : ServerUptime)}`", true))
                 .AddField(new DiscordEmbedField("Currently running software", $"`Project Makoto by {(await ctx.Client.GetUserAsync(411950662662881290)).GetUsernameWithIdentifier()} ({Version} ({Branch}) built on the {Date} at {Time})`"))
                 .AddField(new DiscordEmbedField("Current bot library and version", $"[`{ctx.Client.BotLibrary} {ctx.Client.VersionString}`](https://github.com/Aiko-IT-Systems/DisCatSharp)"))
-                .AddField(new DiscordEmbedField("Plugin Status", $"`{(ctx.Bot.status.LoadedConfig.EnablePlugins && ctx.Bot.Plugins.Count <= 0 ? $"{ctx.Bot.Plugins.Count}/{new DirectoryInfo("Plugins")?.GetDirectories()?.Where(x => !x.Name.StartsWith('.'))?.Count() ?? 0} loaded" : "Disabled")}`"))
+                .AddField(new DiscordEmbedField("Plugin Status", 
+                    $"{(ctx.Bot.status.LoadedConfig.EnablePlugins && ctx.Bot.Plugins.Count > 0 ?
+                        $"`{ctx.Bot.Plugins.Count}/{new DirectoryInfo("Plugins")?.GetFiles()?.Where(x => !x.Name.StartsWith('.') && x.Extension == ".pmpl")?.Count() ?? 0} loaded`\n\n" +
+                        $"{string.Join("\n", ctx.Bot.Plugins.Select(x => $"- `{x.Value.Name}` `v{x.Value.Version}` by {x.Value.AuthorUser?.Mention ?? "`N/A`"} (`{x.Value.Author}`)"))}" :
+                        "`Disabled`")}"))
                 .AsInfo(ctx).WithFooter().WithTimestamp(null);
 
             var cpuEmbed1 = new DiscordEmbedBuilder()
