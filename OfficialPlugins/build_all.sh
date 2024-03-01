@@ -19,6 +19,12 @@ for i in */; do
       cd "$i"
       echo "Running .build.sh in $i"
       ./.build.sh
+	  
+	  if [ $? -ne 0 ]; then
+	    echo "Error: Build failed."
+	    exit 1
+	  fi
+	  
       cd ..
       
       # Move pmpl files to parent directory
