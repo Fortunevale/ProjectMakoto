@@ -709,8 +709,8 @@ public abstract class BaseCommand
             var dropdown = new DiscordStringSelectComponent(CustomPlaceHolder, options.Skip(CurrentPage * 25).Take(25).Select(x => new DiscordStringSelectComponentOption(x.Label, x.Value, x.Description, (x.Value == Selected), x.Emoji)), SelectionInteractionId);
             var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(this.ctx.ResponseMessage.Embeds[0]).AsAwaitingInput(this.ctx)).AddComponents(dropdown).WithContent(this.ctx.ResponseMessage.Content);
 
-            NextPageButton.Disabled = options.Skip(CurrentPage * 25).Count() <= 25;
-            PrevPageButton.Disabled = CurrentPage == 0;
+            _ = NextPageButton.SetState(options.Skip(CurrentPage * 25).Count() <= 25);
+            _ = PrevPageButton.SetState(CurrentPage == 0);
             _ = builder.AddComponents(PrevPageButton, NextPageButton);
 
             if (Selected.IsNullOrWhiteSpace())
