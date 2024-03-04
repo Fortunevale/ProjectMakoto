@@ -643,7 +643,7 @@ public sealed partial class DatabaseClient : RequiresBotReference
             connection.Open();
 
             var Count = 0L;
-            using (var reader = connection.ExecuteReader($"SELECT COUNT(*) FROM `{tableName}`"))
+            using (var reader = new MySqlCommand($"SELECT COUNT(*) FROM `{tableName}`", connection).ExecuteReader())
             {
                 while (reader.Read())
                 {
@@ -670,7 +670,7 @@ public sealed partial class DatabaseClient : RequiresBotReference
             connection.Open();
 
             var rows = new List<T>();
-            using (var reader = connection.ExecuteReader($"SELECT `{columnKey}` FROM `{tableName}`"))
+            using (var reader = new MySqlCommand($"SELECT `{columnKey}` FROM `{tableName}`", connection).ExecuteReader())
             {
                 while (reader.Read())
                 {
@@ -699,7 +699,7 @@ public sealed partial class DatabaseClient : RequiresBotReference
             connection.Open();
 
             var Exists = false;
-            using (var reader = connection.ExecuteReader($"SELECT EXISTS(SELECT 1 FROM `{tableName}` WHERE `{columnKey}` = '{columnValue}')"))
+            using (var reader = new MySqlCommand($"SELECT EXISTS(SELECT 1 FROM `{tableName}` WHERE `{columnKey}` = '{columnValue}')", connection).ExecuteReader())
             {
                 while (reader.Read())
                 {
@@ -726,7 +726,7 @@ public sealed partial class DatabaseClient : RequiresBotReference
 
                 List<string> SavedTables = new();
 
-                using (var reader = connection.ExecuteReader($"SHOW TABLES"))
+                using (var reader = new MySqlCommand($"SHOW TABLES", connection).ExecuteReader())
                 {
                     while (reader.Read())
                     {
@@ -757,7 +757,7 @@ public sealed partial class DatabaseClient : RequiresBotReference
 
                 List<(string Name, string Type, bool Nullable, string Key, string Default, string Extra)> Columns = new();
 
-                using (var reader = connection.ExecuteReader($"SHOW FIELDS FROM `{tableName}`"))
+                using (var reader = new MySqlCommand($"SHOW FIELDS FROM `{tableName}`", connection).ExecuteReader())
                 {
                     while (reader.Read())
                     {

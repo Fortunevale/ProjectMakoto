@@ -70,7 +70,6 @@ global using Xorog.UniversalExtensions.Converters;
 global using Serilog;
 global using Serilog.Events;
 
-global using Dapper;
 global using MySqlConnector;
 global using Newtonsoft.Json;
 global using QuickChart;
