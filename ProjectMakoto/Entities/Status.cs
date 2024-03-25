@@ -31,7 +31,7 @@ public sealed class Status
 
     internal Config LoadedConfig { get; set; }
 
-    public ExposedConfig SafeReadOnlyConfig{ get; set; }
+    public ExposedConfig SafeReadOnlyConfig { get; set; }
     public class ExposedConfig(Config config)
     {
         public bool IsDev => config.IsDev;
