@@ -34,7 +34,6 @@ public sealed class Guild : RequiresBotReference
         this.NameNormalizer = new(bot, this);
         this.EmbedMessage = new(bot, this);
         this.MusicModule = new(bot, this);
-        this.Polls = new(bot, this);
         this.VcCreator = new(bot, this);
         this.PrefixSettings = new(bot, this);
 
@@ -82,9 +81,6 @@ public sealed class Guild : RequiresBotReference
 
     [ContainsValues]
     public EmbedMessageSettings EmbedMessage { get; init; }
-
-    [ContainsValues]
-    public PollSettings Polls { get; init; }
 
     [ContainsValues]
     public VcCreatorSettings VcCreator { get; init; }

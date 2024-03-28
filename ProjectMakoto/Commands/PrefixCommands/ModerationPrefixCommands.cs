@@ -12,12 +12,6 @@ public sealed class ModerationPrefixCommands : BaseCommandModule
 {
     public Bot _bot { private get; set; }
 
-    [Command("poll"),
-    
-    Description("Starts a poll.")]
-    public async Task Poll(CommandContext ctx)
-        => _ = new PollCommand().ExecuteCommand(ctx, this._bot);
-
 
 
     [Command("purge"), Aliases("clear"),

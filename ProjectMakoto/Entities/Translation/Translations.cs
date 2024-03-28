@@ -557,45 +557,6 @@ public class Translations : ITranslations
                 public SingleTranslationKey Fetched;
                 public SingleTranslationKey Fetching;
             }
-            public poll Poll;
-            public sealed class poll
-            {
-                public SingleTranslationKey Votes;
-                public SingleTranslationKey NoVotes;
-                public SingleTranslationKey Results;
-                public SingleTranslationKey PollEnded;
-                public SingleTranslationKey NoPerms;
-                public SingleTranslationKey VoteUpdated;
-                public SingleTranslationKey Voted;
-                public SingleTranslationKey TotalVotes;
-                public SingleTranslationKey PollEnding;
-                public SingleTranslationKey Poll;
-                public SingleTranslationKey EndPollEarly;
-                public SingleTranslationKey VoteOnThisPoll;
-                public SingleTranslationKey OptionExists;
-                public SingleTranslationKey Description;
-                public SingleTranslationKey Title;
-                public SingleTranslationKey ModalTitle;
-                public SingleTranslationKey DontPing;
-                public SingleTranslationKey NoOptions;
-                public SingleTranslationKey MaximumVotes;
-                public SingleTranslationKey MinimumVotes;
-                public SingleTranslationKey Role;
-                public SingleTranslationKey DueTime;
-                public SingleTranslationKey SelectedChannel;
-                public SingleTranslationKey AvailableOptions;
-                public SingleTranslationKey PollContent;
-                public SingleTranslationKey SelectMultiSelectButton;
-                public SingleTranslationKey SetTimeButton;
-                public SingleTranslationKey RemoveOptionButton;
-                public SingleTranslationKey NewOptionButton;
-                public SingleTranslationKey SelectPollContentButton;
-                public SingleTranslationKey SelectChannelButton;
-                public SingleTranslationKey SelectRoleButton;
-                public SingleTranslationKey InvalidOptionLimit;
-                public SingleTranslationKey InvalidTime;
-                public SingleTranslationKey PollLimitReached;
-            }
             public move Move;
             public sealed class move
             {

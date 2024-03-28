@@ -14,10 +14,6 @@ public sealed class ModerationAppCommands : ApplicationCommandsModule
 {
     public Bot _bot { private get; set; }
 
-    [SlashCommand("poll", "Starts a poll.", (long)Permissions.ManageMessages, dmPermission: false)]
-    public async Task Poll(InteractionContext ctx)
-        => _ = new PollCommand().ExecuteCommand(ctx, this._bot);
-
     [SlashCommand("purge", "Deletes the specified amount of messages.", (long)Permissions.ManageMessages, dmPermission: false)]
     public async Task Purge(InteractionContext ctx, [Option("number", "1-2000"), MinimumValue(1), MaximumValue(2000)] int number, [Option("user", "Only delete messages by this user")] DiscordUser victim = null)
         => _ = new PurgeCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
