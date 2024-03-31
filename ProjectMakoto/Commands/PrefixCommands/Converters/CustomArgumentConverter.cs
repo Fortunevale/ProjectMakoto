@@ -25,4 +25,17 @@ internal sealed class CustomArgumentConverter
             throw new Exception($"Invalid Argument");
         }
     }
+
+    internal sealed class AttachmentConverter : IArgumentConverter<DiscordAttachment>
+    {
+        public async Task<Optional<DiscordAttachment>> ConvertAsync(string value, CommandContext ctx)
+        {
+            await Task.Delay(1);
+
+            if (!ctx.Message.Attachments?.Any() ?? true)
+                throw new Exception("No attachment");
+
+            return ctx.Message.Attachments[0];
+        }
+    }
 }
