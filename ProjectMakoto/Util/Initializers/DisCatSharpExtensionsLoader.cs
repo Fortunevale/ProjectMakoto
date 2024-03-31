@@ -284,6 +284,13 @@ internal static class DisCatSharpExtensionsLoader
             Log.Debug("Clearing cached Commands..");
             await FileExtensions.CleanupFilesAndDirectories(new(), Directory.GetFiles("CompiledCommands").ToList());
         }
+
+        Log.Debug("Compiling Built-In Commands..");
+        var commandModules = Commands.Commands.GetList();
+        bot._CommandModules = commandModules;
+        var assemblies = await CommandCompiler.BuildCommands(bot, bot.status.CurrentAppHash, commandModules, null);
+        CommandCompiler.RegisterAssemblies(bot, cNext, appCommands, GetCommandTranslations, assemblies);
+
         if (!bot.status.LoadedConfig.IsDev)
         {
             appCommands.RegisterGlobalCommands<ApplicationCommands.MaintainersAppCommands>(GetCommandTranslations);
@@ -291,11 +298,9 @@ internal static class DisCatSharpExtensionsLoader
             appCommands.RegisterGlobalCommands<ApplicationCommands.ModerationAppCommands>(GetCommandTranslations);
             appCommands.RegisterGlobalCommands<ApplicationCommands.ScoreSaberAppCommands>(GetCommandTranslations);
             appCommands.RegisterGlobalCommands<ApplicationCommands.MusicAppCommands>(GetCommandTranslations);
-            appCommands.RegisterGlobalCommands<ApplicationCommands.UtilityAppCommands>(GetCommandTranslations);
         }
         else
         {
-            appCommands.RegisterGuildCommands<ApplicationCommands.UtilityAppCommands>(bot.status.LoadedConfig.Discord.DevelopmentGuild, GetCommandTranslations);
             appCommands.RegisterGuildCommands<ApplicationCommands.MaintainersAppCommands>(bot.status.LoadedConfig.Discord.DevelopmentGuild, GetCommandTranslations);
             appCommands.RegisterGuildCommands<ApplicationCommands.ConfigurationAppCommands>(bot.status.LoadedConfig.Discord.DevelopmentGuild, GetCommandTranslations);
             appCommands.RegisterGuildCommands<ApplicationCommands.ModerationAppCommands>(bot.status.LoadedConfig.Discord.DevelopmentGuild, GetCommandTranslations);
@@ -304,7 +309,6 @@ internal static class DisCatSharpExtensionsLoader
         }
 
         Log.Debug("Registering Commands..");
-        cNext.RegisterCommands<PrefixCommands.UtilityPrefixCommands>();
         cNext.RegisterCommands<PrefixCommands.MusicPrefixCommands>();
         cNext.RegisterCommands<PrefixCommands.ScoreSaberPrefixCommands>();
         cNext.RegisterCommands<PrefixCommands.ModerationPrefixCommands>();
