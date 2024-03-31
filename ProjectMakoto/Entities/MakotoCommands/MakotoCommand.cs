@@ -7,21 +7,21 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-namespace ProjectMakoto.Plugins;
+namespace ProjectMakoto;
 
-public sealed class PluginCommand
+public sealed class MakotoCommand
 {
-    private PluginCommand() { }
+    private MakotoCommand() { }
 
     /// <summary>
-    /// Creates a new Plugin Context Menu Command.
+    /// Creates a new Context Menu Command.
     /// </summary>
     /// <param name="ContextName">The name of the command to be registered.</param>
     /// <param name="Description">The description of the command to be registered.</param>
     /// <param name="Command">The command to be executed.</param>
     /// <param name="PrefixAlternativeName">If not set, no prefix alternative for the command will be set.</param>
     /// <exception cref="ArgumentNullException">Thrown if any required argument is <see langword="null"/> or consists only of whitespaces.</exception>
-    public PluginCommand(ApplicationCommandType type, string ContextName, string Description, BaseCommand Command, string? PrefixAlternativeName = null)
+    public MakotoCommand(ApplicationCommandType type, string ContextName, string Description, Type Command, string? PrefixAlternativeName = null)
     {
         if (ContextName.IsNullOrWhiteSpace())
             throw new ArgumentNullException(nameof(ContextName));
@@ -37,18 +37,18 @@ public sealed class PluginCommand
         this.AlternativeName = PrefixAlternativeName;
         this.Description = Description.Trim();
         this.Command = Command;
-        this.SupportedCommandTypes = !PrefixAlternativeName.IsNullOrWhiteSpace() ? new[] { PluginCommandType.ContextMenu, PluginCommandType.PrefixCommand } : new[] { PluginCommandType.ContextMenu };
+        this.SupportedCommandTypes = !PrefixAlternativeName.IsNullOrWhiteSpace() ? new[] { MakotoCommandType.ContextMenu, MakotoCommandType.PrefixCommand } : new[] { MakotoCommandType.ContextMenu };
     }
 
     /// <summary>
-    /// Create a new Plugin Command.
+    /// Create a new Command.
     /// </summary>
     /// <param name="Name">The name of the command to be registered.</param>
     /// <param name="Description">The description of the command to be registered.</param>
     /// <param name="Command">The command to be executed.</param>
     /// <param name="Overloads">The required overloads of the command to be registered.</param>
     /// <exception cref="ArgumentNullException">Thrown if any required argument is <see langword="null"/> or consists only of whitespaces.</exception>
-    public PluginCommand(string Name, string Description, BaseCommand Command, params PluginCommandOverload[] Overloads)
+    public MakotoCommand(string Name, string Description, Type Command, params MakotoCommandOverload[] Overloads)
     {
         if (Name.IsNullOrWhiteSpace())
             throw new ArgumentNullException(nameof(Name));
@@ -59,19 +59,23 @@ public sealed class PluginCommand
         if (Command is null)
             throw new ArgumentNullException(nameof(Command));
 
+        if (!Command.IsAssignableTo(typeof(BaseCommand)))
+            throw new ArgumentException($"Command has to inherit {nameof(BaseCommand)}", nameof(Command));
+
         this.Name = Name.Trim();
         this.Description = Description.Trim();
         this.Command = Command;
-        this.Overloads = Overloads?.ToArray() ?? Array.Empty<PluginCommandOverload>();
+        this.Overloads = Overloads?.ToArray() ?? Array.Empty<MakotoCommandOverload>();
     }
 
     /// <summary>
-    /// Creates a new Plugin Command Group.
+    /// Creates a new Command Group.
+    /// <para>To extent an existing command group, name the command group with the same name (case-insensitive) as the existing command group.</para>
     /// </summary>
     /// <param name="Name">The name of this plugin group.</param>
     /// <param name="Description">The description of this plugin group.</param>
     /// <param name="Commands">The commands of this group.</param>
-    public PluginCommand(string Name, string Description, params PluginCommand[] Commands)
+    public MakotoCommand(string Name, string Description, params MakotoCommand[] Commands)
     {
         if (Name.IsNullOrWhiteSpace())
             throw new ArgumentNullException(nameof(Name));
@@ -88,7 +92,7 @@ public sealed class PluginCommand
         this.Name = Name.Trim();
         this.Description = Description.Trim();
         this.SubCommands = Commands;
-        this.Overloads = this.Overloads?.ToArray() ?? Array.Empty<PluginCommandOverload>();
+        this.Overloads = this.Overloads?.ToArray() ?? Array.Empty<MakotoCommandOverload>();
         this.UseDefaultHelp = true;
     }
 
@@ -116,7 +120,7 @@ public sealed class PluginCommand
     /// <summary>
     /// This command's parent, if group.
     /// </summary>
-    public PluginCommand? Parent { get; internal set; }
+    public MakotoCommand? Parent { get; internal set; }
 
     /// <summary>
     /// Whether this command is a group.
@@ -127,17 +131,17 @@ public sealed class PluginCommand
     /// <summary>
     /// The command to execute.
     /// </summary>
-    public BaseCommand? Command { get; internal set; }
+    public Type? Command { get; internal set; }
 
     /// <summary>
     /// The command's sub commands, if group.
     /// </summary>
-    public PluginCommand[]? SubCommands { get; internal set; }
+    public MakotoCommand[]? SubCommands { get; internal set; }
 
     /// <summary>
     /// The required overloads.
     /// </summary>
-    public PluginCommandOverload[] Overloads { get; internal set; }
+    public MakotoCommandOverload[] Overloads { get; internal set; }
 
     /// <summary>
     /// <para>Whether to use the default help for command groups.</para>
@@ -146,7 +150,7 @@ public sealed class PluginCommand
     public bool UseDefaultHelp { get; internal set; } = true;
 
     /// <summary>
-    /// The Context Menu Type, only usable if <see cref="SupportedCommandTypes"/> includes <see cref="PluginCommandType.ContextMenu"/>
+    /// The Context Menu Type, only usable if <see cref="SupportedCommandTypes"/> includes <see cref="MakotoCommandType.ContextMenu"/>
     /// </summary>
     public ApplicationCommandType? ContextMenuType { get; internal set; } = null;
 
@@ -155,9 +159,9 @@ public sealed class PluginCommand
     /// <inheritdoc cref="UseDefaultHelp"/>
     /// </summary>
     /// <param name="UseDefaultHelp">The new <see cref="UseDefaultHelp"/> value.</param>
-    /// <returns>This <see cref="PluginCommand"/> with the updated value.</returns>
+    /// <returns>This <see cref="MakotoCommand"/> with the updated value.</returns>
     /// <exception cref="InvalidOperationException">Thrown if the command is already registered.</exception>
-    public PluginCommand WithUseDefaultHelp(bool UseDefaultHelp)
+    public MakotoCommand WithUseDefaultHelp(bool UseDefaultHelp)
     {
         if (this.Registered)
             throw new InvalidOperationException("The command is already registered. It can no longer be modified.");
@@ -181,9 +185,9 @@ public sealed class PluginCommand
     /// <inheritdoc cref="RequiredPermissions"/>
     /// </summary>
     /// <param name="RequiredPermissions">The new <see cref="RequiredPermissions"/> value.</param>
-    /// <returns>This <see cref="PluginCommand"/> with the updated value.</returns>
+    /// <returns>This <see cref="MakotoCommand"/> with the updated value.</returns>
     /// <exception cref="InvalidOperationException">Thrown if the command is already registered.</exception>
-    public PluginCommand WithRequiredPermissions(Permissions RequiredPermissions)
+    public MakotoCommand WithRequiredPermissions(Permissions RequiredPermissions)
     {
         if (this.Registered)
             throw new InvalidOperationException("The command is already registered. It can no longer be modified.");
@@ -204,9 +208,9 @@ public sealed class PluginCommand
     /// <inheritdoc cref="AllowPrivateUsage"/>
     /// </summary>
     /// <param name="AllowPrivateUsage">The new <see cref="AllowPrivateUsage"/> value.</param>
-    /// <returns>This <see cref="PluginCommand"/> with the updated value.</returns>
+    /// <returns>This <see cref="MakotoCommand"/> with the updated value.</returns>
     /// <exception cref="InvalidOperationException">Thrown if the command is already registered.</exception>
-    public PluginCommand WithAllowPrivateUsage(bool AllowPrivateUsage)
+    public MakotoCommand WithAllowPrivateUsage(bool AllowPrivateUsage)
     {
         if (this.Registered)
             throw new InvalidOperationException("The command is already registered. It can no longer be modified.");
@@ -227,9 +231,9 @@ public sealed class PluginCommand
     /// <inheritdoc cref="IsNsfw"/>
     /// </summary>
     /// <param name="IsNsfw">The new <see cref="IsNsfw"/> value.</param>
-    /// <returns>This <see cref="PluginCommand"/> with the updated value.</returns>
+    /// <returns>This <see cref="MakotoCommand"/> with the updated value.</returns>
     /// <exception cref="InvalidOperationException">Thrown if the command is already registered.</exception>
-    public PluginCommand WithIsNsfw(bool IsNsfw)
+    public MakotoCommand WithIsNsfw(bool IsNsfw)
     {
         if (this.Registered)
             throw new InvalidOperationException("The command is already registered. It can no longer be modified.");
@@ -240,26 +244,26 @@ public sealed class PluginCommand
 
     /// <summary>
     /// <para>Which command types are supported.</para>
-    /// Defaults to <see cref="PluginCommandType.PrefixCommand"/> and  <see cref="PluginCommandType.SlashCommand"/>.
+    /// Defaults to <see cref="MakotoCommandType.PrefixCommand"/> and  <see cref="MakotoCommandType.SlashCommand"/>.
     /// </summary>
-    public IReadOnlyList<PluginCommandType> SupportedCommandTypes { get; internal set; } = new List<PluginCommandType>() { PluginCommandType.PrefixCommand, PluginCommandType.SlashCommand }.AsReadOnly();
+    public IReadOnlyList<MakotoCommandType> SupportedCommandTypes { get; internal set; } = new List<MakotoCommandType>() { MakotoCommandType.PrefixCommand, MakotoCommandType.SlashCommand }.AsReadOnly();
 
     /// <summary>
     /// Updates the <see cref="SupportedCommandTypes"/> value.
     /// <inheritdoc cref="SupportedCommandTypes"/>
     /// </summary>
     /// <param name="SupportedCommands">The new <see cref="SupportedCommandTypes"/> value.</param>
-    /// <returns>This <see cref="PluginCommand"/> with the updated value.</returns>
+    /// <returns>This <see cref="MakotoCommand"/> with the updated value.</returns>
     /// <exception cref="InvalidOperationException">Thrown if the command is already registered or the type cannot be changed.</exception>
-    public PluginCommand WithSupportedCommandTypes(params PluginCommandType[] SupportedCommands)
+    public MakotoCommand WithSupportedCommandTypes(params MakotoCommandType[] SupportedCommands)
     {
         if (this.Registered)
             throw new InvalidOperationException("The command is already registered. It can no longer be modified.");
 
-        if (SupportedCommands.Contains(PluginCommandType.ContextMenu))
+        if (SupportedCommands.Contains(MakotoCommandType.ContextMenu))
             throw new InvalidOperationException("You cannot use ContextMenu or ContextMenuWithoutPrefix as supported CommandType, please use the constructor instead.");
 
-        if (this.SupportedCommandTypes.Any(x => x == PluginCommandType.ContextMenu))
+        if (this.SupportedCommandTypes.Any(x => x == MakotoCommandType.ContextMenu))
             throw new InvalidOperationException("You cannot modify the supported command types on context menus.");
 
         this.SupportedCommandTypes = SupportedCommands;
@@ -277,9 +281,9 @@ public sealed class PluginCommand
     /// <inheritdoc cref="IsEphemeral"/>
     /// </summary>
     /// <param name="SupportedCommands">The new <see cref="SupportedCommandTypes"/> value.</param>
-    /// <returns>This <see cref="PluginCommand"/> with the updated value.</returns>
+    /// <returns>This <see cref="MakotoCommand"/> with the updated value.</returns>
     /// <exception cref="InvalidOperationException">Thrown if the command is already registered.</exception>
-    public PluginCommand WithIsEphemeral(bool useEphemeral)
+    public MakotoCommand WithIsEphemeral(bool useEphemeral)
     {
         if (this.Registered)
             throw new InvalidOperationException("The command is already registered. It can no longer be modified.");

@@ -45,7 +45,7 @@ public sealed class Config
     public SecretsConfig Secrets = new();
     public DontModifyConfig DontModify = new();
 
-    public Dictionary<string, PluginInfo> PluginCache = new();
+    public Dictionary<string, CommandSupplierInfo> CommandCache = new();
     public Dictionary<string, object> PluginData = new();
 
     public sealed class MonitorConfig
@@ -197,7 +197,7 @@ public sealed class Config
         public string LastKnownHash = "";
     }
 
-    public sealed class PluginInfo
+    public sealed class CommandSupplierInfo
     {
         public string? LastKnownHash = null;
         public Dictionary<string, CompilationType> CompiledCommands = new();

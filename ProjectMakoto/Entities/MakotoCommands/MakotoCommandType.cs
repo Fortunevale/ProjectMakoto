@@ -7,8 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-namespace ProjectMakoto.Plugins;
-public enum PluginCommandType
+namespace ProjectMakoto;
+public enum MakotoCommandType
 {
     SlashCommand = 0,
     PrefixCommand = 1,

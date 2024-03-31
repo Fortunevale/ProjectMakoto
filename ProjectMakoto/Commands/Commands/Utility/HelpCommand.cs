@@ -30,10 +30,16 @@ internal sealed class HelpCommand : BaseCommand
             {
                 try
                 {
-                    var module = appCommand.ContainingType.Name.Replace("AppCommands", "").ToLower();
+                    var nspace = appCommand?.ContainingType?.Namespace ?? "";
+                    var module = appCommand?.ContainingType?.Name?.Replace("AppCommands", "")?.ToLower() ?? "";
 
-                    if (appCommand.ContainingType.Namespace != "ProjectMakoto.ApplicationCommands")
-                        module = ctx.Bot.Plugins[ctx.Bot.PluginCommands.First(plugin => plugin.Value.Any(cmd => cmd.Name == appCommand.Name)).Key].Name;
+                    if (!nspace.Equals("ProjectMakoto.ApplicationCommands", StringComparison.InvariantCultureIgnoreCase))
+                        module = ctx.Bot.CommandModules.FirstOrDefault(m => m.Commands.Any(cmd => cmd.Name == appCommand.Name))?.Name ?? ctx.Bot.PluginCommandModules
+                            .FirstOrDefault(pl => pl.Value.Any(m => m.Commands.Any(cmd => cmd.Name == appCommand.Name)), default).Value?
+                            .FirstOrDefault(m => m.Commands.Any(cmd => cmd.Name == appCommand.Name))?.Name;
+
+                    if (module.IsNullOrEmpty())
+                        continue;
 
                     switch (module)
                     {
@@ -148,11 +154,19 @@ internal sealed class HelpCommand : BaseCommand
                         Log.Error(ex, "Failed to generate help");
                     }
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Failed to generate help");
+                }
             }
 
             if (Commands.Count == 0)
-                throw new NullReferenceException();
+            {
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                    .WithDescription(this.GetString(this.t.Commands.Utility.Help.MissingCommand, true))
+                    .AsError(ctx));
+                return;
+            }    
 
             var Fields = Commands.PrepareEmbedFields();
 

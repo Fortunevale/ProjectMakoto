@@ -31,6 +31,16 @@ public sealed class Status
 
     internal Config LoadedConfig { get; set; }
 
+    private string? _CurrentAppHash { get; set; } = null;
+    internal string CurrentAppHash
+    {
+        get
+        {
+            this._CurrentAppHash ??= HashingExtensions.ComputeSHA256Hash(new FileInfo(Assembly.GetExecutingAssembly().Location));
+            return this._CurrentAppHash;
+        }
+    }
+
     public ExposedConfig SafeReadOnlyConfig { get; set; }
     public class ExposedConfig(Config config)
     {

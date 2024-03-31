@@ -158,9 +158,9 @@ public abstract class BasePlugin
     /// Called after registering built-in commands.
     /// </summary>
     /// <returns>A list of all commands the plugin wants to register. (An empty list if none.)</returns>
-    public virtual async Task<IEnumerable<PluginCommand>> RegisterCommands()
+    public virtual async Task<IEnumerable<MakotoModule>> RegisterCommands()
     {
-        return new List<PluginCommand>();
+        return new List<MakotoModule>();
     }
 
     /// <summary>

@@ -279,6 +279,11 @@ internal static class DisCatSharpExtensionsLoader
             DebugStartup = true
         });
 
+        if (bot.status.CurrentAppHash != bot.status.LoadedConfig.DontModify.LastKnownHash)
+        {
+            Log.Debug("Clearing cached Commands..");
+            await FileExtensions.CleanupFilesAndDirectories(new(), Directory.GetFiles("CompiledCommands").ToList());
+        }
         if (!bot.status.LoadedConfig.IsDev)
         {
             appCommands.RegisterGlobalCommands<ApplicationCommands.MaintainersAppCommands>(GetCommandTranslations);

@@ -10,7 +10,7 @@
 namespace ProjectMakoto.Entities;
 
 [AttributeUsage(AttributeTargets.Class)]
-internal class ModulePriorityAttribute(int Priority) : Attribute
+public class ModulePriorityAttribute(int Priority) : Attribute
 {
     public int Priority { get; set; } = Priority;
 }
