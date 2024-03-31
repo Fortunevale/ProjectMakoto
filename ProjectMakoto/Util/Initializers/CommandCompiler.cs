@@ -95,15 +95,15 @@ internal static class CommandCompiler
                 module.Registered = true;
 
                 var rawSlashCommandList = module.Commands
-                    .Where(x => x.SupportedCommandTypes.Any(x => x is MakotoCommandType.SlashCommand))
+                    .Where(x => x.SupportedCommandTypes.Contains(MakotoCommandType.SlashCommand))
                     .Select(x => getMethodDefinition(x, module, null, MakotoCommandType.SlashCommand));
 
                 var rawPrefixCommandList = module.Commands
-                    .Where(x => x.SupportedCommandTypes.Any(x => x is MakotoCommandType.PrefixCommand))
+                    .Where(x => x.SupportedCommandTypes.Contains(MakotoCommandType.PrefixCommand))
                     .Select(x => getMethodDefinition(x, module, null, MakotoCommandType.PrefixCommand));
 
                 var rawContextCommandList = module.Commands
-                    .Where(x => x.SupportedCommandTypes.Any(x => x is MakotoCommandType.ContextMenu))
+                    .Where(x => x.SupportedCommandTypes.Contains(MakotoCommandType.ContextMenu))
                     .Select(x => getMethodDefinition(x, module, null, MakotoCommandType.ContextMenu));
 
                 var rawCodeList = new List<(string Code, CompilationType Type, string ModuleName)>();
@@ -125,6 +125,9 @@ internal static class CommandCompiler
                 command.Registered = true;
                 var TaskName = GetUniqueCodeCompatibleName();
 
+                if (!command.SupportedCommandTypes.Contains(supportedType))
+                    return string.Empty;
+
                 string getAttribute()
                 {
                     switch (supportedType)
@@ -141,8 +144,8 @@ internal static class CommandCompiler
                         case MakotoCommandType.PrefixCommand:
                             if (command.IsGroup)
                                 return $$"""
-                                        [{{typeof(GroupAttribute).FullName}}("{{command.Name}}"), {{typeof(DescriptionAttribute).FullName}}("{{command.Description}}"
-                                        {{(command.Aliases.IsNotNullAndNotEmpty() ? $", {typeof(AliasesAttribute).FullName}({string.Join(", ", command.Aliases.Select(x => $"\"{x}\""))})" : "")}})]
+                                        [{{typeof(GroupAttribute).FullName}}("{{command.Name}}"), {{typeof(DescriptionAttribute).FullName}}("{{command.Description}}")
+                                        {{(command.Aliases.IsNotNullAndNotEmpty() ? $", {typeof(AliasesAttribute).FullName}({string.Join(", ", command.Aliases.Select(x => $"\"{x}\""))})" : "")}}]
                                         """;
                             else
                                 return $$"""
