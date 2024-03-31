@@ -144,15 +144,15 @@ public sealed class MakotoCommand
     public MakotoCommandOverload[] Overloads { get; internal set; }
 
     /// <summary>
+    /// The Context Menu Type, only usable if <see cref="SupportedCommandTypes"/> includes <see cref="MakotoCommandType.ContextMenu"/>
+    /// </summary>
+    public ApplicationCommandType? ContextMenuType { get; internal set; } = null;
+
+    /// <summary>
     /// <para>Whether to use the default help for command groups.</para>
     /// Defaults to <see langword="true"/>.
     /// </summary>
     public bool UseDefaultHelp { get; internal set; } = true;
-
-    /// <summary>
-    /// The Context Menu Type, only usable if <see cref="SupportedCommandTypes"/> includes <see cref="MakotoCommandType.ContextMenu"/>
-    /// </summary>
-    public ApplicationCommandType? ContextMenuType { get; internal set; } = null;
 
     /// <summary>
     /// Updates the <see cref="UseDefaultHelp"/> value.
@@ -289,6 +289,29 @@ public sealed class MakotoCommand
             throw new InvalidOperationException("The command is already registered. It can no longer be modified.");
 
         this.IsEphemeral = useEphemeral;
+        return this;
+    }
+
+
+    /// <summary>
+    /// Alternative command names when running command as prefix command.
+    /// </summary>
+    public string[]? Aliases { get; internal set; } = null;
+
+
+    /// <summary>
+    /// Updates the <see cref="Aliases"/> value.
+    /// <inheritdoc cref="Aliases"/>
+    /// </summary>
+    /// <param name="aliases">The new <see cref="aliases"/> value.</param>
+    /// <returns>This <see cref="MakotoCommand"/> with the updated value.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if the command is already registered.</exception>
+    public MakotoCommand WithAliases(params string[] aliases)
+    {
+        if (this.Registered)
+            throw new InvalidOperationException("The command is already registered. It can no longer be modified.");
+
+        this.Aliases = aliases;
         return this;
     }
 }

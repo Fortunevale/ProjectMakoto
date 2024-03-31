@@ -141,11 +141,13 @@ internal static class CommandCompiler
                         case MakotoCommandType.PrefixCommand:
                             if (command.IsGroup)
                                 return $$"""
-                                        [{{typeof(GroupAttribute).FullName}}("{{command.Name}}"), {{typeof(DescriptionAttribute).FullName}}("{{command.Description}}")]
+                                        [{{typeof(GroupAttribute).FullName}}("{{command.Name}}"), {{typeof(DescriptionAttribute).FullName}}("{{command.Description}}"
+                                        {{(command.Aliases.IsNotNullAndNotEmpty() ? $", {typeof(AliasesAttribute).FullName}({string.Join(", ", command.Aliases.Select(x => $"\"{x}\""))})" : "")}})]
                                         """;
                             else
                                 return $$"""
-                                        [{{typeof(CommandAttribute).FullName}}("{{command.AlternativeName ?? command.Name}}"), {{typeof(DescriptionAttribute).FullName}}("{{command.Description}}")]
+                                        [{{typeof(CommandAttribute).FullName}}("{{command.AlternativeName ?? command.Name}}"), {{typeof(DescriptionAttribute).FullName}}("{{command.Description}}")
+                                        {{(command.Aliases.IsNotNullAndNotEmpty() ? $", {typeof(AliasesAttribute).FullName}({string.Join(", ", command.Aliases.Select(x => $"\"{x}\""))})" : "")}}]
                                         """;
                         case MakotoCommandType.ContextMenu:
                             return $$"""
@@ -209,6 +211,7 @@ internal static class CommandCompiler
                                     {{getAttribute()}}
                                     public {{typeof(Task).FullName}} {{TaskName}}_Execute({{typeof(InteractionContext).FullName}} ctx{{(command.Overloads?.Length > 0 ? ", " : "")}}
                                         {{string.Join(", ", command.Overloads?.Select(x => $"[{typeof(OptionAttribute).FullName}(\"{x.Name}\", \"{x.Description}\", {(x.AutoCompleteType != null).ToString().ToLower()})" +
+                                            $"{(x.ChannelType is not null ? $", {typeof(ChannelTypesAttribute).FullName}(({typeof(ChannelType).FullName}){(int)x.ChannelType})" : "")}" +
                                             $"{(x.MinimumValue is not null ? $", {typeof(MinimumValueAttribute).FullName}({x.MinimumValue})" : "")}" +
                                             $"{(x.MaximumValue is not null ? $", {typeof(MaximumValueAttribute).FullName}({x.MaximumValue})" : "")}" +
                                             $"{(x.AutoCompleteType is not null ? $", {typeof(AutocompleteAttribute).FullName}(typeof({x.AutoCompleteType.FullName

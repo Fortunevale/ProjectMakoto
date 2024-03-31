@@ -60,6 +60,11 @@ public sealed class MakotoCommandOverload(Type Type, string Name, string Descrip
     public long? MaximumValue { get; internal set; } = null;
 
     /// <summary>
+    /// The type of channels to limit this overload to.
+    /// </summary>
+    public ChannelType? ChannelType { get; internal set; } = null;
+
+    /// <summary>
     /// Sets the auto complete provider for this overload.
     /// </summary>
     /// <param name="autocompleteType"></param>
@@ -75,6 +80,21 @@ public sealed class MakotoCommandOverload(Type Type, string Name, string Descrip
     }
 
     /// <summary>
+    /// Sets the channel type and returns this overload.
+    /// </summary>
+    /// <param name="channelType"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
+    public MakotoCommandOverload WithChannelType(ChannelType channelType)
+    {
+        if (this.Type != typeof(DiscordChannel))
+            throw new ArgumentException($"Type has to be a {nameof(DiscordChannel)}!", nameof(channelType));
+
+        this.ChannelType = channelType;
+        return this;
+    }
+
+    /// <summary>
     /// Sets the minimum value and returns this overload.
     /// </summary>
     /// <param name="newValue"></param>
@@ -83,7 +103,7 @@ public sealed class MakotoCommandOverload(Type Type, string Name, string Descrip
     public MakotoCommandOverload WithMinimumValue(long newValue)
     {
         if (this.Type != typeof(int) && this.Type != typeof(long) && this.Type != typeof(double))
-            throw new ArgumentException("Type has to be an int, long or double!");
+            throw new ArgumentException("Type has to be an int, long or double!", nameof(newValue));
 
         this.MinimumValue = newValue;
         return this;
@@ -98,7 +118,7 @@ public sealed class MakotoCommandOverload(Type Type, string Name, string Descrip
     public MakotoCommandOverload WithMaximumValue(long newValue)
     {
         if (this.Type != typeof(int) && this.Type != typeof(long) && this.Type != typeof(double))
-            throw new ArgumentException("Type has to be an int, long or double!");
+            throw new ArgumentException("Type has to be an int, long or double!", nameof(newValue));
 
         this.MaximumValue = newValue;
         return this;
