@@ -216,7 +216,7 @@ internal static class CommandCompiler
                                             $"{(x.MaximumValue is not null ? $", {typeof(MaximumValueAttribute).FullName}({x.MaximumValue})" : "")}" +
                                             $"{(x.AutoCompleteType is not null ? $", {typeof(AutocompleteAttribute).FullName}(typeof({x.AutoCompleteType.FullName
                                                 .Replace('+', '.')}))" : "")}" +
-                                            $"] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
+                                            $"] {x.Type.Name}{(x.Required ? "" : "?")} {x.Name} {(x.Required ? "" : " = null")}"))}})
                                     {
                                         try
                                         {
@@ -263,7 +263,7 @@ internal static class CommandCompiler
                         else
                             return $$"""
                                     {{getAttribute()}}
-                                    public {{typeof(Task).FullName}} {{TaskName}}_Execute({{typeof(CommandContext).FullName}} ctx{{(command.Overloads?.Length > 0 ? ", " : "")}}{{string.Join(", ", command.Overloads?.Select(x => $"{(x.UseRemainingString ? $"[{typeof(RemainingTextAttribute).FullName}]" : "")} [{typeof(DescriptionAttribute).FullName}(\"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}") ?? [])}})
+                                    public {{typeof(Task).FullName}} {{TaskName}}_Execute({{typeof(CommandContext).FullName}} ctx{{(command.Overloads?.Length > 0 ? ", " : "")}}{{string.Join(", ", command.Overloads?.Select(x => $"{(x.UseRemainingString ? $"[{typeof(RemainingTextAttribute).FullName}]" : "")} [{typeof(DescriptionAttribute).FullName}(\"{x.Description}\")] {x.Type.Name}{(x.Required ? "" : "?")} {x.Name} {(x.Required ? "" : " = null")}") ?? [])}})
                                     {
                                         try
                                         {
