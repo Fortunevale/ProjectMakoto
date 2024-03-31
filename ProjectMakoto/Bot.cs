@@ -17,6 +17,7 @@ using Serilog;
 using Microsoft.Extensions.Logging;
 using Serilog.Events;
 using Serilog.Core;
+using ProjectMakoto.Entities.LoggingEnrichers;
 
 namespace ProjectMakoto;
 
@@ -98,13 +99,14 @@ public sealed class Bot
 
         loggingLevel = new LoggingLevelSwitch();
 
-        var loggingTemplate = "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u3}] {Message:lj}{NewLine}{Exception}";
+        var loggingTemplate = "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u3}] {Message:lj}{NewLine}{Exception}{ExceptionData:j}";
 
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.ControlledBy(this.loggingLevel)
             .WriteTo.Console(outputTemplate: loggingTemplate)
             .WriteTo.File($"logs/{DateTime.UtcNow:dd-MM-yyyy_HH-mm-ss}.log", LogEventLevel.Debug, outputTemplate: loggingTemplate)
             .WriteTo.Sink(sink)
+            .Enrich.With<ExceptionDataEnricher>()
             .CreateLogger();
 
         this.msLoggerFactory = new LoggerFactory().AddSerilog();
