@@ -296,18 +296,15 @@ internal static class DisCatSharpExtensionsLoader
             appCommands.RegisterGlobalCommands<ApplicationCommands.MaintainersAppCommands>(GetCommandTranslations);
             appCommands.RegisterGlobalCommands<ApplicationCommands.ConfigurationAppCommands>(GetCommandTranslations);
             appCommands.RegisterGlobalCommands<ApplicationCommands.ScoreSaberAppCommands>(GetCommandTranslations);
-            appCommands.RegisterGlobalCommands<ApplicationCommands.MusicAppCommands>(GetCommandTranslations);
         }
         else
         {
             appCommands.RegisterGuildCommands<ApplicationCommands.MaintainersAppCommands>(bot.status.LoadedConfig.Discord.DevelopmentGuild, GetCommandTranslations);
             appCommands.RegisterGuildCommands<ApplicationCommands.ConfigurationAppCommands>(bot.status.LoadedConfig.Discord.DevelopmentGuild, GetCommandTranslations);
             appCommands.RegisterGuildCommands<ApplicationCommands.ScoreSaberAppCommands>(bot.status.LoadedConfig.Discord.DevelopmentGuild, GetCommandTranslations);
-            appCommands.RegisterGuildCommands<ApplicationCommands.MusicAppCommands>(bot.status.LoadedConfig.Discord.DevelopmentGuild, GetCommandTranslations);
         }
 
         Log.Debug("Registering Commands..");
-        cNext.RegisterCommands<PrefixCommands.MusicPrefixCommands>();
         cNext.RegisterCommands<PrefixCommands.ScoreSaberPrefixCommands>();
         cNext.RegisterCommands<PrefixCommands.ConfigurationPrefixCommands>();
 
