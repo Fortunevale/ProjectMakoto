@@ -291,14 +291,11 @@ internal static class DisCatSharpExtensionsLoader
         var assemblies = await CommandCompiler.BuildCommands(bot, bot.status.CurrentAppHash, commandModules, null);
         CommandCompiler.RegisterAssemblies(bot, cNext, appCommands, GetCommandTranslations, assemblies);
 
+        Log.Debug("Registering Debug Commands..");
         if (!bot.status.LoadedConfig.IsDev)
-        {
-            appCommands.RegisterGlobalCommands<ApplicationCommands.MaintainersAppCommands>(GetCommandTranslations);
-        }
+            appCommands.RegisterGlobalCommands<ApplicationCommands.DebugCommands>(GetCommandTranslations);
         else
-        {
-            appCommands.RegisterGuildCommands<ApplicationCommands.MaintainersAppCommands>(bot.status.LoadedConfig.Discord.DevelopmentGuild, GetCommandTranslations);
-        }
+            appCommands.RegisterGuildCommands<ApplicationCommands.DebugCommands>(bot.status.LoadedConfig.Discord.DevelopmentGuild, GetCommandTranslations);
 
         Log.Debug("Registering Command Converters..");
         cNext.RegisterConverter(new CustomArgumentConverter.BoolConverter());

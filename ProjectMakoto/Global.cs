@@ -58,7 +58,6 @@ global using ProjectMakoto.Events;
 global using ProjectMakoto.Exceptions;
 global using ProjectMakoto.Util;
 global using ProjectMakoto.Plugins;
-global using ProjectMakoto.PrefixCommands;
 global using ProjectMakoto.Util.SystemMonitor;
 global using ProjectMakoto.Util.JsonSerializers;
 

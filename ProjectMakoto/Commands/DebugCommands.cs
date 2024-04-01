@@ -11,7 +11,7 @@ namespace ProjectMakoto.ApplicationCommands;
 
 [ModulePriority(-999)]
 
-public sealed partial class MaintainersAppCommands : ApplicationCommandsModule
+public sealed partial class DebugCommands : ApplicationCommandsModule
 {
     public Bot _bot { private get; set; }
 
