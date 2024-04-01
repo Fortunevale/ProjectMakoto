@@ -23,13 +23,13 @@ internal sealed class HelpCommand : BaseCommand
             List<KeyValuePair<string, string>> Commands = new();
             var PrefixCommandsList = ctx.Client.GetCommandsNext().RegisteredCommands.GroupBy(x => x.Value.Name).Select(x => x.First()).ToList();
 
-            var ApplicationCommandsList = ctx.Client.GetApplicationCommands().RegisteredCommands.First(x => x.Value?.Count > 0).Value;
+            var ApplicationCommandsList = ctx.Client.GetApplicationCommands().RegisteredCommands.First(x => x.Value?.Count > 0).Value.Where(x => x.Version != 0);
 
             foreach (var appCommand in ApplicationCommandsList
                 .OrderByDescending(x => x.ContainingType?.GetCustomAttribute<ModulePriorityAttribute>()?.Priority ?? 0))
             {
                 var nspace = appCommand?.ContainingType?.Namespace ?? "";
-                var module = appCommand?.ContainingType?.Name?.Replace("AppCommands", "")?.ToLower() ?? "";
+                var module = appCommand?.ContainingType?.Name?.Replace("Commands", "")?.ToLower() ?? "";
 
                 if (!nspace.Equals("ProjectMakoto.ApplicationCommands", StringComparison.InvariantCultureIgnoreCase))
                     module = ctx.Bot.CommandModules.FirstOrDefault(m => m.Commands.Any(cmd => cmd.Name == appCommand.Name))?.Name ?? ctx.Bot.PluginCommandModules
@@ -45,7 +45,7 @@ internal sealed class HelpCommand : BaseCommand
                         if (!ctx.Member.IsAdmin(ctx.Bot.status))
                             continue;
                         break;
-                    case "maintenance":
+                    case "debug":
                         if (!ctx.User.IsMaintenance(ctx.Bot.status))
                             continue;
                         break;
