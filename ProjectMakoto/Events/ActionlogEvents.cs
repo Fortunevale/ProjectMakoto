@@ -869,7 +869,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
         { Description += $"{(e.GuildBefore.ExplicitContentFilter != e.GuildAfter.ExplicitContentFilter ? $"**{this.tKey.ExplicitContentFilter.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: `{e.GuildBefore.ExplicitContentFilter}` ➡ `{e.GuildAfter.ExplicitContentFilter}`\n" : "")}"; }
         catch { }
         try
-        { Description += $"{(e.GuildBefore.WidgetEnabled != e.GuildAfter.WidgetEnabled ? $"**{this.tKey.GuildWidgetEnabled.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: {(e.GuildBefore.WidgetEnabled ?? false).ToPillEmote(this.Bot)} ➡ {(e.GuildAfter.WidgetEnabled ?? false).ToPillEmote(this.Bot)}\n" : "")}"; }
+        { Description += $"{((e.GuildBefore.WidgetEnabled ?? false) != (e.GuildAfter.WidgetEnabled ?? false) ? $"**{this.tKey.GuildWidgetEnabled.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: {(e.GuildBefore.WidgetEnabled ?? false).ToPillEmote(this.Bot)} ➡ {(e.GuildAfter.WidgetEnabled ?? false).ToPillEmote(this.Bot)}\n" : "")}"; }
         catch { }
         try
         { Description += $"{(e.GuildBefore.WidgetChannel?.Id != e.GuildAfter.WidgetChannel?.Id ? $"**{this.tKey.GuildWidgetChannel.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: {e.GuildBefore.WidgetChannel.Mention} `[{e.GuildBefore.WidgetChannel.GetIcon()}{e.GuildBefore.WidgetChannel.Name}]` ➡ {e.GuildAfter.WidgetChannel.Mention} `[{e.GuildAfter.WidgetChannel.GetIcon()}{e.GuildAfter.WidgetChannel.Name}]`\n" : "")}"; }
