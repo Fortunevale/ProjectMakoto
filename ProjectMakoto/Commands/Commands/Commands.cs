@@ -149,6 +149,20 @@ internal static class Commands
                             new MakotoCommandOverload(typeof(string), "id", "The Id"))),
                 ]).WithPriority(997),
 
+            new MakotoModule("ScoreSaber", [
+                    new MakotoCommand("scoresaber", "Interact with the ScoreSaber API.",
+                        new MakotoCommand("profile", "Displays you the registered profile of the mentioned user or looks up a profile by a ScoreSaber Id.", typeof(ScoreSaberProfileCommand),
+                            new MakotoCommandOverload(typeof(string), "profile", "ScoreSaber Id | @User", false, true)),
+                        new MakotoCommand("search", "Search a user on Score Saber by name.", typeof(ScoreSaberSearchCommand),
+                            new MakotoCommandOverload(typeof(string), "name", "Search a user on Score Saber by name.")),
+                        new MakotoCommand("map-leaderboard", "Display the leaderboard off a specific map.", typeof(ScoreSaberMapLeaderboardCommand),
+                            new MakotoCommandOverload(typeof(int), "leaderboardid", "The Leaderboard Id"),
+                            new MakotoCommandOverload(typeof(int), "page", "The page", false),
+                            new MakotoCommandOverload(typeof(int), "internal_page", "The internal page", false)),
+                        new MakotoCommand("unlink", "Allows you to remove the saved ScoreSaber profile from your Discord account.", typeof(ScoreSaberUnlinkCommand)))
+                    .WithAliases("ss")
+                ]).WithPriority(996),
+
             new MakotoModule("Moderation", [
                     new MakotoCommand("purge", "Deletes the specified amount of messages.", typeof(PurgeCommand),
                         new MakotoCommandOverload(typeof(int), "number", "1-2000")
