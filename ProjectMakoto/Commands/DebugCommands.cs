@@ -63,7 +63,7 @@ public sealed partial class DebugCommands : ApplicationCommandsModule
                     };
 
                     if (ctx.FocusedOption.Value.ToString().Length > 1)
-                        return new List<DiscordApplicationCommandAutocompleteChoice>() { };
+                        return [];
 
                     var Command = (DevCommands)Enum.Parse(typeof(DevCommands), ctx.Options.First(x => x.Name == "command").Value.ToString());
 
@@ -71,83 +71,88 @@ public sealed partial class DebugCommands : ApplicationCommandsModule
                     {
                         DevCommands.RawGuild => currentArgument switch
                         {
-                            1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("GuildId", "") },
-                            _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
+                            1 => [ new("GuildId", "") ],
+                            _ => [],
                         },
                         DevCommands.BotNick => currentArgument switch
                         {
                             1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("NewNickName", "") },
-                            _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
+                            _ => [],
                         },
                         DevCommands.BanUser => currentArgument switch
                         {
-                            1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("UserId", "") },
-                            2 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("Reason", "") },
-                            _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
+                            1 => [ new("UserId", "") ],
+                            2 => [ new("Reason", "") ],
+                            _ => [],
                         },
                         DevCommands.UnbanUser => currentArgument switch
                         {
                             1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("UserId", "") },
-                            _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
+                            _ => [],
                         },
                         DevCommands.BanGuild => currentArgument switch
                         {
-                            1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("GuildId", "") },
-                            2 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("Reason", "") },
-                            _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
+                            1 => [ new("GuildId", "") ],
+                            2 => [ new("Reason", "") ],
+                            _ => [],
                         },
                         DevCommands.UnbanGuild => currentArgument switch
                         {
-                            1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("GuildId", "") },
-                            _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
+                            1 => [ new("GuildId", "") ],
+                            _ => [],
                         },
                         DevCommands.GlobalBan => currentArgument switch
                         {
-                            1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("UserId", "") },
-                            2 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("Reason", "") },
-                            _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
+                            1 => [ new("UserId", "") ],
+                            2 => [ new("Reason", "") ],
+                            _ => [],
                         },
                         DevCommands.GlobalUnban => currentArgument switch
                         {
-                            1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("UserId", "") },
-                            2 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("UnbanFromServers (True/False)", "") },
-                            _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
+                            1 => [ new("UserId", "") ],
+                            2 => [ new("Unban from all servers that global banned them", "true"), new("Do not unban from all servers that global banned them", "false") ],
+                            _ => [],
                         },
                         DevCommands.GlobalNotes => currentArgument switch
                         {
-                            1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("UserId", "") },
-                            _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
+                            1 => [ new("UserId", "") ],
+                            _ => [],
                         },
                         DevCommands.Log => currentArgument switch
                         {
-                            1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("LogLevel", "") },
-                            _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
+                            1 => [ 
+                                    ..Enum.GetValues(typeof(LogEventLevel)).Cast<LogEventLevel>().Select(x => {
+                                        var val = (LogEventLevel)x;
+                                        return new DiscordApplicationCommandAutocompleteChoice($"{Enum.GetName(val)} and above", ((int)val).ToString());
+                                    }).ToList()
+                                 ],
+                            _ => [],
                         },
                         DevCommands.BatchLookup => currentArgument switch
                         {
-                            1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("UserId, UserId, UserId, ...", "") },
-                            _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
+                            1 => [ new("UserId, UserId, UserId, ...", "") ],
+                            _ => [],
                         },
                         DevCommands.CreateIssue => currentArgument switch
                         {
-                            1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("UseOldSelector (True/False)", "") },
-                            _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
+                            1 => [ new("Use Textbox Label Selector", "true"), new("Use Dropdown Label Selector (broken)", "false")],
+                            _ => [],
                         },
                         DevCommands.Evaluate => currentArgument switch
                         {
-                            1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("MessageId", "") },
-                            _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
+                            1 => [ new("MessageId", "") ],
+                            _ => [],
                         },
                         DevCommands.Disenroll2FAUser => currentArgument switch
                         {
-                            1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("UserId", "") },
-                            _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
+                            1 => [ new("UserId", "") ],
+                            _ => [],
                         },
-                        _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
+                        _ => [],
                     };
                 }
 
-                return new List<DiscordApplicationCommandAutocompleteChoice>() { };
+                return [];
             }
             catch (Exception)
             {

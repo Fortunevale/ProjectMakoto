@@ -23,7 +23,7 @@ internal sealed class LogCommand : BaseCommand
                 throw new Exception("Invalid Log Level");
 
             ctx.Bot.loggingLevel.MinimumLevel = (LogEventLevel)Level;
-            _ = await this.RespondOrEdit($"`Changed LogLevel to '{Level}'`");
+            _ = await this.RespondOrEdit($"`Changed LogLevel to '{Enum.GetName((LogEventLevel)Level)}'`");
         });
     }
 }
