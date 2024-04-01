@@ -99,7 +99,7 @@ public sealed class Bot
 
         loggingLevel = new LoggingLevelSwitch();
 
-        var loggingTemplate = "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u3}] {Message:lj}{NewLine}{Exception}{ExceptionData:j}";
+        var loggingTemplate = "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u3}] {Message:lj}{NewLine}{Exception}{ExceptionData:j}{BadRequestException:j}";
 
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.ControlledBy(this.loggingLevel)
@@ -107,6 +107,7 @@ public sealed class Bot
             .WriteTo.File($"logs/{DateTime.UtcNow:dd-MM-yyyy_HH-mm-ss}.log", LogEventLevel.Debug, outputTemplate: loggingTemplate)
             .WriteTo.Sink(sink)
             .Enrich.With<ExceptionDataEnricher>()
+            .Enrich.With<BadRequestExceptionEnricher>()
             .CreateLogger();
 
         this.msLoggerFactory = new LoggerFactory().AddSerilog();

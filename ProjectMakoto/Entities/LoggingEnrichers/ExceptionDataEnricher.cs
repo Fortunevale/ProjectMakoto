@@ -29,3 +29,28 @@ public class ExceptionDataEnricher : ILogEventEnricher
         logEvent.AddPropertyIfAbsent(property);
     }
 }
+
+public class BadRequestExceptionEnricher : ILogEventEnricher
+{
+    public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
+    {
+        if (logEvent.Exception == null)
+            return;
+
+        if (logEvent.Exception is not DisCatSharp.Exceptions.BadRequestException badRequest)
+            return;
+
+        List<KeyValuePair<string, object>> badRequestData = 
+            [
+                new KeyValuePair<string, object>("Code", badRequest.Code),
+                new KeyValuePair<string, object>("WebRequest", badRequest.WebRequest),
+                new KeyValuePair<string, object>("WebResponse", badRequest.WebResponse),
+                new KeyValuePair<string, object>("JsonMessage", badRequest.JsonMessage),
+                new KeyValuePair<string, object>("Errors", badRequest.Errors),
+            ];
+
+        var property = propertyFactory.CreateProperty("BadRequestException", badRequestData, destructureObjects: true);
+
+        logEvent.AddPropertyIfAbsent(property);
+    }
+}
