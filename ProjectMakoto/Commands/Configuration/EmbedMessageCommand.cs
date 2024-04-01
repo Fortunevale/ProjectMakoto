@@ -7,9 +7,9 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-namespace ProjectMakoto.Commands;
+namespace ProjectMakoto.Commands.Configuration;
 
-internal sealed class TokenDetectionCommand : BaseCommand
+internal sealed class EmbedMessageCommand : BaseCommand
 {
     public override Task<bool> BeforeExecution(SharedCommandContext ctx) => this.CheckAdmin();
 
@@ -17,11 +17,16 @@ internal sealed class TokenDetectionCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var CommandKey = this.t.Commands.Config.TokenDetection;
+            var CommandKey = this.t.Commands.Config.EmbedMessages;
 
             string GetCurrentConfiguration(SharedCommandContext ctx)
             {
-                return $"⚠ `{this.GetString(CommandKey.DetectTokens)}`: {ctx.DbGuild.TokenLeakDetection.DetectTokens.ToEmote(ctx.Bot)}";
+                var CommandKey = ctx.Bot.LoadedTranslations.Commands.Config.EmbedMessages;
+
+                var pad = TranslationUtil.CalculatePadding(ctx.DbUser, CommandKey.EmbedGithubCode, CommandKey.EmbedMessageLinks);
+
+                return $"{"💬".UnicodeToEmoji()} `{CommandKey.EmbedMessageLinks.Get(ctx.DbUser).PadRight(pad)}`: {ctx.DbGuild.EmbedMessage.UseEmbedding.ToEmote(ctx.Bot)}\n" +
+                       $"{"🤖".UnicodeToEmoji()} `{CommandKey.EmbedGithubCode.Get(ctx.DbUser).PadRight(pad)}`: {ctx.DbGuild.EmbedMessage.UseGithubEmbedding.ToEmote(ctx.Bot)}";
             }
 
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
@@ -32,12 +37,14 @@ internal sealed class TokenDetectionCommand : BaseCommand
                 Description = GetCurrentConfiguration(ctx)
             }.AsAwaitingInput(ctx, this.GetString(CommandKey.Title));
 
-            var Toggle = new DiscordButtonComponent((ctx.DbGuild.TokenLeakDetection.DetectTokens ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.ToggleTokenDetection), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚠")));
+            var ToggleMsg = new DiscordButtonComponent((ctx.DbGuild.EmbedMessage.UseEmbedding ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.ToggleMessageLinkButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
+            var ToggleGithub = new DiscordButtonComponent((ctx.DbGuild.EmbedMessage.UseGithubEmbedding ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.ToggleGithubCodeButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🤖")));
 
             _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
-                Toggle
+                ToggleMsg,
+                ToggleGithub
             })
             .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
 
@@ -51,9 +58,16 @@ internal sealed class TokenDetectionCommand : BaseCommand
 
             _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-            if (e.GetCustomId() == Toggle.CustomId)
+            if (e.GetCustomId() == ToggleMsg.CustomId)
             {
-                ctx.DbGuild.TokenLeakDetection.DetectTokens = !ctx.DbGuild.TokenLeakDetection.DetectTokens;
+                ctx.DbGuild.EmbedMessage.UseEmbedding = !ctx.DbGuild.EmbedMessage.UseEmbedding;
+
+                await this.ExecuteCommand(ctx, arguments);
+                return;
+            }
+            if (e.GetCustomId() == ToggleGithub.CustomId)
+            {
+                ctx.DbGuild.EmbedMessage.UseGithubEmbedding = !ctx.DbGuild.EmbedMessage.UseGithubEmbedding;
 
                 await this.ExecuteCommand(ctx, arguments);
                 return;

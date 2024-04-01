@@ -11,32 +11,9 @@ namespace ProjectMakoto.ApplicationCommands;
 
 [ModulePriority(-999)]
 
-public sealed class MaintainersAppCommands : ApplicationCommandsModule
+public sealed partial class MaintainersAppCommands : ApplicationCommandsModule
 {
     public Bot _bot { private get; set; }
-
-    internal enum DevCommands
-    {
-        Info,
-        Log,
-        Stop,
-        BotNick,
-        Evaluate,
-        CreateIssue,
-        Enroll2FA,
-        Quit2FASession,
-        Disenroll2FAUser,
-        ManageCommands,
-        GlobalBan,
-        GlobalUnban,
-        GlobalNotes,
-        BanUser,
-        UnbanUser,
-        BanGuild,
-        UnbanGuild,
-        BatchLookup,
-        RawGuild,
-    };
 
     public sealed class MaintainerAutoComplete : IAutocompleteProvider
     {

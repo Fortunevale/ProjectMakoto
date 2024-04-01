@@ -38,7 +38,7 @@ public class MakotoModule
     /// <summary>
     /// The priority in the help command.
     /// </summary>
-    public uint? Priority { get; internal set; } = null;
+    public int? Priority { get; internal set; } = null;
 
     /// <summary>
     /// The commands contained within this module.
@@ -65,7 +65,7 @@ public class MakotoModule
     /// <param name="priority"></param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public MakotoModule WithPriority(uint priority)
+    public MakotoModule WithPriority(int priority)
     {
         if (this.Registered)
             throw new InvalidOperationException("The module is already registered. It can no longer be modified.");

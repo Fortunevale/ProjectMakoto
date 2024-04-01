@@ -236,6 +236,36 @@ internal static class Commands
 
                     new MakotoCommand("override-bump-time", "Allows fixing of the last bump in case Disboard did not properly post a message.", typeof(ManualBumpCommand))
                         .WithRequiredPermissions(Permissions.ManageChannels),
-                ]).WithPriority(995)
+                ]).WithPriority(995),
+
+            new MakotoModule("Configuration", [
+                    new MakotoCommand("config", "Allows you to configure Makoto.",
+                        new MakotoCommand("join", "Allows you to review and change settings in the event somebody joins the server.", typeof(Configuration.JoinCommand)),
+                        new MakotoCommand("experience", "Allows you to review and change settings related to experience.", typeof(Configuration.ExperienceCommand)),
+                        new MakotoCommand("levelrewards", "Allows you to review, add and change Level Rewards.", typeof(Configuration.LevelRewardsCommand)),
+                        new MakotoCommand("phishing", "Allows you to review and change settings related to phishing link protection.", typeof(Configuration.PhishingCommand)),
+                        new MakotoCommand("bumpreminder", "Allows you to review, set up and change settings related to the Bump Reminder.", typeof(Configuration.BumpReminderCommand)),
+                        new MakotoCommand("actionlog", "Allows you to review and change settings related to the actionlog.", typeof(Configuration.ActionLogCommand)),
+                        new MakotoCommand("autocrosspost", "Allows you to review and change settings related to automatic crossposting.", typeof(Configuration.AutoCrosspostCommand)),
+                        new MakotoCommand("reactionroles", "Allows you to review and change settings related to Reaction Roles.", typeof(ReactionRolesCommand.ConfigCommand)),
+                        new MakotoCommand("invoiceprivacy", "Allows you to review and change settings related to In-Voice Text Channel Privacy.", typeof(Configuration.InVoicePrivacyCommand)),
+                        new MakotoCommand("invitetracker", "Allows you to review and change settings related to Invite Tracking.", typeof(Configuration.InviteTrackerCommand)),
+                        new MakotoCommand("namenormalizer", "Allows you to review and change settings related to automatic name normalization.", typeof(Configuration.NameNormalizerCommand)),
+                        new MakotoCommand("autounarchive", "Allows you to review and change settings related to automatic thread unarchiving.", typeof(Configuration.AutoUnarchiveCommand)),
+                        new MakotoCommand("embedmessages", "Allows you to review and change settings related to automatic message embedding.", typeof(Configuration.EmbedMessageCommand)),
+                        new MakotoCommand("tokendetection", "Allows you to review and change settings related to automatic token invalidation.", typeof(Configuration.TokenDetectionCommand)),
+                        new MakotoCommand("invitenotes", "Allows you to add notes to invite codes.", typeof(Configuration.InviteNotesCommand)),
+                        new MakotoCommand("vccreator", "Allows you to review and change settings related to the Voice Channel Creator.", typeof(Configuration.VcCreatorCommand)),
+                        new MakotoCommand("guild-language", "Allows you to review and change settings related to the guild's selected language.", typeof(Configuration.GuildLanguageCommand)),
+                        new MakotoCommand("guild-prefix", "Allows you to review and change settings related to the guild's prefix.", typeof(Configuration.PrefixCommand)))
+                    .WithRequiredPermissions(Permissions.Administrator),
+
+                    new MakotoCommand(ApplicationCommandType.Message, "Add a Reaction Role", "Allows you to add a reaction role to a message directly.", typeof(ReactionRolesCommand.AddCommand))
+                        .WithRequiredPermissions(Permissions.Administrator),
+                    new MakotoCommand(ApplicationCommandType.Message, "Remove a Reaction Role", "Allows you to remove a specific reaction role from a message directly.", typeof(ReactionRolesCommand.RemoveCommand))
+                        .WithRequiredPermissions(Permissions.Administrator),
+                    new MakotoCommand(ApplicationCommandType.Message, "Remove all Reaction Roles", "Allows you to remove all reaction roles from a message directly.", typeof(ReactionRolesCommand.RemoveAllCommand))
+                        .WithRequiredPermissions(Permissions.Administrator),
+                ]).WithPriority(994),
         ];
 }

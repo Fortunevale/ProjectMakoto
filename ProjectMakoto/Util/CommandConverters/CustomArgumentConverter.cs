@@ -7,7 +7,7 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-namespace ProjectMakoto.PrefixCommands;
+namespace ProjectMakoto.Util;
 
 internal sealed class CustomArgumentConverter
 {

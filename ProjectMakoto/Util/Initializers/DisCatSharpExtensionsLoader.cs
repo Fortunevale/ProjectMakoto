@@ -294,22 +294,15 @@ internal static class DisCatSharpExtensionsLoader
         if (!bot.status.LoadedConfig.IsDev)
         {
             appCommands.RegisterGlobalCommands<ApplicationCommands.MaintainersAppCommands>(GetCommandTranslations);
-            appCommands.RegisterGlobalCommands<ApplicationCommands.ConfigurationAppCommands>(GetCommandTranslations);
-            appCommands.RegisterGlobalCommands<ApplicationCommands.ScoreSaberAppCommands>(GetCommandTranslations);
         }
         else
         {
             appCommands.RegisterGuildCommands<ApplicationCommands.MaintainersAppCommands>(bot.status.LoadedConfig.Discord.DevelopmentGuild, GetCommandTranslations);
-            appCommands.RegisterGuildCommands<ApplicationCommands.ConfigurationAppCommands>(bot.status.LoadedConfig.Discord.DevelopmentGuild, GetCommandTranslations);
-            appCommands.RegisterGuildCommands<ApplicationCommands.ScoreSaberAppCommands>(bot.status.LoadedConfig.Discord.DevelopmentGuild, GetCommandTranslations);
         }
-
-        Log.Debug("Registering Commands..");
-        cNext.RegisterCommands<PrefixCommands.ScoreSaberPrefixCommands>();
-        cNext.RegisterCommands<PrefixCommands.ConfigurationPrefixCommands>();
 
         Log.Debug("Registering Command Converters..");
         cNext.RegisterConverter(new CustomArgumentConverter.BoolConverter());
+        cNext.RegisterConverter(new CustomArgumentConverter.AttachmentConverter());
 
         var commandsNextTypes = new List<Type>();
         var applicationCommandTypes = new List<Type>();

@@ -68,7 +68,7 @@ internal static class CommandCompiler
         {
             var classHeader = GetFileHeader();
 
-            string createCodeWithDefaultClass(IEnumerable<string> code, MakotoCommandType supportedType, uint? Priority)
+            string createCodeWithDefaultClass(IEnumerable<string> code, MakotoCommandType supportedType, int? Priority)
             {
                 var inheritType = supportedType switch
                 {
