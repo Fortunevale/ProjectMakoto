@@ -308,7 +308,7 @@ public sealed class SharedCommandContext
         get
         {
             if (this._member is null && this.Guild is not null)
-                _member = this.Guild.GetMemberAsync(this._member.Id).Result;
+                _member = this.Guild.GetMemberAsync(this.CurrentUser.Id).Result;
 
             return _member;
         }
