@@ -15,8 +15,9 @@ internal sealed class UploadCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var stream = (Stream)arguments["stream"];
-            var filesize = (int)arguments["filesize"];
+            var attachment = (DiscordAttachment)arguments["file"];
+            var stream = await new HttpClient().GetStreamAsync(attachment.Url);
+            var filesize = attachment.FileSize ?? 0;
 
             if (ctx.DbUser.PendingUserUpload is null)
             {

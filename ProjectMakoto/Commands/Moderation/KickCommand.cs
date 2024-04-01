@@ -17,7 +17,7 @@ internal sealed class KickCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var victim = (DiscordUser)arguments["victim"];
+            var victim = (DiscordUser)arguments["user"];
             var reason = (string)arguments["reason"];
 
             var CommandKey = this.t.Commands.Moderation.Kick;

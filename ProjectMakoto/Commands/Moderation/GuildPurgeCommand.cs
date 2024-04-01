@@ -20,7 +20,7 @@ internal sealed class GuildPurgeCommand : BaseCommand
             var CommandKey = this.t.Commands.Moderation.GuildPurge;
 
             var number = (int)arguments["number"];
-            var victim = (DiscordUser)arguments["victim"];
+            var victim = (DiscordUser)arguments["user"];
 
             if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx))
                 return;

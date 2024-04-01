@@ -18,7 +18,7 @@ internal sealed class LimitCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx))
                 return;
 
-            var newLimit = (uint)arguments["newLimit"];
+            var newLimit = (uint)arguments["limit"];
             var channel = ctx.Member.VoiceState?.Channel;
 
             if (!ctx.DbGuild.VcCreator.CreatedChannels.Any(x => x.ChannelId == (channel?.Id ?? 0)))

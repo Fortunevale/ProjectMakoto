@@ -19,7 +19,7 @@ internal sealed class RemoveQueueCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var selection = (string)arguments["selection"];
+            var selection = (string)arguments["video"];
 
             if (string.IsNullOrWhiteSpace(selection))
             {

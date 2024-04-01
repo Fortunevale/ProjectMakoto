@@ -18,7 +18,7 @@ internal sealed class KickCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx))
                 return;
 
-            var victim = (DiscordMember)arguments["victim"];
+            var victim = (DiscordMember)arguments["user"];
             var channel = ctx.Member.VoiceState?.Channel;
 
             if (!ctx.DbGuild.VcCreator.CreatedChannels.Any(x => x.ChannelId == (channel?.Id ?? 0)))

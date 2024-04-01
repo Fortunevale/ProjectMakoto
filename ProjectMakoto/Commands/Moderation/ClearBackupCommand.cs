@@ -19,7 +19,7 @@ internal sealed class ClearBackupCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var victim = (DiscordUser)arguments["victim"];
+            var victim = (DiscordUser)arguments["user"];
 
             if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx))
                 return;

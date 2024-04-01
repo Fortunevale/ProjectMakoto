@@ -96,7 +96,7 @@ internal sealed class ManageCommand : BaseCommand
 
                 await new AddToQueueCommand().TransferCommand(ctx, new Dictionary<string, object>
                 {
-                    { "id", PlaylistResult.Result }
+                    { "playlist", PlaylistResult.Result }
                 });
                 return;
             }
@@ -126,7 +126,7 @@ internal sealed class ManageCommand : BaseCommand
 
                 await new ShareCommand().TransferCommand(ctx, new Dictionary<string, object>
                 {
-                    { "id", PlaylistResult.Result }
+                    { "playlist", PlaylistResult.Result }
                 });
                 return;
             }
@@ -156,7 +156,7 @@ internal sealed class ManageCommand : BaseCommand
 
                 await new ExportCommand().TransferCommand(ctx, new Dictionary<string, object>
                 {
-                    { "id", PlaylistResult.Result }
+                    { "playlist", PlaylistResult.Result }
                 });
                 return;
             }
@@ -203,7 +203,7 @@ internal sealed class ManageCommand : BaseCommand
 
                 await new ModifyCommand().TransferCommand(ctx, new Dictionary<string, object>
                 {
-                    { "id", PlaylistResult.Result }
+                    { "playlist", PlaylistResult.Result }
                 });
                 return;
             }
@@ -233,7 +233,7 @@ internal sealed class ManageCommand : BaseCommand
 
                 await new DeleteCommand().TransferCommand(ctx, new Dictionary<string, object>
                 {
-                    { "id", PlaylistResult.Result }
+                    { "playlist", PlaylistResult.Result }
                 });
 
                 await this.ExecuteCommand(ctx, arguments);

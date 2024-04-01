@@ -17,7 +17,7 @@ internal sealed class MoveAllCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var newChannel = (DiscordChannel)arguments["newChannel"];
+            var newChannel = (DiscordChannel)arguments["channel"];
 
             var CommandKey = this.t.Commands.Moderation.Move;
 

@@ -18,7 +18,7 @@ internal sealed class PurgeCommand : BaseCommand
         return Task.Run(async () =>
         {
             var number = (int)arguments["number"];
-            var victim = (DiscordUser)arguments["victim"];
+            var victim = (DiscordUser)arguments["user"];
 
             var CommandKey = this.t.Commands.Moderation.Purge;
 

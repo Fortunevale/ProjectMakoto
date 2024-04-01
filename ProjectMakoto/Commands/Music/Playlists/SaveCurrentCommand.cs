@@ -131,7 +131,7 @@ internal sealed class SaveCurrentCommand : BaseCommand
                     await Task.Delay(2000);
                     await new ModifyCommand().TransferCommand(ctx, new Dictionary<string, object>
                     {
-                        { "id", v.PlaylistId }
+                        { "playlist", v.PlaylistId }
                     });
                     return;
                 }

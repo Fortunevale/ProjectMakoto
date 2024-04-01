@@ -17,7 +17,7 @@ internal sealed class LoadShareCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var userid = (ulong)arguments["userid"];
+            var userid = (ulong)arguments["user"];
             var id = ((string)arguments["id"])
                 .Replace("/", "")
                 .Replace("\\", "")

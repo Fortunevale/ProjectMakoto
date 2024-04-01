@@ -20,7 +20,7 @@ internal sealed class ModifyCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForModerate(ctx))
                 return;
 
-            var playlistId = (string)arguments["id"];
+            var playlistId = (string)arguments["playlist"];
 
             if (!ctx.DbUser.UserPlaylists.Any(x => x.PlaylistId == playlistId))
             {

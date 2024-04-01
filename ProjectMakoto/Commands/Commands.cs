@@ -45,7 +45,7 @@ internal static class Commands
                     new MakotoCommand("report-host", "Allows you to contribute a new malicious host to our database.", typeof(ReportHostCommand),
                         new MakotoCommandOverload(typeof(string), "url", "The host")),
 
-                    new MakotoCommand("report-translation", "Allows you to report missing, invalid or incorrect translations in Makoto.", typeof(ReportHostCommand),
+                    new MakotoCommand("report-translation", "Allows you to report missing, invalid or incorrect translations in Makoto.", typeof(ReportTranslationCommand),
                         new MakotoCommandOverload(typeof(ReportTranslationType), "affected_type", "The type of module that is affected"),
                         new MakotoCommandOverload(typeof(string), "component", "The affected component")
                             .WithAutoComplete(typeof(AutocompleteProviders.ReportTranslationAutoComplete)),
@@ -84,7 +84,7 @@ internal static class Commands
                             new MakotoCommandOverload(typeof(DiscordUser), "user", "User")),
                         new MakotoCommand("unban", "Unbans person from your channel.", typeof(VcCreator.UnbanCommand),
                             new MakotoCommandOverload(typeof(DiscordUser), "user", "User")),
-                        new MakotoCommand("change-owner", "Sets a new person to be the owner of your channel.", typeof(VcCreator.UnbanCommand),
+                        new MakotoCommand("change-owner", "Sets a new person to be the owner of your channel.", typeof(VcCreator.ChangeOwnerCommand),
                             new MakotoCommandOverload(typeof(DiscordUser), "user", "User"))),
 
                     new MakotoCommand(ApplicationCommandType.Message, "Steal Emojis", "Steals all emojis and stickers of a message. Reply to a message to select it.", typeof(EmojiStealerCommand), "emoji")
@@ -201,7 +201,7 @@ internal static class Commands
                         new MakotoCommandOverload(typeof(DiscordUser), "user", "The user"),
                         new MakotoCommandOverload(typeof(int), "days", "Days of messages to delete")
                             .WithMinimumValue(0)
-                            .WithMaximumValue(30),
+                            .WithMaximumValue(7),
                         new MakotoCommandOverload(typeof(string), "reason", "The reason", false))
                         .WithRequiredPermissions(Permissions.BanMembers),
 
@@ -209,7 +209,7 @@ internal static class Commands
                         new MakotoCommandOverload(typeof(DiscordUser), "user", "The user"),
                         new MakotoCommandOverload(typeof(int), "days", "Days of messages to delete")
                             .WithMinimumValue(0)
-                            .WithMaximumValue(30),
+                            .WithMaximumValue(7),
                         new MakotoCommandOverload(typeof(string), "reason", "The reason", false))
                         .WithRequiredPermissions(Permissions.BanMembers),
 

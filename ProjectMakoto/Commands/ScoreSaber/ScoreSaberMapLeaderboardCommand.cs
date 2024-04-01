@@ -17,9 +17,9 @@ internal sealed class ScoreSaberMapLeaderboardCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var boardId = (int)arguments["boardId"];
-            var Page = (uint)arguments["Page"];
-            var Internal_Page = (int)arguments["Internal_Page"];
+            var boardId = (int)arguments["leaderboardid"];
+            var Page = (uint)arguments["page"];
+            var Internal_Page = (int)arguments["internal_page"];
 
             if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx))
                 return;

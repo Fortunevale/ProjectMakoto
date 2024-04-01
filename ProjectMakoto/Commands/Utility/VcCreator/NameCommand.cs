@@ -18,7 +18,7 @@ internal sealed class NameCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx))
                 return;
 
-            var newName = (string)arguments["newName"];
+            var newName = (string)arguments["name"];
             var channel = ctx.Member.VoiceState?.Channel;
 
             newName = (newName.IsNullOrWhiteSpace() ? this.GetGuildString(this.t.Commands.Utility.VoiceChannelCreator.Events.DefaultChannelName, new TVar("User", ctx.Member.DisplayName)) : newName);

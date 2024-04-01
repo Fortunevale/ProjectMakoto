@@ -15,7 +15,7 @@ internal sealed class ScoreSaberProfileCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var id = (string)arguments["id"];
+            var id = (string)arguments["profile"];
 
             if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx))
                 return;

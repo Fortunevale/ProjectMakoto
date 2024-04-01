@@ -23,7 +23,7 @@ internal sealed class TimeoutCommand : BaseCommand
 
             try
             {
-                victim = await ((DiscordUser)arguments["victim"]).ConvertToMember(ctx.Guild);
+                victim = await ((DiscordUser)arguments["user"]).ConvertToMember(ctx.Guild);
             }
             catch (DisCatSharp.Exceptions.NotFoundException)
             {

@@ -20,7 +20,7 @@ internal sealed class AddToQueueCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx))
                 return;
 
-            var playlistId = (string)arguments["id"];
+            var playlistId = (string)arguments["playlist"];
 
             if (!ctx.DbUser.UserPlaylists.Any(x => x.PlaylistId == playlistId))
             {

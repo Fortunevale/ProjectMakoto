@@ -17,7 +17,7 @@ internal sealed class SoftBanCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var victim = (DiscordUser)arguments["victim"];
+            var victim = (DiscordUser)arguments["user"];
             var deleteMessageDays = (int)arguments["days"] > 7 ? 7 : ((int)arguments["days"] < 0 ? 0 : (int)arguments["days"]);
             var reason = (string)arguments["reason"];
 

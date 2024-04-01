@@ -17,12 +17,12 @@ internal sealed class GuildInfoCommand : BaseCommand
         {
             var CommandKey = this.t.Commands.Utility.GuildInfo;
 
-            var rawGuildId = (ulong?)arguments["guildId"];
+            var rawGuildId = (string?)arguments["guild"];
 
             if (await ctx.DbUser.Cooldown.WaitForModerate(ctx))
                 return;
 
-            var guildId = rawGuildId ?? ctx.Guild.Id;
+            var guildId = rawGuildId?.ToUInt64() ?? ctx.Guild.Id;
 
             if (guildId == 0)
                 guildId = ctx.Guild.Id;

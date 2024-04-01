@@ -24,10 +24,10 @@ internal sealed class ReportTranslationCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx))
                 return;
 
-            var affectedType = (ReportTranslationType)arguments["affectedType"];
-            var reasonType = (ReportTranslationReason)arguments["reasonType"];
+            var affectedType = (ReportTranslationType)arguments["affected_type"];
+            var reasonType = (ReportTranslationReason)arguments["report_type"];
             var component = (string)arguments["component"];
-            var additionalInformation = (string?)arguments["additionalInformation"];
+            var additionalInformation = (string?)arguments["additional_information"];
 
             var tos_version = 1;
 
