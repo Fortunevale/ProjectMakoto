@@ -55,6 +55,11 @@ internal sealed class HelpCommand : BaseCommand
                         break;
                 }
 
+                var cmdPerm = appCommand.DefaultMemberPermissions ?? null;
+
+                if (cmdPerm is not null && ctx.Member.Permissions.HasPermission(cmdPerm.Value))
+                    continue;
+
                 try
                 {
                     var commandKey = this.t.CommandList.FirstOrDefault(localized => localized.Names.Any(x => x.Value == appCommand.Name), null);
