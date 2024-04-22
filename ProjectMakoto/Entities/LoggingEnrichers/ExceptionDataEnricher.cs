@@ -38,7 +38,12 @@ public class BadRequestExceptionEnricher : ILogEventEnricher
             return;
 
         if (logEvent.Exception is not DisCatSharp.Exceptions.BadRequestException badRequest)
-            return;
+        {
+            if (logEvent.Exception is AggregateException aggregateException && aggregateException.InnerException is DisCatSharp.Exceptions.BadRequestException innerException)
+                badRequest = innerException;
+            else
+                return;
+        }    
 
         List<KeyValuePair<string, object>> badRequestData = 
             [
