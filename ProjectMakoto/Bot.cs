@@ -104,7 +104,7 @@ public sealed class Bot
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.ControlledBy(this.loggingLevel)
             .WriteTo.Console(outputTemplate: loggingTemplate)
-            .WriteTo.File($"logs/{DateTime.UtcNow:dd-MM-yyyy_HH-mm-ss}.log", LogEventLevel.Debug, outputTemplate: loggingTemplate)
+            .WriteTo.File($"logs/{DateTime.UtcNow.Ticks}.log", LogEventLevel.Debug, outputTemplate: loggingTemplate, retainedFileTimeLimit: TimeSpan.FromDays(7))
             .WriteTo.Sink(sink)
             .Enrich.With<ExceptionDataEnricher>()
             .Enrich.With<BadRequestExceptionEnricher>()
