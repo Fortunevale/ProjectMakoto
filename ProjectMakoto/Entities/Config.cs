@@ -122,6 +122,7 @@ public sealed class Config
         public ulong SoundCloud = 0;
         public ulong AbuseIPDB = 0;
         public ulong Spotify = 0;
+        public ulong Loading = 0;
     }
 
     public sealed class AccountIdsConfig

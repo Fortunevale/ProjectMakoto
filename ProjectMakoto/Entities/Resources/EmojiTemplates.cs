@@ -40,4 +40,5 @@ public static class EmojiTemplates
     public static DiscordEmoji GetSoundcloud(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient.GetShard(bot.status.LoadedConfig.Discord.AssetsGuild), bot.status.LoadedConfig.Emojis.SoundCloud);
     public static DiscordEmoji GetSpotify(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient.GetShard(bot.status.LoadedConfig.Discord.AssetsGuild), bot.status.LoadedConfig.Emojis.Spotify);
     public static DiscordEmoji GetAbuseIpDb(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient.GetShard(bot.status.LoadedConfig.Discord.AssetsGuild), bot.status.LoadedConfig.Emojis.AbuseIPDB);
+    public static DiscordEmoji GetLoading(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient.GetShard(bot.status.LoadedConfig.Discord.AssetsGuild), bot.status.LoadedConfig.Emojis.Loading);
 }
