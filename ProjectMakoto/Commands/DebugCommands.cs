@@ -62,9 +62,6 @@ public sealed partial class DebugCommands : ApplicationCommandsModule
                         _ => -1,
                     };
 
-                    if (ctx.FocusedOption.Value.ToString().Length > 1)
-                        return [];
-
                     var Command = (DevCommands)Enum.Parse(typeof(DevCommands), ctx.Options.First(x => x.Name == "command").Value.ToString());
 
                     return Command switch
@@ -103,13 +100,35 @@ public sealed partial class DebugCommands : ApplicationCommandsModule
                         },
                         DevCommands.GlobalBan => currentArgument switch
                         {
-                            1 => [ new("UserId", "") ],
+                            1 => [ new("UserIds", "") ],
                             2 => [ new("Reason", "") ],
                             _ => [],
                         },
                         DevCommands.GlobalUnban => currentArgument switch
                         {
-                            1 => [ new("UserId", "") ],
+                            1 => [ ..bot.globalBans.Keys
+                                    .Where(bannedId =>
+                                    {
+                                        var currentInputRaw = ctx.Options.First(x => x.Name == "argument1").Value.ToString().Trim();
+                                        var currentInput = DiscordExtensions.ParseStringAsIdArray(currentInputRaw).ToList();
+
+                                        foreach (var input in currentInput)
+                                            if (bannedId == input)
+                                                return false;
+
+                                        return true;
+                                    })
+                                    .Select(bannedId => 
+                                    {
+                                        var val = bot.globalBans[bannedId];
+                                        var currentInputRaw = ctx.Options.First(x => x.Name == "argument1").Value.ToString().Trim();
+                                        var currentInput = DiscordExtensions.ParseStringAsIdArray(currentInputRaw)
+                                            .Select(id => id.ToString())
+                                            .ToList();
+
+                                        return new DiscordApplicationCommandAutocompleteChoice($"{(currentInput.Count > 0 ? $"{string.Join(", ", currentInput)}, " : string.Empty)}{bannedId}", $"{currentInputRaw} {bannedId}");
+                                    }).ToList()
+                                 ],
                             2 => [ new("Unban from all servers that global banned them", "true"), new("Do not unban from all servers that global banned them", "false") ],
                             _ => [],
                         },
@@ -315,7 +334,7 @@ public sealed partial class DebugCommands : ApplicationCommandsModule
 
                         await new Commands.DevTools.GlobalBanCommand().ExecuteCommandWith2FA(ctx, this._bot, new Dictionary<string, object>
                         {
-                            { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
+                            { "victims", argument1 },
                             { "reason", argument2 },
                         });
                     });
@@ -323,13 +342,13 @@ public sealed partial class DebugCommands : ApplicationCommandsModule
                 case DevCommands.GlobalUnban:
                     _ = Task.Run(async () =>
                     {
-                        if (!Require1() || !Require2())
+                        if (!Require1())
                             return;
 
                         await new Commands.DevTools.GlobalUnbanCommand().ExecuteCommandWith2FA(ctx, this._bot, new Dictionary<string, object>
                         {
-                            { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
-                            { "UnbanFromGuilds", bool.Parse(argument2) },
+                            { "victims", argument1 },
+                            { "UnbanFromGuilds", bool.TryParse(argument2, out var r) ? r : true },
                         });
                     });
                     break;

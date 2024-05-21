@@ -72,7 +72,7 @@ public static class DiscordExtensions
 
         var messageStrings = messages.OrderBy(x => x.Id.GetSnowflakeTime().Ticks).Select(msg =>
         {
-            var messageBuilder = 
+            var messageBuilder =
             $"<discord-message author=\"{Sanitize(msg.Author?.GetUsername() ?? "Unknown User")} ({msg.Author?.Id})\" " +
             $"avatar=\"{msg.Author?.AvatarUrl}\" timestamp=\"{msg.Id.GetSnowflakeTime().ToUnixTimeSeconds()}\" " +
             $"twenty-four=\"true\" " +
@@ -80,7 +80,7 @@ public static class DiscordExtensions
             $"verified={((msg.Author?.IsVerifiedBot ?? false) && !msg.WebhookMessage).ToString().ToLower()} " +
             $"webhook={msg.WebhookMessage.ToString().ToLower()} " +
             $"edited={msg.IsEdited.ToString().ToLower()}>" +
-            $"{(msg.ReferencedMessage is not null ? 
+            $"{(msg.ReferencedMessage is not null ?
                 $"<discord-reply slot=\"reply\"" +
                 $" author=\"{Sanitize(msg.ReferencedMessage.Author?.GetUsername() ?? "Unknown User")} ({msg.Author?.Id})\"" +
                 $" avatar=\"{msg.ReferencedMessage.Author?.AvatarUrl}\">{Sanitize(msg.ReferencedMessage.Content.TruncateWithIndication(100))
@@ -99,7 +99,7 @@ public static class DiscordExtensions
                     {
                         videoId = RegexTemplates.YouTubeUrl.Match(msg.Content).Groups[5].Value;
                     }
-                    catch {}
+                    catch { }
                 }
 
                 if (msg.Flags?.HasMessageFlag(MessageFlags.SuppressedEmbeds) ?? false)
@@ -111,7 +111,7 @@ public static class DiscordExtensions
                     $"type=\"image\" " +
                     $"url=\"{Sanitize(embed.Url.ToString())}\" />";
                 }
-                
+
                 if (embed.Type is "video" && (embed.Provider is null || embed.Provider.Name.IsNullOrWhiteSpace()))
                 {
                     return $"<discord-attachment slot=\"attachments\" " +
@@ -237,15 +237,15 @@ public static class DiscordExtensions
 
         return LoadedHtml
             .Replace("<--! RawMessages -->", Uri.EscapeDataString(JsonConvert.SerializeObject(messages.OrderBy(x => x.Id.GetSnowflakeTime().Ticks), new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                Error = (serializer, err) =>
                 {
-                    Formatting = Formatting.Indented,
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                    Error = (serializer, err) =>
-                    {
-                        Log.Error(err.ErrorContext.Error, "Failed to serialize member '{member}' at '{path}'", err.ErrorContext.Member, err.ErrorContext.Path);
-                        err.ErrorContext.Handled = true;
-                    },
-                })))
+                    Log.Error(err.ErrorContext.Error, "Failed to serialize member '{member}' at '{path}'", err.ErrorContext.Member, err.ErrorContext.Path);
+                    err.ErrorContext.Handled = true;
+                },
+            })))
             .Replace("<--! RawMessageFileName -->", $"{Guid.NewGuid()}.txt")
             .Replace("<!-- Title -->", "Chat History")
             .Replace("<!-- MessageCount -->", messages.Count())
@@ -271,7 +271,7 @@ public static class DiscordExtensions
             return $"<discord-inline-code in-embed=\"{isEmbed.ToString().ToLower()}\" >{e.Groups[1].Value
                 .Replace("*", "\\*").Replace("_", "\\_").Replace("&gt;", "\\&gt;").Replace("&lt;", "\\&lt;").Replace("~", "\\~").Replace("`", "\\`").Replace("|", "\\|").Replace(" ", "&nbsp;")}</discord-inline-code>";
         }, RegexOptions.Compiled);
-        
+
         md = Regex.Replace(md, @"(?<!\\)(?:\`\`\`)(?:(\w{2,15})\n)?((?:.|\n)+?)(?:\`\`\`)", (e) =>
         {
             var lang = "";
@@ -312,7 +312,7 @@ public static class DiscordExtensions
         {
             return $"<discord-italic>{e.Groups[1].Value}</discord-italic>";
         }, RegexOptions.Compiled);
-        
+
         md = Regex.Replace(md, @"^(?<!\\)&gt; ([^\n_]+?)", (e) =>
         {
             return $"<discord-quote>{e.Groups[1].Value}</discord-quote>";
@@ -322,12 +322,12 @@ public static class DiscordExtensions
         {
             return $"<discord-time format=\"{e.Groups[3].Value}\" timestamp=\"{e.Groups[1].Value}\"></discord-time>";
         }, RegexOptions.Compiled);
-        
+
         md = Regex.Replace(md, @"(?<!\\)&lt;/([\w -]+?):(?:\d+?)&gt;", (e) =>
         {
             return $"<discord-mention type=\"slash\">{e.Groups[1].Value}</discord-mention>";
         }, RegexOptions.Compiled);
-        
+
         md = Regex.Replace(md, @"(&lt;)?(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=;]*))", (e) =>
         {
             var url = e.Groups[2].Value;
@@ -781,5 +781,41 @@ public static class DiscordExtensions
         }
 
         throw new ArgumentException("");
+    }
+
+    public static ulong[] ParseStringAsIdArray(string str)
+    {
+        char[] chars = [' ', ','];
+
+        var Ids = str
+            .Split(chars, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(x =>
+            {
+                var ret = x;
+
+                foreach (var c in chars)
+                {
+                    ret = ret.Replace(c.ToString(), string.Empty);
+                }
+
+                return ret;
+            });
+        return Ids.Select(x => UInt64.Parse(x)).ToArray();
+    }
+
+    public static async Task<DiscordUser[]> ParseStringAsUserArray(string str, DiscordClient client)
+    {
+        var Ids = ParseStringAsIdArray(str);
+
+        if (Ids.Length == 0)
+            throw new ArgumentException("");
+
+        var Users = new List<DiscordUser>();
+
+        foreach (var b in Ids)
+            if (client.TryGetUser(b, out var user))
+                Users.Add(user);
+
+        return Users.ToArray();
     }
 }
