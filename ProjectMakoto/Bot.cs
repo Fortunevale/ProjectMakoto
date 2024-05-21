@@ -180,7 +180,13 @@ public sealed class Bot
                 this.WebServer = Host.Create()
                                     .Port(this.status.LoadedConfig.WebServer.Port)
                                     .Console()
-                                    .Defaults(true, false, false, true, false, false)
+                                    .Defaults(
+                                        compression: true,
+                                        secureUpgrade: false,
+                                        strictTransport: false,
+                                        clientCaching: true,
+                                        rangeSupport: false,
+                                        preventSniffing: false)
                                     .Handler(StaticWebsite.From(ResourceTree.FromDirectory("WebServer")))
                                     .Start();
 
@@ -195,7 +201,6 @@ public sealed class Bot
                 {
                     return new SubmittedUrlEntry(this, id);
                 });
-                //this.PhishingHosts = new();
 
                 this.Users = new(this.DatabaseClient, "users", "userid", this.DatabaseClient.mainDatabaseConnection, (id) =>
                 {

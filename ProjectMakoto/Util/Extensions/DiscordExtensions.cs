@@ -29,6 +29,20 @@ public static class DiscordExtensions
     public static DiscordClient? GetFirstShard(this DiscordShardedClient client)
         => client.ShardClients.FirstOrDefault(_ => true, new KeyValuePair<int, DiscordClient>(0, null)).Value;
 
+    public static string ConvertToText(this DiscordMessage msg)
+    {
+        return ($"{(msg.Content?.Length > 0 ? msg.Content : string.Empty)}" +
+               $"{(msg.Attachments?.Count > 0 ? $"\n## _Attachments_\n{string.Join("\n", msg.Attachments.Select(x => $"[{x.Filename.FullSanitize()}]({x.Url})"))}" : string.Empty)}" +
+               $"{(msg.Embeds?.Count > 0 ? $"\n## _Embeds_\n{string.Join("\n", msg.Embeds.Select(embed =>
+               {
+                   return ($"{(embed.Title?.Length > 0 ? $"\n### {embed.Title}" : string.Empty)}" +
+                          $"{(embed.Author?.Name?.Length > 0 ? $"\n### {embed.Author.Name.FullSanitize()}" : string.Empty)}" +
+                          $"{(embed.Description?.Length > 0 ? $"\n{embed.Description}" : string.Empty)}" +
+                          $"{(embed.Fields?.Count > 0 ? $"\n\n{string.Join("\n", embed.Fields.Select(field => $"**{field.Name.FullSanitize()}**\n{field.Value}"))}" : string.Empty)}" +
+                          $"{(embed.Footer?.Text?.Length > 0 ? $"\n\n_{embed.Footer.Text.FullSanitize()}_" : string.Empty)}").TrimStart();
+               }))}" : string.Empty)}").TrimStart();
+    }
+
     public static string GenerateHtmlFromMessages(this IEnumerable<DiscordMessage> messages, Bot bot)
     {
         var sanitizer = new Ganss.Xss.HtmlSanitizer(new()
