@@ -126,7 +126,7 @@ public sealed partial class DebugCommands : ApplicationCommandsModule
                                             .Select(id => id.ToString())
                                             .ToList();
 
-                                        return new DiscordApplicationCommandAutocompleteChoice($"{(currentInput.Count > 0 ? $"{string.Join(", ", currentInput)}, " : string.Empty)}{bannedId}", $"{currentInputRaw} {bannedId}");
+                                        return new DiscordApplicationCommandAutocompleteChoice($"{(currentInput.Count > 0 ? $"{string.Join(", ", currentInput)}, " : string.Empty)}{bannedId}", $"{string.Join(" ", currentInput)} {bannedId}");
                                     }).ToList()
                                  ],
                             2 => [ new("Unban from all servers that global banned them", "true"), new("Do not unban from all servers that global banned them", "false") ],
