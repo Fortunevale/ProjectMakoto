@@ -18,6 +18,7 @@ using Microsoft.Extensions.Logging;
 using Serilog.Events;
 using Serilog.Core;
 using ProjectMakoto.Entities.LoggingEnrichers;
+using Status = ProjectMakoto.Entities.Status;
 
 namespace ProjectMakoto;
 
