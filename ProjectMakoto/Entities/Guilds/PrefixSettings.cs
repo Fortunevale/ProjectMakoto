@@ -1,5 +1,5 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -7,12 +7,10 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-using ProjectMakoto.Entities.Database.ColumnAttributes;
-
 namespace ProjectMakoto.Entities.Guilds;
 public sealed class PrefixSettings(Bot bot, Guild parent) : RequiresParent<Guild>(bot, parent)
 {
-    [ColumnName("prefix"), ColumnType(ColumnTypes.Text), WithCollation, Default(";;")]
+    [ColumnName("prefix"), ColumnType(ColumnTypes.Text), Default(";;")]
     public string Prefix
     {
         get => this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Parent.Id, "prefix", this.Bot.DatabaseClient.mainDatabaseConnection);

@@ -1,5 +1,5 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -15,10 +15,6 @@ internal sealed class CrosspostEvents(Bot bot) : RequiresTranslation(bot)
     {
         if (e.Guild is null || e.Channel.IsPrivate)
             return;
-
-        foreach (var b in this.Bot.Guilds[e.Guild.Id].Crosspost.CrosspostChannels.ToList())
-            if (!e.Guild.Channels.ContainsKey(b))
-                this.Bot.Guilds[e.Guild.Id].Crosspost.CrosspostChannels = this.Bot.Guilds[e.Guild.Id].Crosspost.CrosspostChannels.Remove(x => x.ToString(), b);
 
         if (!this.Bot.Guilds[e.Guild.Id].Crosspost.CrosspostChannels.Contains(e.Channel.Id))
             return;

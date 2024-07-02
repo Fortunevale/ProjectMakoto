@@ -1,5 +1,5 @@
 ﻿// Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -23,7 +23,7 @@ internal class GlobalNote : RequiresBotReference
     internal ulong Id { get; init; }
     
     
-    [ColumnName("notes"), ColumnType(ColumnTypes.LongText), WithCollation, Default("[]")]
+    [ColumnName("notes"), ColumnType(ColumnTypes.LongText), Default("[]")]
     internal Note[] Notes
     {
         get => JsonConvert.DeserializeObject<Note[]>(this.Bot.DatabaseClient.GetValue<string>("globalnotes", "id", this.Id, "notes", this.Bot.DatabaseClient.mainDatabaseConnection));

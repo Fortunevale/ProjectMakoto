@@ -1,5 +1,5 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -18,7 +18,7 @@ internal static class SyncTasks
         {
             bot.status.DiscordGuildDownloadCompleted = true;
 
-            _logger.LogInfo("I'm on {GuildsCount} guilds.", e.Guilds.Count);
+            Log.Information("I'm on {GuildsCount} guilds.", e.Guilds.Count);
 
             _ = Task.Run(async () =>
             {
@@ -37,15 +37,15 @@ internal static class SyncTasks
                             {
                                 if (!VideoLengthCache.TryGetValue(b.Url, out var value))
                                 {
-                                    _logger.LogInfo("Fetching video length for '{Url}'", b.Url);
+                                    Log.Information("Fetching video length for '{Url}'", b.Url);
 
-                                    var loadResult = await bot.DiscordClient.GetLavalink().ConnectedSessions.First(x => x.Value.IsConnected).Value.LoadTracksAsync(LavalinkSearchType.Plain, b.Url);
+                                    var loadResult = await bot.DiscordClient.GetFirstShard().GetLavalink().ConnectedSessions.First(x => x.Value.IsConnected).Value.LoadTracksAsync(LavalinkSearchType.Plain, b.Url);
                                     var track = loadResult.GetResultAs<LavalinkTrack>();
 
                                     if (loadResult.LoadType != LavalinkLoadResultType.Track)
                                     {
                                         list.List = list.List.Remove(x => x.Url, b);
-                                        _logger.LogError("Failed to load video length for '{Url}'", b.Url);
+                                        Log.Error("Failed to load video length for '{Url}'", b.Url);
                                         continue;
                                     }
 
@@ -69,7 +69,7 @@ internal static class SyncTasks
 
                             if (!userCache.TryGetValue(b, out var victim))
                             {
-                                if (bot.DiscordClient.TryGetUser(b, out var fetched))
+                                if (bot.DiscordClient.GetFirstShard().TryGetUser(b, out var fetched))
                                     userCache.Add(b, fetched);
                                 else
                                     userCache.Add(b, null);
@@ -79,7 +79,7 @@ internal static class SyncTasks
 
                             if (victim is null || victim.Id == bot.DiscordClient.CurrentUser.Id || victim.Id == user.Key || victim.IsBot || (victim.Flags?.HasFlag(UserFlags.Staff) ?? false))
                             {
-                                _logger.LogDebug("Removing '{victim}' from '{owner}' blocklist", b, user.Value.Id);
+                                Log.Debug("Removing '{victim}' from '{owner}' blocklist", b, user.Value.Id);
                                 i--;
                                 user.Value.BlockedUsers = user.Value.BlockedUsers.Remove(x => x.ToString(), b);
                             }
@@ -114,7 +114,7 @@ internal static class SyncTasks
 
                             var ChannelId = bot.Guilds[guild.Key].Crosspost.CrosspostChannels[i];
 
-                            _logger.LogDebug("Checking channel '{ChannelId}' for missing crossposts..", ChannelId);
+                            Log.Debug("Checking channel '{ChannelId}' for missing crossposts..", ChannelId);
 
                             if (!guild.Value.Channels.ContainsKey(ChannelId))
                                 return;
@@ -124,7 +124,7 @@ internal static class SyncTasks
                             if (Messages.Any(x => x.Flags.HasValue && !x.Flags.Value.HasMessageFlag(MessageFlags.Crossposted)))
                                 foreach (var msg in Messages.Where(x => x.Flags.HasValue && !x.Flags.Value.HasMessageFlag(MessageFlags.Crossposted)))
                                 {
-                                    _logger.LogDebug("Handling missing crosspost message '{msg}' in '{ChannelId}' for '{guild}'..", msg.Id, msg.ChannelId, guild.Key);
+                                    Log.Debug("Handling missing crosspost message '{msg}' in '{ChannelId}' for '{guild}'..", msg.Id, msg.ChannelId, guild.Key);
 
                                     var WaitTime = bot.Guilds[guild.Value.Id].Crosspost.DelayBeforePosting - msg.Id.GetSnowflakeTime().GetTotalSecondsSince();
 
@@ -143,11 +143,11 @@ internal static class SyncTasks
 
             try
             {
-                await ExecuteSyncTasks(bot, bot.DiscordClient.Guilds);
+                await ExecuteSyncTasks(bot, bot.DiscordClient);
             }
             catch (Exception ex)
             {
-                _logger.LogError("Failed to run sync tasks", ex);
+                Log.Error(ex, "Failed to run sync tasks");
             }
 
             while (!bot.status.LavalinkInitialized)
@@ -178,11 +178,11 @@ internal static class SyncTasks
                                 {
                                     var b = bot.Guilds[guild.Key].MusicModule.SongQueue[i];
 
-                                    _logger.LogDebug("Fixing queue info for '{Url}'", b.Url);
+                                    Log.Debug("Fixing queue info for '{Url}'", b.Url);
                                 }
                             }
 
-                            var lava = bot.DiscordClient.GetLavalink();
+                            var lava = bot.DiscordClient.GetShard(guild.Key).GetLavalink();
 
                             while (!lava.ConnectedSessions.Values.Any(x => x.IsConnected))
                                 await Task.Delay(1000);
@@ -210,12 +210,12 @@ internal static class SyncTasks
                             await Task.Delay(1000);
                             _ = await conn.SeekAsync(TimeSpan.FromSeconds(bot.Guilds[guild.Key].MusicModule.CurrentVideoPosition));
 
-                            bot.Guilds[guild.Key].MusicModule.QueueHandler(bot, bot.DiscordClient, node, conn);
+                            bot.Guilds[guild.Key].MusicModule.QueueHandler(bot, bot.DiscordClient.GetShard(guild.Key), node, conn);
                         }
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError("An exception occurred while trying to continue music playback for '{guild}'", ex, guild.Key);
+                        Log.Error(ex, "An exception occurred while trying to continue music playback for '{guild}'", guild.Key);
                         bot.Guilds[guild.Key].MusicModule.Reset();
                     }
                 });
@@ -225,8 +225,10 @@ internal static class SyncTasks
         }).Add(bot);
     }
 
-    internal static async Task ExecuteSyncTasks(Bot bot, IReadOnlyDictionary<ulong, DiscordGuild> Guilds)
+    internal static async Task ExecuteSyncTasks(Bot bot, DiscordShardedClient shardedClient)
     {
+        var Guilds = shardedClient.GetGuilds();
+
         ObservableList<Task> runningTasks = new();
 
         void runningTasksUpdated(object sender, ObservableListUpdate<Task> e)
@@ -253,11 +255,11 @@ internal static class SyncTasks
 
             runningTasks.Add(Task.Run(async () =>
             {
-                _logger.LogDebug("Performing sync tasks for '{guild}'..", guild.Key);
+                Log.Debug("Performing sync tasks for '{guild}'..", guild.Key);
 
                 if (bot.objectedUsers.Contains(guild.Value.OwnerId) || bot.bannedUsers.ContainsKey(guild.Value.OwnerId) || bot.bannedGuilds.ContainsKey(guild.Key))
                 {
-                    _logger.LogInfo("Leaving guild '{guild}'..", guild.Key);
+                    Log.Information("Leaving guild '{guild}'..", guild.Key);
                     await guild.Value.LeaveAsync();
                     return;
                 }
@@ -335,18 +337,18 @@ internal static class SyncTasks
                     if (!t.HasMore)
                         break;
 
-                    _logger.LogDebug("Requesting more threads for '{guild}'", guild.Key);
+                    Log.Debug("Requesting more threads for '{guild}'", guild.Key);
                 }
 
                 foreach (var b in Threads.Where(x => x.CurrentMember is null))
                 {
-                    _logger.LogDebug("Joining thread on '{guild}': {thread}", guild.Key, b.Id);
+                    Log.Debug("Joining thread on '{guild}': {thread}", guild.Key, b.Id);
                     b.JoinWithQueue(bot.ThreadJoinClient);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError("Failed to join threads on '{guild}'", ex, guild.Key);
+                Log.Error(ex, "Failed to join threads on '{guild}'", guild.Key);
             }
         }
 
@@ -356,6 +358,6 @@ internal static class SyncTasks
         runningTasks.ItemsChanged -= runningTasksUpdated;
         runningTasks.Clear();
 
-        _logger.LogInfo("Sync Tasks successfully finished for {startupTasksSuccess}/{GuildCount} guilds.", startupTasksSuccess, Guilds.Count);
+        Log.Information("Sync Tasks successfully finished for {startupTasksSuccess}/{GuildCount} guilds.", startupTasksSuccess, Guilds.Count);
     }
 }

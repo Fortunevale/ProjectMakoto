@@ -1,5 +1,5 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Util;
 
-internal static class PreMadeEmbedsExtensions
+public static class PreMadeEmbedsExtensions
 {
     public static DiscordEmbedBuilder AsLoading(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
     {

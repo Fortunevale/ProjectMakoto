@@ -1,13 +1,11 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
-
-using ProjectMakoto.Entities.Database.ColumnAttributes;
 
 namespace ProjectMakoto.Entities.Guilds;
 
@@ -42,7 +40,7 @@ public sealed class PhishingDetectionSettings(Bot bot, Guild parent) : RequiresP
     }
 
 
-    [ColumnName("phishing_reason"), ColumnType(ColumnTypes.Text), WithCollation, Default("%R")]
+    [ColumnName("phishing_reason"), ColumnType(ColumnTypes.Text), Default("%R")]
     public string CustomPunishmentReason
     {
         get => this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Parent.Id, "phishing_reason", this.Bot.DatabaseClient.mainDatabaseConnection);

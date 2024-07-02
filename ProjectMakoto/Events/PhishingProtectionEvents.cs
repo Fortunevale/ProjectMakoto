@@ -1,5 +1,5 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -146,12 +146,12 @@ internal sealed class PhishingProtectionEvents(Bot bot) : RequiresTranslation(bo
             {
                 try
                 {
-                    var unshortened_url = await WebTools.UnshortenUrl(match.Value);
-                    var parsedUri = new UriBuilder(unshortened_url);
+                    var unshortenedUrl = await WebTools.UnshortenUrl(match.Value);
+                    var parsedUri = new UriBuilder(unshortenedUrl);
 
                     _ = CheckDb(parsedUri.Uri);
 
-                    if (unshortened_url != match.Value)
+                    if (unshortenedUrl != match.Value)
                     {
                         foreach (var url in this.Bot.PhishingHosts)
                         {
@@ -162,9 +162,18 @@ internal sealed class PhishingProtectionEvents(Bot bot) : RequiresTranslation(bo
                             }
                         }
 
-                        if (!this.recentlyResolvedUrls.TryGetValue(unshortened_url, out var value) || value.AddSeconds(10) < DateTime.UtcNow)
-                            redirectUrls.Add(match.Value, unshortened_url);
+                        if (!this.recentlyResolvedUrls.TryGetValue(unshortenedUrl, out var value) || value.AddSeconds(10) < DateTime.UtcNow)
+                            redirectUrls.Add(match.Value, unshortenedUrl);
                     }
+                }
+                catch (DepthLimitReachedException)
+                {
+                    if (this.Bot.Guilds[guild.Id].PhishingDetection.WarnOnRedirect)
+                        _ = e.RespondAsync(embed: new DiscordEmbedBuilder
+                        {
+                            Title = $":no_entry: {this.tKey.RedirectDepthLimitError.Get(this.Bot.Guilds[guild.Id])}",
+                            Color = EmbedColors.Error
+                        });
                 }
                 catch (Exception ex) when (ex is TimeoutException ||
                                            (ex is HttpRequestException && ex.Message.Contains("Cannot write more bytes")))
@@ -178,7 +187,7 @@ internal sealed class PhishingProtectionEvents(Bot bot) : RequiresTranslation(bo
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError("An exception occurred while trying to unshorten url '{url}'", ex, match);
+                    Log.Error(ex, "An exception occurred while trying to unshorten url '{url}'", match);
 
                     if (this.Bot.Guilds[guild.Id].PhishingDetection.WarnOnRedirect)
                         _ = e.RespondAsync(embed: new DiscordEmbedBuilder

@@ -1,5 +1,5 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -13,7 +13,7 @@ namespace ProjectMakoto.Entities;
 
 public sealed class SharedCommandContext
 {
-    internal SharedCommandContext() { }
+    public SharedCommandContext() { }
 
     public SharedCommandContext(BaseCommand cmd, CommandContext ctx, Bot _bot)
     {
@@ -47,7 +47,7 @@ public sealed class SharedCommandContext
         }
         catch (Exception ex)
         {
-            _logger.LogWarn("Unable to fetch database user entry for '{User}'\n{ex}", ctx.User.Id, ex);
+            Log.Warning(ex, "Unable to fetch database user entry for '{User}'", ctx.User.Id);
         }
 
         try
@@ -56,7 +56,7 @@ public sealed class SharedCommandContext
         }
         catch (Exception ex)
         {
-            _logger.LogWarn("Unable to fetch database guild entry for '{User}'\n{ex}", ctx.User.Id, ex);
+            Log.Warning(ex, "Unable to fetch database guild entry for '{User}'", ctx.User.Id);
         }
     }
 
@@ -64,7 +64,7 @@ public sealed class SharedCommandContext
     {
         this.CommandType = CommandType.Custom;
 
-        this.Client = _bot.DiscordClient;
+        this.Client = _bot.DiscordClient.GetShard(message.Guild);
         this.User = message.Author;
         this.Guild = message.Channel.Guild;
         this.Channel = message.Channel;
@@ -89,7 +89,7 @@ public sealed class SharedCommandContext
         }
         catch (Exception ex)
         {
-            _logger.LogWarn("Unable to fetch database user entry for '{User}'\n{ex}", message.Author.Id, ex);
+            Log.Warning(ex, "Unable to fetch database user entry for '{User}'", message.Author.Id);
         }
 
         try
@@ -98,7 +98,7 @@ public sealed class SharedCommandContext
         }
         catch (Exception ex)
         {
-            _logger.LogWarn("Unable to fetch database guild entry for '{User}'\n{ex}", message.Channel.Guild.Id, ex);
+            Log.Warning(ex, "Unable to fetch database guild entry for '{User}'", message.Channel.Guild.Id);
         }
     }
 
@@ -132,7 +132,7 @@ public sealed class SharedCommandContext
         }
         catch (Exception ex)
         {
-            _logger.LogWarn("Unable to fetch database user entry for '{User}'\n{ex}", ctx.User.Id, ex);
+            Log.Warning(ex, "Unable to fetch database user entry for '{User}'", ctx.User.Id);
         }
 
         try
@@ -141,7 +141,7 @@ public sealed class SharedCommandContext
         }
         catch (Exception ex)
         {
-            _logger.LogWarn("Unable to fetch database guild entry for '{User}'\n{ex}", ctx.User.Id, ex);
+            Log.Warning(ex, "Unable to fetch database guild entry for '{User}'", ctx.User.Id);
         }
     }
 
@@ -177,7 +177,7 @@ public sealed class SharedCommandContext
         }
         catch (Exception ex)
         {
-            _logger.LogWarn("Unable to fetch database user entry for '{User}'\n{ex}", ctx.User?.Id ?? 0, ex);
+            Log.Warning(ex, "Unable to fetch database user entry for '{User}'", ctx.User?.Id ?? 0);
         }
 
         try
@@ -186,7 +186,7 @@ public sealed class SharedCommandContext
         }
         catch (Exception ex)
         {
-            _logger.LogWarn("Unable to fetch database guild entry for '{Guild}'\n{ex}", ctx.Guild?.Id ?? 0, ex);
+            Log.Warning(ex, "Unable to fetch database guild entry for '{Guild}'", ctx.Guild?.Id ?? 0);
         }
     }
 
@@ -220,7 +220,7 @@ public sealed class SharedCommandContext
         }
         catch (Exception ex)
         {
-            _logger.LogWarn("Unable to fetch database user entry for '{User}'\n{ex}", ctx.User.Id, ex);
+            Log.Warning(ex, "Unable to fetch database user entry for '{User}'", ctx.User.Id);
         }
 
         try
@@ -229,7 +229,7 @@ public sealed class SharedCommandContext
         }
         catch (Exception ex)
         {
-            _logger.LogWarn("Unable to fetch database guild entry for '{User}'\n{ex}", ctx.User.Id, ex);
+            Log.Warning(ex, "Unable to fetch database guild entry for '{User}'", ctx.User.Id);
         }
     }
 

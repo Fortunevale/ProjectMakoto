@@ -1,5 +1,5 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@ internal class PostLoginTaskLoader
 {
     public static async Task Load(Bot bot)
     {
-        var guild = await bot.DiscordClient.GetGuildAsync(bot.status.LoadedConfig.Discord.AssetsGuild);
+        var guild = await bot.DiscordClient.GetShard(bot.status.LoadedConfig.Discord.AssetsGuild).GetGuildAsync(bot.status.LoadedConfig.Discord.AssetsGuild);
         var emojis = await guild.GetEmojisAsync();
 
         foreach (var field in typeof(Config.EmojiConfig).GetFields())
@@ -29,14 +29,14 @@ internal class PostLoginTaskLoader
             {
                 if (emojis.Any(x => x.Name == field.Name))
                 {
-                    _logger.LogInfo("Missing '{emojiName}' Emoji but Guild '{guild}' contains emoji with same name. Using that..", field.Name, guild.Name);
+                    Log.Information("Missing '{emojiName}' Emoji but Guild '{guild}' contains emoji with same name. Using that..", field.Name, guild.Name);
 
                     field.SetValue(bot.status.LoadedConfig.Emojis, emojis.First(x => x.Name == field.Name).Id);
                     bot.status.LoadedConfig.Save();
                     continue;
                 }
 
-                _logger.LogInfo("Uploading '{emojiName}' Emoji to '{guild}'..", field.Name, guild.Name);
+                Log.Information("Uploading '{emojiName}' Emoji to '{guild}'..", field.Name, guild.Name);
 
                 var fileName = $"Assets/Emojis/Upload/{field.Name}.png";
 
@@ -61,7 +61,7 @@ internal class PostLoginTaskLoader
             }
             catch (Exception ex)
             {
-                _logger.LogError("Could not upload emoji", ex);
+                Log.Error(ex, "Could not upload emoji");
             }
         }
     }

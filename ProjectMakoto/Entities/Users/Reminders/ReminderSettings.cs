@@ -1,13 +1,11 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
-
-using ProjectMakoto.Entities.Database.ColumnAttributes;
 
 namespace ProjectMakoto.Entities.Users;
 
@@ -18,7 +16,7 @@ public sealed class ReminderSettings : RequiresParent<User>
         this.RemindersUpdated();
     }
 
-    [ColumnName("reminders"), ColumnType(ColumnTypes.LongText), WithCollation, Default("[]")]
+    [ColumnName("reminders"), ColumnType(ColumnTypes.LongText), Default("[]")]
     public ReminderItem[] ScheduledReminders
     {
         get => JsonConvert.DeserializeObject<ReminderItem[]>(this.Bot.DatabaseClient.GetValue<string>("users", "userid", this.Parent.Id, "reminders", this.Bot.DatabaseClient.mainDatabaseConnection));
@@ -48,7 +46,7 @@ public sealed class ReminderSettings : RequiresParent<User>
 
                         this.ScheduledReminders = this.ScheduledReminders.Remove(x => x.ToString(), b);
 
-                        var user = await this.Bot.DiscordClient.Guilds.First<KeyValuePair<ulong, DiscordGuild>>(x => x.Value.Members.ContainsKey(this.Parent.Id)).Value.GetMemberAsync(this.Parent.Id);
+                        var user = await this.Bot.DiscordClient.GetFirstShard().GetUserAsync(this.Parent.Id);
 
                         var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
                             .WithDescription($"> {b.Description.FullSanitize()}\n" +
@@ -69,7 +67,7 @@ public sealed class ReminderSettings : RequiresParent<User>
 
                     _ = task.CreateScheduledTask(b.DueTime, new ScheduledTaskIdentifier(this.Parent.Id, b.UUID, "reminder"));
 
-                    _logger.LogDebug("Created scheduled task for reminder by '{User}'", this.Parent.Id);
+                    Log.Debug("Created scheduled task for reminder by '{User}'", this.Parent.Id);
                 }
 
             foreach (var b in ScheduledTaskExtensions.GetScheduledTasks())
@@ -81,7 +79,7 @@ public sealed class ReminderSettings : RequiresParent<User>
                 {
                     b.Delete();
 
-                    _logger.LogDebug("Deleted scheduled task for reminder by '{User}'", this.Parent.Id);
+                    Log.Debug("Deleted scheduled task for reminder by '{User}'", this.Parent.Id);
                 }
             }
         });

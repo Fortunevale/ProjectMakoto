@@ -1,13 +1,11 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
-
-using ProjectMakoto.Entities.Database.ColumnAttributes;
 
 namespace ProjectMakoto.Entities.Guilds;
 
@@ -54,7 +52,7 @@ public sealed class CrosspostSettings(Bot bot, Guild parent) : RequiresParent<Gu
     public async Task CrosspostQueue()
     {
         this.QueueInitialized = true;
-        _logger.LogDebug("Initializing crosspost queue for '{Guild}'", this.Parent.Id);
+        Log.Debug("Initializing crosspost queue for '{Guild}'", this.Parent.Id);
 
         while (true)
         {
@@ -80,7 +78,7 @@ public sealed class CrosspostSettings(Bot bot, Guild parent) : RequiresParent<Gu
             {
                 if (!this.CrosspostRatelimits.Any(x => x.Id == channel.Id))
                 {
-                    _logger.LogDebug("Initialized new crosspost ratelimit for '{Channel}'", channel.Id);
+                    Log.Debug("Initialized new crosspost ratelimit for '{Channel}'", channel.Id);
                     this.CrosspostRatelimits = this.CrosspostRatelimits.Add(new()
                     {
                         Id = channel.Id,
@@ -89,7 +87,7 @@ public sealed class CrosspostSettings(Bot bot, Guild parent) : RequiresParent<Gu
 
                 var r = this.CrosspostRatelimits.First(x => x.Id == channel.Id);
 
-                _logger.LogDebug("Crosspost Ratelimit '{Channel}': First: {First}; Remaining: {Remaining}", channel.Id, r.FirstPost, r.PostsRemaining);
+                Log.Debug("Crosspost Ratelimit '{Channel}': First: {First}; Remaining: {Remaining}", channel.Id, r.FirstPost, r.PostsRemaining);
 
                 async Task Crosspost()
                 {
@@ -105,11 +103,11 @@ public sealed class CrosspostSettings(Bot bot, Guild parent) : RequiresParent<Gu
                         await Task.Delay(50);
                     sw.Stop();
 
-                    _logger.LogDebug("It took {Milliseconds}ms to process a crosspost", sw.ElapsedMilliseconds);
+                    Log.Debug("It took {Milliseconds}ms to process a crosspost", sw.ElapsedMilliseconds);
 
                     if (!crossPostTask.IsCompleted)
                     {
-                        _logger.LogWarn("Crosspost Ratelimit tripped for '{Channel}': {Message}", channel.Id, message.Id);
+                        Log.Warning("Crosspost Ratelimit tripped for '{Channel}': {Message}", channel.Id, message.Id);
 
                         r.FirstPost = DateTime.UtcNow;
                         r.PostsRemaining = 0;
@@ -118,7 +116,7 @@ public sealed class CrosspostSettings(Bot bot, Guild parent) : RequiresParent<Gu
                     _ = await crossPostTask;
 
                     _ = this._queue.Remove(message);
-                    _logger.LogDebug("Crossposted message in '{Channel}': {Message}", channel.Id, message.Id);
+                    Log.Debug("Crossposted message in '{Channel}': {Message}", channel.Id, message.Id);
                 }
 
                 void ResetLimits()
@@ -129,33 +127,33 @@ public sealed class CrosspostSettings(Bot bot, Guild parent) : RequiresParent<Gu
 
                 if (r.FirstPost.AddHours(1).GetTotalSecondsUntil() <= 0)
                 {
-                    _logger.LogDebug("First crosspost for '{Channel}' was at {FirstPost}, resetting crosspost availability", channel.Id, r.FirstPost.AddHours(1));
+                    Log.Debug("First crosspost for '{Channel}' was at {FirstPost}, resetting crosspost availability", channel.Id, r.FirstPost.AddHours(1));
                     ResetLimits();
                 }
 
                 if (r.PostsRemaining > 0)
                 {
-                    _logger.LogDebug("{Remaining} crossposts available for '{Channel}', allowing request", r.PostsRemaining, channel.Id);
+                    Log.Debug("{Remaining} crossposts available for '{Channel}', allowing request", r.PostsRemaining, channel.Id);
                     await Crosspost();
                     continue;
                 }
 
                 if (r.FirstPost.AddHours(1).GetTotalSecondsUntil() > 0)
                 {
-                    _logger.LogDebug("No crossposts available for '{Channel}', waiting until {WaitUntil} ({WaitUntilSec} seconds)", channel.Id, r.FirstPost.AddHours(1), r.FirstPost.AddHours(1).GetTotalSecondsUntil());
+                    Log.Debug("No crossposts available for '{Channel}', waiting until {WaitUntil} ({WaitUntilSec} seconds)", channel.Id, r.FirstPost.AddHours(1), r.FirstPost.AddHours(1).GetTotalSecondsUntil());
                     await Task.Delay(r.FirstPost.AddHours(1).GetTimespanUntil());
                 }
 
                 ResetLimits();
 
-                _logger.LogDebug("Crossposts for '{Channel}' available again, allowing request. {Remaining} requests remaining, first post at {First}.", channel.Id, r.PostsRemaining, r.FirstPost);
+                Log.Debug("Crossposts for '{Channel}' available again, allowing request. {Remaining} requests remaining, first post at {First}.", channel.Id, r.PostsRemaining, r.FirstPost);
                 await Crosspost();
                 continue;
             }
             catch (Exception ex)
             {
                 _ = this._queue.Remove(message);
-                _logger.LogError("Failed to process crosspost queue", ex);
+                Log.Error(ex, "Failed to process crosspost queue");
             }
         }
     }

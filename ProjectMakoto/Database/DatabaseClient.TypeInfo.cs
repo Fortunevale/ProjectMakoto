@@ -1,13 +1,11 @@
 ﻿// Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
-
-using ProjectMakoto.Entities.Database.ColumnAttributes;
 
 namespace ProjectMakoto.Database;
 partial class DatabaseClient
@@ -35,10 +33,6 @@ partial class DatabaseClient
             foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
             {
                 if (property.GetCustomAttribute<ColumnNameAttribute>() is null &&
-                    property.GetCustomAttribute<ColumnType>() is null &&
-                    property.GetCustomAttribute<MaxValueAttribute>() is null &&
-                    property.GetCustomAttribute<WithCollationAttribute>() is null &&
-                    property.GetCustomAttribute<NullableAttribute>() is null &&
                     property.GetCustomAttribute<ContainsValuesAttribute>() is null)
                     continue;
 
@@ -67,12 +61,20 @@ partial class DatabaseClient
     /// <exception cref="InvalidOperationException"></exception>
     internal (string ColumnName, ColumnTypes ColumnType, bool Primary, long? MaxValue, string? Collation, bool Nullable, string Default) GetPropertyInfo(PropertyInfo info) 
         => (info.GetCustomAttribute<ColumnNameAttribute>()?.Name ?? throw new InvalidOperationException("Not a valid column.").AddData("info", info),
-            info.GetCustomAttribute<ColumnType>()?.Type ?? throw new InvalidOperationException("Not a valid column.").AddData("info", info),
+            info.GetCustomAttribute<ColumnTypeAttribute>()?.Type ?? throw new InvalidOperationException("Not a valid column.").AddData("info", info),
             info.GetCustomAttribute<PrimaryAttribute>()?.Primary ?? false,
-            info.GetCustomAttribute<MaxValueAttribute>()?.MaxValue ?? (this.GetDefaultMaxValue(info.GetCustomAttribute<ColumnType>().Type, out var max) ? max : null),
-            info.GetCustomAttribute<WithCollationAttribute>() is not null ? this.Bot.status.LoadedConfig.Secrets.Database.Collation : null,
+            info.GetCustomAttribute<MaxValueAttribute>()?.MaxValue ?? (this.GetDefaultMaxValue(info.GetCustomAttribute<ColumnTypeAttribute>().Type, out var max) ? max : null),
+            this.UsesCollation(info.GetCustomAttribute<ColumnTypeAttribute>().Type) ? this.Bot.status.LoadedConfig.Secrets.Database.Collation : null,
             info.GetCustomAttribute<NullableAttribute>()?.Nullable ?? false,
             info.GetCustomAttribute<DefaultAttribute>()?.Default);
+
+    private bool UsesCollation(ColumnTypes columnType) 
+        => columnType switch
+        {
+            ColumnTypes.BigInt or ColumnTypes.Int or ColumnTypes.TinyInt => false,
+            ColumnTypes.LongText or ColumnTypes.Text or ColumnTypes.VarChar => true,
+            _ => throw new InvalidOperationException(),
+        };
 
     internal bool GetDefaultMaxValue(ColumnTypes type, out long maxValue)
     {

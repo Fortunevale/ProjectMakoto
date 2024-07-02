@@ -1,5 +1,5 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using Serilog;
+using Serilog.Events;
 using Xorog.UniversalExtensions.EventArgs;
 
 namespace ProjectMakoto.Util;
@@ -57,12 +59,12 @@ public sealed class TaskWatcher
 
                     if (b.Task.IsCompletedSuccessfully)
                     {
-                        _logger.LogTrace("Successfully executed Task:{Id} '{Uuid}' in {Elapsed}ms, Task Count now at {Count}.", 
+                        Log.Verbose("Successfully executed Task:{Id} '{Uuid}' in {Elapsed}ms, Task Count now at {Count}.", 
                             b.Task.Id, b.GetName(), b.CreationTime.GetTimespanSince().TotalMilliseconds.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")), this.TaskList.Count);
 
                         if (b.CustomData is SharedCommandContext sctx)
                         {
-                            _logger.LogInfo("Successfully executed '{Prefix}{Name}' for '{User}' on '{Guild}'",
+                            Log.Information("Successfully executed '{Prefix}{Name}' for '{User}' on '{Guild}'",
                                 sctx?.Prefix,
                                 sctx?.CommandName,
                                 sctx?.User?.Id,
@@ -70,7 +72,7 @@ public sealed class TaskWatcher
                         }
                         else if (b.CustomData is CommandContext cctx)
                         {
-                            _logger.LogInfo("Successfully executed '{Prefix}{Name}' for '{User}' on '{Guild}'",
+                            Log.Information("Successfully executed '{Prefix}{Name}' for '{User}' on '{Guild}'",
                                 cctx?.Prefix,
                                 cctx?.Command.Parent is not null ? $"{cctx.Command.Parent.Name} " : "" + cctx.Command.Name,
                                 cctx?.User?.Id,
@@ -78,14 +80,14 @@ public sealed class TaskWatcher
                         }
                         else if (b.CustomData is InteractionContext ictx)
                         {
-                            _logger.LogInfo("Successfully executed '/{Name}' for '{User}' on '{Guild}'",
+                            Log.Information("Successfully executed '/{Name}' for '{User}' on '{Guild}'",
                                 ictx?.FullCommandName,
                                 ictx?.User?.Id,
                                 ictx?.Guild?.Id);
                         }
                         else if (b.CustomData is ContextMenuContext cmctx)
                         {
-                            _logger.LogInfo("Successfully executed '{Name}' for '{User}' on '{Guild}'",
+                            Log.Information("Successfully executed '{Name}' for '{User}' on '{Guild}'",
                                 cmctx?.FullCommandName,
                                 cmctx?.User?.Id,
                                 cmctx?.Guild?.Id);
@@ -101,16 +103,16 @@ public sealed class TaskWatcher
                         if (Exception is DisCatSharp.Exceptions.BadRequestException badReq)
                         {
                             try
-                            { _logger.LogError("Web Request: {Request}", (JsonConvert.SerializeObject(badReq?.WebRequest, Formatting.Indented).Replace("\\", ""))); }
+                            { Log.Error("Web Request: {Request}", (JsonConvert.SerializeObject(badReq?.WebRequest, Formatting.Indented).Replace("\\", ""))); }
                             catch { }
                             try
-                            { _logger.LogError("Web Response: {Response}", badReq.WebResponse.Response.Replace("\\", "")); }
+                            { Log.Error("Web Response: {Response}", badReq.WebResponse.Response.Replace("\\", "")); }
                             catch { }
                         }
 
                         if (b.CustomData is SharedCommandContext sctx)
                         {
-                            _logger.LogError("Failed to execute '{Prefix}{Name}' for '{User}' on '{Guild}', Task Count now at {Count}.", b.Task.Exception,
+                            Log.Error(b.Task.Exception, "Failed to execute '{Prefix}{Name}' for '{User}' on '{Guild}', Task Count now at {Count}.", 
                                 sctx?.Prefix,
                                 sctx?.CommandName,
                                 sctx?.User?.Id,
@@ -137,16 +139,16 @@ public sealed class TaskWatcher
                                     });
                                 });
                             }
-                            catch (Exception ex) { _logger.LogError("Failed to notify user about unhandled exception.", ex); }
+                            catch (Exception ex) { Log.Error(ex, "Failed to notify user about unhandled exception."); }
                         }
                         else
                         {
-                            _logger.LogError("Task '{UUID}' failed to execute", b.Task.Exception, b.GetName());
+                            Log.Error(b.Task.Exception, "Task '{UUID}' failed to execute", b.GetName());
                         }
                     }
                     else
                     {
-                        _logger.LogError("Task '{UUID}' failed to execute", b.Task.Exception, b.GetName());
+                        Log.Error(b.Task.Exception, "Task '{UUID}' failed to execute", b.GetName());
                     }
 
                     if (b.IsVital)
@@ -161,7 +163,7 @@ public sealed class TaskWatcher
         {
             if (!x.IsCompletedSuccessfully)
             {
-                _logger.LogError("TaskWatcher failed to execute", x.Exception);
+                Log.Error(x.Exception, "TaskWatcher failed to execute");
                 await Task.Delay(1000);
                 Environment.Exit((int)ExitCodes.VitalTaskFailed);
                 return;
@@ -171,25 +173,26 @@ public sealed class TaskWatcher
 
     internal TaskInfo AddToList(TaskInfo taskInfo)
     {
-        _logger.LogTrace("Started Task:{uuid}, Task Count now at {Count}.", taskInfo.GetName(), this.TaskList.Count + 1);
+        Log.Verbose("Started Task:{uuid}, Task Count now at {Count}.", taskInfo.GetName(), this.TaskList.Count + 1);
         lock (this.TaskList) { this.TaskList.Add(taskInfo); }
 
         return taskInfo;
     }
 
-    internal async void LogHandler(Bot bot, object? sender, LogMessageEventArgs e, int depth = 0)
+    internal async void LogHandler(Bot bot, object? sender, LogEvent e, int depth = 0)
     {
-        switch (e.LogEntry.LogLevel)
+        var message = e.RenderMessage();
+
+        switch (e.Level)
         {
-            case CustomLogLevel.Fatal:
+            case LogEventLevel.Fatal:
             {
-                if (e.LogEntry.Message.ToLower().Contains("'not authenticated.'"))
+                if (message.ToLower().Contains("'not authenticated.'"))
                 {
                     bot.status.DiscordDisconnections++;
 
                     if (bot.status.DiscordDisconnections >= 3)
                     {
-                        _logger.LogRaised -= bot.LogHandler;
                         _ = bot.ExitApplication();
                     }
                     else
@@ -197,12 +200,12 @@ public sealed class TaskWatcher
                         try
                         {
                             await Task.Delay(10000);
-                            await bot.DiscordClient.ConnectAsync();
+                            await bot.DiscordClient.StopAsync();
+                            await bot.DiscordClient.StartAsync();
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogFatal("Failed to reconnect to discord", ex);
-                            _logger.LogRaised -= bot.LogHandler;
+                            Log.Fatal(ex, "Failed to reconnect to discord");
                             _ = bot.ExitApplication();
                         }
                     }
@@ -213,27 +216,27 @@ public sealed class TaskWatcher
                 break;
         }
 
-        switch (e.LogEntry.LogLevel)
+        switch (e.Level)
         {
-            case CustomLogLevel.Fatal:
-            case CustomLogLevel.Error:
+            case LogEventLevel.Fatal:
+            case LogEventLevel.Error:
             {
                 try
                 {
                     if (bot.status.DiscordInitialized)
                     {
-                        if (e.LogEntry.Message is "[111] Connection terminated (4000, ''), reconnecting"
+                        if (message is "[111] Connection terminated (4000, ''), reconnecting"
                             or "[111] Connection terminated (-1, ''), reconnecting"
                             or "[111] Connection terminated (1001, 'CloudFlare WebSocket proxy restarting'), reconnecting")
                             break;
 
-                        var channel = bot.DiscordClient.Guilds[bot.status.LoadedConfig.Discord.DevelopmentGuild].GetChannel(bot.status.LoadedConfig.Channels.ExceptionLog);
+                        var channel = bot.DiscordClient.GetGuilds()[bot.status.LoadedConfig.Discord.DevelopmentGuild].GetChannel(bot.status.LoadedConfig.Channels.ExceptionLog);
 
                         if (channel is null)
                         {
                             if (depth > 10)
                             {
-                                _logger.LogWarn("Could not notify of exception in channel");
+                                Log.Warning("Could not notify of exception in channel");
                                 return;
                             }
 
@@ -243,20 +246,20 @@ public sealed class TaskWatcher
                         }
 
                         var template = new DiscordEmbedBuilder()
-                                                    .WithColor(e.LogEntry.LogLevel == CustomLogLevel.Fatal ? new DiscordColor("#FF0000") : EmbedColors.Error)
-                                                    .WithTitle(e.LogEntry.LogLevel.GetName().ToLower().FirstLetterToUpper())
-                                                    .WithTimestamp(e.LogEntry.TimeOfEvent);
+                                                    .WithColor(e.Level == LogEventLevel.Fatal ? new DiscordColor("#FF0000") : EmbedColors.Error)
+                                                    .WithTitle(e.Level.GetName().ToLower().FirstLetterToUpper())
+                                                    .WithTimestamp(e.Timestamp);
 
                         List<DiscordEmbedBuilder> embeds = new();
 
-                        if (e.LogEntry.Exception is not null)
+                        if (e.Exception is not null)
                         {
                             void BuildEmbed(Exception ex, bool First)
                             {
                                 var embed = new DiscordEmbedBuilder(template);
 
                                 if (First)
-                                    _ = embed.WithDescription($"`{e.LogEntry.Message.SanitizeForCode()}`");
+                                    _ = embed.WithDescription($"`{message.SanitizeForCode()}`");
                                 else
                                 {
                                     embed.Title = "";
@@ -303,7 +306,7 @@ public sealed class TaskWatcher
                                     BuildEmbed(ex.InnerException, false);
                             }
 
-                            BuildEmbed(e.LogEntry.Exception, true);
+                            BuildEmbed(e.Exception, true);
                         }
 
                         var index = 0;

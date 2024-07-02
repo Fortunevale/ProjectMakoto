@@ -1,5 +1,5 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -26,7 +26,7 @@ public sealed class BanDetails : RequiresBotReference
     [ColumnName("id"), ColumnType(ColumnTypes.BigInt), Primary]
     internal ulong Id { get; init; }
 
-    [ColumnName("reason"), ColumnType(ColumnTypes.LongText), WithCollation, Default("-")]
+    [ColumnName("reason"), ColumnType(ColumnTypes.LongText), Default("-")]
     public string Reason
     {
         get => this.Bot.DatabaseClient.GetValue<string>(this._tableName, "id", this.Id, "reason", this.Bot.DatabaseClient.mainDatabaseConnection);

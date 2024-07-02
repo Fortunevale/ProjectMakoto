@@ -1,5 +1,5 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -62,7 +62,7 @@ public class TokenInvalidatorRepository : RequiresBotReference
 
             if (!this.ExistsOnPath("git"))
             {
-                _logger.LogWarn("Git was not found, cannot sync token invalidator repository.");
+                Log.Warning("Git was not found, cannot sync token invalidator repository.");
                 return;
             }
 
@@ -91,7 +91,7 @@ public class TokenInvalidatorRepository : RequiresBotReference
 
             if (fetch.ExitCode != 0)
             {
-                _logger.LogError("Git fetch exited with a non-zero exit code.");
+                Log.Error("Git fetch exited with a non-zero exit code.");
                 return;
             }
 
@@ -118,14 +118,14 @@ public class TokenInvalidatorRepository : RequiresBotReference
 
             if (pull.ExitCode != 0)
             {
-                _logger.LogError("Git pull exited with a non-zero exit code.");
+                Log.Error("Git pull exited with a non-zero exit code.");
                 return;
             }
 
             if (!pullOutput.Contains("Already up to date.", StringComparison.InvariantCultureIgnoreCase))
-                _logger.LogInfo("Updated {TokenLeakRepo} repository.", this.Bot.status.LoadedConfig.Secrets.Github.TokenLeakRepo);
+                Log.Information("Updated {TokenLeakRepo} repository.", this.Bot.status.LoadedConfig.Secrets.Github.TokenLeakRepo);
             else
-                _logger.LogDebug("{TokenLeakRepo} repository already up to date.", this.Bot.status.LoadedConfig.Secrets.Github.TokenLeakRepo);
+                Log.Debug("{TokenLeakRepo} repository already up to date.", this.Bot.status.LoadedConfig.Secrets.Github.TokenLeakRepo);
         }
         finally
         {

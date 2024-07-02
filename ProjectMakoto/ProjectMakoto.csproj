@@ -15,7 +15,7 @@
     <StartupObject>ProjectMakoto.Program</StartupObject>
     <SignAssembly>False</SignAssembly>
     <Copyright>Project-Makoto</Copyright>
-    <PackageProjectUrl>https://github.com/TheXorog/Project-Makoto</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/Fortunevale/ProjectMakoto</PackageProjectUrl>
     <AnalysisLevel>latest</AnalysisLevel>
     <NeutralLanguage>en</NeutralLanguage>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -40,34 +40,39 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dapper" Version="2.1.28" />
-    <PackageReference Include="DisCatSharp.Extensions.TwoFactorCommands" Version="3.0.1" />
+    <PackageReference Include="DisCatSharp.Extensions.TwoFactorCommands" Version="3.0.4" />
     <PackageReference Include="FFMpegCore" Version="5.1.0" />
-    <PackageReference Include="GenHTTP.Core" Version="8.1.0" />
-    <PackageReference Include="GenHTTP.Modules.StaticWebsites" Version="8.1.0" />
-    <PackageReference Include="HtmlSanitizer" Version="8.0.843" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="4.8.0" />
-    <PackageReference Include="MySqlConnector" Version="2.3.5" />
-    <PackageReference Include="Octokit" Version="9.1.2" />
+    <PackageReference Include="GenHTTP.Core" Version="8.6.0" />
+    <PackageReference Include="GenHTTP.Modules.StaticWebsites" Version="8.6.0" />
+    <PackageReference Include="HtmlSanitizer" Version="8.0.865" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.10.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="4.10.0" />
+    <PackageReference Include="MySqlConnector" Version="2.3.7" />
+    <PackageReference Include="Octokit" Version="13.0.0" />
+    <PackageReference Include="Serilog" Version="4.0.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.118" />
-	<PackageReference Include="DisCatSharp.Analyzer.Roselyn" Version="6.2.2">
+	<PackageReference Include="DisCatSharp.Analyzer.Roselyn" Version="6.2.4">
 		<PrivateAssets>all</PrivateAssets>
 		<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	</PackageReference>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\quickchart-csharp\QuickChart\QuickChart.csproj" />
-    <ProjectReference Include="..\Xorog.Logger\Xorog.Logger.csproj" />
-    <ProjectReference Include="..\Xorog.UniversalExtensions\Xorog.UniversalExtensions.csproj" />
-    <ProjectReference Include="..\DisCatSharp\DisCatSharp\DisCatSharp.csproj" />
-    <ProjectReference Include="..\DisCatSharp\DisCatSharp.ApplicationCommands\DisCatSharp.ApplicationCommands.csproj" />
-    <ProjectReference Include="..\DisCatSharp\DisCatSharp.CommandsNext\DisCatSharp.CommandsNext.csproj" />
-    <ProjectReference Include="..\DisCatSharp\DisCatSharp.Common\DisCatSharp.Common.csproj" />
-    <ProjectReference Include="..\DisCatSharp\DisCatSharp.Experimental\DisCatSharp.Experimental.csproj" />
-    <ProjectReference Include="..\DisCatSharp\DisCatSharp.Interactivity\DisCatSharp.Interactivity.csproj" />
-    <ProjectReference Include="..\DisCatSharp\DisCatSharp.Lavalink\DisCatSharp.Lavalink.csproj" />
+    <ProjectReference Include="..\Dependencies\DisCatSharp\DisCatSharp.ApplicationCommands\DisCatSharp.ApplicationCommands.csproj" />
+    <ProjectReference Include="..\Dependencies\DisCatSharp\DisCatSharp.CommandsNext\DisCatSharp.CommandsNext.csproj" />
+    <ProjectReference Include="..\Dependencies\DisCatSharp\DisCatSharp.Common\DisCatSharp.Common.csproj" />
+    <ProjectReference Include="..\Dependencies\DisCatSharp\DisCatSharp.Configuration\DisCatSharp.Configuration.csproj" />
+    <ProjectReference Include="..\Dependencies\DisCatSharp\DisCatSharp.Experimental\DisCatSharp.Experimental.csproj" />
+    <ProjectReference Include="..\Dependencies\DisCatSharp\DisCatSharp.Interactivity\DisCatSharp.Interactivity.csproj" />
+    <ProjectReference Include="..\Dependencies\DisCatSharp\DisCatSharp.Lavalink\DisCatSharp.Lavalink.csproj" />
+    <ProjectReference Include="..\Dependencies\DisCatSharp\DisCatSharp.VoiceNext.Natives\DisCatSharp.VoiceNext.Natives.csproj" />
+    <ProjectReference Include="..\Dependencies\DisCatSharp\DisCatSharp.VoiceNext\DisCatSharp.VoiceNext.csproj" />
+    <ProjectReference Include="..\Dependencies\DisCatSharp\DisCatSharp\DisCatSharp.csproj" />
+    <ProjectReference Include="..\Dependencies\quickchart-csharp\QuickChart\QuickChart.csproj" />
+    <ProjectReference Include="..\Dependencies\Xorog.UniversalExtensions\Xorog.UniversalExtensions.csproj" />
   </ItemGroup>
 
   <ItemGroup>

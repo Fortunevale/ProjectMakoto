@@ -1,14 +1,11 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
-
-using ProjectMakoto.Entities.Database.ColumnAttributes;
-using Xorog.UniversalExtensions;
 
 namespace ProjectMakoto.Entities.Guilds;
 
@@ -33,7 +30,7 @@ public sealed class Lavalink(Bot bot, Guild parent) : RequiresParent<Guild>(bot,
     public List<ulong> collectedDisconnectVotes = new();
     public List<ulong> collectedClearQueueVotes = new();
 
-    [ColumnName("lavalink_queue"), ColumnType(ColumnTypes.LongText), WithCollation, Default("[]")]
+    [ColumnName("lavalink_queue"), ColumnType(ColumnTypes.LongText), Default("[]")]
     public QueueInfo[] SongQueue
     {
         get => JsonConvert.DeserializeObject<QueueInfo[]>(this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Parent.Id, "lavalink_queue", this.Bot.DatabaseClient.mainDatabaseConnection));
@@ -47,7 +44,7 @@ public sealed class Lavalink(Bot bot, Guild parent) : RequiresParent<Guild>(bot,
         set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "lavalink_channel", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    [ColumnName("lavalink_currentvideo"), ColumnType(ColumnTypes.Text), WithCollation, Nullable]
+    [ColumnName("lavalink_currentvideo"), ColumnType(ColumnTypes.Text), Nullable]
     public string? CurrentVideo
     {
         get => this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Parent.Id, "lavalink_currentvideo", this.Bot.DatabaseClient.mainDatabaseConnection);
@@ -102,7 +99,7 @@ public sealed class Lavalink(Bot bot, Guild parent) : RequiresParent<Guild>(bot,
     {
         this.Disposed = true;
 
-        _logger.LogDebug("Disposed Player for {Id}. ({reason})", Id, reason);
+        Log.Debug("Disposed Player for {Id}. ({reason})", Id, reason);
 
         _bot.Guilds[Id].MusicModule.Reset();
     }
@@ -120,7 +117,7 @@ public sealed class Lavalink(Bot bot, Guild parent) : RequiresParent<Guild>(bot,
 
                 this.Guild = guildPlayer.Guild;
 
-                _logger.LogDebug("Initializing Player for {Guild}..", this.Guild.Id);
+                Log.Debug("Initializing Player for {Guild}..", this.Guild.Id);
 
                 var UserAmount = guildPlayer.Channel.Users.Count;
                 CancellationTokenSource VoiceUpdateTokenSource = new();
@@ -138,7 +135,7 @@ public sealed class Lavalink(Bot bot, Guild parent) : RequiresParent<Guild>(bot,
 
                             UserAmount = e.Channel is not null ? e.Channel.Users.Count : e.Guild.Channels.First(x => x.Key == e.Before.Channel.Id).Value.Users.Count;
 
-                            _logger.LogTrace("UserAmount updated to {UserAmount} for {Guild}", UserAmount, this.Guild.Id);
+                            Log.Verbose("UserAmount updated to {UserAmount} for {Guild}", UserAmount, this.Guild.Id);
 
                             if (UserAmount <= 1)
                                 _ = Task.Delay(30000, VoiceUpdateTokenSource.Token).ContinueWith(x =>
@@ -178,10 +175,10 @@ public sealed class Lavalink(Bot bot, Guild parent) : RequiresParent<Guild>(bot,
                     this.CurrentVideoPosition = (Convert.ToInt64(e.State?.Position.TotalSeconds ?? -1d));
                 }
 
-                _logger.LogDebug("Initializing VoiceStateUpdated Event for {Guild}..", this.Guild.Id);
+                Log.Debug("Initializing VoiceStateUpdated Event for {Guild}..", this.Guild.Id);
                 sender.VoiceStateUpdated += VoiceStateUpdated;
 
-                _logger.LogDebug("Initializing PlayerUpdated Event for {Guild}..", this.Guild.Id);
+                Log.Debug("Initializing PlayerUpdated Event for {Guild}..", this.Guild.Id);
                 guildPlayer.StateUpdated += StateUpdated;
 
                 QueueInfo LastPlayedTrack = null;
@@ -208,7 +205,7 @@ public sealed class Lavalink(Bot bot, Guild parent) : RequiresParent<Guild>(bot,
 
                     if (this.Disposed)
                     {
-                        _logger.LogDebug("Destroying Player for {Guild}..", this.Guild.Id);
+                        Log.Debug("Destroying Player for {Guild}..", this.Guild.Id);
                         sender.VoiceStateUpdated -= VoiceStateUpdated;
                         guildPlayer.StateUpdated -= StateUpdated;
 
@@ -274,7 +271,7 @@ public sealed class Lavalink(Bot bot, Guild parent) : RequiresParent<Guild>(bot,
             }
             catch (Exception ex)
             {
-                _logger.LogError("An exception occurred while trying to handle music queue", ex);
+                Log.Error(ex, "An exception occurred while trying to handle music queue");
 
                 _ = guildPlayer.DisconnectAsync();
                 this.Dispose(_bot, this.Guild.Id, "Exception");

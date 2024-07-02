@@ -1,5 +1,5 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -83,7 +83,7 @@ internal sealed class ExperienceHandler : RequiresTranslation
 
         if (this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Points is > (long.MaxValue - 10000) or < (long.MinValue + 10000))
         {
-            _logger.LogWarn("Member '{User}' on '{Guild}' is within 10000 points of the experience limit. Resetting.", user.Id, guild.Id);
+            Log.Warning("Member '{User}' on '{Guild}' is within 10000 points of the experience limit. Resetting.", user.Id, guild.Id);
             this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Points = 1;
         }
 

@@ -1,5 +1,5 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -58,21 +58,17 @@ global using ProjectMakoto.Events;
 global using ProjectMakoto.Exceptions;
 global using ProjectMakoto.Util;
 global using ProjectMakoto.Plugins;
-global using ProjectMakoto.PrefixCommands;
 global using ProjectMakoto.Util.SystemMonitor;
 global using ProjectMakoto.Util.JsonSerializers;
-global using ProjectMakoto.Entities.Database.ColumnAttributes;
-global using static ProjectMakoto.Util.Log;
-
-global using Xorog.Logger;
-global using Xorog.Logger.EventArgs;
 
 global using Xorog.UniversalExtensions;
 global using Xorog.UniversalExtensions.Entities;
 global using Xorog.UniversalExtensions.Enums;
 global using Xorog.UniversalExtensions.Converters;
 
-global using Dapper;
+global using Serilog;
+global using Serilog.Events;
+
 global using MySqlConnector;
 global using Newtonsoft.Json;
 global using QuickChart;

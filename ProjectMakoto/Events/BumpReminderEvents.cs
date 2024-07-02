@@ -1,5 +1,5 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -97,7 +97,7 @@ internal sealed class BumpReminderEvents(Bot bot) : RequiresTranslation(bot)
 
         //                this.Bot.BumpReminder.ScheduleBump(sender, e.Guild.Id);
         //            }
-        //            catch (Exception ex) { _logger.LogDebug(ex.ToString()); }
+        //            catch (Exception ex) { Log.Debug(ex.ToString()); }
         //        }
         //    }
         //}

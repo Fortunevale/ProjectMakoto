@@ -1,5 +1,5 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -51,7 +51,7 @@ internal sealed class BumpReminderHandler(Bot bot) : RequiresBotReference(bot)
 
     internal void ScheduleBump(DiscordClient client, ulong ServerId)
     {
-        _logger.LogDebug("Queuing Bump Message for '{Guild}'", ServerId);
+        Log.Debug("Queuing Bump Message for '{Guild}'", ServerId);
 
         try
         {
@@ -66,24 +66,24 @@ internal sealed class BumpReminderHandler(Bot bot) : RequiresBotReference(bot)
         }
         catch (Exception ex)
         {
-            _logger.LogError("An exception occurred while trying to un-queue previous bump messages for '{Guild}'", ex, ServerId);
+            Log.Error(ex, "An exception occurred while trying to un-queue previous bump messages for '{Guild}'", ServerId);
         }
 
         _ = new Func<Task>(async () =>
         {
-            _logger.LogDebug("Executing Bump Message for '{Guild}'", ServerId);
+            Log.Debug("Executing Bump Message for '{Guild}'", ServerId);
             var Guild = await client.GetGuildAsync(ServerId);
 
             if (!Guild.Channels.ContainsKey(this.Bot.Guilds[ServerId].BumpReminder.ChannelId) || this.Bot.Guilds[ServerId].BumpReminder.BumpsMissed > 168)
             {
-                _logger.LogDebug("'{Guild}' hasn't bumped 169 times. Disabling bump reminder..", ServerId);
+                Log.Debug("'{Guild}' has deleted their bump channel or hasn't bumped 169 times. Disabling bump reminder..", ServerId);
                 this.Bot.Guilds[ServerId].BumpReminder.Reset();
                 return;
             }
 
             var Channel = Guild.GetChannel(this.Bot.Guilds[ServerId].BumpReminder.ChannelId);
 
-            _logger.LogDebug("Checking if Self Role Message still exists, has it's reaction and is pinned in '{Guild}'", ServerId);
+            Log.Debug("Checking if Self Role Message still exists, has it's reaction and is pinned in '{Guild}'", ServerId);
 
             try
             {

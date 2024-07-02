@@ -1,5 +1,5 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -7,16 +7,10 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace ProjectMakoto.Entities;
 
 [AttributeUsage(AttributeTargets.Class)]
-internal class ModulePriorityAttribute(int Priority) : Attribute
+public class ModulePriorityAttribute(int Priority) : Attribute
 {
     public int Priority { get; set; } = Priority;
 }

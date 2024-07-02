@@ -1,5 +1,5 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -20,10 +20,9 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         DiscordEventHandler handler = new(_bot);
 
-        _logger.LogDebug("Registering DisCatSharp EventHandler..");
+        Log.Debug("Registering DisCatSharp EventHandler..");
         handler.genericGuildEvents = new(_bot);
         handler.commandEvents = new(_bot);
-        handler.afkEvents = new(_bot);
         handler.crosspostEvents = new(_bot);
         handler.phishingProtectionEvents = new(_bot);
         handler.submissionEvents = new(_bot);
@@ -42,7 +41,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
         handler.tokenLeakEvents = new(_bot);
         handler.vcCreatorEvents = new(_bot);
         handler.reminderEvents = new(_bot);
-        handler.userBlockEvents = new(_bot);
 
         _bot.DiscordClient.GuildCreated += handler.GuildCreated;
         _bot.DiscordClient.GuildUpdated += handler.GuildUpdated;
@@ -84,13 +82,12 @@ internal sealed class DiscordEventHandler : RequiresBotReference
         _bot.DiscordClient.ThreadListSynced += handler.ThreadListSynced;
         _bot.DiscordClient.UserUpdated += handler.UserUpdated;
 
-        _bot.DiscordClient.GetCommandsNext().CommandExecuted += handler.CommandExecuted;
-        _bot.DiscordClient.GetCommandsNext().CommandErrored += handler.CommandError;
+        _bot.DiscordClient.GetFirstShard().GetCommandsNext().CommandExecuted += handler.CommandExecuted;
+        _bot.DiscordClient.GetFirstShard().GetCommandsNext().CommandErrored += handler.CommandError;
     }
 
     GenericGuildEvents genericGuildEvents { get; set; }
     CommandEvents commandEvents { get; set; }
-    AfkEvents afkEvents { get; set; }
     CrosspostEvents crosspostEvents { get; set; }
     PhishingProtectionEvents phishingProtectionEvents { get; set; }
     PhishingSubmissionEvents submissionEvents { get; set; }
@@ -109,7 +106,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     EmbedMessagesEvents embedMessagesEvents { get; set; }
     TokenLeakEvents tokenLeakEvents { get; set; }
     ReminderEvents reminderEvents { get; set; }
-    UserBlockEvents userBlockEvents { get; set; }
 
     internal async Task GuildMemberAdded(DiscordClient sender, GuildMemberAddEventArgs e)
     {
@@ -172,7 +168,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     {
         _ = Task.Run(async () =>
         {
-            _ = this.afkEvents.MessageCreated(sender, e).Add(this.Bot);
             _ = this.crosspostEvents.MessageCreated(sender, e).Add(this.Bot);
             _ = this.phishingProtectionEvents.MessageCreated(sender, e).Add(this.Bot);
             _ = this.bumpReminderEvents.MessageCreated(sender, e).Add(this.Bot);
@@ -350,7 +345,6 @@ internal sealed class DiscordEventHandler : RequiresBotReference
             _ = this.actionlogEvents.VoiceStateUpdated(sender, e).Add(this.Bot);
             _ = this.voicePrivacyEvents.VoiceStateUpdated(sender, e).Add(this.Bot);
             _ = this.vcCreatorEvents.VoiceStateUpdated(sender, e).Add(this.Bot);
-            _ = this.userBlockEvents.VoiceStateUpdated(sender, e).Add(this.Bot);
         }).Add(this.Bot);
     }
 

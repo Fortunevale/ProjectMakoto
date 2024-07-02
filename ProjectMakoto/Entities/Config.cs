@@ -1,11 +1,13 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
+
+using ProjectMakoto.Util.Initializers;
 
 namespace ProjectMakoto.Entities;
 
@@ -43,7 +45,7 @@ public sealed class Config
     public SecretsConfig Secrets = new();
     public DontModifyConfig DontModify = new();
 
-    public Dictionary<string, PluginInfo> PluginCache = new();
+    public Dictionary<string, CommandSupplierInfo> CommandCache = new();
     public Dictionary<string, object> PluginData = new();
 
     public sealed class MonitorConfig
@@ -84,12 +86,7 @@ public sealed class Config
 
     public sealed class EmojiConfig
     {
-        public string[] JoinEvent = { "🙋‍", "🙋‍" };
-        public string Cuddle = "🅿";
-        public string Kiss = "🅿";
-        public string Slap = "🅿";
-        public string Proud = "🅿";
-        public string Hug = "🅿";
+        public string[] JoinEvent = ["🙋‍", "🙋‍"];
 
         public ulong DisabledRepeat = 0;
         public ulong DisabledShuffle = 0;
@@ -125,6 +122,7 @@ public sealed class Config
         public ulong SoundCloud = 0;
         public ulong AbuseIPDB = 0;
         public ulong Spotify = 0;
+        public ulong Loading = 0;
     }
 
     public sealed class AccountIdsConfig
@@ -134,9 +132,7 @@ public sealed class Config
 
     public sealed class SecretsConfig
     {
-        public string KawaiiRedToken = "";
         public string AbuseIpDbToken = "";
-        public string LibreTranslateHost = "127.0.0.1";
 
         public QuickChartSecrets QuickChart = new();
         public DiscordSecrets Discord = new();
@@ -183,6 +179,7 @@ public sealed class Config
 
             public string MainDatabaseName = "";
             public string GuildDatabaseName = "";
+            public string PluginDatabaseName = "";
 
             public string Collation = "utf8mb4_general_ci";
         }
@@ -201,9 +198,9 @@ public sealed class Config
         public string LastKnownHash = "";
     }
 
-    public sealed class PluginInfo
+    public sealed class CommandSupplierInfo
     {
         public string? LastKnownHash = null;
-        public Dictionary<string, string> CompiledCommands = new();
+        public Dictionary<string, CompilationType> CompiledCommands = new();
     }
 }

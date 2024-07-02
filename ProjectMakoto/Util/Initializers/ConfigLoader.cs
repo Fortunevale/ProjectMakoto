@@ -1,5 +1,5 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -35,13 +35,13 @@ internal static class ConfigLoader
                     {
                         try
                         {
-                            _logger.LogDebug("Reloading config..");
+                            Log.Debug("Reloading config..");
                             bot.status.LoadedConfig = JsonConvert.DeserializeObject<Config>(await File.ReadAllTextAsync("config.json"));
-                            _logger.LogInfo("Config reloaded.");
+                            Log.Information("Config reloaded.");
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogError("Failed to reload config", ex);
+                            Log.Error(ex, "Failed to reload config");
                         }
                     }
 
@@ -51,7 +51,7 @@ internal static class ConfigLoader
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError("An exception occurred while trying to reload the config.json", ex);
+                    Log.Error(ex, "An exception occurred while trying to reload the config.json");
                     await Task.Delay(10000);
                 }
             }
@@ -69,7 +69,7 @@ internal static class ConfigLoader
             if (v is not 0UL)
                 continue;
 
-            _logger.LogError("No {0} provided.", field.Name);
+            Log.Error("No {0} provided.", field.Name);
             await Task.Delay(1000);
             Console.Write("> ");
             field.SetValue(bot.status.LoadedConfig.Discord, Convert.ToUInt64(Console.ReadLine()));
@@ -84,19 +84,12 @@ internal static class ConfigLoader
             if (v is not 0UL)
                 continue;
 
-            _logger.LogError("No {0} provided.", field.Name);
+            Log.Error("No {0} provided.", field.Name);
             await Task.Delay(1000);
             Console.Write("> ");
             field.SetValue(bot.status.LoadedConfig.Channels, Convert.ToUInt64(Console.ReadLine()));
 
             bot.status.LoadedConfig.Save();
         }
-
-        _logger.AddBlacklist(bot.status.LoadedConfig.Secrets.Database.Password,
-            bot.status.LoadedConfig.Secrets.Discord.Token,
-            bot.status.LoadedConfig.Secrets.Telegram.Token,
-            bot.status.LoadedConfig.Secrets.Lavalink.Password,
-            bot.status.LoadedConfig.Secrets.Github.Token,
-            bot.status.LoadedConfig.Secrets.KawaiiRedToken);
     }
 }

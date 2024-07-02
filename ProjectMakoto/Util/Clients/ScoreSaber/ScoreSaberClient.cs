@@ -1,5 +1,5 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -46,7 +46,7 @@ public class ScoreSaberClient : RequiresBotReference
 
                 try
                 {
-                    _logger.LogTrace("Sending Request to '{Url}'..", b.Value.Url);
+                    Log.Verbose("Sending Request to '{Url}'..", b.Value.Url);
                     var response = await client.GetAsync(b.Value.Url);
 
                     this.Queue[b.Key].StatusCode = response.StatusCode;

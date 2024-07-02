@@ -1,5 +1,5 @@
-// Project Makoto
-// Copyright (C) 2023  Fortunevale
+﻿// Project Makoto
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -15,7 +15,6 @@ public sealed class Status
 
     public DateTime startupTime { get; internal set; } = DateTime.UtcNow;
 
-    internal bool MigrationRequired { get; set; } = false;
     public string RunningVersion { get; internal set; }
 
     public bool DiscordInitialized { get; internal set; } = false;
@@ -31,6 +30,64 @@ public sealed class Status
     internal long DiscordDisconnections = 0;
 
     internal Config LoadedConfig { get; set; }
+
+    private string? _CurrentAppHash { get; set; } = null;
+    internal string CurrentAppHash
+    {
+        get
+        {
+            this._CurrentAppHash ??= HashingExtensions.ComputeSHA256Hash(new FileInfo(Assembly.GetExecutingAssembly().Location));
+            return this._CurrentAppHash;
+        }
+    }
+
+    public ExposedConfig SafeReadOnlyConfig { get; set; }
+    public class ExposedConfig(Config config)
+    {
+        public bool IsDev => config.IsDev;
+        public bool AllowMoreThan100Guilds => config.AllowMoreThan100Guilds;
+
+        public string SupportServerInvite = config.SupportServerInvite;
+        public EmojiConfig Emojis = new(config);
+
+        public sealed class EmojiConfig(Config config)
+        {
+            public ulong DisabledRepeat => config.Emojis.DisabledRepeat;
+            public ulong DisabledShuffle => config.Emojis.DisabledShuffle;
+            public ulong Paused => config.Emojis.Paused;
+            public ulong DisabledPlay => config.Emojis.DisabledPlay;
+
+            public ulong Error => config.Emojis.Error;
+
+            public ulong CheckboxTicked => config.Emojis.CheckboxTicked;
+            public ulong CheckboxUnticked => config.Emojis.CheckboxUnticked;
+
+            public ulong PillOn => config.Emojis.PillOn;
+            public ulong PillOff => config.Emojis.PillOff;
+
+            public ulong QuestionMark => config.Emojis.QuestionMark;
+
+            public ulong PrefixCommandDisabled => config.Emojis.PrefixCommandDisabled;
+            public ulong PrefixCommandEnabled => config.Emojis.PrefixCommandEnabled;
+
+            public ulong SlashCommand => config.Emojis.SlashCommand;
+            public ulong MessageCommand => config.Emojis.MessageCommand;
+            public ulong UserCommand => config.Emojis.UserCommand;
+
+            public ulong Channel => config.Emojis.Channel;
+            public ulong User => config.Emojis.User;
+            public ulong VoiceState => config.Emojis.VoiceState;
+            public ulong Message => config.Emojis.Message;
+            public ulong Guild => config.Emojis.Guild;
+            public ulong Invite => config.Emojis.Invite;
+            public ulong In => config.Emojis.In;
+
+            public ulong YouTube => config.Emojis.YouTube;
+            public ulong SoundCloud => config.Emojis.SoundCloud;
+            public ulong AbuseIPDB => config.Emojis.AbuseIPDB;
+            public ulong Spotify => config.Emojis.Spotify;
+        }
+    }
 
     #region Legacy
 

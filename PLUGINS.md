@@ -1,7 +1,6 @@
 <h1 align="center">Makoto</h1>
 <p align="center"><img src="ProjectMakoto/Assets/Prod.png" width=250 align="center"></p>
 <p align="center" style="font-weight:bold;">A feature packed discord bot!</p>
-<a href="#getting-makoto" ><p align="center"><img src="ProjectMakoto/Assets/AddToServer.png" width=350 align="center"></p></a>
 
 <p align="center"><img src="https://github.com/Fortunevale/ProjectMakoto/actions/workflows/dev.yml/badge.svg?branch=dev" align="center">
 <p align="center"><img src="https://img.shields.io/github/contributors/Fortunevale/ProjectMakoto" align="center"> <img src="https://img.shields.io/github/issues-raw/Fortunevale/ProjectMakoto" align="center"></p>
@@ -19,14 +18,15 @@
 
 <p align="center"><img src="DocAssets/DownloadProject1.png" width=400 align="center"/></p>
 
-3. Load the Project and add the `ProjectMakoto.dll`, `Xorog.Logger.dll` and `Xorog.UniversalExtensions.dll` as dependencies.
+3. Create a folder called `deps` in the root directory of the example plugin.
 
-<p align="center"><img src="DocAssets/ComReference1.png" width=400 align="center"/></p>
-<p align="center"><img src="DocAssets/ComReference2.png" width=400 align="center"/></p>
+4. Drop all files of release zip archive into the `deps` folder.
 
-4. Specify your Plugin's Name, Author in `ExamplePlugin.cs`.
+5. Open the project.
+
+6. Specify your Plugin's Name, Author and other details in `ExamplePlugin.cs`.
     - The comments should help you get started.
-    - You can rename this file, inheriting the `BasePlugin` is what matters for Makoto to find and load your plugin.
+    - You can rename this file, project and everything else, inheriting the `BasePlugin` is what matters for Makoto to find and load your plugin.
 
 <p align="center"><img src="DocAssets/ExamplePluginInfo1.png" width=600 align="center"/></p>
 

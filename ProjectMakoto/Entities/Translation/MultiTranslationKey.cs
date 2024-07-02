@@ -1,5 +1,5 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -113,10 +113,8 @@ public sealed class MultiTranslationKey : IDictionary<string, string[]>
         var callingFrame = stackFrames[1];
         var method = callingFrame.GetMethod();
 
-        _logger.LogError("Key with english text '{text}' was incorrectly accessed. Defaulting to english translation.", new InvalidCallException()
-                                                                                                                            .AddData("StackTrace", stackTrace)
-                                                                                                                            .AddData("DeclaryingType", method.DeclaringType)
-                                                                                                                            .AddData("Method", method), this.t["en"].Build());
+        Log.Error(new InvalidCallException().AddData("StackTrace", stackTrace).AddData("DeclaryingType", method.DeclaringType).AddData("Method", method),
+            "Key with english text '{text}' was incorrectly accessed. Defaulting to english translation.", this.t["en"].Build());
         return this.t["en"].Build();
     }
 }

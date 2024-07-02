@@ -1,5 +1,5 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -7,7 +7,6 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-using ProjectMakoto.Entities.Database.ColumnAttributes;
 using ProjectMakoto.Entities.Guilds;
 
 namespace ProjectMakoto.Entities;
@@ -35,11 +34,10 @@ public sealed class Guild : RequiresBotReference
         this.NameNormalizer = new(bot, this);
         this.EmbedMessage = new(bot, this);
         this.MusicModule = new(bot, this);
-        this.Polls = new(bot, this);
         this.VcCreator = new(bot, this);
         this.PrefixSettings = new(bot, this);
 
-        this.Members = new(this.Bot.DatabaseClient, serverId.ToString(), "userid", true, (id) =>
+        this.Members = new(this.Bot.DatabaseClient, serverId.ToString(), "userid", this.Bot.DatabaseClient.guildDatabaseConnection, (id) =>
         {
             return new Member(bot, this, id);
         });
@@ -85,9 +83,6 @@ public sealed class Guild : RequiresBotReference
     public EmbedMessageSettings EmbedMessage { get; init; }
 
     [ContainsValues]
-    public PollSettings Polls { get; init; }
-
-    [ContainsValues]
     public VcCreatorSettings VcCreator { get; init; }
 
     [ContainsValues]
@@ -96,35 +91,35 @@ public sealed class Guild : RequiresBotReference
     [ContainsValues]
     public Lavalink MusicModule { get; set; }
 
-    [ColumnName("autounarchivelist"), ColumnType(ColumnTypes.LongText), WithCollation, Default("[]")]
+    [ColumnName("autounarchivelist"), ColumnType(ColumnTypes.LongText), Default("[]")]
     public ulong[] AutoUnarchiveThreads
     {
         get => JsonConvert.DeserializeObject<ulong[]>(this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Id, "autounarchivelist", this.Bot.DatabaseClient.mainDatabaseConnection));
         set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Id, "autounarchivelist", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    [ColumnName("levelrewards"), ColumnType(ColumnTypes.LongText), WithCollation, Default("[]")]
-    public LevelRewardEntry[] LevelRewards // todo
+    [ColumnName("levelrewards"), ColumnType(ColumnTypes.LongText), Default("[]")]
+    public LevelRewardEntry[] LevelRewards
     {
         get => JsonConvert.DeserializeObject<LevelRewardEntry[]>(this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Id, "levelrewards", this.Bot.DatabaseClient.mainDatabaseConnection));
         set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Id, "levelrewards", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    [ColumnName("reactionroles"), ColumnType(ColumnTypes.LongText), WithCollation, Default("[]")]
+    [ColumnName("reactionroles"), ColumnType(ColumnTypes.LongText), Default("[]")]
     public ReactionRoleEntry[] ReactionRoles
     {
         get => JsonConvert.DeserializeObject<ReactionRoleEntry[]>(this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Id, "reactionroles", this.Bot.DatabaseClient.mainDatabaseConnection));
         set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Id, "reactionroles", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    [ColumnName("current_locale"), ColumnType(ColumnTypes.LongText), WithCollation, Nullable]
+    [ColumnName("current_locale"), ColumnType(ColumnTypes.LongText), Nullable]
     public string? CurrentLocale
     {
         get => this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Id, "current_locale", this.Bot.DatabaseClient.mainDatabaseConnection);
         set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Id, "current_locale", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    [ColumnName("override_locale"), ColumnType(ColumnTypes.LongText), WithCollation, Nullable]
+    [ColumnName("override_locale"), ColumnType(ColumnTypes.LongText), Nullable]
     public string? OverrideLocale
     {
         get => this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Id, "override_locale", this.Bot.DatabaseClient.mainDatabaseConnection);

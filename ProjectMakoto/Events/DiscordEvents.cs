@@ -1,5 +1,5 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -19,7 +19,7 @@ internal sealed class DiscordEvents(Bot bot) : RequiresTranslation(bot)
         if (this.Bot.objectedUsers.Contains(e.Guild.OwnerId) || this.Bot.bannedUsers.ContainsKey(e.Guild.OwnerId) || this.Bot.bannedGuilds.ContainsKey(e.Guild?.Id ?? 0))
         {
             await Task.Delay(1000);
-            _logger.LogInfo("Leaving guild '{Guild}'..", e.Guild.Id);
+            Log.Information("Leaving guild '{Guild}'..", e.Guild.Id);
             await e.Guild.LeaveAsync();
             return;
         }

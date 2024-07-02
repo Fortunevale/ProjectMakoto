@@ -1,5 +1,5 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -11,22 +11,10 @@ namespace ProjectMakoto.Events;
 
 internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
 {
-    internal async Task<bool> ValidateServer(DiscordGuild guild)
-    {
-        if (guild is null)
-            return false;
-
-        if (this.Bot.Guilds[guild.Id].ActionLog.Channel == 0)
-            return false;
-
-        if (!guild.Channels.ContainsKey(this.Bot.Guilds[guild.Id].ActionLog.Channel))
-        {
-            this.Bot.Guilds[guild.Id].ActionLog.Channel = 0;
-            return false;
-        }
-
-        return true;
-    }
+    internal async Task<bool> ValidateServer(DiscordGuild guild) 
+        => guild is not null
+            && this.Bot.Guilds[guild.Id].ActionLog.Channel != 0
+            && guild.Channels.ContainsKey(this.Bot.Guilds[guild.Id].ActionLog.Channel);
 
     Translations.events.actionlog tKey => this.t.Events.Actionlog;
 
@@ -256,7 +244,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
         }
         catch (Exception ex)
         {
-            _logger.LogError("Failed to generate html from messages", ex);
+            Log.Error(ex, "Failed to generate html from messages");
 
             FileName = $"{Guid.NewGuid()}.json";
             Messages = JsonConvert.SerializeObject(e.Messages.OrderBy(x => x.Id.GetSnowflakeTime().Ticks), new JsonSerializerSettings
@@ -265,7 +253,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
                 Error = (serializer, err) =>
                 {
-                    _logger.LogError("Failed to serialize member '{member}' at '{path}'", err.ErrorContext.Error, err.ErrorContext.Member, err.ErrorContext.Path);
+                    Log.Error(err.ErrorContext.Error, "Failed to serialize member '{member}' at '{path}'", err.ErrorContext.Member, err.ErrorContext.Path);
                     err.ErrorContext.Handled = true;
                 },
             });
@@ -442,33 +430,30 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
             _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
         }
 
-        //if (e.TimeoutBefore != e.TimeoutAfter)
-        //{
-        //    // Timeouts don't seem to fire the member updated event, will keep this code for potential future updates.
+        if (e.TimeoutBefore != e.TimeoutAfter)
+        {
+            var timeAfter = (e.TimeoutAfter ?? DateTime.Today.AddDays(-300)).ToUniversalTime();
+            var timeBefore = (e.TimeoutBefore ?? DateTime.Today.AddDays(-300)).ToUniversalTime();
 
-        //    if (e.TimeoutAfter?.ToUniversalTime() > e.TimeoutBefore?.ToUniversalTime())
-        //        _ = SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
-        //        {
-        //            Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = AuditLogIcons.UserBanned, Name = $"User timed out" },
-        //            Color = EmbedColors.Error,
-        //            Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
-        //            Timestamp = DateTime.UtcNow,
-        //            Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
-        //            Description = $"**User**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`\n" +
-        //                            $"**Timed out until**: {Formatter.Timestamp((DateTime)(e.TimeoutAfter?.ToUniversalTime().DateTime), TimestampFormat.LongDateTime)} ({Formatter.Timestamp((DateTime)(e.TimeoutAfter?.ToUniversalTime().DateTime), TimestampFormat.RelativeTime)})"
-        //        }));
+            if (timeAfter > timeBefore)
+                _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                    .WithAuthor(this.tKey.TimedOut.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.UserBanned)
+                        .WithColor(EmbedColors.Error)
+                        .WithFooter($"{this.tKey.UserId.Get(this.Bot.Guilds[e.Guild.Id])}: {e.Member.Id}")
+                        .WithTimestamp(DateTime.UtcNow)
+                        .WithThumbnail(e.Member.AvatarUrl)
+                        .WithDescription($"**{this.tKey.User.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`\n" +
+                                         $"**{this.tKey.TimedOutUntil.Get(this.Bot.Guilds[e.Guild.Id])}**: {timeAfter.Timestamp(TimestampFormat.LongDateTime)} ({timeAfter.Timestamp()})")));
 
-        //    if (e.TimeoutAfter?.ToUniversalTime() < e.TimeoutBefore?.ToUniversalTime())
-        //        _ = SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
-        //        {
-        //            Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = AuditLogIcons.UserBanRemoved, Name = $"User timeout removed" },
-        //            Color = EmbedColors.Success,
-        //            Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
-        //            Timestamp = DateTime.UtcNow,
-        //            Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
-        //            Description = $"**User**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`"
-        //        }));
-        //}
+            if (timeAfter < timeBefore)
+                _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                    .WithAuthor(this.tKey.TimeoutRemoved.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.UserBanRemoved)
+                        .WithColor(EmbedColors.Success)
+                        .WithFooter($"{this.tKey.UserId.Get(this.Bot.Guilds[e.Guild.Id])}: {e.Member.Id}")
+                        .WithTimestamp(DateTime.UtcNow)
+                        .WithThumbnail(e.Member.AvatarUrl)
+                        .WithDescription($"**{this.tKey.User.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`")));
+        }
 
         if (e.PendingBefore != e.PendingAfter)
         {
@@ -884,7 +869,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
         { Description += $"{(e.GuildBefore.ExplicitContentFilter != e.GuildAfter.ExplicitContentFilter ? $"**{this.tKey.ExplicitContentFilter.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: `{e.GuildBefore.ExplicitContentFilter}` ➡ `{e.GuildAfter.ExplicitContentFilter}`\n" : "")}"; }
         catch { }
         try
-        { Description += $"{(e.GuildBefore.WidgetEnabled != e.GuildAfter.WidgetEnabled ? $"**{this.tKey.GuildWidgetEnabled.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: {(e.GuildBefore.WidgetEnabled ?? false).ToPillEmote(this.Bot)} ➡ {(e.GuildAfter.WidgetEnabled ?? false).ToPillEmote(this.Bot)}\n" : "")}"; }
+        { Description += $"{((e.GuildBefore.WidgetEnabled ?? false) != (e.GuildAfter.WidgetEnabled ?? false) ? $"**{this.tKey.GuildWidgetEnabled.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: {(e.GuildBefore.WidgetEnabled ?? false).ToPillEmote(this.Bot)} ➡ {(e.GuildAfter.WidgetEnabled ?? false).ToPillEmote(this.Bot)}\n" : "")}"; }
         catch { }
         try
         { Description += $"{(e.GuildBefore.WidgetChannel?.Id != e.GuildAfter.WidgetChannel?.Id ? $"**{this.tKey.GuildWidgetChannel.Get(this.Bot.Guilds[e.GuildAfter.Id])}**: {e.GuildBefore.WidgetChannel.Mention} `[{e.GuildBefore.WidgetChannel.GetIcon()}{e.GuildBefore.WidgetChannel.Name}]` ➡ {e.GuildAfter.WidgetChannel.Mention} `[{e.GuildAfter.WidgetChannel.GetIcon()}{e.GuildAfter.WidgetChannel.Name}]`\n" : "")}"; }

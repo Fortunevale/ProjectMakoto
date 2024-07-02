@@ -1,13 +1,11 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
-
-using ProjectMakoto.Entities.Database.ColumnAttributes;
 
 namespace ProjectMakoto.Entities.Guilds;
 
@@ -30,7 +28,7 @@ public sealed class VcCreatorSettings : RequiresParent<Guild>
         set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "vccreator_channelid", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
 
-    [ColumnName("vccreator_channellist"), ColumnType(ColumnTypes.LongText), WithCollation, Default("[]")]
+    [ColumnName("vccreator_channellist"), ColumnType(ColumnTypes.LongText), Default("[]")]
     public VcCreatorDetails[] CreatedChannels
     {
         get => JsonConvert.DeserializeObject<VcCreatorDetails[]>(this.Bot.DatabaseClient.GetValue<string>("guilds", "serverid", this.Parent.Id, "vccreator_channellist", this.Bot.DatabaseClient.mainDatabaseConnection)).Select(x =>
@@ -57,7 +55,7 @@ public sealed class VcCreatorSettings : RequiresParent<Guild>
             while (!this.Bot.status.DiscordGuildDownloadCompleted)
                 await Task.Delay(1000);
 
-            this.cachedGuild ??= await this.Bot.DiscordClient.GetGuildAsync(this.Parent.Id);
+            this.cachedGuild ??= await this.Bot.DiscordClient.GetShard(this.Parent.Id).GetGuildAsync(this.Parent.Id);
 
             await Task.Delay(5000);
 
@@ -67,7 +65,7 @@ public sealed class VcCreatorSettings : RequiresParent<Guild>
 
                 if (!this.cachedGuild.Channels.ContainsKey(b.OwnerId))
                 {
-                    _logger.LogDebug("Channel '{Channel}' was deleted, deleting Vc Creator Entry.", b.OwnerId);
+                    Log.Debug("Channel '{Channel}' was deleted, deleting Vc Creator Entry.", b.OwnerId);
                     this.CreatedChannels = this.CreatedChannels.Remove(x => x.ChannelId.ToString(), b);
                     i--;
                 }
@@ -90,7 +88,7 @@ public sealed class VcCreatorSettings : RequiresParent<Guild>
 
                                     if (users.Count <= 0)
                                     {
-                                        _logger.LogDebug("Channel '{Channel}' is now empty, deleting.", b.ChannelId);
+                                        Log.Debug("Channel '{Channel}' is now empty, deleting.", b.ChannelId);
 
                                         await channel.DeleteAsync();
                                         this.CreatedChannels = this.CreatedChannels.Remove(x => x.ChannelId.ToString(), b);
@@ -99,7 +97,7 @@ public sealed class VcCreatorSettings : RequiresParent<Guild>
 
                                     if (e.User.Id == b.OwnerId && e.After?.Channel?.Id != b.ChannelId)
                                     {
-                                        _logger.LogDebug("The owner of channel '{Channel}' left, assigning new owner.", b.ChannelId);
+                                        Log.Debug("The owner of channel '{Channel}' left, assigning new owner.", b.ChannelId);
                                         var newOwner = users.SelectRandom();
 
                                         b.OwnerId = newOwner.Id;
@@ -112,7 +110,7 @@ public sealed class VcCreatorSettings : RequiresParent<Guild>
                                     {
                                         var u = await e.User.ConvertToMember(this.cachedGuild);
 
-                                        _logger.LogDebug("Banned user in channel '{Channel}' joined, disconnecting.", b.ChannelId);
+                                        Log.Debug("Banned user in channel '{Channel}' joined, disconnecting.", b.ChannelId);
                                         if (u.Permissions.HasPermission(Permissions.Administrator) || u.Permissions.HasPermission(Permissions.ManageChannels) || u.Permissions.HasPermission(Permissions.ModerateMembers) || u.Permissions.HasPermission(Permissions.KickMembers) || u.Permissions.HasPermission(Permissions.BanMembers) || u.Permissions.HasPermission(Permissions.MuteMembers) || u.Permissions.HasPermission(Permissions.DeafenMembers))
                                             return;
 
@@ -139,11 +137,11 @@ public sealed class VcCreatorSettings : RequiresParent<Guild>
                         {
                             await Task.Delay(5000);
 
-                            var channel = await this.Bot.DiscordClient.GetChannelAsync(b.ChannelId);
+                            var channel = await this.Bot.DiscordClient.GetShard(this.Parent.Id).GetChannelAsync(b.ChannelId);
 
                             if (channel.Users.Count <= 0)
                             {
-                                _logger.LogDebug("No one joined channel '{Channel}', deleting.", b.ChannelId);
+                                Log.Debug("No one joined channel '{Channel}', deleting.", b.ChannelId);
 
                                 await channel.DeleteAsync();
                                 this.CreatedChannels = this.CreatedChannels.Remove(x => x.ChannelId.ToString(), b);
@@ -152,13 +150,13 @@ public sealed class VcCreatorSettings : RequiresParent<Guild>
                         }).Add(this.Bot);
 
                         this.Bot.DiscordClient.VoiceStateUpdated += VoiceStateUpdated;
-                        _logger.LogDebug("Created VcCreator Event for '{Channel}'", b.ChannelId);
+                        Log.Debug("Created VcCreator Event for '{Channel}'", b.ChannelId);
 
                         while (this.CreatedChannels.Any(x => x.ChannelId == b.ChannelId))
                             await Task.Delay(500);
 
                         this.Bot.DiscordClient.VoiceStateUpdated -= VoiceStateUpdated;
-                        _logger.LogDebug("Deleted VcCreator Event for '{Channel}'", b.ChannelId);
+                        Log.Debug("Deleted VcCreator Event for '{Channel}'", b.ChannelId);
                     }).Add(this.Bot);
                 }
         });

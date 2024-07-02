@@ -1,5 +1,5 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -10,61 +10,90 @@
 namespace ProjectMakoto.Plugins;
 public sealed class PluginLoggerClient
 {
-    internal PluginLoggerClient(LoggerClient client, BasePlugin parent)
+    internal PluginLoggerClient(ILogger client, BasePlugin parent)
     {
         this._client = client;
         this.Parent = parent;
     }
 
-    private LoggerClient _client;
+    private ILogger _client;
 
     private BasePlugin Parent;
 
-    /// <inheritdoc cref="LoggerClient.LogTrace(string, Exception?, object[])"/>
+    /// <inheritdoc cref="Serilog.Log.Verbose(Exception?, string, object?[]?)"/>
     public void LogTrace(string message, Exception? exception = null, params object[] args)
-        => this._client.LogTrace(message.Insert(0, "[{Plugin}] "), exception, args.Prepend(this.Parent.Name).ToArray());
+        => this._client.Verbose(exception, message.Insert(0, "[{Plugin}] "), args.Prepend(this.Parent.Name).ToArray());
 
-    /// <inheritdoc cref="LoggerClient.LogTrace(string, object[])"/>
+    /// <inheritdoc cref="Serilog.Log.Verbose(Exception?, string, object?[]?)"/>
+    public void LogTrace(Exception? exception, string message, params object[] args)
+        => this._client.Verbose(exception, message.Insert(0, "[{Plugin}] "), args.Prepend(this.Parent.Name).ToArray());
+
+    /// <inheritdoc cref="Serilog.Log.Verbose(string, object?[]?)"/>
     public void LogTrace(string message, params object[] args)
-        => this._client.LogTrace(message.Insert(0, "[{Plugin}] "), args.Prepend(this.Parent.Name).ToArray());
+        => this._client.Verbose(message.Insert(0, "[{Plugin}] "), args.Prepend(this.Parent.Name).ToArray());
 
-    /// <inheritdoc cref="LoggerClient.LogDebug(string, Exception?, object[])"/>
+
+    /// <inheritdoc cref="Serilog.Log.Debug(Exception?, string, object?[]?)"/>
     public void LogDebug(string message, Exception? exception = null, params object[] args)
-        => this._client.LogDebug(message.Insert(0, "[{Plugin}] "), exception, args.Prepend(this.Parent.Name).ToArray());
+        => this._client.Debug(exception, message.Insert(0, "[{Plugin}] "), args.Prepend(this.Parent.Name).ToArray());
 
-    /// <inheritdoc cref="LoggerClient.LogDebug(string, object[])"/>
+    /// <inheritdoc cref="Serilog.Log.Debug(Exception?, string, object?[]?)"/>
+    public void LogDebug(Exception? exception, string message, params object[] args)
+        => this._client.Debug(exception, message.Insert(0, "[{Plugin}] "), args.Prepend(this.Parent.Name).ToArray());
+
+    /// <inheritdoc cref="Serilog.Log.Debug(string, object?[]?)"/>
     public void LogDebug(string message, params object[] args)
-        => this._client.LogDebug(message.Insert(0, "[{Plugin}] "), args.Prepend(this.Parent.Name).ToArray());
+        => this._client.Debug(message.Insert(0, "[{Plugin}] "), args.Prepend(this.Parent.Name).ToArray());
 
-    /// <inheritdoc cref="LoggerClient.LogInfo(string, Exception?, object[])"/>
+
+    /// <inheritdoc cref="Serilog.Log.Information(Exception?, string, object?[]?)"/>
     public void LogInfo(string message, Exception? exception = null, params object[] args)
-        => this._client.LogInfo(message.Insert(0, "[{Plugin}] "), exception, args.Prepend(this.Parent.Name).ToArray());
+        => this._client.Information(exception, message.Insert(0, "[{Plugin}] "), args.Prepend(this.Parent.Name).ToArray());
+    
+    /// <inheritdoc cref="Serilog.Log.Information(Exception?, string, object?[]?)"/>
+    public void LogInfo(Exception? exception, string message, params object[] args)
+        => this._client.Information(exception, message.Insert(0, "[{Plugin}] "), args.Prepend(this.Parent.Name).ToArray());
 
-    /// <inheritdoc cref="LoggerClient.LogInfo(string, object[])"/>
+    /// <inheritdoc cref="Serilog.Log.Information(string, object?[]?)"/>
     public void LogInfo(string message, params object[] args)
-        => this._client.LogInfo(message.Insert(0, "[{Plugin}] "), args.Prepend(this.Parent.Name).ToArray());
+        => this._client.Information(message.Insert(0, "[{Plugin}] "), args.Prepend(this.Parent.Name).ToArray());
 
-    /// <inheritdoc cref="LoggerClient.LogWarn(string, Exception?, object[])"/>
+
+    /// <inheritdoc cref="Serilog.Log.Warning(Exception?, string, object?[]?)"/>
     public void LogWarn(string message, Exception? exception = null, params object[] args)
-        => this._client.LogWarn(message.Insert(0, "[{Plugin}] "), exception, args.Prepend(this.Parent.Name).ToArray());
+        => this._client.Warning(exception, message.Insert(0, "[{Plugin}] "), args.Prepend(this.Parent.Name).ToArray());
 
-    /// <inheritdoc cref="LoggerClient.LogWarn(string, object[])"/>
+    /// <inheritdoc cref="Serilog.Log.Warning(Exception?, string, object?[]?)"/>
+    public void LogWarn(Exception? exception, string message, params object[] args)
+        => this._client.Warning(exception, message.Insert(0, "[{Plugin}] "), args.Prepend(this.Parent.Name).ToArray());
+
+    /// <inheritdoc cref="Serilog.Log.Warning(string, object?[]?)"/>
     public void LogWarn(string message, params object[] args)
-        => this._client.LogWarn(message.Insert(0, "[{Plugin}] "), args.Prepend(this.Parent.Name).ToArray());
+        => this._client.Warning(message.Insert(0, "[{Plugin}] "), args.Prepend(this.Parent.Name).ToArray());
 
-    /// <inheritdoc cref="LoggerClient.LogError(string, Exception?, object[])"/>
+
+    /// <inheritdoc cref="Serilog.Log.Error(Exception?, string, object?[]?)"/>
     public void LogError(string message, Exception? exception = null, params object[] args)
-        => this._client.LogError(message.Insert(0, "[{Plugin}] "), exception, args.Prepend(this.Parent.Name).ToArray());
+        => this._client.Error(exception, message.Insert(0, "[{Plugin}] "), args.Prepend(this.Parent.Name).ToArray());
 
-    /// <inheritdoc cref="LoggerClient.LogError(string, object[])"/>
+    /// <inheritdoc cref="Serilog.Log.Error(Exception?, string, object?[]?)"/>
+    public void LogError(Exception? exception, string message, params object[] args)
+        => this._client.Error(exception, message.Insert(0, "[{Plugin}] "), args.Prepend(this.Parent.Name).ToArray());
+
+    /// <inheritdoc cref="Serilog.Log.Error(string, object?[]?)"/>
     public void LogError(string message, params object[] args)
-        => this._client.LogError(message.Insert(0, "[{Plugin}] "), args.Prepend(this.Parent.Name).ToArray());
+        => this._client.Error(message.Insert(0, "[{Plugin}] "), args.Prepend(this.Parent.Name).ToArray());
 
-    /// <inheritdoc cref="LoggerClient.LogFatal(string, Exception?, object[])"/>
+
+    /// <inheritdoc cref="Serilog.Log.Fatal(Exception?, string, object?[]?)"/>
     public void LogFatal(string message, Exception? exception = null, params object[] args)
-        => this._client.LogFatal(message.Insert(0, "[{Plugin}] "), exception, args.Prepend(this.Parent.Name).ToArray());
+        => this._client.Fatal(exception, message.Insert(0, "[{Plugin}] "), args.Prepend(this.Parent.Name).ToArray());
+    
+    /// <inheritdoc cref="Serilog.Log.Fatal(Exception?, string, object?[]?)"/>
+    public void LogFatal(Exception? exception, string message, params object[] args)
+        => this._client.Fatal(exception, message.Insert(0, "[{Plugin}] "), args.Prepend(this.Parent.Name).ToArray());
 
-    /// <inheritdoc cref="LoggerClient.LogFatal(string, object[])"/>
+    /// <inheritdoc cref="Serilog.Log.Fatal(string, object?[]?)"/>
     public void LogFatal(string message, params object[] args)
-        => this._client.LogFatal(message.Insert(0, "[{Plugin}] "), args.Prepend(this.Parent.Name).ToArray());
+        => this._client.Fatal(message.Insert(0, "[{Plugin}] "), args.Prepend(this.Parent.Name).ToArray());
 }

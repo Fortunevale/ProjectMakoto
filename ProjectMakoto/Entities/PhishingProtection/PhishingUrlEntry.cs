@@ -1,5 +1,5 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -23,10 +23,10 @@ public sealed class PhishingUrlEntry : RequiresBotReference
         this.Url = Url;
     }
 
-    [ColumnName("url"), ColumnType(ColumnTypes.VarChar), WithCollation, MaxValue(500), Primary]
+    [ColumnName("url"), ColumnType(ColumnTypes.VarChar), MaxValue(500), Primary]
     public string Url { get; init; }
 
-    [ColumnName("origin"), ColumnType(ColumnTypes.LongText), WithCollation, Default("[]")]
+    [ColumnName("origin"), ColumnType(ColumnTypes.LongText), Default("[]")]
     public string[] Origin
     {
         get => JsonConvert.DeserializeObject<string[]>(this.Bot.DatabaseClient.GetValue<string>("scam_urls", "url", this.Url, "origin", this.Bot.DatabaseClient.mainDatabaseConnection) ?? "");

@@ -1,5 +1,5 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -19,6 +19,7 @@ internal sealed class EmbedMessagesEvents(Bot bot) : RequiresTranslation(bot)
             return;
 
         var Delete = new DiscordButtonComponent(ButtonStyle.Danger, "DeleteEmbedMessage", this.tKey.Delete.Get(this.Bot.Guilds[e.Guild.Id]), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
+
 
         do
         {
@@ -52,17 +53,19 @@ internal sealed class EmbedMessagesEvents(Bot bot) : RequiresTranslation(bot)
                     if (!channel.TryGetMessage(MessageId, out var message))
                         continue;
 
+                    var JumpToMessage = new DiscordLinkButtonComponent(message.JumpLink.ToString(), this.t.Common.JumpToMessage.Get(this.Bot.Guilds[e.Guild.Id]), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
+                    
                     var msg = await e.Message.RespondAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = message.Author.AvatarUrl, Name = $"{message.Author.GetUsernameWithIdentifier()} ({message.Author.Id})" },
+                        Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = message.Author.AvatarUrl, Name = $"{message.Author.GetUsernameWithIdentifier()}" },
                         Color = message.Author.BannerColor ?? EmbedColors.Info,
-                        Description = $"[`{this.t.Common.JumpToMessage.Get(this.Bot.Guilds[e.Guild.Id])}`]({message.JumpLink})\n\n{message.Content}".TruncateWithIndication(2000),
+                        Description = $"{message.ConvertToText()}".TruncateWithIndication(2000),
                         ImageUrl = (message.Attachments?.Count > 0 && (message.Attachments[0].Filename.EndsWith(".png")
                                                                     || message.Attachments[0].Filename.EndsWith(".jpeg")
                                                                     || message.Attachments[0].Filename.EndsWith(".jpg")
                                                                     || message.Attachments[0].Filename.EndsWith(".gif")) ? message.Attachments[0].Url : ""),
                         Timestamp = message.Timestamp,
-                    }).AddComponents(Delete));
+                    }).AddComponents(JumpToMessage, Delete));
                 }
             }
         } while (false);

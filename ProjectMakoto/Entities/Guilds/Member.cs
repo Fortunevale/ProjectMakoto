@@ -1,5 +1,5 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -7,7 +7,6 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-using ProjectMakoto.Entities.Database.ColumnAttributes;
 using ProjectMakoto.Entities.Members;
 
 namespace ProjectMakoto.Entities.Guilds;
@@ -30,17 +29,17 @@ public sealed class Member : RequiresParent<Guild>
 
         if (retryCount >= 3)
         {
-            _logger.LogError("Failed to perform auto kick checks for {id}", this.Id);
+            Log.Error("Failed to perform auto kick checks for {id}", this.Id);
 
             foreach (var b in exceptions)
-                _logger.LogError("Auto Kick Error", b);
+                Log.Error(b, "Auto Kick Error");
 
             throw exceptions.Last();
         }
 
         try
         {
-            guild ??= await this.Bot.DiscordClient.GetGuildAsync(this.Parent.Id);
+            guild ??= await this.Bot.DiscordClient.GetShard(this.Parent.Id).GetGuildAsync(this.Parent.Id);
             member ??= await guild.GetMemberAsync(this.Id);
         }
         catch (Exception ex)
@@ -57,7 +56,7 @@ public sealed class Member : RequiresParent<Guild>
             (member.Flags.Value.HasFlag(UserFlags.Spammer) || member.Flags.Value.HasFlag(UserFlags.DisabledSuspiciousActivity)))
         {
             await member.RemoveAsync(this.Bot.LoadedTranslations.Commands.Config.Join.AutoKickSpammerReason.Get(this.Parent));
-            _logger.LogDebug("Kicked {User} from {Guild}: Account is likely spammer", this.Id, this.Parent.Id);
+            Log.Debug("Kicked {User} from {Guild}: Account is likely spammer", this.Id, this.Parent.Id);
             return;
         }
 
@@ -65,7 +64,7 @@ public sealed class Member : RequiresParent<Guild>
             member.CreationTimestamp.GetTimespanSince() < this.Parent.Join.AutoKickAccountAge)
         {
             await member.RemoveAsync(this.Bot.LoadedTranslations.Commands.Config.Join.AutoKickAccountAgeReason.Get(this.Parent));
-            _logger.LogDebug("Kicked {User} from {Guild}: Account is too young", this.Id, this.Parent.Id);
+            Log.Debug("Kicked {User} from {Guild}: Account is too young", this.Id, this.Parent.Id);
             return;
         }
 
@@ -84,7 +83,7 @@ public sealed class Member : RequiresParent<Guild>
                     if (member.Roles.Count == 0)
                     {
                         await member.RemoveAsync(this.Bot.LoadedTranslations.Commands.Config.Join.AutoKickNoRolesReason.Get(this.Parent));
-                        _logger.LogDebug("Kicked {User} from {Guild}: User did not pick roles after {Time}", this.Id, this.Parent.Id, this.Parent.Join.AutoKickNoRoleTime.GetHumanReadable());
+                        Log.Debug("Kicked {User} from {Guild}: User did not pick roles after {Time}", this.Id, this.Parent.Id, this.Parent.Join.AutoKickNoRoleTime.GetHumanReadable());
                     }
                 }
                 catch (DisCatSharp.Exceptions.NotFoundException)
@@ -93,7 +92,7 @@ public sealed class Member : RequiresParent<Guild>
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError("Auto Kick Error", ex);
+                    Log.Error(ex, "Auto Kick Error");
                     return;
                 }
             }).CreateScheduledTask(member.JoinedAt.Add(this.Parent.Join.AutoKickNoRoleTime).UtcDateTime, 
@@ -106,7 +105,7 @@ public sealed class Member : RequiresParent<Guild>
     [ColumnName("userid"), ColumnType(ColumnTypes.BigInt), Primary]
     internal ulong Id { get; set; }
 
-    [ColumnName("saved_nickname"), ColumnType(ColumnTypes.Text), WithCollation, Nullable]
+    [ColumnName("saved_nickname"), ColumnType(ColumnTypes.Text), Nullable]
     public string? SavedNickname
     {
         get => this.Bot.DatabaseClient.GetValue<string>(this.Parent.Id.ToString(), "userid", this.Id, "saved_nickname", this.Bot.DatabaseClient.guildDatabaseConnection);
@@ -127,7 +126,7 @@ public sealed class Member : RequiresParent<Guild>
         set => _ = this.Bot.DatabaseClient.SetValue(this.Parent.Id.ToString(), "userid", this.Id, "last_leave", value, this.Bot.DatabaseClient.guildDatabaseConnection);
     }
 
-    [ColumnName("roles"), ColumnType(ColumnTypes.LongText), WithCollation, Default("[]")]
+    [ColumnName("roles"), ColumnType(ColumnTypes.LongText), Default("[]")]
     public MemberRole[] MemberRoles
     {
         get => JsonConvert.DeserializeObject<MemberRole[]>(this.Bot.DatabaseClient.GetValue<string>(this.Parent.Id.ToString(), "userid", this.Id, "roles", this.Bot.DatabaseClient.guildDatabaseConnection));

@@ -1,5 +1,5 @@
 // Project Makoto
-// Copyright (C) 2023  Fortunevale
+// Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -9,7 +9,6 @@
 
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
-using ProjectMakoto.Entities.Database.ColumnAttributes;
 
 namespace ProjectMakoto.Entities;
 
@@ -21,9 +20,9 @@ public class DatabaseDictionary<T1, T2>
     /// <param name="client">The database client to use.</param>
     /// <param name="tableName">The table this dictionary is mapped to.</param>
     /// <param name="primaryKey">The name of the table's primary key.</param>
-    /// <param name="useGuildConnection">Whether this table is in the guild database.</param>
+    /// <param name="connection">Which connection to use.</param>
     /// <param name="newValuePredicate">A predicate returning the value object.</param>
-    public DatabaseDictionary(DatabaseClient client, string tableName, string primaryKey, bool useGuildConnection, Func<T1, T2>? newValuePredicate)
+    public DatabaseDictionary(DatabaseClient client, string tableName, string primaryKey, DatabaseClient.MySqlConnectionInformation connection, Func<T1, T2>? newValuePredicate)
     {
         if (typeof(T2).GetCustomAttribute<TableNameAttribute>() is null || !this.Try(() => { _ = client.GetPrimaryKey(typeof(T2)); }))
             throw new ArgumentException("The given type is not a valid database type. A valid database type needs to have the 'TableName' attribute.");
@@ -31,7 +30,19 @@ public class DatabaseDictionary<T1, T2>
         this._client = client;
         this._tableName = tableName;
         this._primaryKey = primaryKey;
-        this._useGuildConnection = useGuildConnection;
+        this._connection = connection;
+        this._newValuePredicate = newValuePredicate;
+    }
+
+    public DatabaseDictionary(BasePlugin plugin, Type type, Func<T1, T2>? newValuePredicate = null)
+    {
+        if (typeof(T2).GetCustomAttribute<TableNameAttribute>() is null || !this.Try(() => { _ = plugin.Bot.DatabaseClient.GetPrimaryKey(typeof(T2)); }))
+            throw new ArgumentException("The given type is not a valid database type. A valid database type needs to have the 'TableName' attribute.");
+
+        this._client = plugin.Bot.DatabaseClient;
+        this._tableName = (plugin.Bot.DatabaseClient.MakePluginTablePrefix(plugin) + plugin.Bot.DatabaseClient.GetTableName(type)).ToLower();
+        this._primaryKey = plugin.Bot.DatabaseClient.GetPrimaryKey(type).ColumnName;
+        this._connection = plugin.Bot.DatabaseClient.pluginDatabaseConnection;
         this._newValuePredicate = newValuePredicate;
     }
 
@@ -40,10 +51,7 @@ public class DatabaseDictionary<T1, T2>
     private DatabaseClient _client;
     private string _tableName;
     private string _primaryKey;
-    private bool _useGuildConnection;
-
-    private DatabaseClient.MySqlConnectionInformation _connection
-        => this._useGuildConnection ? this._client.guildDatabaseConnection : this._client.mainDatabaseConnection;
+    private DatabaseClient.MySqlConnectionInformation _connection;
 
     private ConcurrentDictionary<T1, T2> _items = new();
 
