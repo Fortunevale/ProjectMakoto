@@ -188,7 +188,7 @@ public static class DiscordExtensions
                 $"height=\"{x.Height}\" " +
                 $"width=\"{x.Width}\"/>";
             }))}" +
-            $"{(msg.Components?.Count > 0 ? $"<discord-attachments slot=\"components\">{string.Join("", msg.Components.Select(c1 =>
+            $"{(msg.Components?.Count > 0 ? $"<discord-attachments slot=\"components\">{string.Join("", msg.Components.OfType<DiscordActionRowComponent>().Select(c1 =>
             {
                 return $"<discord-action-row>{string.Join("", c1.Components.Select(c2 =>
                 {
@@ -385,7 +385,7 @@ public static class DiscordExtensions
 
         md = Regex.Replace(md, @"(?<!\\)(?<!\&gt;)(?<!a):\w+?:", (e) =>
         {
-            if (!DiscordEmoji.TryFromName(bot.DiscordClient.GetFirstShard(), e.Value, false, out var emoji))
+            if (!DiscordEmoji.TryFromName(bot.DiscordClient.GetFirstShard(), e.Value, false, false, out var emoji))
                 return e.Value;
             else
                 try
@@ -534,6 +534,9 @@ public static class DiscordExtensions
 
     public static DiscordEmoji ToEmote(this bool b, Bot client)
         => b ? DiscordEmoji.FromUnicode("✅") : EmojiTemplates.GetError(client);
+
+    public static DiscordEmoji ToPillEmote(this bool? b, Bot client)
+        => b?.ToPillEmote(client) ?? false.ToPillEmote(client);
 
     public static DiscordEmoji ToPillEmote(this bool b, Bot client)
         => b ? EmojiTemplates.GetPillOn(client) : EmojiTemplates.GetPillOff(client);

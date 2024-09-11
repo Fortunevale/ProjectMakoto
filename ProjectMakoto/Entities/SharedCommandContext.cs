@@ -288,7 +288,19 @@ public sealed class SharedCommandContext
     /// <summary>
     /// The member that executed this command.
     /// </summary>
-    public DiscordMember Member { get; set; }
+    public DiscordMember Member
+    {
+        get
+        {
+            if (this._member is null && this.Guild is not null)
+                _member = this.Guild.GetMemberAsync(this.CurrentUser.Id).Result;
+
+            return _member;
+        }
+        set => this._member = value;
+    }
+
+    private DiscordMember? _member;
 
     /// <summary>
     /// This user that executed this command.
@@ -307,15 +319,15 @@ public sealed class SharedCommandContext
     {
         get
         {
-            if (this._member is null && this.Guild is not null)
-                _member = this.Guild.GetMemberAsync(this.CurrentUser.Id).Result;
+            if (this._currentMember is null && this.Guild is not null)
+                _currentMember = this.Guild.GetMemberAsync(this.CurrentUser.Id).Result;
 
-            return _member;
+            return _currentMember;
         }
-        set => this._member = value;
+        set => this._currentMember = value;
     }
 
-    private DiscordMember? _member;
+    private DiscordMember? _currentMember;
 
     /// <summary>
     /// The current user the bot uses.

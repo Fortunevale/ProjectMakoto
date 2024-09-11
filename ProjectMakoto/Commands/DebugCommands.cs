@@ -468,30 +468,13 @@ public sealed partial class DebugCommands : ApplicationCommandsModule
             => _ = new Commands.Debug.ThrowCommand().ExecuteCommand(ctx, this._bot);
 
         [SlashCommand("test", "Test.")]
-        public async Task Test(InteractionContext ctx, [Option("test", "test"), MinimumValue(1), MaximumValue(2000)] int number)
+        public async Task Test(InteractionContext ctx)
         {
             _ = Task.Run(async () =>
             {
-                await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
 
-                var embed = new DiscordEmbedBuilder()
-                    .WithAuthor(this._bot.LoadedTranslations.Events.Actionlog.MultipleMessagesDeleted.Get(this._bot.Guilds[ctx.Guild.Id]), null, AuditLogIcons.MessageDeleted)
-                    .WithColor(EmbedColors.Error)
-                    .WithTimestamp(DateTime.UtcNow)
-                    .WithDescription($"**{this._bot.LoadedTranslations.Events.Actionlog.Channel.Get(this._bot.Guilds[ctx.Guild.Id])}**: {ctx.Channel.Mention} `[{ctx.Channel.GetIcon()}{ctx.Channel.Name}]`\n" +
-                                     $"{this._bot.LoadedTranslations.Events.Actionlog.CheckAttachedFileForDeletedMessages.Get(this._bot.Guilds[ctx.Guild.Id]).Build(true)}");
-
-                var Messages = (await ctx.Channel.GetMessagesAsync(number)).GenerateHtmlFromMessages(this._bot);
-
-                if (Messages.Length == 0)
-                    return;
-
-                var FileName = $"{Guid.NewGuid()}.html";
-
-                using (var fileStream = new MemoryStream(Encoding.UTF8.GetBytes(Messages)))
-                    _ = await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(embed).AddFile(FileName, fileStream));
             });
         }
-    }
+    }   
 #endif
 }

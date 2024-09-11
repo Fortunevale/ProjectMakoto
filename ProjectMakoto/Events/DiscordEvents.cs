@@ -16,7 +16,7 @@ internal sealed class DiscordEvents(Bot bot) : RequiresTranslation(bot)
 
     internal async Task GuildCreated(DiscordClient sender, GuildCreateEventArgs e)
     {
-        if (this.Bot.objectedUsers.Contains(e.Guild.OwnerId) || this.Bot.bannedUsers.ContainsKey(e.Guild.OwnerId) || this.Bot.bannedGuilds.ContainsKey(e.Guild?.Id ?? 0))
+        if (this.Bot.objectedUsers.Contains(e.Guild.OwnerId.Value) || this.Bot.bannedUsers.ContainsKey(e.Guild.OwnerId.Value) || this.Bot.bannedGuilds.ContainsKey(e.Guild?.Id ?? 0))
         {
             await Task.Delay(1000);
             Log.Information("Leaving guild '{Guild}'..", e.Guild.Id);
