@@ -257,7 +257,7 @@ internal static class SyncTasks
             {
                 Log.Debug("Performing sync tasks for '{guild}'..", guild.Key);
 
-                if (bot.objectedUsers.Contains(guild.Value.OwnerId) || bot.bannedUsers.ContainsKey(guild.Value.OwnerId) || bot.bannedGuilds.ContainsKey(guild.Key))
+                if (bot.objectedUsers.Contains(guild.Value.OwnerId.Value) || bot.bannedUsers.ContainsKey(guild.Value.OwnerId.Value) || bot.bannedGuilds.ContainsKey(guild.Key))
                 {
                     Log.Information("Leaving guild '{guild}'..", guild.Key);
                     await guild.Value.LeaveAsync();
