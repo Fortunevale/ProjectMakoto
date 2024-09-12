@@ -54,7 +54,7 @@ jobs:
         run: find . -type f -name "*.sh" -exec chmod +x {} +
         working-directory: ProjectMakotoTest/OfficialPlugins/
         
-      - name: Preparing Makoto Plugin Build..
+      - name: Prepare Makoto Plugin Build
         run: sh update_deps.sh
         working-directory: ProjectMakotoTest/OfficialPlugins/
         

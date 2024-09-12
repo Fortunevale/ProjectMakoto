@@ -39,15 +39,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DisCatSharp.VoiceNext", "..
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DisCatSharp.VoiceNext.Natives", "..\Dependencies\DisCatSharp\DisCatSharp.VoiceNext.Natives\DisCatSharp.VoiceNext.Natives.csproj", "{370E7196-9D06-43D6-B267-F63F8C38C33F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectMakoto.Plugins.Social", "..\..\..\..\..\Mira\Documents\GitHub\ProjectIchigo\OfficialPlugins\Social\ProjectMakoto.Plugins.Social.csproj", "{40158660-CD40-44A8-8834-077C132B7DDD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectMakoto.Plugins.Social", "..\OfficialPlugins\Social\ProjectMakoto.Plugins.Social.csproj", "{40158660-CD40-44A8-8834-077C132B7DDD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectMakoto.Plugins.AbuseIPDB", "..\..\..\..\..\Mira\Documents\GitHub\ProjectIchigo\OfficialPlugins\AbuseIPDB\ProjectMakoto.Plugins.AbuseIPDB.csproj", "{7F04788A-8B14-4C62-A247-3B1F93C01B03}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectMakoto.Plugins.AbuseIPDB", "..\OfficialPlugins\AbuseIPDB\ProjectMakoto.Plugins.AbuseIPDB.csproj", "{7F04788A-8B14-4C62-A247-3B1F93C01B03}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectMakoto.Plugins.Translations", "..\..\..\..\..\Mira\Documents\GitHub\ProjectIchigo\OfficialPlugins\Translations\ProjectMakoto.Plugins.Translations.csproj", "{0AB29534-3D3E-4482-A98A-8F1C01C4B476}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectMakoto.Plugins.Translations", "..\OfficialPlugins\Translations\ProjectMakoto.Plugins.Translations.csproj", "{0AB29534-3D3E-4482-A98A-8F1C01C4B476}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectMakoto.Plugins.Example", "..\..\..\..\..\Mira\Documents\GitHub\ProjectIchigo\OfficialPlugins\Example\ProjectMakoto.Plugins.Example.csproj", "{B387A175-639B-4376-A221-34E733B4C6FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectMakoto.Plugins.Example", "..\OfficialPlugins\Example\ProjectMakoto.Plugins.Example.csproj", "{B387A175-639B-4376-A221-34E733B4C6FC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectMakoto.Plugins.Music", "..\..\..\..\..\Mira\Documents\GitHub\ProjectIchigo\OfficialPlugins\Music\ProjectMakoto.Plugins.Music.csproj", "{C609247B-037D-4E16-9E75-6DA142E4EDAC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectMakoto.Plugins.Music", "..\OfficialPlugins\Music\ProjectMakoto.Plugins.Music.csproj", "{C609247B-037D-4E16-9E75-6DA142E4EDAC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
