@@ -33,7 +33,6 @@ public sealed class Guild : RequiresBotReference
         this.InviteNotes = new(bot, this);
         this.NameNormalizer = new(bot, this);
         this.EmbedMessage = new(bot, this);
-        this.MusicModule = new(bot, this);
         this.VcCreator = new(bot, this);
         this.PrefixSettings = new(bot, this);
 
@@ -88,9 +87,6 @@ public sealed class Guild : RequiresBotReference
     [ContainsValues]
     public PrefixSettings PrefixSettings { get; init; }
 
-    [ContainsValues]
-    public Lavalink MusicModule { get; set; }
-
     [ColumnName("autounarchivelist"), ColumnType(ColumnTypes.LongText), Default("[]")]
     public ulong[] AutoUnarchiveThreads
     {
@@ -128,4 +124,5 @@ public sealed class Guild : RequiresBotReference
 
 
     public SelfFillingDatabaseDictionary<Member> Members { get; init; }
+
 }

@@ -19,6 +19,7 @@ using Serilog.Events;
 using Serilog.Core;
 using ProjectMakoto.Entities.LoggingEnrichers;
 using Status = ProjectMakoto.Entities.Status;
+using Microsoft.CodeAnalysis;
 
 namespace ProjectMakoto;
 
@@ -29,7 +30,6 @@ public sealed class Bot
     internal DatabaseClient DatabaseClient { get; set; }
 
     public DiscordShardedClient DiscordClient { get; internal set; }
-    internal LavalinkSession LavalinkSession;
 
     internal ScoreSaberClient ScoreSaberClient { get; set; }
     public ThreadJoinClient ThreadJoinClient { get; internal set; }
@@ -56,7 +56,7 @@ public sealed class Bot
 
     #region Util
 
-    internal Translations LoadedTranslations { get; set; }
+    public Translations LoadedTranslations { get; set; }
 
     public CountryCodes CountryCodes { get; internal set; }
     public LanguageCodes LanguageCodes { get; internal set; }
@@ -147,11 +147,6 @@ public sealed class Bot
                 Environment.CurrentDirectory,
                 Regex.Replace(Environment.CommandLine, @"(--token \S*)", ""));
 
-        _ = Task.Run(() =>
-        {
-            UniversalExtensions.LoadAllReferencedAssemblies(AppDomain.CurrentDomain);
-        });
-
         var loadDatabase = Task.Run(async () =>
         {
             try
@@ -170,7 +165,16 @@ public sealed class Bot
 
                 await Task.WhenAll(Util.Initializers.ListLoader.Load(this), 
                                    Util.Initializers.TranslationLoader.Load(this),
-                                   Util.Initializers.DependencyLoader.Load(this));
+                                   Util.Initializers.DependencyLoader.Load(this),
+                                   Task.Run(() =>
+                                   {
+                                       UniversalExtensions.LoadAllReferencedAssemblies(AppDomain.CurrentDomain);
+                                   }));
+
+                Util.Initializers.CommandCompiler.AssemblyReferences = AppDomain.CurrentDomain.GetAssemblies()
+                    .Where(x => !x.IsDynamic && !x.Location.IsNullOrWhiteSpace())
+                    .Select(x => MetadataReference.CreateFromFile(x.Location))
+                    .ToList();
 
                 await Util.Initializers.PluginLoader.LoadPlugins(this);
                 _ = await DatabaseClient.InitializeDatabase(this);

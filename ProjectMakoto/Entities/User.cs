@@ -8,6 +8,7 @@
 // but WITHOUT ANY WARRANTY
 
 using ProjectMakoto.Entities.Users;
+using ProjectMakoto.Entities.Users.Legacy;
 
 namespace ProjectMakoto.Entities;
 
@@ -54,30 +55,6 @@ public sealed class User : RequiresBotReference
     [ContainsValues]
     public DataSettings Data { get; init; }
 
-    [ColumnName("blocked_users"), ColumnType(ColumnTypes.LongText), Default("[]")]
-    public ulong[] BlockedUsers
-    {
-        get => JsonConvert.DeserializeObject<ulong[]>(this.Bot.DatabaseClient.GetValue<string>("users", "userid", this.Id, "blocked_users", this.Bot.DatabaseClient.mainDatabaseConnection));
-        set => this.Bot.DatabaseClient.SetValue("users", "userid", this.Id, "blocked_users", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);
-    }
-
-    [ColumnName("playlists"), ColumnType(ColumnTypes.LongText), Default("[]")]
-    public UserPlaylist[] UserPlaylists
-    {
-        get
-        {
-            return JsonConvert.DeserializeObject<UserPlaylist[]>(this.Bot.DatabaseClient.GetValue<string>("users", "userid", this.Id, "playlists", this.Bot.DatabaseClient.mainDatabaseConnection))
-                .Select(x =>
-                {
-                    x.Bot = this.Bot;
-                    x.Parent = this;
-
-                    return x;
-                }).ToArray();
-        }
-        set => this.Bot.DatabaseClient.SetValue("users", "userid", this.Id, "playlists", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);
-    }
-
     [ColumnName("current_locale"), ColumnType(ColumnTypes.Text), Nullable]
     public string? CurrentLocale
     {
@@ -111,4 +88,20 @@ public sealed class User : RequiresBotReference
 
     [JsonIgnore]
     public UserUpload? PendingUserUpload { get; set; } = null;
+
+    #region Legacy
+    [ColumnName("playlists"), ColumnType(ColumnTypes.LongText), Default("[]")]
+    public UserPlaylist[] LegacyUserPlaylists
+    {
+        get => JsonConvert.DeserializeObject<UserPlaylist[]>(this.Bot.DatabaseClient.GetValue<string>("users", "userid", this.Id, "playlists", this.Bot.DatabaseClient.mainDatabaseConnection));
+        set => this.Bot.DatabaseClient.SetValue("users", "userid", this.Id, "playlists", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
+
+    [ColumnName("blocked_users"), ColumnType(ColumnTypes.LongText), Default("[]")]
+    public ulong[] LegacyBlockedUsers
+    {
+        get => JsonConvert.DeserializeObject<ulong[]>(this.Bot.DatabaseClient.GetValue<string>("users", "userid", this.Id, "blocked_users", this.Bot.DatabaseClient.mainDatabaseConnection));
+        set => this.Bot.DatabaseClient.SetValue("users", "userid", this.Id, "blocked_users", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
+    #endregion
 }

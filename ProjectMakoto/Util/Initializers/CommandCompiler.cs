@@ -15,6 +15,8 @@ using Microsoft.CodeAnalysis.CSharp;
 namespace ProjectMakoto.Util.Initializers;
 internal static class CommandCompiler
 {
+    internal static List<PortableExecutableReference> AssemblyReferences = new();
+
     internal static async Task<(Assembly compiledCommands, CompilationType Type)[]> BuildCommands(Bot bot, string applicationHash, IEnumerable<MakotoModule> moduleList, KeyValuePair<string, BasePlugin>? plugin = null)
     {
         var isPlugin = plugin != null;
@@ -178,7 +180,7 @@ internal static class CommandCompiler
                             public static void Populate_{{TaskName}}({{typeof(Bot).FullName}} _bot)
                             {
                                 Log.Debug("Populating execution properties for '{CommandName}':'{taskname}'", "{{command.Name}}","{{TaskName}}");
-                                {{(parent is null ? $"{TaskName}_CommandType = _bot.PluginCommandModules[\"{plugin.Value.Key}\"].First(x => x.Name == \"{module.Name}\").Commands.First(x => x.Name == \"{command.Name}\").Command;" : $"{TaskName}_CommandType = _bot.PluginCommandModules[\"{plugin.Value.Key}\"].Commands.First(x => x.Name == \"{module.Name}\").First(x => x.Name == \"{parent.Name}\").SubCommands.First(x => x.Name == \"{command.Name}\").Command;")}}
+                                {{(parent is null ? $"{TaskName}_CommandType = _bot.PluginCommandModules[\"{plugin.Value.Key}\"].First(x => x.Name == \"{module.Name}\").Commands.First(x => x.Name == \"{command.Name}\").Command;" : $"{TaskName}_CommandType = _bot.PluginCommandModules[\"{plugin.Value.Key}\"].First(x => x.Name == \"{module.Name}\").Commands.First(x => x.Name == \"{parent.Name}\").SubCommands.First(x => x.Name == \"{command.Name}\").Command;")}}
                                 {{TaskName}}_CommandMethod = {{TaskName}}_CommandType.GetMethods().First(x => x.Name == "ExecuteCommand" && x.GetParameters().Any(param => param.ParameterType == typeof({{contextType.FullName}})));
                             }
                             """ :
@@ -337,10 +339,6 @@ internal static class CommandCompiler
 #endif
             .WithDeterministic(true);
 
-        var references = AppDomain.CurrentDomain.GetAssemblies()
-            .Where(x => !x.IsDynamic && !x.Location.IsNullOrWhiteSpace())
-            .Select(x => MetadataReference.CreateFromFile(x.Location));
-
         if (isPlugin)
             Log.Information("Compiling {0} Commands from Plugin from '{1}' ({2}).",
                 moduleList.Count(),
@@ -357,7 +355,7 @@ internal static class CommandCompiler
             {
                 var compilation = CSharpCompilation.Create(CommandCompiler.GetUniqueCodeCompatibleName() + $"_{Regex.Replace($"{classCode.ModuleName}_{Enum.GetName(classCode.Type)}", @"[^a-zA-Z0-9_]", "")}")
                 .AddSyntaxTrees(SyntaxFactory.ParseSyntaxTree(classCode.Code))
-                .AddReferences(references)
+                .AddReferences(AssemblyReferences)
                 .WithOptions(options);
 
                 var data = new CompilationData(classCode.Type, classCode.Code, moduleList, plugin.Value.Key);
@@ -448,6 +446,10 @@ internal static class CommandCompiler
                         }
                         Console.WriteLine();
                     }
+
+#if DEBUG
+                    File.WriteAllText($"CompiledCommands/failed.cs", classCode.Code);
+#endif
 
                     _ = Console.ReadLine();
                 }

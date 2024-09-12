@@ -20,7 +20,6 @@ public sealed class Status
     public bool DiscordInitialized { get; internal set; } = false;
     public bool DiscordGuildDownloadCompleted { get; internal set; } = false;
     public bool DiscordCommandsRegistered { get; internal set; } = false;
-    public bool LavalinkInitialized { get; internal set; } = false;
 
     public ulong TeamOwner { get; internal set; } = new();
     public IReadOnlyList<ulong> TeamMembers
@@ -41,7 +40,9 @@ public sealed class Status
         }
     }
 
-    public ExposedConfig SafeReadOnlyConfig { get; set; }
+    public ExposedConfig SafeReadOnlyConfig
+        => new(this.LoadedConfig);
+
     public class ExposedConfig(Config config)
     {
         public bool IsDev => config.IsDev;
@@ -49,6 +50,31 @@ public sealed class Status
 
         public string SupportServerInvite = config.SupportServerInvite;
         public EmojiConfig Emojis = new(config);
+        public DiscordConfig Discord = new(config);
+        public ChannelsConfig Channels = new(config);
+
+        public sealed class DiscordConfig(Config config)
+        {
+            public ulong AssetsGuild => config.Discord.AssetsGuild;
+            public ulong DevelopmentGuild => config.Discord.DevelopmentGuild;
+
+            public uint MaxUploadSize => config.Discord.MaxUploadSize;
+            public IReadOnlyList<string> DisabledCommands => config.Discord.DisabledCommands.ToList().AsReadOnly();
+        }
+
+        public sealed class ChannelsConfig(Config config)
+        {
+            public ulong GlobalBanAnnouncements => config.Channels.GlobalBanAnnouncements;
+            public ulong GithubLog => config.Channels.GithubLog;
+            public ulong News => config.Channels.News;
+
+            public ulong GraphAssets => config.Channels.GraphAssets;
+            public ulong PlaylistAssets => config.Channels.PlaylistAssets;
+            public ulong UrlSubmissions => config.Channels.UrlSubmissions;
+            public ulong OtherAssets => config.Channels.OtherAssets;
+
+            public ulong ExceptionLog => config.Channels.ExceptionLog;
+        }
 
         public sealed class EmojiConfig(Config config)
         {

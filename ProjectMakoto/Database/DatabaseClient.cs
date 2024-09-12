@@ -454,7 +454,8 @@ public sealed partial class DatabaseClient : RequiresBotReference
             if (typeof(T) == typeof(TimeSpan))
                 return TimeSpan.FromSeconds(Convert.ToInt64(input)) is T t ? t : throw new Exception("Impossible Exception.");
 
-            return (T)Convert.ChangeType(input, typeof(T));
+            var t1 = (T)Convert.ChangeType(input, typeof(T));
+            return t1;
         }
 
         try
@@ -561,7 +562,7 @@ public sealed partial class DatabaseClient : RequiresBotReference
                 })
                 .Select(x =>
                 {
-                    return $"{this.GetPropertyInfo(x).ColumnName}";
+                    return $"`{this.GetPropertyInfo(x).ColumnName}`";
                 }))} ) VALUES ( {string.Join(", ", this.GetValidProperties(type)
                 .Where(x =>
                 {
@@ -621,7 +622,7 @@ public sealed partial class DatabaseClient : RequiresBotReference
                 return false;
 
             var cmd = connection.CreateCommand();
-            cmd.CommandText = $"INSERT INTO `{tableName}` ( {key} ) VALUES ( @value )";
+            cmd.CommandText = $"INSERT INTO `{tableName}` ( `{key}` ) VALUES ( @value )";
             _ = cmd.Parameters.AddWithValue($"@value", value);
 
             _ = this.RunCommand(cmd);

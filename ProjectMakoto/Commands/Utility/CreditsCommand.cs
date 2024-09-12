@@ -25,7 +25,6 @@ internal sealed class CreditsCommand : BaseCommand
 
             var contributors = await ctx.Bot.GithubClient.Repository.GetAllContributors(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository);
             var contributorsdcs = await ctx.Bot.GithubClient.Repository.GetAllContributors("Aiko-IT-Systems", "DisCatSharp");
-            var contributorslava = await ctx.Bot.GithubClient.Repository.GetAllContributors("freyacodes", "Lavalink");
 
             List<DiscordUser> userlist = new();
 
@@ -42,9 +41,6 @@ internal sealed class CreditsCommand : BaseCommand
                 new TVar("Library", "[`DisCatSharp`](https://github.com/Aiko-IT-Systems/DisCatSharp)", false),
                 new TVar("LibraryContList", string.Join(", ", contributorsdcs.Take(10).Where(x => !x.Login.Contains("[bot]")).OrderByDescending(x => x.Contributions).Select(x => $"[`{x.Login}`]({x.HtmlUrl})")), false),
                 new TVar("LibraryContCount", $"[{contributorsdcs.Count - 10}](https://github.com/Aiko-IT-Systems/DisCatSharp/graphs/contributors)", false),
-                new TVar("MusicModule", $"[`Lavalink`](https://github.com/freyacodes/Lavalink)", false),
-                new TVar("MusicContList", string.Join(", ", contributorslava.Take(10).Where(x => !x.Login.Contains("[bot]")).OrderByDescending(x => x.Contributions).Select(x => $"[`{x.Login}`]({x.HtmlUrl})")), false),
-                new TVar("MusicContCount", $"[{contributorslava.Count - 10}](https://github.com/freyacodes/Lavalink/graphs/contributors)", false),
                 new TVar("PhishingListRepos", $"[`nikolaischunk`](https://github.com/nikolaischunk), [`DevSpen`](https://github.com/DevSpen), [`PoorPocketsMcNewHold`](https://github.com/PoorPocketsMcNewHold), [`sk-cat`](https://github.com/sk-cat) & [`Junortiz`](https://github.com/Junortiz)", false))
             }.AsInfo(ctx));
         });

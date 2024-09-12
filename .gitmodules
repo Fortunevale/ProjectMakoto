@@ -28,3 +28,6 @@
 [submodule "OfficialPlugins/AbuseIPDB"]
 	path = OfficialPlugins/AbuseIPDB
 	url = https://github.com/Fortunevale/ProjectMakoto.Plugins.AbuseIPDB
+[submodule "OfficialPlugins/ProjectMakoto.Plugins.Music"]
+	path = OfficialPlugins/Music
+	url = https://github.com/Fortunevale/ProjectMakoto.Plugins.Music

@@ -22,50 +22,15 @@ internal static class SyncTasks
 
             _ = Task.Run(async () =>
             {
-                while (!bot.status.LavalinkInitialized)
-                    await Task.Delay(1000);
-
-                Dictionary<string, TimeSpan> VideoLengthCache = new();
-
                 foreach (var user in bot.Users)
                 {
-                    foreach (var list in user.Value.UserPlaylists)
-                    {
-                        foreach (var b in list.List.ToList())
-                        {
-                            if (b.Length is null || !b.Length.HasValue)
-                            {
-                                if (!VideoLengthCache.TryGetValue(b.Url, out var value))
-                                {
-                                    Log.Information("Fetching video length for '{Url}'", b.Url);
-
-                                    var loadResult = await bot.DiscordClient.GetFirstShard().GetLavalink().ConnectedSessions.First(x => x.Value.IsConnected).Value.LoadTracksAsync(LavalinkSearchType.Plain, b.Url);
-                                    var track = loadResult.GetResultAs<LavalinkTrack>();
-
-                                    if (loadResult.LoadType != LavalinkLoadResultType.Track)
-                                    {
-                                        list.List = list.List.Remove(x => x.Url, b);
-                                        Log.Error("Failed to load video length for '{Url}'", b.Url);
-                                        continue;
-                                    }
-
-                                    value = track.Info.Length;
-                                    VideoLengthCache.Add(b.Url, value);
-                                    await Task.Delay(100);
-                                }
-
-                                b.Length = value;
-                            }
-                        }
-                    }
-
                     var userCache = new Dictionary<ulong, DiscordUser?>();
 
-                    if (user.Value.BlockedUsers.Length > 0)
+                    if (user.Value.LegacyBlockedUsers.Length > 0)
                     {
-                        for (var i = 0; i < user.Value.BlockedUsers.Length; i++)
+                        for (var i = 0; i < user.Value.LegacyBlockedUsers.Length; i++)
                         {
-                            var b = user.Value.BlockedUsers[i];
+                            var b = user.Value.LegacyBlockedUsers[i];
 
                             if (!userCache.TryGetValue(b, out var victim))
                             {
@@ -81,7 +46,7 @@ internal static class SyncTasks
                             {
                                 Log.Debug("Removing '{victim}' from '{owner}' blocklist", b, user.Value.Id);
                                 i--;
-                                user.Value.BlockedUsers = user.Value.BlockedUsers.Remove(x => x.ToString(), b);
+                                user.Value.LegacyBlockedUsers = user.Value.LegacyBlockedUsers.Remove(x => x.ToString(), b);
                             }
                         }
                     }
@@ -141,6 +106,8 @@ internal static class SyncTasks
                 }
             }
 
+            _ = BasePlugin.RaisePreSyncTasksExecution(bot, e.Guilds.Values.Where(x => x != null));
+
             try
             {
                 await ExecuteSyncTasks(bot, bot.DiscordClient);
@@ -150,78 +117,7 @@ internal static class SyncTasks
                 Log.Error(ex, "Failed to run sync tasks");
             }
 
-            while (!bot.status.LavalinkInitialized)
-                await Task.Delay(500);
-
-            foreach (var guild in e.Guilds)
-            {
-                _ = Task.Run(async () =>
-                {
-                    try
-                    {
-                        if (bot.Guilds[guild.Key].MusicModule.ChannelId != 0)
-                        {
-                            if (!guild.Value.Channels.ContainsKey(bot.Guilds[guild.Key].MusicModule.ChannelId))
-                                throw new Exception("Channel no longer exists");
-
-                            if (bot.Guilds[guild.Key].MusicModule.CurrentVideo.ToLower().Contains("localhost") || bot.Guilds[guild.Key].MusicModule.CurrentVideo.ToLower().Contains("127.0.0.1"))
-                                throw new Exception("Localhost?");
-
-                            var channel = guild.Value.GetChannel(bot.Guilds[guild.Key].MusicModule.ChannelId);
-
-                            if (!channel.Users.Where(x => !x.IsBot).Any())
-                                throw new Exception("Channel empty");
-
-                            if (bot.Guilds[guild.Key].MusicModule.SongQueue.Length > 0)
-                            {
-                                for (var i = 0; i < bot.Guilds[guild.Key].MusicModule.SongQueue.Length; i++)
-                                {
-                                    var b = bot.Guilds[guild.Key].MusicModule.SongQueue[i];
-
-                                    Log.Debug("Fixing queue info for '{Url}'", b.Url);
-                                }
-                            }
-
-                            var lava = bot.DiscordClient.GetShard(guild.Key).GetLavalink();
-
-                            while (!lava.ConnectedSessions.Values.Any(x => x.IsConnected))
-                                await Task.Delay(1000);
-
-                            var node = lava.ConnectedSessions.Values.First(x => x.IsConnected);
-                            var conn = node.GetGuildPlayer(guild.Value);
-
-                            if (conn is null)
-                            {
-                                if (!lava.ConnectedSessions.Any())
-                                {
-                                    throw new Exception("Lavalink connection isn't established.");
-                                }
-
-                                conn = await node.ConnectAsync(channel);
-                            }
-
-                            var loadResult = await node.LoadTracksAsync(LavalinkSearchType.Plain, bot.Guilds[guild.Key].MusicModule.CurrentVideo);
-
-                            if (loadResult.LoadType is LavalinkLoadResultType.Error or LavalinkLoadResultType.Empty)
-                                return;
-
-                            _ = await conn.PlayAsync(loadResult.GetResultAs<LavalinkTrack>());
-
-                            await Task.Delay(1000);
-                            _ = await conn.SeekAsync(TimeSpan.FromSeconds(bot.Guilds[guild.Key].MusicModule.CurrentVideoPosition));
-
-                            bot.Guilds[guild.Key].MusicModule.QueueHandler(bot, bot.DiscordClient.GetShard(guild.Key), node, conn);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Error(ex, "An exception occurred while trying to continue music playback for '{guild}'", guild.Key);
-                        bot.Guilds[guild.Key].MusicModule.Reset();
-                    }
-                });
-
-                await Task.Delay(1000);
-            }
+            _ = BasePlugin.RaisePostSyncTasksExecution(bot, e.Guilds.Values.Where(x => x != null));
         }).Add(bot);
     }
 

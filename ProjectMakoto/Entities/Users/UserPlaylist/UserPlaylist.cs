@@ -7,16 +7,10 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-namespace ProjectMakoto.Entities.Users;
+namespace ProjectMakoto.Entities.Users.Legacy;
 
 public sealed class UserPlaylist
 {
-    [JsonIgnore]
-    public Bot Bot { get; set; }
-
-    [JsonIgnore]
-    public User Parent { get; set; }
-
     public string PlaylistId { get; set; } = Guid.NewGuid().ToString();
 
     private string _PlaylistName { get; set; } = "";
@@ -28,7 +22,6 @@ public sealed class UserPlaylist
         set
         {
             this._PlaylistName = value.TruncateWithIndication(256);
-            this.Update();
         }
     }
 
@@ -39,7 +32,6 @@ public sealed class UserPlaylist
         set
         {
             this._PlaylistColor = value.Truncate(7).IsValidHexColor();
-            this.Update();
         }
     }
 
@@ -50,7 +42,6 @@ public sealed class UserPlaylist
         set
         {
             this._PlaylistThumbnail = value.Truncate(2048);
-            this.Update();
         }
     }
 
@@ -63,15 +54,6 @@ public sealed class UserPlaylist
         set
         {
             this._List = value.Take(250).ToArray();
-            this.Update();
         }
-    }
-
-    void Update()
-    {
-        if (this.Bot is null || this.Parent is null)
-            return;
-
-        this.Parent.UserPlaylists = this.Parent.UserPlaylists.Update(x => x.PlaylistId, this);
     }
 }
