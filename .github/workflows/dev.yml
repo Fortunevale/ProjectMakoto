@@ -31,28 +31,38 @@ jobs:
     steps:
       - name: Cleanup before build
         run: rm -rf ProjectMakotoTest/
+        
       - name: Setup .NET Core SDK 8.x
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: | 
             9.0.100-preview.7.24407.12
             8.x
+            
       - name: "Clone Repository"
         uses: actions/checkout@v4
         with:
           submodules: recursive
           path: ProjectMakotoTest
           token: ${{ secrets.Access_token }}
+          
       - name: Install dependencies
         run: dotnet restore
         working-directory: ProjectMakotoTest/ProjectMakoto/
+        
+      - name: Mark .sh files as executable
+        run: find . -type f -name "*.sh" -exec chmod +x {} +
+        working-directory: ProjectMakotoTest/OfficialPlugins/
+        
+      - name: Preparing Makoto Plugin Build..
+        run: sh update_deps.sh
+        working-directory: ProjectMakotoTest/OfficialPlugins/
+        
       - name: Test Build Makoto
         run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained --framework net8.0
         working-directory: ProjectMakotoTest/ProjectMakoto/
         timeout-minutes: 5
-      - name: Mark .sh files as executable
-        run: find . -type f -name "*.sh" -exec chmod +x {} +
-        working-directory: ProjectMakotoTest/OfficialPlugins/
+        
       - name: Test Build Makoto Plugins
-        run: sh build_all.sh
+        run: sh build_all.sh 1
         working-directory: ProjectMakotoTest/OfficialPlugins/

@@ -3,6 +3,10 @@
 current_dir=$(pwd)
 ./update_deps.sh
 
+if [ "$1" -ne 1 ]; then
+    ./update_deps.sh
+fi
+
 if [ $? -ne 0 ]; then
   echo "Error: update_deps.sh script failed. Exiting."
   exit 1
