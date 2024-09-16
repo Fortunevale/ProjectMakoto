@@ -63,6 +63,14 @@ jobs:
         run: dotnet restore
         working-directory: ProjectMakotoPreview/ProjectMakoto/
         
+      - name: Mark .sh files as executable
+        run: find . -type f -name "*.sh" -exec chmod +x {} +
+        working-directory: ProjectMakotoPreview/OfficialPlugins/
+        
+      - name: Prepare Makoto Plugin Build
+        run: sh update_deps.sh
+        working-directory: ProjectMakotoTest/OfficialPlugins/
+        
       - name: Build Makoto
         run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained --output "build" --property:PublishDir="build" --framework net8.0
         working-directory: ProjectMakotoPreview/ProjectMakoto/
@@ -72,12 +80,8 @@ jobs:
         run: git rev-parse --short HEAD > "ProjectMakoto/build/LatestGitPush.cfg" && git branch --show-current >> ProjectMakoto/build/LatestGitPush.cfg && echo $(date +%d.%m.%y) >> ProjectMakoto/build/LatestGitPush.cfg && echo $(date +%H:%M:%S,00) >> ProjectMakoto/build/LatestGitPush.cfg
         working-directory: ProjectMakotoPreview/
 
-      - name: Mark .sh files as executable
-        run: find . -type f -name "*.sh" -exec chmod +x {} +
-        working-directory: ProjectMakotoPreview/OfficialPlugins/
-
       - name: Build Makoto Plugins
-        run: sh build_all.sh
+        run: sh build_all.sh 1
         working-directory: ProjectMakotoPreview/OfficialPlugins/
 
       - name: Create plugins directory

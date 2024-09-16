@@ -232,25 +232,6 @@ internal static class DisCatSharpExtensionsLoader
             PrefixResolver = new PrefixResolverDelegate(bot.GetPrefix)
         });
 
-
-
-        Log.Debug("Registering Lavalink..");
-
-        var endpoint = new ConnectionEndpoint
-        {
-            Hostname = bot.status.LoadedConfig.Secrets.Lavalink.Host,
-            Port = bot.status.LoadedConfig.Secrets.Lavalink.Port
-        };
-
-        var lavalinkConfig = new LavalinkConfiguration
-        {
-            Password = bot.status.LoadedConfig.Secrets.Lavalink.Password,
-            RestEndpoint = endpoint,
-            SocketEndpoint = endpoint
-        };
-
-        _ = await bot.DiscordClient.UseLavalinkAsync();
-
         Log.Debug("Registering DisCatSharp TwoFactor..");
 
         var tfa = bot.DiscordClient.UseTwoFactorAsync(new TwoFactorConfiguration
@@ -285,6 +266,8 @@ internal static class DisCatSharpExtensionsLoader
             await FileExtensions.CleanupFilesAndDirectories(new(), Directory.GetFiles("CompiledCommands").ToList());
         }
 
+        await BasePlugin.RaisePreLogin(bot, bot.DiscordClient);
+
         Log.Debug("Compiling Built-In Commands..");
         var commandModules = Commands.Commands.GetList();
         bot._CommandModules = commandModules;
@@ -302,32 +285,6 @@ internal static class DisCatSharpExtensionsLoader
         var applicationCommandTypes = new List<Type>();
 
         await Util.Initializers.PluginLoader.LoadPluginCommands(bot, cNext, appCommands);
-
-        _ = Task.Run(async () =>
-        {
-            while (!bot.status.DiscordInitialized)
-                await Task.Delay(100);
-
-            try
-            {
-                Log.Information("Connecting and authenticating with Lavalink..");
-                bot.LavalinkSession = await bot.DiscordClient.GetFirstShard().GetLavalink().ConnectAsync(lavalinkConfig);
-                Log.Information("Connected and authenticated with Lavalink.");
-
-                bot.status.LavalinkInitialized = true;
-
-                try
-                {
-                    Log.Information("Lavalink is running on {Version}.", (await bot.LavalinkSession.GetLavalinkInfoAsync()).Version.Semver);
-                }
-                catch { }
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "An exception occurred while trying to log into Lavalink");
-                return;
-            }
-        });
 
         _ = Task.Run(async () =>
         {

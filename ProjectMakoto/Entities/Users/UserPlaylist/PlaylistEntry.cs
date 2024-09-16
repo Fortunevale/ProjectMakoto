@@ -7,7 +7,7 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-namespace ProjectMakoto.Entities.Users;
+namespace ProjectMakoto.Entities.Users.Legacy;
 
 public sealed class PlaylistEntry
 {

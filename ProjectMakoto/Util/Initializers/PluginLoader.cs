@@ -90,6 +90,9 @@ internal static class PluginLoader
                                 bot._Plugins.Add(assemblyName, result);
 
                                 UniversalExtensions.LoadAllReferencedAssemblies(assembly.GetReferencedAssemblies());
+
+                                _ = assemblyStream.Seek(0, SeekOrigin.Begin);
+                                CommandCompiler.AssemblyReferences.Add(MetadataReference.CreateFromStream(assemblyStream));
                                 break;
                             }
                         }

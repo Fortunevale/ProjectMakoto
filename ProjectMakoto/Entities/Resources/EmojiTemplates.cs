@@ -41,4 +41,9 @@ public static class EmojiTemplates
     public static DiscordEmoji GetSpotify(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient.GetShard(bot.status.LoadedConfig.Discord.AssetsGuild), bot.status.LoadedConfig.Emojis.Spotify);
     public static DiscordEmoji GetAbuseIpDb(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient.GetShard(bot.status.LoadedConfig.Discord.AssetsGuild), bot.status.LoadedConfig.Emojis.AbuseIPDB);
     public static DiscordEmoji GetLoading(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient.GetShard(bot.status.LoadedConfig.Discord.AssetsGuild), bot.status.LoadedConfig.Emojis.Loading);
+
+    public static DiscordEmoji GetPaused(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient.GetShard(bot.status.LoadedConfig.Discord.AssetsGuild), bot.status.LoadedConfig.Emojis.Paused);
+    public static DiscordEmoji GetDisabledPlay(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient.GetShard(bot.status.LoadedConfig.Discord.AssetsGuild), bot.status.LoadedConfig.Emojis.DisabledPlay);
+    public static DiscordEmoji GetDisabledRepeat(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient.GetShard(bot.status.LoadedConfig.Discord.AssetsGuild), bot.status.LoadedConfig.Emojis.DisabledRepeat);
+    public static DiscordEmoji GetDisabledShuffle(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient.GetShard(bot.status.LoadedConfig.Discord.AssetsGuild), bot.status.LoadedConfig.Emojis.DisabledShuffle);
 }

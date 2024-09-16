@@ -8,7 +8,9 @@
 // but WITHOUT ANY WARRANTY
 
 using Octokit;
+using ProjectMakoto.Plugins.EventArgs;
 using ProjectMakoto.Util.Initializers;
+using User = ProjectMakoto.Entities.User;
 
 namespace ProjectMakoto.Plugins;
 
@@ -75,16 +77,39 @@ public abstract class BasePlugin
     #region Events
 
     /// <summary>
+    /// Raised before login to discord takes place. Useful for registering DisCatSharp extensions.
+    /// </summary>
+    public event EventHandler<PreLoginEventArgs> PreLogin;
+    internal static Task RaisePreLogin(Bot bot, DiscordShardedClient client) 
+        => Task.Run(() => CallEvent(bot, bot.Plugins?.Select(x => x.Value.PreLogin ), new PreLoginEventArgs(client)));
+    
+    /// <summary>
     /// Raised on first successful log in to discord.
     /// </summary>
-    public event EventHandler<EventArgs> Connected;
-    internal static Task RaiseConnected(Bot bot) => Task.Run(() => CallEvent<EventArgs>(bot, bot.Plugins?.Select(x => x.Value.Connected), EventArgs.Empty));
+    public event EventHandler<System.EventArgs> Connected;
+    internal static Task RaiseConnected(Bot bot) 
+        => Task.Run(() => CallEvent(bot, bot.Plugins?.Select(x => x.Value.Connected), System.EventArgs.Empty));
 
     /// <summary>
     /// Raised on when database is initialized.
     /// </summary>
-    public event EventHandler<EventArgs> DatabaseInitialized;
-    internal static Task RaiseDatabaseInitialized(Bot bot) => Task.Run(() => CallEvent<EventArgs>(bot, bot.Plugins?.Select(x => x.Value.DatabaseInitialized), EventArgs.Empty));
+    public event EventHandler<System.EventArgs> DatabaseInitialized;
+    internal static Task RaiseDatabaseInitialized(Bot bot) 
+        => Task.Run(() => CallEvent(bot, bot.Plugins?.Select(x => x.Value.DatabaseInitialized), System.EventArgs.Empty));
+
+    /// <summary>
+    /// Raised before sync tasks are ran.
+    /// </summary>
+    public event EventHandler<SyncTaskEventArgs> PreSyncTasksExecution;
+    internal static Task RaisePreSyncTasksExecution(Bot bot, IEnumerable<DiscordGuild> discordGuilds) 
+        => Task.Run(() => CallEvent(bot, bot.Plugins?.Select(x => x.Value.PreSyncTasksExecution), new(discordGuilds)));
+
+    /// <summary>
+    /// Raised after sync tasks are ran.
+    /// </summary>
+    public event EventHandler<SyncTaskEventArgs> PostSyncTasksExecution;
+    internal static Task RaisePostSyncTasksExecution(Bot bot, IEnumerable<DiscordGuild> discordGuilds)
+        => Task.Run(() => CallEvent(bot, bot.Plugins?.Select(x => x.Value.PostSyncTasksExecution), new(discordGuilds)));
 
     #endregion
 

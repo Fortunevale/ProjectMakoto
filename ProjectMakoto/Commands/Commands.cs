@@ -91,64 +91,6 @@ internal static class Commands
                         .WithAliases("emojis", "emote", "steal", "grab", "sticker", "stickers"),
                 ]).WithPriority(999),
 
-            new MakotoModule("Music", [
-                    new MakotoCommand("music", "Allows to play music and change the current playback settings.",
-                        new MakotoCommand("join", "The bot will join your channel if it's not already being used in this server.", typeof(Music.JoinCommand))
-                            .WithAliases("connect"),
-                        new MakotoCommand("disconnect", "Starts a voting to disconnect the bot.", typeof(Music.DisconnectCommand))
-                            .WithAliases("dc", "leave"),
-                        new MakotoCommand("forcedisconnect", "Forces the bot to disconnect. `DJ` role or Administrator permissions required.", typeof(Music.ForceDisconnectCommand))
-                            .WithAliases("fdc", "forceleave", "fleave", "stop"),
-                        new MakotoCommand("play", "Searches for a video and adds it to the queue. If given a direct url, adds it to the queue.", typeof(Music.PlayCommand),
-                            new MakotoCommandOverload(typeof(string), "search", "Search Query/Url")),
-                        new MakotoCommand("pause", "Pause or unpause the current song.", typeof(Music.PauseCommand))
-                            .WithAliases("resume"),
-                        new MakotoCommand("queue", "Displays the current queue.", typeof(Music.QueueCommand)),
-                        new MakotoCommand("removequeue", "Remove a song from the queue.", typeof(Music.RemoveQueueCommand),
-                            new MakotoCommandOverload(typeof(string), "video", "The Index or Video Title")
-                                .WithAutoComplete(typeof(AutocompleteProviders.SongQueueAutocompleteProvider)))
-                            .WithAliases("rq"),
-                        new MakotoCommand("skip", "Starts a voting to skip the current song.", typeof(Music.SkipCommand)),
-                        new MakotoCommand("forceskip", "Forces skipping of the current song. `DJ` role or Administrator permissions required.", typeof(Music.ForceSkipCommand))
-                            .WithAliases("fs", "fskip"),
-                        new MakotoCommand("clearqueue", "Starts a voting to clear the current queue.", typeof(Music.ClearQueueCommand))
-                            .WithAliases("cq"),
-                        new MakotoCommand("forceclearqueue", "Forces clearing the current queue. `DJ` role or Administrator permissions required.", typeof(Music.ForceClearQueueCommand))
-                            .WithAliases("fcq"),
-                        new MakotoCommand("shuffle", "Toggles shuffling of the current queue.", typeof(Music.ShuffleCommand)),
-                        new MakotoCommand("repeat", "Toggles repeating the current queue.", typeof(Music.RepeatCommand)))
-                        .WithAliases("m"),
-
-                    new MakotoCommand("playlists", "Allows you to manage your personal playlists.",
-                        new MakotoCommand("manage", "Allows you to use and manage your playlists.", typeof(Playlists.ManageCommand)),
-                        new MakotoCommand("add-to-queue", "Adds a playlist to the current song queue.", typeof(Playlists.AddToQueueCommand),
-                            new MakotoCommandOverload(typeof(string), "playlist", "The Playlist Id")
-                                .WithAutoComplete(typeof(AutocompleteProviders.PlaylistsAutoCompleteProvider)))
-                            .WithSupportedCommandTypes(MakotoCommandType.SlashCommand),
-                        new MakotoCommand("share", "Share one of your playlists.", typeof(Playlists.ShareCommand),
-                            new MakotoCommandOverload(typeof(string), "playlist", "The Playlist Id")
-                                .WithAutoComplete(typeof(AutocompleteProviders.PlaylistsAutoCompleteProvider)))
-                            .WithSupportedCommandTypes(MakotoCommandType.SlashCommand),
-                        new MakotoCommand("export", "Export one of your playlists.", typeof(Playlists.ExportCommand),
-                            new MakotoCommandOverload(typeof(string), "playlist", "The Playlist Id")
-                                .WithAutoComplete(typeof(AutocompleteProviders.PlaylistsAutoCompleteProvider)))
-                            .WithSupportedCommandTypes(MakotoCommandType.SlashCommand),
-                        new MakotoCommand("modify", "Modify one of your playlists.", typeof(Playlists.ModifyCommand),
-                            new MakotoCommandOverload(typeof(string), "playlist", "The Playlist Id")
-                                .WithAutoComplete(typeof(AutocompleteProviders.PlaylistsAutoCompleteProvider)))
-                            .WithSupportedCommandTypes(MakotoCommandType.SlashCommand),
-                        new MakotoCommand("delete", "Delete one of your playlists.", typeof(Playlists.DeleteCommand),
-                            new MakotoCommandOverload(typeof(string), "playlist", "The Playlist Id")
-                                .WithAutoComplete(typeof(AutocompleteProviders.PlaylistsAutoCompleteProvider)))
-                            .WithSupportedCommandTypes(MakotoCommandType.SlashCommand),
-                        new MakotoCommand("create-new", "Create a new playlist from scratch.", typeof(Playlists.NewPlaylistCommand)),
-                        new MakotoCommand("save-queue", "Save the current queue as playlist.", typeof(Playlists.SaveCurrentCommand)),
-                        new MakotoCommand("import", "Import a playlists from another platform or from a previously exported playlist.", typeof(Playlists.ImportCommand)),
-                        new MakotoCommand("load-share", "Loads a playlist share.", typeof(Playlists.LoadShareCommand),
-                            new MakotoCommandOverload(typeof(DiscordUser), "user", "The user"),
-                            new MakotoCommandOverload(typeof(string), "id", "The Id"))),
-                ]).WithPriority(997),
-
             new MakotoModule("ScoreSaber", [
                     new MakotoCommand("scoresaber", "Interact with the ScoreSaber API.",
                         new MakotoCommand("profile", "Displays you the registered profile of the mentioned user or looks up a profile by a ScoreSaber Id.", typeof(ScoreSaberProfileCommand),
