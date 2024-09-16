@@ -69,7 +69,7 @@ jobs:
         
       - name: Prepare Makoto Plugin Build
         run: sh update_deps.sh
-        working-directory: ProjectMakotoTest/OfficialPlugins/
+        working-directory: ProjectMakotoPreview/OfficialPlugins/
         
       - name: Build Makoto
         run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained --output "build" --property:PublishDir="build" --framework net8.0
