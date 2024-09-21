@@ -105,6 +105,10 @@ jobs:
           git commit -am "Add new preview hashes"
           git push
 
+      - name: Sleep for 10 seconds
+        run: sleep 10
+        shell: bash
+
       - name: Deploy to Preview Server
         if: ${{ !github.event.act }} # skip during local actions testing
         run: rsync -avz --delete --force -e "ssh -p ${{ secrets.SSH_PORT }}" . ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_SERVER }}:/home/${{ secrets.SSH_USERNAME }}/Bots/latestProjectIchigoPreview/
