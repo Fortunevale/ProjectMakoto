@@ -8,9 +8,9 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Util;
-internal class ChartGeneration(Bot bot) : RequiresBotReference(bot)
+public class ChartGeneration(Bot bot) : RequiresBotReference(bot)
 {
-    internal Chart GetChart(int Width, int Height, IEnumerable<string> Labels, IEnumerable<Dataset> Datasets, int Min, int Max)
+    public Chart GetChart(int Width, int Height, IEnumerable<string> Labels, IEnumerable<Dataset> Datasets, int Min, int Max)
     {
         var v = $@"{{
                     type: 'line',
@@ -70,5 +70,5 @@ internal class ChartGeneration(Bot bot) : RequiresBotReference(bot)
         };
     }
 
-    internal record Dataset(string Name, IEnumerable<string> Data, string? Color = null, string Id = "yaxis2", bool Reverse = false);
+    public record Dataset(string Name, IEnumerable<string> Data, string? Color = null, string Id = "yaxis2", bool Reverse = false);
 }

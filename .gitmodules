@@ -31,3 +31,6 @@
 [submodule "OfficialPlugins/ProjectMakoto.Plugins.Music"]
 	path = OfficialPlugins/Music
 	url = https://github.com/Fortunevale/ProjectMakoto.Plugins.Music
+[submodule "ScoreSaber"]
+	path = OfficialPlugins/ScoreSaber
+	url = https://github.com/Fortunevale/ProjectMakoto.Plugins.ScoreSaber

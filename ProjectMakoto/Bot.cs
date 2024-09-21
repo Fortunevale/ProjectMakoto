@@ -31,13 +31,12 @@ public sealed class Bot
 
     public DiscordShardedClient DiscordClient { get; internal set; }
 
-    internal ScoreSaberClient ScoreSaberClient { get; set; }
     public ThreadJoinClient ThreadJoinClient { get; internal set; }
     public AbuseIpDbClient AbuseIpDbClient { get; internal set; }
     public MonitorClient MonitorClient { get; internal set; }
+    public ChartGeneration ChartsClient { get; set; }
     public TokenInvalidatorRepository TokenInvalidator { get; internal set; }
     internal GitHubClient GithubClient { get; set; }
-    internal ChartGeneration ChartsClient { get; set; }
 
     internal IServerHost WebServer { get; set; }
 
@@ -152,7 +151,6 @@ public sealed class Bot
             try
             {
                 await Util.Initializers.ConfigLoader.Load(this);
-                this.ScoreSaberClient = new ScoreSaberClient(this);
                 this.ThreadJoinClient = new ThreadJoinClient();
                 this.MonitorClient = new MonitorClient(this);
                 this.AbuseIpDbClient = new AbuseIpDbClient(this);
