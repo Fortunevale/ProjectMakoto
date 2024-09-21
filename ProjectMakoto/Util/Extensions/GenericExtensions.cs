@@ -15,6 +15,34 @@ namespace ProjectMakoto.Util;
 
 public static class GenericExtensions
 {
+    public static int IndexOf<T>(this IEnumerable<T> enumerable, T obj)
+    {
+        var found = false;
+        var h = -1;
+
+        foreach (var b in enumerable)
+        {
+            var equal = false;
+            h++;
+
+            if (typeof(T) == typeof(string))
+                if ((b as string) == (obj as string))
+                    equal = true;
+
+            if (b.Equals(obj))
+                equal = true;
+
+            if (equal)
+            {
+                found = true;
+                break;
+            }
+        }
+
+
+        return found ? h : -1;
+    }
+
     public static void AddRange<T>(this List<T> list, params T[] items)
         => list.AddRange(items);
 

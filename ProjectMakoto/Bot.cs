@@ -118,9 +118,6 @@ public sealed class Bot
 
         RenderAsciiArt();
 
-        this.status.RunningVersion = (File.Exists("LatestGitPush.cfg") ? await File.ReadAllLinesAsync("LatestGitPush.cfg") : new string[] { "Development-Build" })[0].Trim();
-        Log.Information("Starting up Makoto {RunningVersion}..\n", this.status.RunningVersion);
-
         if (args.Contains("--verbose"))
             this.loggingLevel.MinimumLevel = LogEventLevel.Verbose;
         else if (args.Contains("--debug"))
@@ -145,6 +142,15 @@ public sealed class Bot
                 Environment.UserDomainName,
                 Environment.CurrentDirectory,
                 Regex.Replace(Environment.CommandLine, @"(--token \S*)", ""));
+
+        if (args.Contains("--build-manifests"))
+        {
+            await ManifestBuilder.BuildPluginManifests(this, args);
+            return;
+        }
+
+        this.status.RunningVersion = (File.Exists("LatestGitPush.cfg") ? await File.ReadAllLinesAsync("LatestGitPush.cfg") : new string[] { "Development-Build" })[0].Trim();
+        Log.Information("Starting up Makoto {RunningVersion}..\n", this.status.RunningVersion);
 
         var loadDatabase = Task.Run(async () =>
         {
