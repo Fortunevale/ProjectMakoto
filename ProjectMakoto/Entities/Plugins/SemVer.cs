@@ -11,6 +11,9 @@ namespace ProjectMakoto.Plugins;
 
 public sealed class SemVer : IComparable<SemVer>
 {
+    [JsonConstructor]
+    internal SemVer() { }
+
     public SemVer(int major, int minor, int patch)
     {
         this.Major = major;
@@ -53,4 +56,30 @@ public sealed class SemVer : IComparable<SemVer>
 
     public static implicit operator SemVer(string v)
         => new(v);
+
+    public override bool Equals(object obj)
+    {
+        if (ReferenceEquals(this, obj))
+            return true;
+
+        if (obj is SemVer other)
+            return this == other;
+
+        return false;
+    }
+
+    public override int GetHashCode()
+    {
+        return (int)this;
+    }
+
+    public static bool operator ==(SemVer v1, SemVer v2)
+    {
+        return v1.CompareTo(v2) == 0;
+    }
+
+    public static bool operator !=(SemVer v1, SemVer v2)
+    {
+        return !(v1 == v2);
+    }
 }

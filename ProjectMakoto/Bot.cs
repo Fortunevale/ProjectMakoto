@@ -36,6 +36,7 @@ public sealed class Bot
     public MonitorClient MonitorClient { get; internal set; }
     public ChartGeneration ChartsClient { get; set; }
     public TokenInvalidatorRepository TokenInvalidator { get; internal set; }
+    public OfficialPluginRepository OfficialPlugins { get; internal set; }
     internal GitHubClient GithubClient { get; set; }
 
     internal IServerHost WebServer { get; set; }
@@ -118,9 +119,6 @@ public sealed class Bot
 
         RenderAsciiArt();
 
-        this.status.RunningVersion = (File.Exists("LatestGitPush.cfg") ? await File.ReadAllLinesAsync("LatestGitPush.cfg") : new string[] { "Development-Build" })[0].Trim();
-        Log.Information("Starting up Makoto {RunningVersion}..\n", this.status.RunningVersion);
-
         if (args.Contains("--verbose"))
             this.loggingLevel.MinimumLevel = LogEventLevel.Verbose;
         else if (args.Contains("--debug"))
@@ -146,6 +144,15 @@ public sealed class Bot
                 Environment.CurrentDirectory,
                 Regex.Replace(Environment.CommandLine, @"(--token \S*)", ""));
 
+        if (args.Contains("--build-manifests"))
+        {
+            await ManifestBuilder.BuildPluginManifests(this, args);
+            return;
+        }
+
+        this.status.RunningVersion = (File.Exists("LatestGitPush.cfg") ? await File.ReadAllLinesAsync("LatestGitPush.cfg") : new string[] { "Development-Build" })[0].Trim();
+        Log.Information("Starting up Makoto {RunningVersion}..\n", this.status.RunningVersion);
+
         var loadDatabase = Task.Run(async () =>
         {
             try
@@ -155,6 +162,7 @@ public sealed class Bot
                 this.MonitorClient = new MonitorClient(this);
                 this.AbuseIpDbClient = new AbuseIpDbClient(this);
                 this.TokenInvalidator = new TokenInvalidatorRepository(this);
+                this.OfficialPlugins = new OfficialPluginRepository(this);
                 this.ChartsClient = new ChartGeneration(this);
                 this.GithubClient = new GitHubClient(new ProductHeaderValue("ProjectMakoto", this.status.RunningVersion))
                 {

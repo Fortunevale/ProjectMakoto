@@ -15,17 +15,17 @@ using Microsoft.CodeAnalysis.CSharp;
 namespace ProjectMakoto.Util.Initializers;
 internal static class PluginLoader
 {
-    internal static async Task LoadPlugins(Bot bot)
+    internal static async Task LoadPlugins(Bot bot, bool InitializeLoadedPlugins = true, string PluginDirectory = "Plugins")
     {
-        if (!bot.status.LoadedConfig.EnablePlugins)
+        if (InitializeLoadedPlugins && !bot.status.LoadedConfig.EnablePlugins)
             return;
 
-        Log.Debug("Loading Plugins..");
+        Log.Debug("Loading Plugins from '{PluginDirectory}'..", PluginDirectory);
 
-        if (!Directory.Exists("Plugins"))
-            _ = Directory.CreateDirectory("Plugins");
+        if (!Directory.Exists(PluginDirectory))
+            _ = Directory.CreateDirectory(PluginDirectory);
 
-        foreach (var pluginFile in Directory.GetFiles("Plugins").Where(x => x.EndsWith(".pmpl")))
+        foreach (var pluginFile in Directory.GetFiles(PluginDirectory).Where(x => x.EndsWith(".pmpl")))
         {
             if (new DirectoryInfo(pluginFile).Name.StartsWith('.'))
                 continue;
@@ -34,8 +34,45 @@ internal static class PluginLoader
 
             Log.Debug("Loading Plugin '{Name}'..", pluginName);
 
+            var pluginHash = HashingExtensions.ComputeSHA256Hash(new FileInfo(pluginFile));
+
             using var pluginFileStream = new FileStream(pluginFile, FileMode.Open, FileAccess.ReadWrite);
             using var zipArchive = new ZipArchive(pluginFileStream, ZipArchiveMode.Update);
+            var isOfficial = false;
+
+            if (InitializeLoadedPlugins)
+            {
+                var (found, remoteInfo) = bot.OfficialPlugins.FindHash(pluginHash);
+
+                if (!found && bot.status.LoadedConfig.OnlyLoadOfficialPlugins)
+                {
+                    Log.Warning("Skipped loading of unofficial plugin '{Name}'.", pluginName);
+                    continue;
+                }
+
+                if (found)
+                {
+                    Log.Information("'{Name}' is an official plugin: {Hash}", pluginName, pluginHash);
+
+                    using var localManifestStream = zipArchive.GetEntry("manifest.json").Open();
+                    using var localManifestStreamReader = new StreamReader(localManifestStream);
+                    var localManifestText = localManifestStreamReader.ReadToEnd();
+
+                    var localInfo = JsonConvert.DeserializeObject<PluginManifest>(localManifestText);
+
+                    if (localInfo.Name != remoteInfo.Name ||
+                        localInfo.Description != remoteInfo.Description ||
+                        localInfo.Author != remoteInfo.Author ||
+                        localInfo.AuthorId != remoteInfo.AuthorId ||
+                        localInfo.Version != localInfo.Version)
+                    {
+                        Log.Warning("Skipped loading of official plugin '{Name}', manifest mismatches.", pluginName);
+                        continue;
+                    }
+
+                    isOfficial = true;
+                }
+            }
 
             var referenceFiles = zipArchive.Entries;
             Assembly? resolveAssemblyEvent(object? obj, ResolveEventArgs arg)
@@ -83,6 +120,7 @@ internal static class PluginLoader
                                 count++;
                                 var result = Activator.CreateInstance(type) as BasePlugin;
                                 result.LoadedFile = new FileInfo(pluginFile);
+                                result.OfficialPlugin = isOfficial;
 
                                 if (result.SupportedPluginApis == null || !result.SupportedPluginApis.Contains(BasePlugin.CurrentApiVersion))
                                     throw new IndexOutOfRangeException($"Plugin does not support Api Version {BasePlugin.CurrentApiVersion}");
@@ -150,7 +188,8 @@ internal static class PluginLoader
 
             try
             {
-                b.Value.Load(bot);
+                if (InitializeLoadedPlugins)
+                    b.Value.Load(bot);
                 Log.Information("Initialized Plugin from '{0}': '{1}' (v{2}).", b.Key, b.Value.Name, b.Value.Version.ToString());
             }
             catch (Exception ex)
@@ -160,7 +199,8 @@ internal static class PluginLoader
 
             try
             {
-                await b.Value.CheckForUpdates();
+                if (InitializeLoadedPlugins)
+                    await b.Value.CheckForUpdates();
             }
             catch (Exception ex)
             {
@@ -169,20 +209,23 @@ internal static class PluginLoader
 
             try
             {
-                var (path, type) = b.Value.LoadTranslations();
-
-                if (path != null)
+                if (InitializeLoadedPlugins)
                 {
-                    using var stream = b.Value.LoadedFile.Open(FileMode.Open);
-                    using var zip = new ZipArchive(stream);
-                    using var file = zip.GetEntry(path).Open();
-                    using var reader = new StreamReader(file);
+                    var (path, type) = b.Value.LoadTranslations();
 
-                    b.Value.UsesTranslations = true;
-                    b.Value.Translations = (ITranslations)JsonConvert.DeserializeObject(reader.ReadToEnd(), type);
+                    if (path != null)
+                    {
+                        using var stream = b.Value.LoadedFile.Open(FileMode.Open);
+                        using var zip = new ZipArchive(stream);
+                        using var file = zip.GetEntry(path).Open();
+                        using var reader = new StreamReader(file);
 
-                    foreach (var item in b.Value.Translations.CommandList)
-                        bot.LoadedTranslations.CommandList = bot.LoadedTranslations.CommandList.Add(item);
+                        b.Value.UsesTranslations = true;
+                        b.Value.Translations = (ITranslations)JsonConvert.DeserializeObject(reader.ReadToEnd(), type);
+
+                        foreach (var item in b.Value.Translations.CommandList)
+                            bot.LoadedTranslations.CommandList = bot.LoadedTranslations.CommandList.Add(item);
+                    }
                 }
             }
             catch (Exception ex)

@@ -42,6 +42,11 @@ public abstract class BasePlugin
     internal List<string> AllowedTables { get; set; } = new();
 
     /// <summary>
+    /// Whether this plugin is official or not.
+    /// </summary>
+    internal bool OfficialPlugin { get; set; } = new();
+
+    /// <summary>
     /// Makoto Instance
     /// </summary>
     public Bot Bot { get; set; }

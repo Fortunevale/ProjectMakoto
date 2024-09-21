@@ -344,4 +344,5 @@ launchSettings.json
 !.vscode/settings.json
 ProjectMakoto/Plugins/*
 OfficialPlugins/deps/
+OfficialPlugins/trusted_manifests/
 *.pmpl

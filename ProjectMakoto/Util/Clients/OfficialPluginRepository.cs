@@ -9,9 +9,9 @@
 
 namespace ProjectMakoto.Util;
 
-public class TokenInvalidatorRepository : RequiresBotReference
+public class OfficialPluginRepository : RequiresBotReference
 {
-    internal TokenInvalidatorRepository(Bot bot) : base(bot)
+    internal OfficialPluginRepository(Bot bot) : base(bot)
     {
         this.SyncRepository();
     }
@@ -27,23 +27,31 @@ public class TokenInvalidatorRepository : RequiresBotReference
         _ = Task.Run(this.Pull);
     }
 
-    public (bool, FileInfo?) SearchForString(string searchQuery, string? startDirectory = null)
+    internal (bool, PluginManifest?) FindHash(string hash)
     {
-        startDirectory ??= $"GitHub/{this.Bot.status.LoadedConfig.Secrets.Github.TokenLeakRepo}/";
+        (var found, var fileInfo) = this.FindFile(hash);
+
+        if (found)
+            return (true, JsonConvert.DeserializeObject<PluginManifest>(File.ReadAllText(fileInfo.FullName)));
+
+        return (false, null);
+    }
+
+    private (bool, FileInfo?) FindFile(string searchQuery, string? startDirectory = null)
+    {
+        startDirectory ??= $"GitHub/ProjectMakoto.TrustedPlugins/";
 
         foreach (var directory in Directory.GetDirectories(startDirectory))
         {
-            (var found, var fileInfo) = this.SearchForString(searchQuery, directory);
+            (var found, var fileInfo) = this.FindFile(searchQuery, directory);
 
             if (found)
                 return (true, fileInfo);
         }
 
-        foreach (var file in Directory.GetFiles(startDirectory))
+        foreach (var file in Directory.GetFiles(startDirectory).Where(x => x.EndsWith(".json")))
         {
-            var fileContent = File.ReadAllText(file);
-
-            if (fileContent.Contains(searchQuery))
+            if (Path.GetFileNameWithoutExtension(file) == searchQuery)
                 return (true, new FileInfo(file));
         }
 
@@ -62,18 +70,18 @@ public class TokenInvalidatorRepository : RequiresBotReference
 
             if (!this.ExistsOnPath("git"))
             {
-                Log.Warning("Git was not found, cannot sync token invalidator repository.");
+                Log.Warning("Git was not found, cannot sync trusted plugins repository.");
                 return;
             }
 
-            if (!Directory.Exists($"GitHub/{this.Bot.status.LoadedConfig.Secrets.Github.TokenLeakRepo}"))
+            if (!Directory.Exists("GitHub/ProjectMakoto.TrustedPlugins"))
             {
                 _ = Directory.CreateDirectory("GitHub");
 
                 _ = Process.Start(new ProcessStartInfo()
                 {
                     FileName = "git",
-                    Arguments = $"clone https://github.com/{this.Bot.status.LoadedConfig.Secrets.Github.TokenLeakRepoOwner}/{this.Bot.status.LoadedConfig.Secrets.Github.TokenLeakRepo}.git",
+                    Arguments = $"clone https://github.com/Fortunevale/ProjectMakoto.TrustedPlugins.git",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
@@ -85,7 +93,7 @@ public class TokenInvalidatorRepository : RequiresBotReference
             {
                 FileName = "git",
                 Arguments = $"fetch",
-                WorkingDirectory = $"GitHub/{this.Bot.status.LoadedConfig.Secrets.Github.TokenLeakRepo}/"
+                WorkingDirectory = $"GitHub/ProjectMakoto.TrustedPlugins/"
             });
             await fetch.WaitForExitAsync();
 
@@ -102,7 +110,7 @@ public class TokenInvalidatorRepository : RequiresBotReference
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
-                WorkingDirectory = $"GitHub/{this.Bot.status.LoadedConfig.Secrets.Github.TokenLeakRepo}/"
+                WorkingDirectory = $"GitHub/ProjectMakoto.TrustedPlugins/"
             });
             pull.BeginOutputReadLine();
             pull.BeginErrorReadLine();
@@ -123,9 +131,9 @@ public class TokenInvalidatorRepository : RequiresBotReference
             }
 
             if (!pullOutput.Contains("Already up to date.", StringComparison.InvariantCultureIgnoreCase))
-                Log.Information("Updated {TokenLeakRepo} repository.", this.Bot.status.LoadedConfig.Secrets.Github.TokenLeakRepo);
+                Log.Information("Updated {Repo} repository.", "ProjectMakoto.TrustedPlugins");
             else
-                Log.Debug("{TokenLeakRepo} repository already up to date.", this.Bot.status.LoadedConfig.Secrets.Github.TokenLeakRepo);
+                Log.Debug("{Repo} repository already up to date.", "ProjectMakoto.TrustedPlugins");
         }
         finally
         {

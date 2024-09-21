@@ -36,3 +36,9 @@ for i in */; do
     fi
   fi
 done
+
+rm -rf trusted_manifests
+mkdir trusted_manifests
+
+cd deps
+dotnet ProjectMakoto.dll --build-manifests .. --output-manifests ../trusted_manifests
