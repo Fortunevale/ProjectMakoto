@@ -27,23 +27,31 @@ public class OfficialPluginRepository : RequiresBotReference
         _ = Task.Run(this.Pull);
     }
 
-    public (bool, FileInfo?) SearchForString(string searchQuery, string? startDirectory = null)
+    internal (bool, OfficialPluginInfo?) FindHash(string hash)
+    {
+        (var found, var fileInfo) = this.FindFile(hash);
+
+        if (found)
+            return (true, JsonConvert.DeserializeObject<OfficialPluginInfo>(File.ReadAllText(fileInfo.FullName)));
+
+        return (false, null);
+    }
+
+    private (bool, FileInfo?) FindFile(string searchQuery, string? startDirectory = null)
     {
         startDirectory ??= $"GitHub/ProjectMakoto.TrustedPlugins/";
 
         foreach (var directory in Directory.GetDirectories(startDirectory))
         {
-            (var found, var fileInfo) = this.SearchForString(searchQuery, directory);
+            (var found, var fileInfo) = this.FindFile(searchQuery, directory);
 
             if (found)
                 return (true, fileInfo);
         }
 
-        foreach (var file in Directory.GetFiles(startDirectory))
+        foreach (var file in Directory.GetFiles(startDirectory).Where(x => x.EndsWith(".json")))
         {
-            var fileContent = File.ReadAllText(file);
-
-            if (fileContent.Contains(searchQuery))
+            if (Path.GetFileNameWithoutExtension(file) == searchQuery)
                 return (true, new FileInfo(file));
         }
 

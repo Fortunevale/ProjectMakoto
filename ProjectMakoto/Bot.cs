@@ -36,6 +36,7 @@ public sealed class Bot
     public MonitorClient MonitorClient { get; internal set; }
     public ChartGeneration ChartsClient { get; set; }
     public TokenInvalidatorRepository TokenInvalidator { get; internal set; }
+    public OfficialPluginRepository OfficialPlugins { get; internal set; }
     internal GitHubClient GithubClient { get; set; }
 
     internal IServerHost WebServer { get; set; }
@@ -161,6 +162,7 @@ public sealed class Bot
                 this.MonitorClient = new MonitorClient(this);
                 this.AbuseIpDbClient = new AbuseIpDbClient(this);
                 this.TokenInvalidator = new TokenInvalidatorRepository(this);
+                this.OfficialPlugins = new OfficialPluginRepository(this);
                 this.ChartsClient = new ChartGeneration(this);
                 this.GithubClient = new GitHubClient(new ProductHeaderValue("ProjectMakoto", this.status.RunningVersion))
                 {

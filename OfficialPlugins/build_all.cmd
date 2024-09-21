@@ -21,3 +21,9 @@ for /D %%i in (*) do (
 		)
 	)
 )
+
+rmdir /s /q trusted_manifests
+mkdir trusted_manifests
+
+cd deps
+dotnet ProjectMakoto.dll --build-manifests .. --output-manifests ../trusted_manifests

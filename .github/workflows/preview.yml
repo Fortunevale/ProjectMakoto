@@ -92,6 +92,18 @@ jobs:
         run: mv ../OfficialPlugins/*.pmpl build/Plugins/
         working-directory: ProjectMakotoPreview/ProjectMakoto/
 
+      - name: Commit new trusted hashes
+        working-directory: ProjectMakotoPreview/
+        run: |
+          git clone https://github.com/Fortunevale/ProjectMakoto.TrustedPlugins
+          cd ProjectMakoto.TrustedPlugins
+          mv ../OfficialPlugins/trusted_manifests/*.json hashes/
+          git config --global user.name 'Mira'
+          git config --global user.email 'xorog@outlook.de'
+          git remote set-url origin https://x-access-token:${{ secrets.Access_token }}@github.com/Fortunevale/ProjectMakoto.TrustedPlugins
+          git commit -am "Add new preview hashes"
+          git push
+
       - name: Deploy to Preview Server
         if: ${{ !github.event.act }} # skip during local actions testing
         run: rsync -avz --delete --force -e "ssh -p ${{ secrets.SSH_PORT }}" . ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_SERVER }}:/home/${{ secrets.SSH_USERNAME }}/Bots/latestProjectIchigoPreview/

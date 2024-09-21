@@ -14,26 +14,41 @@ internal static class ManifestBuilder
     {
         Log.Warning("Makoto has been started as a Manifest Builder.", args);
 
-        var DirectoryIndex = args.IndexOf("--build-manifests") + 1;
-        if (DirectoryIndex > args.Length)
+        var pluginDirectoryIndex = args.IndexOf("--build-manifests") + 1;
+        if (pluginDirectoryIndex > args.Length)
         {
             Log.Fatal("No plugin directory provided.");
             bot.ExitApplication(true).Wait();
             return;
         }
 
-        var DirectoryPath = args[DirectoryIndex];
-        if (!Directory.Exists(DirectoryPath))
+        var pluginDirectoryPath = args[pluginDirectoryIndex];
+        if (!Directory.Exists(pluginDirectoryPath))
         {
             Log.Fatal("Plugin directory was not found.");
             bot.ExitApplication(true).Wait();
             return;
         }
 
-        Log.Information("Building Makoto Plugin manifests in '{Directory}'..", DirectoryPath);
+        string? manifestOutputDirectory = null;
+
+        if (args.Contains("--output-manifests"))
+        {
+            var outputDirectoryIndex = args.IndexOf("--output-manifests") + 1;
+            if (outputDirectoryIndex > args.Length)
+            {
+                Log.Fatal("No output directory provided.");
+                bot.ExitApplication(true).Wait();
+                return;
+            }
+
+            manifestOutputDirectory = args[outputDirectoryIndex];
+        }
+
+        Log.Information("Building Makoto Plugin manifests in '{Directory}'..", pluginDirectoryPath);
 
         UniversalExtensions.LoadAllReferencedAssemblies(AppDomain.CurrentDomain);
-        await Util.Initializers.PluginLoader.LoadPlugins(bot, false, DirectoryPath);
+        await Util.Initializers.PluginLoader.LoadPlugins(bot, false, pluginDirectoryPath);
 
         foreach (var plugin in bot.Plugins)
         {
@@ -47,6 +62,14 @@ internal static class ManifestBuilder
                 AuthorId = plugin.Value.AuthorId,
                 Version = plugin.Value.Version,
             };
+
+            if (manifestOutputDirectory is not null)
+            {
+                var pluginHash = HashingExtensions.ComputeSHA256Hash(plugin.Value.LoadedFile);
+
+                File.WriteAllText($"{manifestOutputDirectory}/{pluginHash}.json", JsonConvert.SerializeObject(manifest, Formatting.Indented));
+                continue;
+            }
 
             using var zipStream = plugin.Value.LoadedFile.Open(FileMode.Open, FileAccess.ReadWrite);
             using var pluginZip = new ZipArchive(zipStream, ZipArchiveMode.Update, false);
