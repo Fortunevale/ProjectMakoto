@@ -66,16 +66,3 @@ jobs:
       - name: Test Build Makoto Plugins
         run: sh build_all.sh 1
         working-directory: ProjectMakotoTest/OfficialPlugins/
-        
-      - name: Commit new trusted hashes (temporary)
-        working-directory: ProjectMakotoTest/
-        run: |
-          git clone https://github.com/Fortunevale/ProjectMakoto.TrustedPlugins
-          cd ProjectMakoto.TrustedPlugins
-          mv ../OfficialPlugins/trusted_manifests/*.json hashes/
-          git config --global user.name 'Project Makoto'
-          git config --global user.email 'ichigo@aitsys.dev'
-          git remote set-url origin https://x-access-token:${{ secrets.PROJECT_MAKOTO_ACCESS_TOKEN }}@github.com/Fortunevale/ProjectMakoto.TrustedPlugins
-          git add -A
-          git commit -am "Add new preview hashes"
-          git push
