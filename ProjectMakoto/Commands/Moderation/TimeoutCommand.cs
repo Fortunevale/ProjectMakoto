@@ -91,7 +91,7 @@ internal sealed class TimeoutCommand : BaseCommand
             {
                 _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
                     .WithDescription(this.GetString(CommandKey.Failed, true, new TVar("Victim", victim.Mention)))
-                    .AsSuccess(ctx));
+                    .AsError(ctx));
             }
         });
     }

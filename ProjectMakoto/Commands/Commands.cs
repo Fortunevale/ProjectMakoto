@@ -43,20 +43,20 @@ internal static class Commands
                             .WithMaximumValue(50)),
 
                     new MakotoCommand("report-host", "Allows you to contribute a new malicious host to our database.", typeof(ReportHostCommand),
-                        new MakotoCommandOverload(typeof(string), "url", "The host")),
+                        new MakotoCommandOverload(typeof(string), "url", "The host", UseRemainingString: true)),
 
                     new MakotoCommand("report-translation", "Allows you to report missing, invalid or incorrect translations in Makoto.", typeof(ReportTranslationCommand),
                         new MakotoCommandOverload(typeof(ReportTranslationType), "affected_type", "The type of module that is affected"),
                         new MakotoCommandOverload(typeof(string), "component", "The affected component")
                             .WithAutoComplete(typeof(AutocompleteProviders.ReportTranslationAutoComplete)),
                         new MakotoCommandOverload(typeof(ReportTranslationReason), "report_type", "What type of issue you're reporting"),
-                        new MakotoCommandOverload(typeof(string), "additional_information", "Any additional information you can give us", false)),
+                        new MakotoCommandOverload(typeof(string), "additional_information", "Any additional information you can give us", false, true)),
 
                     new MakotoCommand("upload", "Upload a file to the bot. Only use when instructed to.", typeof(UploadCommand),
                         new MakotoCommandOverload(typeof(DiscordAttachment), "file", "The file you want to upload.")),
 
                     new MakotoCommand("urban-dictionary", "Look up a term on Urban Dictionary.", typeof(UrbanDictionaryCommand),
-                        new MakotoCommandOverload(typeof(string), "term", "The term you want to look up.")),
+                        new MakotoCommandOverload(typeof(string), "term", "The term you want to look up.", UseRemainingString: true)),
 
                     new MakotoCommand("data", "Allows you to request or manage your user data.",
                         new MakotoCommand("request", "Allows you to request your user data.", typeof(Data.RequestCommand)),
@@ -71,7 +71,7 @@ internal static class Commands
                         new MakotoCommand("open", "Opens your channel so new users can freely join.", typeof(VcCreator.OpenCommand)),
                         new MakotoCommand("close", "Closes your channel. You have to invite people for them to join.", typeof(VcCreator.CloseCommand)),
                         new MakotoCommand("name", "Changes the name of your channel.", typeof(VcCreator.NameCommand),
-                            new MakotoCommandOverload(typeof(string), "name", "The name", false)),
+                            new MakotoCommandOverload(typeof(string), "name", "The name", false, UseRemainingString: true)),
                         new MakotoCommand("limit", "Changes the user limit of your channel.", typeof(VcCreator.LimitCommand),
                             new MakotoCommandOverload(typeof(int), "limit", "The limit", false)
                                 .WithMaximumValue(99)
@@ -90,20 +90,6 @@ internal static class Commands
                     new MakotoCommand(ApplicationCommandType.Message, "Steal Emojis", "Steals all emojis and stickers of a message. Reply to a message to select it.", typeof(EmojiStealerCommand), "emoji")
                         .WithAliases("emojis", "emote", "steal", "grab", "sticker", "stickers"),
                 ]).WithPriority(999),
-
-            new MakotoModule("ScoreSaber", [
-                    new MakotoCommand("scoresaber", "Interact with the ScoreSaber API.",
-                        new MakotoCommand("profile", "Displays you the registered profile of the mentioned user or looks up a profile by a ScoreSaber Id.", typeof(ScoreSaberProfileCommand),
-                            new MakotoCommandOverload(typeof(string), "profile", "ScoreSaber Id | @User", false, true)),
-                        new MakotoCommand("search", "Search a user on Score Saber by name.", typeof(ScoreSaberSearchCommand),
-                            new MakotoCommandOverload(typeof(string), "name", "Search a user on Score Saber by name.")),
-                        new MakotoCommand("map-leaderboard", "Display the leaderboard off a specific map.", typeof(ScoreSaberMapLeaderboardCommand),
-                            new MakotoCommandOverload(typeof(int), "leaderboardid", "The Leaderboard Id"),
-                            new MakotoCommandOverload(typeof(int), "page", "The page", false),
-                            new MakotoCommandOverload(typeof(int), "internal_page", "The internal page", false)),
-                        new MakotoCommand("unlink", "Allows you to remove the saved ScoreSaber profile from your Discord account.", typeof(ScoreSaberUnlinkCommand)))
-                    .WithAliases("ss")
-                ]).WithPriority(996),
 
             new MakotoModule("Moderation", [
                     new MakotoCommand("purge", "Deletes the specified amount of messages.", typeof(PurgeCommand),
@@ -127,7 +113,7 @@ internal static class Commands
                     new MakotoCommand("timeout", "Sets the specified user into a timeout.", typeof(TimeoutCommand),
                         new MakotoCommandOverload(typeof(DiscordUser), "user", "The user"),
                         new MakotoCommandOverload(typeof(string), "duration", "The duration", false),
-                        new MakotoCommandOverload(typeof(string), "reason", "The reason", false))
+                        new MakotoCommandOverload(typeof(string), "reason", "The reason", false, true))
                         .WithRequiredPermissions(Permissions.ModerateMembers),
 
                     new MakotoCommand("remove-timeout", "Removes a timeout from the specified user.", typeof(RemoveTimeoutCommand),
@@ -136,7 +122,7 @@ internal static class Commands
 
                     new MakotoCommand("kick", "Kicks the specified user.", typeof(KickCommand),
                         new MakotoCommandOverload(typeof(DiscordUser), "user", "The user"),
-                        new MakotoCommandOverload(typeof(string), "reason", "The reason", false))
+                        new MakotoCommandOverload(typeof(string), "reason", "The reason", false, true))
                         .WithRequiredPermissions(Permissions.KickMembers),
 
                     new MakotoCommand("ban", "Bans the specified user.", typeof(BanCommand),
@@ -144,7 +130,7 @@ internal static class Commands
                         new MakotoCommandOverload(typeof(int), "days", "Days of messages to delete")
                             .WithMinimumValue(0)
                             .WithMaximumValue(7),
-                        new MakotoCommandOverload(typeof(string), "reason", "The reason", false))
+                        new MakotoCommandOverload(typeof(string), "reason", "The reason", false, true))
                         .WithRequiredPermissions(Permissions.BanMembers),
 
                     new MakotoCommand("softban", "Soft bans the specified user.", typeof(SoftBanCommand),
@@ -152,7 +138,7 @@ internal static class Commands
                         new MakotoCommandOverload(typeof(int), "days", "Days of messages to delete")
                             .WithMinimumValue(0)
                             .WithMaximumValue(7),
-                        new MakotoCommandOverload(typeof(string), "reason", "The reason", false))
+                        new MakotoCommandOverload(typeof(string), "reason", "The reason", false, true))
                         .WithRequiredPermissions(Permissions.BanMembers),
 
                     new MakotoCommand("unban", "Unbans the specified user.", typeof(UnbanCommand),
