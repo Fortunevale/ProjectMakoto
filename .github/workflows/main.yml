@@ -61,7 +61,24 @@ jobs:
       - name: Move plugins into directory
         run: mv ../OfficialPlugins/*.pmpl build/Plugins/
         working-directory: ProjectMakoto/ProjectMakoto/
+        
+      - name: Commit new trusted hashes
+        working-directory: ProjectMakoto/
+        run: |
+          git clone https://github.com/Fortunevale/ProjectMakoto.TrustedPlugins
+          cd ProjectMakoto.TrustedPlugins
+          mv ../OfficialPlugins/trusted_manifests/*.json hashes/
+          git config --global user.name 'Project Makoto'
+          git config --global user.email 'ichigo@aitsys.dev'
+          git remote set-url origin https://x-access-token:${{ secrets.PROJECT_MAKOTO_ACCESS_TOKEN }}@github.com/Fortunevale/ProjectMakoto.TrustedPlugins
+          git add -A
+          git commit -am "Add new hashes"
+          git push
 
+      - name: Sleep for 10 seconds
+        run: sleep 10
+        shell: bash
+        
       - name: Deploy to Production Server
         if: ${{ !github.event.act }} # skip during local actions testing
         run: rsync -avz --delete --force -e "ssh -p ${{ secrets.SSH_PORT }}" . ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_SERVER }}:/home/${{ secrets.SSH_USERNAME }}/Bots/latestProjectIchigo/
