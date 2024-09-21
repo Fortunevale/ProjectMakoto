@@ -75,7 +75,7 @@ jobs:
           mv ../OfficialPlugins/trusted_manifests/*.json hashes/
           git config --global user.name 'Mira'
           git config --global user.email 'xorog@outlook.de'
-          git remote set-url origin https://x-access-token:${{ secrets.Access_token }}@github.com/Fortunevale/ProjectMakoto.TrustedPlugins
+          git remote set-url origin https://x-access-token:${{ secrets.PROJECT_MAKOTO_ACCESS_TOKEN }}@github.com/Fortunevale/ProjectMakoto.TrustedPlugins
           git add -A
           git commit -am "Add new preview hashes"
           git push
