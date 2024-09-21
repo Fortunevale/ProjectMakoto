@@ -33,6 +33,7 @@ public sealed class Config
     public bool AllowMoreThan100Guilds = false;
 
     public bool EnablePlugins = false;
+    public bool OnlyLoadOfficialPlugins = true;
 
     public string SupportServerInvite = "";
 

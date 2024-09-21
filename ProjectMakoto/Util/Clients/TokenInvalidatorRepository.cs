@@ -66,7 +66,7 @@ public class TokenInvalidatorRepository : RequiresBotReference
                 return;
             }
 
-            if (!Directory.Exists("GitHub"))
+            if (!Directory.Exists($"GitHub/{this.Bot.status.LoadedConfig.Secrets.Github.TokenLeakRepo}"))
             {
                 _ = Directory.CreateDirectory("GitHub");
 

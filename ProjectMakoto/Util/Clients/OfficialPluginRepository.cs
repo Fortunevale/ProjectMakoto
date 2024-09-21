@@ -27,12 +27,12 @@ public class OfficialPluginRepository : RequiresBotReference
         _ = Task.Run(this.Pull);
     }
 
-    internal (bool, OfficialPluginInfo?) FindHash(string hash)
+    internal (bool, PluginManifest?) FindHash(string hash)
     {
         (var found, var fileInfo) = this.FindFile(hash);
 
         if (found)
-            return (true, JsonConvert.DeserializeObject<OfficialPluginInfo>(File.ReadAllText(fileInfo.FullName)));
+            return (true, JsonConvert.DeserializeObject<PluginManifest>(File.ReadAllText(fileInfo.FullName)));
 
         return (false, null);
     }
@@ -74,7 +74,7 @@ public class OfficialPluginRepository : RequiresBotReference
                 return;
             }
 
-            if (!Directory.Exists("GitHub"))
+            if (!Directory.Exists("GitHub/ProjectMakoto.TrustedPlugins"))
             {
                 _ = Directory.CreateDirectory("GitHub");
 

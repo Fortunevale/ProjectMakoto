@@ -34,8 +34,45 @@ internal static class PluginLoader
 
             Log.Debug("Loading Plugin '{Name}'..", pluginName);
 
+            var pluginHash = HashingExtensions.ComputeSHA256Hash(new FileInfo(pluginFile));
+
             using var pluginFileStream = new FileStream(pluginFile, FileMode.Open, FileAccess.ReadWrite);
             using var zipArchive = new ZipArchive(pluginFileStream, ZipArchiveMode.Update);
+            var isOfficial = false;
+
+            if (InitializeLoadedPlugins)
+            {
+                var (found, remoteInfo) = bot.OfficialPlugins.FindHash(pluginHash);
+
+                if (!found && bot.status.LoadedConfig.OnlyLoadOfficialPlugins)
+                {
+                    Log.Warning("Skipped loading of unofficial plugin '{Name}'.", pluginName);
+                    continue;
+                }
+
+                if (found)
+                {
+                    Log.Information("'{Name}' is an official plugin: {Hash}", pluginName, pluginHash);
+
+                    using var localManifestStream = zipArchive.GetEntry("manifest.json").Open();
+                    using var localManifestStreamReader = new StreamReader(localManifestStream);
+                    var localManifestText = localManifestStreamReader.ReadToEnd();
+
+                    var localInfo = JsonConvert.DeserializeObject<PluginManifest>(localManifestText);
+
+                    if (localInfo.Name != remoteInfo.Name ||
+                        localInfo.Description != remoteInfo.Description ||
+                        localInfo.Author != remoteInfo.Author ||
+                        localInfo.AuthorId != remoteInfo.AuthorId ||
+                        localInfo.Version != localInfo.Version)
+                    {
+                        Log.Warning("Skipped loading of official plugin '{Name}', manifest mismatches.", pluginName);
+                        continue;
+                    }
+
+                    isOfficial = true;
+                }
+            }
 
             var referenceFiles = zipArchive.Entries;
             Assembly? resolveAssemblyEvent(object? obj, ResolveEventArgs arg)
@@ -83,6 +120,7 @@ internal static class PluginLoader
                                 count++;
                                 var result = Activator.CreateInstance(type) as BasePlugin;
                                 result.LoadedFile = new FileInfo(pluginFile);
+                                result.OfficialPlugin = isOfficial;
 
                                 if (result.SupportedPluginApis == null || !result.SupportedPluginApis.Contains(BasePlugin.CurrentApiVersion))
                                     throw new IndexOutOfRangeException($"Plugin does not support Api Version {BasePlugin.CurrentApiVersion}");

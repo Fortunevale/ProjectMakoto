@@ -54,7 +54,7 @@ internal static class ManifestBuilder
         {
             Log.Information("Generating Plugin Manifest for '{assembly}'..", plugin.Key);
 
-            var manifest = new OfficialPluginInfo()
+            var manifest = new PluginManifest()
             {
                 Name = plugin.Value.Name,
                 Description = plugin.Value.Description,

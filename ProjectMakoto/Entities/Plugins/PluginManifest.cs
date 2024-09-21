@@ -8,7 +8,7 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Plugins;
-internal class OfficialPluginInfo
+internal class PluginManifest
 {
     public string Name { get; set; }
     public string Description { get; set; }
