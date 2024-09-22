@@ -58,7 +58,7 @@ public class OfficialPluginRepository : RequiresBotReference
         return (false, null);
     }
 
-    bool PullRunning = false;
+    internal bool PullRunning = false;
 
     public async Task Pull()
     {
