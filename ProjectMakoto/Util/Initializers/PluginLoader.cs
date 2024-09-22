@@ -22,6 +22,8 @@ internal static class PluginLoader
 
         if (InitializeLoadedPlugins)
         {
+            Log.Debug("Updating official plugin repository..");
+
             await bot.OfficialPlugins.Pull();
             await Task.Delay(500);
             while (bot.OfficialPlugins.PullRunning)

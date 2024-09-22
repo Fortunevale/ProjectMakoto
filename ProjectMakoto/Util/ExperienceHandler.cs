@@ -232,7 +232,7 @@ internal sealed class ExperienceHandler : RequiresTranslation
         {
             var v = (long)Math.Ceiling(Math.Pow((double)Level, 1.60) * 92);
             value = v;
-            this.LevelCache.Add(Level, value);
+            this.LevelCache.TryAdd(Level, value);
         }
 
         return value;

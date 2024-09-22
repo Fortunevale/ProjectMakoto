@@ -1,0 +1,28 @@
+{
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": false,
+        "OfficialPlugins/deps": true,
+        "OfficialPlugins/trusted_manifests": true,
+        "hooks": true,
+        "_typos.toml": true,
+        "InitSubmodules.sh": true,
+        ".gitattributes": true,
+        ".gitconfig": true,
+        "LICENSE": true,
+        "renovate.json": true,
+        "ResetDevToPreview.sh": true,
+        "ResetPreviewToMain.sh": true,
+        "SetupGit.sh": true,
+        "TestRun.sh": true,
+        "UpdateSubmodules.sh": true,
+        "**/*.pmpl": true,
+        "event.json": true
+    },
+    "explorerExclude.backup": {},
+    "dotnet.defaultSolution": "ProjectMakoto/ProjectMakoto.sln"
+}
