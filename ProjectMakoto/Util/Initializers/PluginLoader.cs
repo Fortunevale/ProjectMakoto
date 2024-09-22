@@ -20,10 +20,13 @@ internal static class PluginLoader
         if (InitializeLoadedPlugins && !bot.status.LoadedConfig.EnablePlugins)
             return;
 
-        await bot.OfficialPlugins.Pull();
-        await Task.Delay(500);
-        while (bot.OfficialPlugins.PullRunning)
-            await Task.Delay(1000);
+        if (InitializeLoadedPlugins)
+        {
+            await bot.OfficialPlugins.Pull();
+            await Task.Delay(500);
+            while (bot.OfficialPlugins.PullRunning)
+                await Task.Delay(1000);
+        }
 
         Log.Debug("Loading Plugins from '{PluginDirectory}'..", PluginDirectory);
 
