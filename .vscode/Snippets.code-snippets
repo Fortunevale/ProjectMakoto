@@ -1,0 +1,97 @@
+{
+	// Place your ProjectIchigo workspace snippets here. Each snippet is defined under a snippet name and has a scope, prefix, body and 
+	// description. Add comma separated ids of the languages where the snippet is applicable in the scope field. If scope 
+	// is left empty or omitted, the snippet gets applied to all languages. The prefix is what is 
+	// used to trigger the snippet and the body will be expanded and inserted. Possible variables are: 
+	// $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders. 
+	// Placeholders with the same ids are connected.
+	// Example:
+	// "Print to console": {
+	// 	"scope": "javascript,typescript",
+	// 	"prefix": "log",
+	// 	"body": [
+	// 		"console.log('$1');",
+	// 		"$2"
+	// 	],
+	// 	"description": "Log output to console"
+	// }
+    "FileHeader": {
+        "prefix": "header",
+        "body": [
+            "Project Makoto",
+            "Copyright (C) 2024  Fortunevale",
+            "This program is free software: you can redistribute it and/or modify",
+            "it under the terms of the GNU General Public License as published by",
+            "the Free Software Foundation, either version 3 of the License, or",
+            "(at your option) any later version.",
+            "This program is distributed in the hope that it will be useful,",
+            "but WITHOUT ANY WARRANTY; without even the implied warranty of",
+            "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the",
+            "GNU General Public License for more details.",
+            "You should have received a copy of the GNU General Public License",
+            "along with this program.  If not, see <http://www.gnu.org/licenses/>."
+        ]
+    },
+    "LogFatal": {
+        "prefix": "fatal",
+        "body": [
+            "Log.Fatal($0$TM_SELECTED_TEXT);"
+        ]
+    },
+    "LogError": {
+        "prefix": "error",
+        "body": [
+            "Log.Error($0$TM_SELECTED_TEXT);"
+        ]
+    },
+    "LogWarn": {
+        "prefix": "warn",
+        "body": [
+            "Log.Warning($0$TM_SELECTED_TEXT);"
+        ]
+    },
+    "LogInfo": {
+        "prefix": "info",
+        "body": [
+            "Log.Information($0$TM_SELECTED_TEXT);"
+        ]
+    },
+    "LogDebug": {
+        "prefix": "debug",
+        "body": [
+            "Log.Debug($0$TM_SELECTED_TEXT);"
+        ]
+    },
+    "LogVerbose": {
+        "prefix": "verbose",
+        "body": [
+            "Log.Verbose($0$TM_SELECTED_TEXT);"
+        ]
+    },
+    "AsyncTask": {
+        "prefix": "asynctask",
+        "body": [
+            "$0_ = Task.Run(async () =>",
+            "{",
+            "\t$TM_SELECTED_TEXT",
+            "});"
+        ]
+    },
+    "Task": {
+        "prefix": "task",
+        "body": [
+            "$0_ = Task.Run(() =>",
+            "{",
+            "\t$TM_SELECTED_TEXT",
+            "});"
+        ]
+    },
+    "Braces": {
+        "prefix": "braces",
+        "body": [
+            "$0{",
+            "\t$TM_SELECTED_TEXT",
+            "}"
+        ]
+    }
+}
