@@ -1,7 +1,7 @@
 @echo off
 
 rmdir /S /Q deps
-dotnet publish ..\ProjectMakoto\ProjectMakoto.csproj --configuration RELEASE --runtime linux-x64 --no-self-contained --property:PublishDir="deps" --framework net8.0
+dotnet publish ..\ProjectMakoto\ProjectMakoto.csproj --configuration RELEASE --runtime linux-x64 --no-self-contained --property:PublishDir="deps" --framework net9.0
 move ..\ProjectMakoto\deps deps
 
 set "original_dir=%CD%"
