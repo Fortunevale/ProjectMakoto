@@ -21,10 +21,10 @@ jobs:
           key: ${{ secrets.SSH_TOKEN }}
           known_hosts: ${{ secrets.SSH_KNOWN_HOST }}
 
-      - name: Setup .NET Core SDK 8.x
+      - name: Setup .NET Core SDK 9.x
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.x'
+          dotnet-version: '9.x'
 
       - name: "Clone Repository"
         uses: actions/checkout@v4
@@ -38,7 +38,7 @@ jobs:
         working-directory: ProjectMakoto/ProjectMakoto/
 
       - name: Build Makoto
-        run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained --output "build" --property:PublishDir="build" --framework net8.0
+        run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained --output "build" --property:PublishDir="build" --framework net9.0
         working-directory: ProjectMakoto/ProjectMakoto/
         timeout-minutes: 5
 

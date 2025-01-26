@@ -49,8 +49,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: | 
-            9.0.100-preview.7.24407.12
-            8.x
+            9.x
 
       - name: "Clone Repository"
         uses: actions/checkout@v4
@@ -72,7 +71,7 @@ jobs:
         working-directory: ProjectMakotoPreview/OfficialPlugins/
         
       - name: Build Makoto
-        run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained --output "build" --property:PublishDir="build" --framework net8.0
+        run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained --output "build" --property:PublishDir="build" --framework net9.0
         working-directory: ProjectMakotoPreview/ProjectMakoto/
         timeout-minutes: 5
 

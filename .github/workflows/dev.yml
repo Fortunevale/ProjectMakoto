@@ -32,12 +32,11 @@ jobs:
       - name: Cleanup before build
         run: rm -rf ProjectMakotoTest/
         
-      - name: Setup .NET Core SDK 8.x
+      - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: | 
-            9.0.100-preview.7.24407.12
-            8.x
+            9.x
             
       - name: "Clone Repository"
         uses: actions/checkout@v4
@@ -59,7 +58,7 @@ jobs:
         working-directory: ProjectMakotoTest/OfficialPlugins/
         
       - name: Test Build Makoto
-        run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained --framework net8.0
+        run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained --framework net9.0
         working-directory: ProjectMakotoTest/ProjectMakoto/
         timeout-minutes: 5
         
