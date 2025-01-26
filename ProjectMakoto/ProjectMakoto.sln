@@ -17,8 +17,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xorog.UniversalExtensions", "..\Dependencies\Xorog.UniversalExtensions\Xorog.UniversalExtensions.csproj", "{906F9C70-17B3-4B6D-AFFF-976338D641C4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickChart", "..\Dependencies\quickchart-csharp\QuickChart\QuickChart.csproj", "{953F15E3-C11E-43FD-AF41-459AC1537232}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DisCatSharp", "..\Dependencies\DisCatSharp\DisCatSharp\DisCatSharp.csproj", "{8BD34631-4327-4533-8587-93E38D7A5DD9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DisCatSharp.ApplicationCommands", "..\Dependencies\DisCatSharp\DisCatSharp.ApplicationCommands\DisCatSharp.ApplicationCommands.csproj", "{5C28FAB1-DBAE-4A92-ABF0-13ED9727DD39}"
@@ -50,6 +48,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectMakoto.Plugins.Music", "..\OfficialPlugins\Music\ProjectMakoto.Plugins.Music.csproj", "{C609247B-037D-4E16-9E75-6DA142E4EDAC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectMakoto.Plugins.ScoreSaber", "..\OfficialPlugins\ScoreSaber\ProjectMakoto.Plugins.ScoreSaber.csproj", "{CF74444A-A805-43F2-A5C9-2AF49E472754}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickChart", "..\Dependencies\quickchart-csharp\QuickChart\QuickChart.csproj", "{8EE7D3DD-FC09-42A7-91B3-447FC9944D0E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -85,18 +85,6 @@ Global
 		{906F9C70-17B3-4B6D-AFFF-976338D641C4}.x64|Any CPU.Build.0 = x64|Any CPU
 		{906F9C70-17B3-4B6D-AFFF-976338D641C4}.x64|x64.ActiveCfg = x64|x64
 		{906F9C70-17B3-4B6D-AFFF-976338D641C4}.x64|x64.Build.0 = x64|x64
-		{953F15E3-C11E-43FD-AF41-459AC1537232}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{953F15E3-C11E-43FD-AF41-459AC1537232}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{953F15E3-C11E-43FD-AF41-459AC1537232}.Debug|x64.ActiveCfg = Debug|x64
-		{953F15E3-C11E-43FD-AF41-459AC1537232}.Debug|x64.Build.0 = Debug|x64
-		{953F15E3-C11E-43FD-AF41-459AC1537232}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{953F15E3-C11E-43FD-AF41-459AC1537232}.Release|Any CPU.Build.0 = Release|Any CPU
-		{953F15E3-C11E-43FD-AF41-459AC1537232}.Release|x64.ActiveCfg = Release|x64
-		{953F15E3-C11E-43FD-AF41-459AC1537232}.Release|x64.Build.0 = Release|x64
-		{953F15E3-C11E-43FD-AF41-459AC1537232}.x64|Any CPU.ActiveCfg = x64|Any CPU
-		{953F15E3-C11E-43FD-AF41-459AC1537232}.x64|Any CPU.Build.0 = x64|Any CPU
-		{953F15E3-C11E-43FD-AF41-459AC1537232}.x64|x64.ActiveCfg = x64|x64
-		{953F15E3-C11E-43FD-AF41-459AC1537232}.x64|x64.Build.0 = x64|x64
 		{8BD34631-4327-4533-8587-93E38D7A5DD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8BD34631-4327-4533-8587-93E38D7A5DD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8BD34631-4327-4533-8587-93E38D7A5DD9}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -289,6 +277,18 @@ Global
 		{CF74444A-A805-43F2-A5C9-2AF49E472754}.x64|Any CPU.Build.0 = Debug|Any CPU
 		{CF74444A-A805-43F2-A5C9-2AF49E472754}.x64|x64.ActiveCfg = Debug|Any CPU
 		{CF74444A-A805-43F2-A5C9-2AF49E472754}.x64|x64.Build.0 = Debug|Any CPU
+		{8EE7D3DD-FC09-42A7-91B3-447FC9944D0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EE7D3DD-FC09-42A7-91B3-447FC9944D0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EE7D3DD-FC09-42A7-91B3-447FC9944D0E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8EE7D3DD-FC09-42A7-91B3-447FC9944D0E}.Debug|x64.Build.0 = Debug|Any CPU
+		{8EE7D3DD-FC09-42A7-91B3-447FC9944D0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EE7D3DD-FC09-42A7-91B3-447FC9944D0E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EE7D3DD-FC09-42A7-91B3-447FC9944D0E}.Release|x64.ActiveCfg = Release|Any CPU
+		{8EE7D3DD-FC09-42A7-91B3-447FC9944D0E}.Release|x64.Build.0 = Release|Any CPU
+		{8EE7D3DD-FC09-42A7-91B3-447FC9944D0E}.x64|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EE7D3DD-FC09-42A7-91B3-447FC9944D0E}.x64|Any CPU.Build.0 = Debug|Any CPU
+		{8EE7D3DD-FC09-42A7-91B3-447FC9944D0E}.x64|x64.ActiveCfg = Debug|Any CPU
+		{8EE7D3DD-FC09-42A7-91B3-447FC9944D0E}.x64|x64.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

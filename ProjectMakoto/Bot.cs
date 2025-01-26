@@ -20,6 +20,7 @@ using Serilog.Core;
 using ProjectMakoto.Entities.LoggingEnrichers;
 using Status = ProjectMakoto.Entities.Status;
 using Microsoft.CodeAnalysis;
+using GenHTTP.Engine.Internal;
 
 namespace ProjectMakoto;
 
@@ -188,7 +189,7 @@ public sealed class Bot
 
                 _ = Directory.CreateDirectory("WebServer");
 
-                this.WebServer = Host.Create()
+                this.WebServer = await Host.Create()
                                     .Port(this.status.LoadedConfig.WebServer.Port)
                                     .Console()
                                     .Defaults(
@@ -199,7 +200,7 @@ public sealed class Bot
                                         rangeSupport: false,
                                         preventSniffing: false)
                                     .Handler(StaticWebsite.From(ResourceTree.FromDirectory("WebServer")))
-                                    .Start();
+                                    .StartAsync();
 
                 this.objectedUsers = new(this.DatabaseClient, "objected_users", "id", false);
 
@@ -462,7 +463,7 @@ public sealed class Bot
 
         Log.Information("Preparing to shut down Makoto..");
 
-        _ = this.WebServer.Stop();
+        _ = await this.WebServer.StopAsync();
 
         foreach (var b in this.Plugins)
         {
