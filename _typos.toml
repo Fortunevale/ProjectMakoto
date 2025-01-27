@@ -1,0 +1,6 @@
+[files]
+extend-exclude = ["*.pdn","*.json","Xorog.*"]
+
+[default.extend-words]
+optin = "optin"
+Experiation = "Experiation"

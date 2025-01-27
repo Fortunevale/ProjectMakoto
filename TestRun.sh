@@ -1,0 +1,1 @@
+act -s GITHUB_TOKEN="$(gh auth token)" push -P self-hosted=ghcr.io/catthehacker/ubuntu:act-latest "$@"

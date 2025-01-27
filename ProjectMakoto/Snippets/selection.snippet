@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+    <CodeSnippet Format="1.0.0">
+        <Header>
+           <Title>Custom Selection</Title>
+           <Author>Myself</Author>
+           <Description>Custom Selection</Description>
+           <Shortcut>customsel</Shortcut>
+        </Header>
+        <Snippet>
+            <Code Language="CSharp">
+                <![CDATA[var SelectionResult = await PromptCustomSelection();
+
+                if (SelectionResult.TimedOut)
+                {
+                    ModifyToTimedOut(true);
+                    return;
+                }
+                else if (SelectionResult.Cancelled)
+                {
+                    await ExecuteCommand(ctx, arguments);
+                    return;
+                }
+                else if (SelectionResult.Errored)
+                {
+                    throw SelectionResult.Exception;
+                }]]>
+            </Code>
+        </Snippet>
+    </CodeSnippet>
+</CodeSnippets>

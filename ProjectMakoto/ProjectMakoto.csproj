@@ -1,0 +1,145 @@
+﻿ <Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <RootNamespace>ProjectMakoto</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>annotations</Nullable>
+	<EmbedAllSources>true</EmbedAllSources>
+    <DebugType>embedded</DebugType>
+	<EmbedAllSources>true</EmbedAllSources>
+    <PlatformTarget>x64</PlatformTarget>
+    <Configurations>Debug;Release;x64</Configurations>
+    <Platforms>AnyCPU;x64</Platforms>
+    <StartupObject>ProjectMakoto.Program</StartupObject>
+    <SignAssembly>False</SignAssembly>
+    <Copyright>Project-Makoto</Copyright>
+    <PackageProjectUrl>https://github.com/Fortunevale/ProjectMakoto</PackageProjectUrl>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <NeutralLanguage>en</NeutralLanguage>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	<Platforms>x64</Platforms>
+	<RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <WarningLevel>1</WarningLevel>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <WarningLevel>1</WarningLevel>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='x64|AnyCPU'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='x64|x64'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DisCatSharp.Extensions.TwoFactorCommands" Version="3.1.0" />
+    <PackageReference Include="FFMpegCore" Version="5.1.0" />
+    <PackageReference Include="GenHTTP.Core" Version="9.6.0" />
+    <PackageReference Include="GenHTTP.Modules.StaticWebsites" Version="9.6.0" />
+    <PackageReference Include="HtmlSanitizer" Version="8.1.870" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="4.12.0" />
+    <PackageReference Include="MySqlConnector" Version="2.4.0" />
+    <PackageReference Include="Octokit" Version="14.0.0" />
+    <PackageReference Include="Serilog" Version="4.2.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
+    <PackageReference Include="System.Data.SQLite" Version="1.0.119" />
+	<PackageReference Include="DisCatSharp.Analyzer.Roselyn" Version="6.2.5">
+		<PrivateAssets>all</PrivateAssets>
+		<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	</PackageReference>
+	<PackageReference Include="System.Drawing.Common" Version="9.0.1" />
+	<PackageReference Include="System.Text.Json" Version="9.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dependencies\DisCatSharp\DisCatSharp.ApplicationCommands\DisCatSharp.ApplicationCommands.csproj" />
+    <ProjectReference Include="..\Dependencies\DisCatSharp\DisCatSharp.CommandsNext\DisCatSharp.CommandsNext.csproj" />
+    <ProjectReference Include="..\Dependencies\DisCatSharp\DisCatSharp.Common\DisCatSharp.Common.csproj" />
+    <ProjectReference Include="..\Dependencies\DisCatSharp\DisCatSharp.Configuration\DisCatSharp.Configuration.csproj" />
+    <ProjectReference Include="..\Dependencies\DisCatSharp\DisCatSharp.Experimental\DisCatSharp.Experimental.csproj" />
+    <ProjectReference Include="..\Dependencies\DisCatSharp\DisCatSharp.Interactivity\DisCatSharp.Interactivity.csproj" />
+    <ProjectReference Include="..\Dependencies\DisCatSharp\DisCatSharp.Lavalink\DisCatSharp.Lavalink.csproj" />
+    <ProjectReference Include="..\Dependencies\DisCatSharp\DisCatSharp.VoiceNext.Natives\DisCatSharp.VoiceNext.Natives.csproj" />
+    <ProjectReference Include="..\Dependencies\DisCatSharp\DisCatSharp.VoiceNext\DisCatSharp.VoiceNext.csproj" />
+    <ProjectReference Include="..\Dependencies\DisCatSharp\DisCatSharp\DisCatSharp.csproj" />
+    <ProjectReference Include="..\Dependencies\quickchart-csharp\QuickChart\QuickChart.csproj" />
+    <ProjectReference Include="..\Dependencies\Xorog.UniversalExtensions\Xorog.UniversalExtensions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<RuntimeHostConfigurationOption Include="Switch.System.IO.Compression.ZipFile.UseBackslash" Value="true" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Global.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Assets\1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\ASCII.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\Countries.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\DiscordMessages.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\Languages.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="GraphTemplate.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Translations\*.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+	<None Update="Assets\Emojis\Upload\*">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</None>
+  </ItemGroup>
+
+  <ItemGroup>
+	<Folder Include="Properties\" />
+	<Folder Include="Assets\Emojis\Upload\" />
+  </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
+
+</Project>

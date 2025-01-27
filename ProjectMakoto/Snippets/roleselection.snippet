@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+    <CodeSnippet Format="1.0.0">
+        <Header>
+           <Title>Role Selection</Title>
+           <Author>Myself</Author>
+           <Description>Role Selection</Description>
+           <Shortcut>rolesel</Shortcut>
+        </Header>
+        <Snippet>
+            <Code Language="CSharp">
+                <![CDATA[var RoleResult = await PromptRoleSelection();
+
+                if (RoleResult.TimedOut)
+                {
+                    ModifyToTimedOut();
+                    return;
+                }
+                else if (RoleResult.Cancelled)
+                {
+                    await ExecuteCommand(ctx, arguments);
+                    return;
+                }
+                else if (RoleResult.Failed)
+                {
+                    if (RoleResult.Exception.GetType() == typeof(NullReferenceException))
+                    {
+                        await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any roles in your server.`"));
+                        await Task.Delay(3000);
+                        return;
+                    }
+
+                    throw RoleResult.Exception;
+                }]]>
+            </Code>
+        </Snippet>
+    </CodeSnippet>
+</CodeSnippets>

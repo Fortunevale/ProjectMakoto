@@ -1,0 +1,71 @@
+name: Test Dev Branch
+on:
+  push:
+    branches: [ "dev" ]
+  workflow_dispatch:
+jobs:
+  secretscan:
+    name: Scan for Secrets
+    runs-on: self-hosted
+    steps:
+    - name: Clone Repository
+      uses: actions/checkout@v4
+      with:
+        ref: dev
+
+    - name: Secret Scan
+      uses: max/secret-scan@master
+      with:
+        exclude_path: 'SecretsIgnore.txt'
+  spellcheck:
+    name: Clone Repository
+    runs-on: self-hosted
+    steps:
+    - name: Checkout Actions Repository
+      uses: actions/checkout@v4
+      with:
+        ref: dev
+
+    - name: Check spelling
+      uses: crate-ci/typos@master
+  testbuild:
+    name: Build Project
+    runs-on: self-hosted
+    steps:
+      - name: Cleanup before build
+        run: rm -rf ProjectMakotoTest/
+        
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: | 
+            9.x
+            
+      - name: "Clone Repository"
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          path: ProjectMakotoTest
+          token: ${{ secrets.Access_token }}
+          ref: dev
+          
+      - name: Install dependencies
+        run: dotnet restore
+        working-directory: ProjectMakotoTest/ProjectMakoto/
+        
+      - name: Mark .sh files as executable
+        run: find . -type f -name "*.sh" -exec chmod +x {} +
+        working-directory: ProjectMakotoTest/OfficialPlugins/
+        
+      - name: Prepare Makoto Plugin Build
+        run: sh update_deps.sh
+        working-directory: ProjectMakotoTest/OfficialPlugins/
+        
+      - name: Test Build Makoto
+        run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained --framework net9.0
+        working-directory: ProjectMakotoTest/ProjectMakoto/
+        timeout-minutes: 5
+        
+      - name: Test Build Makoto Plugins
+        run: sh build_all.sh 1
+        working-directory: ProjectMakotoTest/OfficialPlugins/

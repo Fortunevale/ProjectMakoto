@@ -1,0 +1,11 @@
+{
+    "recommendations": [
+        "ms-dotnettools.vscode-dotnet-runtime",
+        "ms-dotnettools.csharp",
+        "tdallau-csharpextensions.csharpextensions",
+        "anseki.vscode-color",
+        "peterschmalfeldt.explorer-exclude",
+        "christian-kohler.path-intellisense",
+        "ms-vscode.vs-keybindings"
+    ]
+}
