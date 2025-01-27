@@ -1,0 +1,5066 @@
+{
+  "CommandList": [
+    {
+      "Type": 1,
+      "Names": {
+        "en": "help",
+        "de": "hilfe"
+      },
+      "Descriptions": {
+        "en": "Sends you a list of all available commands, their usage and their description.",
+        "de": "Sendet dir eine Liste von allen verfügbaren Befehlen, ihr Syntax und ihre Beschreibung."
+      },
+      "Options": [
+        {
+          "Names": {
+            "en": "command",
+            "de": "befehl"
+          },
+          "Descriptions": {
+            "en": "The command to show help for.",
+            "de": "Der Befehl für den die Hilfe angezeigt werden soll."
+          }
+        }
+      ]
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "user-info",
+        "de": "benutzer-info"
+      },
+      "Descriptions": {
+        "en": "Displays information the bot knows about you or the mentioned user.",
+        "de": "Zeigt Informationen über dich oder den gewählten Benutzer an."
+      },
+      "Options": [
+        {
+          "Names": {
+            "en": "user",
+            "de": "benutzer"
+          },
+          "Descriptions": {
+            "en": "The user to show information about.",
+            "de": "Der Benutzer über den Information angezeigt werden sollen."
+          }
+        }
+      ]
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "guild-info",
+        "de": "server-info"
+      },
+      "Descriptions": {
+        "en": "Displays information the bot knows about this or the mentioned server.",
+        "de": "Zeigt Informationen über diesen oder den gewählten Server an."
+      },
+      "Options": [
+        {
+          "Names": {
+            "en": "guild",
+            "de": "server"
+          },
+          "Descriptions": {
+            "en": "The guild to show information about.",
+            "de": "Der Server über den Information angezeigt werden sollen."
+          }
+        }
+      ]
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "reminders",
+        "de": "erinnerungen"
+      },
+      "Descriptions": {
+        "en": "Allows you to manage your reminders.",
+        "de": "Erlaubt es dir deine Erinnerungen zu verwalten."
+      }
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "avatar",
+        "de": "profilbild"
+      },
+      "Descriptions": {
+        "en": "Displays your or the mentioned user's avatar as an embedded image.",
+        "de": "Zeigt das Profilbild von dir oder dem gewählten Benutzer."
+      },
+      "Options": [
+        {
+          "Names": {
+            "en": "user",
+            "de": "benutzer"
+          },
+          "Descriptions": {
+            "en": "The user to show the avatar from.",
+            "de": "Der Benutzer von dem das Profilbild angezeigt werden soll."
+          }
+        }
+      ]
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "banner",
+        "de": "banner"
+      },
+      "Descriptions": {
+        "en": "Displays your or the mentioned user's banner as an embedded image.",
+        "de": "Zeigt das Banner von dir oder dem gewählten Benutzer."
+      },
+      "Options": [
+        {
+          "Names": {
+            "en": "user",
+            "de": "benutzer"
+          },
+          "Descriptions": {
+            "en": "The user to show the avatar from.",
+            "de": "Der Benutzer von dem das Banner angezeigt werden soll."
+          }
+        }
+      ]
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "rank",
+        "de": "rang"
+      },
+      "Descriptions": {
+        "en": "Shows your or the mentioned user's rank and rank progress.",
+        "de": "Zeigt dir den Rang von dir oder dem gewählten Benutzer."
+      },
+      "Options": [
+        {
+          "Names": {
+            "en": "user",
+            "de": "benutzer"
+          },
+          "Descriptions": {
+            "en": "The user to show the rank from.",
+            "de": "Der Benutzer von dem der Rang angezeigt werden soll."
+          }
+        }
+      ]
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "leaderboard",
+        "de": "rangliste"
+      },
+      "Descriptions": {
+        "en": "Displays the current experience rankings on this server.",
+        "de": "Zeigt dir die aktuelle Rangliste auf diesem Server."
+      },
+      "Options": [
+        {
+          "Names": {
+            "en": "amount",
+            "de": "menge"
+          },
+          "Descriptions": {
+            "en": "The amount of rankings to show.",
+            "de": "Wie viele Plätze angezeigt werden sollen."
+          }
+        }
+      ]
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "report-host",
+        "de": "host-melden"
+      },
+      "Descriptions": {
+        "en": "Allows you to contribute a new malicious host to our database.",
+        "de": "Erlaubt es dir, einen neuen bösartigen Host zu melden."
+      },
+      "Options": [
+        {
+          "Names": {
+            "en": "url",
+            "de": "url"
+          },
+          "Descriptions": {
+            "en": "The host you want to report.",
+            "de": "Den Host den du melden möchtest."
+          }
+        }
+      ]
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "report-translation",
+        "de": "übersetzung-melden"
+      },
+      "Descriptions": {
+        "en": "Allows you to report missing, invalid or incorrect translations in Makoto.",
+        "de": "Erlaubt es fehlende oder falsche Übersetzungen in Makoto zu melden."
+      },
+      "Options": [
+        {
+          "Names": {
+            "en": "affected_type",
+            "de": "betroffener_typ"
+          },
+          "Descriptions": {
+            "en": "The type of module that is affected.",
+            "de": "Der Typ des Moduls was betroffen ist."
+          },
+          "Choices": [
+            {
+              "Names": {
+                "en": "Miscellaneous",
+                "de": "Sonstiges"
+              }
+            },
+            {
+              "Names": {
+                "en": "Command",
+                "de": "Befehl"
+              }
+            },
+            {
+              "Names": {
+                "en": "Event",
+                "de": "Ereignis"
+              }
+            }
+          ]
+        },
+        {
+          "Names": {
+            "en": "component",
+            "de": "komponent"
+          },
+          "Descriptions": {
+            "en": "The affected component",
+            "de": "Das Komponent was betroffen ist"
+          }
+        },
+        {
+          "Names": {
+            "en": "report_type",
+            "de": "meldungs_typ"
+          },
+          "Descriptions": {
+            "en": "The type of issue you're reporting.",
+            "de": "Die Art von Meldung"
+          },
+          "Choices": [
+            {
+              "Names": {
+                "en": "MissingTranslation",
+                "de": "FehlendeÜbersetzung"
+              }
+            },
+            {
+              "Names": {
+                "en": "IncorrectTranslation",
+                "de": "FalscheÜbersetzung"
+              }
+            },
+            {
+              "Names": {
+                "en": "ValuesNotFilledIntoString",
+                "de": "WerteNichtGeladen"
+              }
+            },
+            {
+              "Names": {
+                "en": "Other",
+                "de": "Sonstiges"
+              }
+            }
+          ]
+        },
+        {
+          "Names": {
+            "en": "additional_information",
+            "de": "weitere_informationen"
+          },
+          "Descriptions": {
+            "en": "Any additional information you can give us.",
+            "de": "Jegliche weitere Informationen die du uns dazu geben kannst."
+          }
+        }
+      ]
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "upload",
+        "de": "hochladen"
+      },
+      "Descriptions": {
+        "en": "Upload a file to the bot. Only use when instructed to.",
+        "de": "Lade eine Datei auf den Bot hoch. Nur verwenden wenn dazu aufgefordert."
+      },
+      "Options": [
+        {
+          "Names": {
+            "en": "file",
+            "de": "datei"
+          },
+          "Descriptions": {
+            "en": "The file you want to upload.",
+            "de": "Die Datei, die du hochladen möchtest."
+          }
+        }
+      ]
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "urban-dictionary",
+        "de": "urban-dictionary"
+      },
+      "Descriptions": {
+        "en": "Look up a term on Urban Dictionary.",
+        "de": "Suche nach einem Wort oder einer Phrase auf Urban Dictionary."
+      },
+      "Options": [
+        {
+          "Names": {
+            "en": "term",
+            "de": "wort"
+          },
+          "Descriptions": {
+            "en": "The term you want to look up.",
+            "de": "Das Wort oder die Phrase, nach der du suchen möchtest."
+          }
+        }
+      ]
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "language",
+        "de": "sprache"
+      },
+      "Descriptions": {
+        "en": "Change the language Makoto uses.",
+        "de": "Erlaubt es dir die Sprache, die Makoto verwendet, zu ändern."
+      }
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "credits",
+        "de": "credits"
+      },
+      "Descriptions": {
+        "en": "Allows you to view who contributed the bot.",
+        "de": "Zeigt dir wer Makoto unterstützt hat."
+      }
+    },
+    {
+      "Type": 3,
+      "Names": {
+        "en": "Steal Emojis",
+        "de": "Emojis klauen"
+      },
+      "Descriptions": {
+        "en": "Allows you to steal emojis and stickers from a selected message.",
+        "de": "Erlaubt es dir Emojis oder Sticker von einer ausgewählten Nachricht zu klauen."
+      }
+    },
+    {
+      "Type": 3,
+      "Names": {
+        "en": "Add a Reaction Role",
+        "de": "Eine Reaktionsrolle hinzufügen"
+      },
+      "Descriptions": {
+        "en": "Allows you to add a reaction role to the selected message.",
+        "de": "Erlaubt es dir eine Reaktionsrolle zur ausgewählten Nachricht hinzuzufügen."
+      }
+    },
+    {
+      "Type": 3,
+      "Names": {
+        "en": "Remove a Reaction Role",
+        "de": "Eine Reaktionsrolle entfernen"
+      },
+      "Descriptions": {
+        "en": "Allows you to remove a reaction role from the selected message.",
+        "de": "Erlaubt es dir eine Reaktionsrolle von der ausgewählten Nachricht zu entfernen."
+      }
+    },
+    {
+      "Type": 3,
+      "Names": {
+        "en": "Remove all Reaction Roles",
+        "de": "Eine Reaktionsrolle entfernen"
+      },
+      "Descriptions": {
+        "en": "Allows you to remove all reaction roles from the selected message.",
+        "de": "Erlaubt es dir alle Reaktionsrollen von der ausgewählten Nachricht zu entfernen."
+      }
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "purge",
+        "de": "purge"
+      },
+      "Descriptions": {
+        "en": "Deletes the specified amount of messages with an optional user filter.",
+        "de": "Löscht die angegebene Menge an Nachrichten mit einem optionalen Nutzerfilter."
+      },
+      "Options": [
+        {
+          "Names": {
+            "en": "number",
+            "de": "anzahl"
+          },
+          "Descriptions": {
+            "en": "1-2000 | The number of messages to delete.",
+            "de": "1-2000 | Die Anzahl an Nachricht zu löschen."
+          }
+        },
+        {
+          "Names": {
+            "en": "user",
+            "de": "benutzer"
+          },
+          "Descriptions": {
+            "en": "Optional user filter, only delete messages by this user.",
+            "de": "Optionaler Nutzerfilter, lösche Nachrichten nur von diesem Benutzer."
+          }
+        }
+      ]
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "guild-purge",
+        "de": "guild-purge"
+      },
+      "Descriptions": {
+        "en": "Deletes the specified amount of messages with an user filter in every channel.",
+        "de": "Löscht die angegebene Menge an Nachrichten mit einem Nutzerfilter in jedem Kanal."
+      },
+      "Options": [
+        {
+          "Names": {
+            "en": "number",
+            "de": "anzahl"
+          },
+          "Descriptions": {
+            "en": "1-2000 | The number of messages to delete in every channel.",
+            "de": "1-2000 | Die Anzahl an Nachricht zu löschen in jedem Kanal."
+          }
+        },
+        {
+          "Names": {
+            "en": "user",
+            "de": "benutzer"
+          },
+          "Descriptions": {
+            "en": "User filter, only delete messages by this user.",
+            "de": "Nutzerfilter, lösche Nachrichten nur von diesem Benutzer."
+          }
+        }
+      ]
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "clearbackup",
+        "de": "backup-entfernen"
+      },
+      "Descriptions": {
+        "en": "Clears the stored roles and nickname of a user.",
+        "de": "Löscht die gespeicherten Rollen und den Nutzernamen von einem Benutzer."
+      },
+      "Options": [
+        {
+          "Names": {
+            "en": "user",
+            "de": "benutzer"
+          },
+          "Descriptions": {
+            "en": "The user of who the backup will be deleted.",
+            "de": "Der Benutzer von dem das Backup gelöscht werden soll."
+          }
+        }
+      ]
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "timeout",
+        "de": "timeout"
+      },
+      "Descriptions": {
+        "en": "Sets a user into timeout.",
+        "de": "Schickt einen Benutzer in den Timeout."
+      },
+      "Options": [
+        {
+          "Names": {
+            "en": "user",
+            "de": "benutzer"
+          },
+          "Descriptions": {
+            "en": "The user to timeout.",
+            "de": "Der Benutzer der in den Timeout geschickt werden soll."
+          }
+        },
+        {
+          "Names": {
+            "en": "duration",
+            "de": "dauer"
+          },
+          "Descriptions": {
+            "en": "How long this user will be timed out for.",
+            "de": "Wie lang dieser Benutzer im Timeout sein wird."
+          }
+        },
+        {
+          "Names": {
+            "en": "reason",
+            "de": "grund"
+          },
+          "Descriptions": {
+            "en": "The reason why this user is in timeout.",
+            "de": "Der Grund warum der Benutzer im Timeout ist."
+          }
+        }
+      ]
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "remove-timeout",
+        "de": "timeout-entfernen"
+      },
+      "Descriptions": {
+        "en": "Removes a timeout from the specified user.",
+        "de": "Entfernt den Timeout von dem angegebenen Benutzer."
+      },
+      "Options": [
+        {
+          "Names": {
+            "en": "user",
+            "de": "benutzer"
+          },
+          "Descriptions": {
+            "en": "The user to remove the timeout from.",
+            "de": "Der Benutzer von dem der Timeout entfernt werden soll."
+          }
+        }
+      ]
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "kick",
+        "de": "kick"
+      },
+      "Descriptions": {
+        "en": "Kicks the specified user.",
+        "de": "Kickt den angegebenen Benutzer vom Server."
+      },
+      "Options": [
+        {
+          "Names": {
+            "en": "user",
+            "de": "benutzer"
+          },
+          "Descriptions": {
+            "en": "The user to kick.",
+            "de": "Der Benutzer der gekickt werden soll."
+          }
+        },
+        {
+          "Names": {
+            "en": "reason",
+            "de": "grund"
+          },
+          "Descriptions": {
+            "en": "The reason why this user was kicked.",
+            "de": "Der Grund warum dieser Benutzer gekickt wurde."
+          }
+        }
+      ]
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "ban",
+        "de": "ban"
+      },
+      "Descriptions": {
+        "en": "Bans the specified user.",
+        "de": "Bannt den angegebenen Benutzer vom Server."
+      },
+      "Options": [
+        {
+          "Names": {
+            "en": "user",
+            "de": "benutzer"
+          },
+          "Descriptions": {
+            "en": "The user to ban.",
+            "de": "Der Benutzer der gebannt werden soll."
+          }
+        },
+        {
+          "Names": {
+            "en": "days",
+            "de": "tage"
+          },
+          "Descriptions": {
+            "en": "Delete messages younger than x days.",
+            "de": "Nachrichten löschen die jünger als x Tage sind."
+          }
+        },
+        {
+          "Names": {
+            "en": "reason",
+            "de": "grund"
+          },
+          "Descriptions": {
+            "en": "The reason why this user was banned.",
+            "de": "Der Grund warum dieser Benutzer gebannt wurde."
+          }
+        }
+      ]
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "softban",
+        "de": "softban"
+      },
+      "Descriptions": {
+        "en": "Soft bans the specified user. (Bans & unbans user immediately.)",
+        "de": "Soft-bannt den angegebenen Benutzer vom Server. (Bannt & entbannt Nutzer)"
+      },
+      "Options": [
+        {
+          "Names": {
+            "en": "user",
+            "de": "benutzer"
+          },
+          "Descriptions": {
+            "en": "The user to ban.",
+            "de": "Der Benutzer der soft-gebannt werden soll."
+          }
+        },
+        {
+          "Names": {
+            "en": "days",
+            "de": "tage"
+          },
+          "Descriptions": {
+            "en": "Delete messages younger than x days.",
+            "de": "Nachrichten löschen die jünger als x Tage sind."
+          }
+        },
+        {
+          "Names": {
+            "en": "reason",
+            "de": "grund"
+          },
+          "Descriptions": {
+            "en": "The reason why this user was soft banned.",
+            "de": "Der Grund warum dieser Benutzer soft-gebannt wurde."
+          }
+        }
+      ]
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "unban",
+        "de": "unban"
+      },
+      "Descriptions": {
+        "en": "Unbans the specified user.",
+        "de": "Entbannt den angegebenen Benutzer vom Server."
+      },
+      "Options": [
+        {
+          "Names": {
+            "en": "user",
+            "de": "benutzer"
+          },
+          "Descriptions": {
+            "en": "The user to unban.",
+            "de": "Der Benutzer der entbannt werden soll."
+          }
+        }
+      ]
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "follow",
+        "de": "folgen"
+      },
+      "Descriptions": {
+        "en": "Allows you to follow an announcement channel from our support server.",
+        "de": "Erlaubt es dir Neugkeitenkanälen von unserem Supportserver zu folgen."
+      },
+      "Options": [
+        {
+          "Names": {
+            "en": "channel",
+            "de": "kanal"
+          },
+          "Descriptions": {
+            "en": "The channel to follow.",
+            "de": "Der Kanal dem du folgen möchtest."
+          },
+          "Choices": [
+            {
+              "Names": {
+                "en": "GithubUpdates",
+                "de": "GithubUpdates"
+              }
+            },
+            {
+              "Names": {
+                "en": "GlobalBans",
+                "de": "GlobalBans"
+              }
+            },
+            {
+              "Names": {
+                "en": "News",
+                "de": "News"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "moveall",
+        "de": "moveall"
+      },
+      "Descriptions": {
+        "en": "Move all users in your Voice Channel to another Voice Channel.",
+        "de": "Verschiebt alle Benutzer in deinen Sprachkanal zu einem anderen Sprachkanal."
+      },
+      "Options": [
+        {
+          "Names": {
+            "en": "channel",
+            "de": "kanal"
+          },
+          "Descriptions": {
+            "en": "The channel to move to.",
+            "de": "Der neue Sprachkanal."
+          }
+        }
+      ]
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "movehere",
+        "de": "movehere"
+      },
+      "Descriptions": {
+        "en": "Move all users from another Voice Channel to your Voice Channel.",
+        "de": "Verschiebt alle Benutzer von einem anderen Sprachkanal zu deinem Sprachkanal."
+      },
+      "Options": [
+        {
+          "Names": {
+            "en": "channel",
+            "de": "kanal"
+          },
+          "Descriptions": {
+            "en": "The channel to move from.",
+            "de": "Der Sprachkanal."
+          }
+        }
+      ]
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "customembed",
+        "de": "customembed"
+      },
+      "Descriptions": {
+        "en": "Create an embedded message.",
+        "de": "Erlaubt es dir eine eigene eingebettete Nachricht zu erstellen."
+      }
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "override-bump-time",
+        "de": "bump-zeit-überschreiben"
+      },
+      "Descriptions": {
+        "en": "Allows fixing of the last bump in case Disboard did not properly post a message.",
+        "de": "Erlaubt es dir die letzte Bump Zeit zu überschreiben."
+      }
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "developertools",
+        "de": "entwicklerwerkzeuge"
+      },
+      "Descriptions": {
+        "en": "Developer Tools used to manage Makoto.",
+        "de": "Entwicklerwerkzeuge um Makoto zu verwalten."
+      },
+      "Options": [
+        {
+          "Names": {
+            "en": "command",
+            "de": "befehl"
+          },
+          "Descriptions": {
+            "en": "The command you want to run.",
+            "de": "Der Befehl der ausgeführt werden soll."
+          }
+        },
+        {
+          "Names": {
+            "en": "argument1",
+            "de": "argument1"
+          },
+          "Descriptions": {
+            "en": "Argument 1, if required",
+            "de": "Argument 1, falls nötig"
+          }
+        },
+        {
+          "Names": {
+            "en": "argument2",
+            "de": "argument2"
+          },
+          "Descriptions": {
+            "en": "Argument 2, if required",
+            "de": "Argument 2, falls nötig"
+          }
+        },
+        {
+          "Names": {
+            "en": "argument3",
+            "de": "argument3"
+          },
+          "Descriptions": {
+            "en": "Argument 3, if required",
+            "de": "Argument 3, falls nötig"
+          }
+        }
+      ]
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "data",
+        "de": "daten"
+      },
+      "Descriptions": {
+        "en": "Allows you to request or manage your user data.",
+        "de": "Erlaubt es dir deine Nutzerdaten anzufragen oder zu verwalten."
+      },
+      "Commands": [
+        {
+          "Names": {
+            "en": "request",
+            "de": "anfragen"
+          },
+          "Descriptions": {
+            "en": "Allows you to request your user data.",
+            "de": "Erlaubt es dir deine Nutzerdaten anzufragen."
+          }
+        },
+        {
+          "Names": {
+            "en": "delete",
+            "de": "löschen"
+          },
+          "Descriptions": {
+            "en": "Allows you to delete your user data and stop Makoto from further processing your user data.",
+            "de": "Erlaubt es dir deine Nutzerdaten zu löschen und Makoto die weitere Datenverarbeitung zu verbieten."
+          }
+        },
+        {
+          "Names": {
+            "en": "policy",
+            "de": "policy"
+          },
+          "Descriptions": {
+            "en": "Allows you to view how Makoto processes your data.",
+            "de": "Erklärt wie Makoto deine Daten behandelt und verarbeitet."
+          }
+        }
+      ]
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "vcc",
+        "de": "vcc"
+      },
+      "Descriptions": {
+        "en": "Allows you to modify your own voice channel.",
+        "de": "Erlaubt es dir dein persönlichen Sprachkanal zu bearbeiten."
+      },
+      "Commands": [
+        {
+          "Names": {
+            "en": "open",
+            "de": "öffnen"
+          },
+          "Descriptions": {
+            "en": "Opens your channel so new users can freely join.",
+            "de": "Öffnet dein Sprachkanal für alle Benutzer."
+          }
+        },
+        {
+          "Names": {
+            "en": "close",
+            "de": "schließen"
+          },
+          "Descriptions": {
+            "en": "Closes your channel. You have to invite people for them to join.",
+            "de": "Schließt deinen Sprachkanal für alle Benutzer."
+          }
+        },
+        {
+          "Names": {
+            "en": "name",
+            "de": "name"
+          },
+          "Descriptions": {
+            "en": "Changes the name of your channel.",
+            "de": "Ändert den Namen von deinen Sprachkanal."
+          },
+          "Options": [
+            {
+              "Names": {
+                "en": "name",
+                "de": "name"
+              },
+              "Descriptions": {
+                "en": "The new name.",
+                "de": "Der neue Name."
+              }
+            }
+          ]
+        },
+        {
+          "Names": {
+            "en": "limit",
+            "de": "limit"
+          },
+          "Descriptions": {
+            "en": "Changes user limit of your channel.",
+            "de": "Ändert das Benutzerlimit von deinen Sprachkanal."
+          },
+          "Options": [
+            {
+              "Names": {
+                "en": "limit",
+                "de": "limit"
+              },
+              "Descriptions": {
+                "en": "The new limit.",
+                "de": "Das neue Limit."
+              }
+            }
+          ]
+        },
+        {
+          "Names": {
+            "en": "invite",
+            "de": "einladen"
+          },
+          "Descriptions": {
+            "en": "Invites a new person to your channel.",
+            "de": "Lädt eine neue Person zu deinem Sprachkanal ein."
+          },
+          "Options": [
+            {
+              "Names": {
+                "en": "user",
+                "de": "benutzer"
+              },
+              "Descriptions": {
+                "en": "The user to invite.",
+                "de": "Der Benutzer der eingeladen werden soll."
+              }
+            }
+          ]
+        },
+        {
+          "Names": {
+            "en": "kick",
+            "de": "kick"
+          },
+          "Descriptions": {
+            "en": "Kicks a person from your channel.",
+            "de": "Kickt eine Person aus deinem Sprachkanal."
+          },
+          "Options": [
+            {
+              "Names": {
+                "en": "user",
+                "de": "benutzer"
+              },
+              "Descriptions": {
+                "en": "The user to kick.",
+                "de": "Der Benutzer der gekickt werden soll."
+              }
+            }
+          ]
+        },
+        {
+          "Names": {
+            "en": "ban",
+            "de": "ban"
+          },
+          "Descriptions": {
+            "en": "Bans a person from your channel.",
+            "de": "Bannt eine Person aus deinem Sprachkanal."
+          },
+          "Options": [
+            {
+              "Names": {
+                "en": "user",
+                "de": "benutzer"
+              },
+              "Descriptions": {
+                "en": "The user to ban.",
+                "de": "Der Benutzer der gebannt werden soll."
+              }
+            }
+          ]
+        },
+        {
+          "Names": {
+            "en": "unban",
+            "de": "unban"
+          },
+          "Descriptions": {
+            "en": "Unbans a person from your channel.",
+            "de": "Entbannt eine Person aus deinem Sprachkanal."
+          },
+          "Options": [
+            {
+              "Names": {
+                "en": "user",
+                "de": "benutzer"
+              },
+              "Descriptions": {
+                "en": "The user to unban.",
+                "de": "Der Benutzer der entbannt werden soll."
+              }
+            }
+          ]
+        },
+        {
+          "Names": {
+            "en": "change-owner",
+            "de": "besitzer-ändern"
+          },
+          "Descriptions": {
+            "en": "Sets a new person to be the owner of your channel.",
+            "de": "Setzt einen anderen Benutzer als den Besitzer von deinem Sprachkanal."
+          },
+          "Options": [
+            {
+              "Names": {
+                "en": "user",
+                "de": "benutzer"
+              },
+              "Descriptions": {
+                "en": "The user that will receive the channel.",
+                "de": "Der Benutzer der den Kanal bekommt."
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "debug",
+        "de": "debug"
+      },
+      "Descriptions": {
+        "en": "Debug commands, only registered in this server.",
+        "de": "Debug Befehle, nur in diesem Server registriert."
+      },
+      "Commands": [
+        {
+          "Names": {
+            "en": "throw",
+            "de": "throw"
+          },
+          "Descriptions": {
+            "en": "throw",
+            "de": "throw"
+          }
+        },
+        {
+          "Names": {
+            "en": "test",
+            "de": "test"
+          },
+          "Descriptions": {
+            "en": "test",
+            "de": "test"
+          },
+          "Options": [
+            {
+              "Names": {
+                "en": "test"
+              },
+              "Descriptions": {
+                "en": "test"
+              }
+            }
+          ]
+        },
+        {
+          "Names": {
+            "en": "tfa-register",
+            "de": "tfa-register"
+          },
+          "Descriptions": {
+            "en": "tfa-register",
+            "de": "tfa-register"
+          }
+        },
+        {
+          "Names": {
+            "en": "tfa-test",
+            "de": "tfa-test"
+          },
+          "Descriptions": {
+            "en": "tfa-test",
+            "de": "tfa-test"
+          }
+        }
+      ]
+    },
+    {
+      "Type": 1,
+      "Names": {
+        "en": "config",
+        "de": "einstellungen"
+      },
+      "Descriptions": {
+        "en": "Allows you to configure Makoto.",
+        "de": "Erlaubt es dir Einstellungen von Makoto zu ändern."
+      },
+      "Commands": [
+        {
+          "Names": {
+            "en": "join",
+            "de": "beitritt"
+          },
+          "Descriptions": {
+            "en": "Allows you to review and change settings in the event somebody joins the server.",
+            "de": "Erlaubt es dir die aktuelle Beitritts-Konfiguration anzusehen oder zu ändern."
+          }
+        },
+        {
+          "Names": {
+            "en": "experience",
+            "de": "erfahrung"
+          },
+          "Descriptions": {
+            "en": "Allows you to review and change settings related to experience.",
+            "de": "Erlaubt es dir die aktuelle Erfahrungs-Konfiguration anzusehen oder zu ändern."
+          }
+        },
+        {
+          "Names": {
+            "en": "levelrewards",
+            "de": "rang-belohnungen"
+          },
+          "Descriptions": {
+            "en": "Allows you to review, add and change Level Rewards.",
+            "de": "Erlaubt es dir die aktuelle Rang Belohnungen Konfiguration anzusehen oder zu bearbeiten."
+          }
+        },
+        {
+          "Names": {
+            "en": "phishing",
+            "de": "phishing"
+          },
+          "Descriptions": {
+            "en": "Allows you to review and change settings related to phishing link protection.",
+            "de": "Erlaubt es dir die aktuellen Phishingschutz Konfiguration anzusehen oder zu bearbeiten."
+          }
+        },
+        {
+          "Names": {
+            "en": "bumpreminder",
+            "de": "bump-erinnerungen"
+          },
+          "Descriptions": {
+            "en": "Allows you to review, set up and change settings related to the Bump Reminder.",
+            "de": "Erlaubt es dir die aktuelle Bump-Erinnerungen Konfiguration anzusehen oder zu bearbeiten."
+          }
+        },
+        {
+          "Names": {
+            "en": "actionlog",
+            "de": "aktions-protokoll"
+          },
+          "Descriptions": {
+            "en": "Allows you to review and change settings related to the actionlog.",
+            "de": "Erlaubt es dir die aktuelle Aktionsprotokoll Konfiguration anzusehen oder zu bearbeiten."
+          }
+        },
+        {
+          "Names": {
+            "en": "autocrosspost",
+            "de": "autocrosspost"
+          },
+          "Descriptions": {
+            "en": "Allows you to review and change settings related to automatic crossposting.",
+            "de": "Erlaubt es dir die aktuelle Auto Crosspost Konfiguration anzusehen oder zu bearbeiten."
+          }
+        },
+        {
+          "Names": {
+            "en": "reactionroles",
+            "de": "reaktionsrollen"
+          },
+          "Descriptions": {
+            "en": "Allows you to review and change settings related to Reaction Roles.",
+            "de": "Erlaubt es dir die aktuelle Reaktionsrollen Konfiguration anzusehen oder zu bearbeiten."
+          }
+        },
+        {
+          "Names": {
+            "en": "invoiceprivacy",
+            "de": "sprachkanal-privatsphäre"
+          },
+          "Descriptions": {
+            "en": "Allows you to review and change settings related to In-Voice Text Channel Privacy.",
+            "de": "Erlaubt es dir die aktuelle In-Voice Text Text Privacy Konfiguration anzusehen oder zu bearbeiten."
+          }
+        },
+        {
+          "Names": {
+            "en": "invitetracker",
+            "de": "einladungstracker"
+          },
+          "Descriptions": {
+            "en": "Allows you to review and change settings related to Invite Tracking.",
+            "de": "Erlaubt es dir die aktuelle Einladungstracker Konfiguration anzusehen oder zu bearbeiten."
+          }
+        },
+        {
+          "Names": {
+            "en": "namenormalizer",
+            "de": "namen-normalisierer"
+          },
+          "Descriptions": {
+            "en": "Allows you to review and change settings related to automatic name normalization.",
+            "de": "Erlaubt es dir die aktuelle Namen-Normalisierer Konfiguration anzusehen oder zu bearbeiten."
+          }
+        },
+        {
+          "Names": {
+            "en": "autounarchive",
+            "de": "autounarchive"
+          },
+          "Descriptions": {
+            "en": "Allows you to review and change settings related to automatic thread unarchiving.",
+            "de": "Erlaubt es dir die aktuelle Konfiguration für das Auto Entarchievieren anzusehen oder zu bearbeiten."
+          }
+        },
+        {
+          "Names": {
+            "en": "embedmessages",
+            "de": "nachrichten-einbetten"
+          },
+          "Descriptions": {
+            "en": "Allows you to review and change settings related to automatic message embedding.",
+            "de": "Erlaubt es dir die aktuelle Konfiguration für das erweiterte Nachrichten einbetten zu bearbeiten."
+          }
+        },
+        {
+          "Names": {
+            "en": "tokendetection",
+            "de": "token-erkennung"
+          },
+          "Descriptions": {
+            "en": "Allows you to review and change settings related to automatic token invalidation.",
+            "de": "Erlaubt es dir die aktuelle Konfiguration für das Token Invalidation anzusehen oder zu bearbeiten."
+          }
+        },
+        {
+          "Names": {
+            "en": "invitenotes",
+            "de": "einladungsnotizen"
+          },
+          "Descriptions": {
+            "en": "Allows you to add notes to invite codes.",
+            "de": "Erlaubt es dir die aktuelle Konfiguration für Einladungsnotizen anzusehen oder zu bearbeiten."
+          }
+        },
+        {
+          "Names": {
+            "en": "vccreator",
+            "de": "vccreator"
+          },
+          "Descriptions": {
+            "en": "Allows you to review and change settings related to the Voice Channel Creator.",
+            "de": "Erlaubt es dir die aktuelle Konfiguration für persönliche Sprachkanäle anzusehen oder zu bearbeiten."
+          }
+        },
+        {
+          "Names": {
+            "en": "guild-prefix",
+            "de": "server-prefix"
+          },
+          "Descriptions": {
+            "en": "Allows you to review and change settings related to the guild's prefix.",
+            "de": "Erlaubt es dir die aktuelle Konfiguration für das Server Prefix anzusehen oder zu bearbeiten."
+          }
+        },
+        {
+          "Names": {
+            "en": "guild-language",
+            "de": "server-sprache"
+          },
+          "Descriptions": {
+            "en": "Allows you to review and change settings related to the guild's selected language.",
+            "de": "Erlaubt es dir die aktuelle Konfiguration für die Serversprache anzusehen oder zu bearbeiten."
+          }
+        }
+      ]
+    }
+  ],
+  "Common": {
+    "Permissions": {
+      "None": {
+        "en": "None",
+        "de": "Keine"
+      },
+      "All": {
+        "en": "All",
+        "de": "Alle"
+      },
+      "CreateInstantInvite": {
+        "en": "Create Invite",
+        "de": "Einladung erstellen"
+      },
+      "KickMembers": {
+        "en": "Kick Members",
+        "de": "Member kicken"
+      },
+      "BanMembers": {
+        "en": "Ban Members",
+        "de": "Member bannen"
+      },
+      "Administrator": {
+        "en": "Administrator",
+        "de": "Administrator"
+      },
+      "ManageChannels": {
+        "en": "Manage Channels",
+        "de": "Kanäle verwalten"
+      },
+      "ManageGuild": {
+        "en": "Manage Guild",
+        "de": "Server verwalten"
+      },
+      "AddReactions": {
+        "en": "Add Reactions",
+        "de": "Reaktionen hinzufügen"
+      },
+      "ViewAuditLog": {
+        "en": "View AuditLog",
+        "de": "AuditLog ansehen"
+      },
+      "PrioritySpeaker": {
+        "en": "Priority Speaker",
+        "de": "Prioritätssprecher"
+      },
+      "Stream": {
+        "en": "Screenshare",
+        "de": "Bildschirmübertragung"
+      },
+      "AccessChannels": {
+        "en": "View Channels",
+        "de": "Kanäle sehen"
+      },
+      "SendMessages": {
+        "en": "Send Messages",
+        "de": "Nachrichten senden"
+      },
+      "SendTtsMessages": {
+        "en": "Send TTS Messages",
+        "de": "TTS Nachrichten senden"
+      },
+      "ManageMessages": {
+        "en": "Mange Messages",
+        "de": "Nachrichten verwalten"
+      },
+      "EmbedLinks": {
+        "en": "Embed Links",
+        "de": "Links einbetten"
+      },
+      "AttachFiles": {
+        "en": "Attach Files",
+        "de": "Dateien anhängen"
+      },
+      "ReadMessageHistory": {
+        "en": "Read Message History",
+        "de": "Nachrichtenverlauf lesen"
+      },
+      "MentionEveryone": {
+        "en": "Mention Everyone",
+        "de": "Alle erwähnen"
+      },
+      "UseExternalEmojis": {
+        "en": "Use External Emojis",
+        "de": "Externe Emojis verwenden"
+      },
+      "ViewGuildInsights": {
+        "en": "View Guild Insights",
+        "de": "Server-Einblicke anzeigen"
+      },
+      "UseVoice": {
+        "en": "Use Voice",
+        "de": "Verbinden"
+      },
+      "Speak": {
+        "en": "Speak",
+        "de": "Sprechen"
+      },
+      "MuteMembers": {
+        "en": "Mute Members",
+        "de": "Member stummschalten"
+      },
+      "DeafenMembers": {
+        "en": "Deafen Members",
+        "de": "Ein- und Ausgabe von Membern deaktivieren"
+      },
+      "MoveMembers": {
+        "en": "Move Members",
+        "de": "Member verschieben"
+      },
+      "UseVoiceDetection": {
+        "en": "Use Voice Detection",
+        "de": "Sprachaktivierung verwenden"
+      },
+      "ChangeNickname": {
+        "en": "Change Nickname",
+        "de": "Nickname ändern"
+      },
+      "ManageNicknames": {
+        "en": "Manage Nicknames",
+        "de": "Nicknames verwalten"
+      },
+      "ManageRoles": {
+        "en": "Manage Roles",
+        "de": "Rollen bearbeiten"
+      },
+      "ManageWebhooks": {
+        "en": "Manage Webhooks",
+        "de": "Webhooks verwalten"
+      },
+      "ManageGuildExpressions": {
+        "en": "Manage Guild's Sounds",
+        "de": "Serversounds verwalten"
+      },
+      "UseApplicationCommands": {
+        "en": "Use Application Commands",
+        "de": "Anwendungsbefehle verwenden"
+      },
+      "RequestToSpeak": {
+        "en": "Request To Speak",
+        "de": "Redeanfrage"
+      },
+      "ManageEvents": {
+        "en": "Manage Events",
+        "de": "Events verwalten"
+      },
+      "ManageThreads": {
+        "en": "Manage Threads",
+        "de": "Threads verwalten"
+      },
+      "CreatePublicThreads": {
+        "en": "Create Public Threads",
+        "de": "Öffentliche Threads erstellen"
+      },
+      "CreatePrivateThreads": {
+        "en": "Create Private Threads",
+        "de": "Private Threads erstellen"
+      },
+      "UseExternalStickers": {
+        "en": "Use External Stickers",
+        "de": "Externe Sticker verwenden"
+      },
+      "SendMessagesInThreads": {
+        "en": "Send Messages In Threads",
+        "de": "Nachrichten in Threads versenden"
+      },
+      "StartEmbeddedActivities": {
+        "en": "Start Activities",
+        "de": "Aktivitäten starten"
+      },
+      "ModerateMembers": {
+        "en": "Moderate Members",
+        "de": "Member moderieren"
+      },
+      "ViewCreatorMonetizationInsights": {
+        "en": "View Creator Monetization Insights",
+        "de": "Creator Monetarisierungseinblicke anzeigen"
+      },
+      "UseSoundboard": {
+        "en": "Use Soundboard",
+        "de": "Soundboard verwenden"
+      },
+      "CreateGuildExpressions": {
+        "en": "Create Guild Expressions",
+        "de": "Sounds erstellen"
+      },
+      "CreateEvents": {
+        "en": "Create Events",
+        "de": "Events erstellen"
+      },
+      "UseExternalSounds": {
+        "en": "Use External Sounds",
+        "de": "Externe Sounds verwenden"
+      },
+      "SendVoiceMessages": {
+        "en": "Send Voice Messages",
+        "de": "Sprachnachricht senden"
+      }
+    },
+    "Time": {
+      "Years": {
+        "en": "Years",
+        "de": "Jahre"
+      },
+      "Year": {
+        "en": "Year",
+        "de": "Jahr"
+      },
+      "Months": {
+        "en": "Months",
+        "de": "Monate"
+      },
+      "Month": {
+        "en": "Month",
+        "de": "Monat"
+      },
+      "Days": {
+        "en": "Days",
+        "de": "Tage"
+      },
+      "Day": {
+        "en": "Day",
+        "de": "Tag"
+      },
+      "Hours": {
+        "en": "Hours",
+        "de": "Stunden"
+      },
+      "Hour": {
+        "en": "Hour",
+        "de": "Stunde"
+      },
+      "Minutes": {
+        "en": "Minutes",
+        "de": "Minuten"
+      },
+      "Minute": {
+        "en": "Minute",
+        "de": "Minute"
+      },
+      "Seconds": {
+        "en": "Seconds",
+        "de": "Sekunden"
+      },
+      "Second": {
+        "en": "Second",
+        "de": "Sekunde"
+      }
+    },
+    "MissingTranslation": {
+      "en": "Missing Translation",
+      "de": "Fehlende Übersetzung"
+    },
+    "Yes": {
+      "en": "Yes",
+      "de": "Ja"
+    },
+    "No": {
+      "en": "No",
+      "de": "Nein"
+    },
+    "On": {
+      "en": "On",
+      "de": "An"
+    },
+    "Off": {
+      "en": "Off",
+      "de": "Aus"
+    },
+    "Confirm": {
+      "en": "Confirm",
+      "de": "Bestätigen"
+    },
+    "Deny": {
+      "en": "Deny",
+      "de": "Ablehnen"
+    },
+    "Submit": {
+      "en": "Submit",
+      "de": "Absenden"
+    },
+    "Cancel": {
+      "en": "Cancel",
+      "de": "Abbrechen"
+    },
+    "Back": {
+      "en": "Back",
+      "de": "Zurück"
+    },
+    "Page": {
+      "en": "Page",
+      "de": "Seite"
+    },
+    "PreviousPage": {
+      "en": "Previous Page",
+      "de": "Vorherige Seite"
+    },
+    "NextPage": {
+      "en": "Next Page",
+      "de": "Nächste Seite"
+    },
+    "Refresh": {
+      "en": "Refresh",
+      "de": "Neu laden"
+    },
+    "NotSelected": {
+      "en": "Not yet selected.",
+      "de": "Noch nicht ausgewählt."
+    },
+    "Reason": {
+      "en": "Reason",
+      "de": "Grund"
+    },
+    "JumpToMessage": {
+      "en": "Jump to message",
+      "de": "Zur Nachricht springen"
+    }
+  },
+  "Commands": {
+    "Common": {
+      "Errors": {
+        "Generic": {
+          "en": "You dont have permissions to use the command '{CurrentCommand}'. You need to be {Required} to use this command.",
+          "de": "Du hast nicht die benötigten Berechtigungen um den Befehl '{CurrentCommand}' zu verwenden. Du musst '{Required}' sein."
+        },
+        "NoMember": {
+          "en": "The user you tagged is required to be on this server for this command to run.",
+          "de": "Der gewählte Benutzer muss auf dem Server sein um diesen Befehl zu verwenden."
+        },
+        "BotOwner": {
+          "en": "You dont have permissions to use the command '{CurrentCommand}'. You need to be {Required} to use this command.",
+          "de": "Du hast nicht die benötigten Berechtigungen um den Befehl '{CurrentCommand}' zu verwenden. Du musst {Required} sein."
+        },
+        "VoiceChannel": {
+          "en": "You aren't in a voice channel.",
+          "de": "Du befindest dich nicht in einem Sprachkanal."
+        },
+        "UserBan": {
+          "en": "You are currently banned from using this bot: {Reason}",
+          "de": "Die Nutzung des Bots ist aktuell gesperrt für dich: {Reason}"
+        },
+        "GuildBan": {
+          "en": "This guild is currently banned from using this bot: {Reason}",
+          "de": "Die Nutzung des Bots ist gesperrt auf diesem Server: {Reason}"
+        },
+        "ExclusivePrefix": {
+          "en": "This command is exclusive to prefix commands.",
+          "de": "Dieser Befehl ist limitiert zur Verwendung als Prefixbefehl."
+        },
+        "ExclusiveApp": {
+          "en": "This command is exclusive to application commands.",
+          "de": "Dieser Befehl ist limitiert zur Verwendung als Applikationsbefehl."
+        },
+        "Data": {
+          "en": "You objected to having your data being processed. To run commands, please run '{Command}' again to re-allow data processing.",
+          "de": "Du hast Datenverarbeitung verweigert. Um Befehle erneut verwenden zu können, verwende '{Command}'."
+        },
+        "BotPermissions": {
+          "en": "The bot is missing permissions to run this command. Please assign the bot '{Required}' to use this command.",
+          "de": "Dem Bot fehlen benötigte Berechtigungen. Bitte erteile die Berechtigung '{Required}' um diesen Befehl zu verwenden."
+        },
+        "DirectMessage": {
+          "en": "I am unable to send you a direct message. Please make sure you have the server's direct messages on and you don't have me blocked.",
+          "de": "Ich kann dir keine Direktnachricht senden. Bitte stelle sicher dass du mich nicht blockiert hast und Direktnachrichten auf diesem Server an hast."
+        },
+        "UploadInProgress": {
+          "en": "An upload interaction is already taking place. Please finish it beforehand.",
+          "de": "Eine Upload Interaktion läuft bereits. Bitte beende diese bevor du eine weitere startest."
+        },
+        "NoRoles": {
+          "en": "Could not find any roles in your server.",
+          "de": "Es konnten keine Rollen in deinem Server gefunden werden."
+        },
+        "NoChannels": {
+          "en": "Could not find any fitting channels in your server.",
+          "de": "Es konnten keine passenden Kanäle in deinem Server gefunden werden."
+        },
+        "CommandDisabled": {
+          "en": "The command '{Command}' is currently disabled.",
+          "de": "Der Befehl '{Command}' ist aktuell deaktiviert."
+        },
+        "UnhandledException": {
+          "en": [
+            "An unhandled exception occured while trying to execute your command.",
+            "The exception has been reported and we will be working on a resolution soon.",
+            "{Message}",
+            "_The message will be deleted {Timestamp}._"
+          ],
+          "de": [
+            "Es ist eine unerwarteter Fehler aufgetreten.",
+            "Der Fehler wurde gemeldet und wir werden an einer Lösung arbeiten.",
+            "{Message}",
+            "_Diese Nachricht wird {Timestamp} gelöscht._"
+          ]
+        }
+      },
+      "Prompts": {
+        "ConfirmSelection": {
+          "en": "Confirm Selection",
+          "de": "Auswahl bestätigen"
+        },
+        "Disable": {
+          "en": "Disable",
+          "de": "Deaktivieren"
+        },
+        "CreateRoleForMe": {
+          "en": "Create one for me",
+          "de": "Erstelle Rolle für mich"
+        },
+        "SelectARole": {
+          "en": "Select a role..",
+          "de": "Eine Rolle auswählen.."
+        },
+        "SelectEveryone": {
+          "en": "Select @everyone",
+          "de": "@everyone auswählen"
+        },
+        "SelectedRoleUnavailable": {
+          "en": "The selected role is managed or unavailable to you. Please select another role.",
+          "de": "Die gewählte Rolle wird automatisch verwaltet oder ist nicht verfügbar für dich. Bitte wähle eine andere Rolle."
+        },
+        "CreateChannelForMe": {
+          "en": "Create a new channel",
+          "de": "Erstelle ein neuen Kanal"
+        },
+        "SelectAChannel": {
+          "en": "Select a channel..",
+          "de": "Einen Kanal auswählen.."
+        },
+        "SelectAnOption": {
+          "en": "Select an option..",
+          "de": "Eine Option auswählen.."
+        },
+        "ReOpenModal": {
+          "en": "Re-Open Modal",
+          "de": "Modal erneut öffnen.."
+        },
+        "WaitingForModalResponse": {
+          "en": "Waiting for a modal response..",
+          "de": "Warte auf Modalantwort.."
+        },
+        "SelectATimeSpan": {
+          "en": "Select a time span",
+          "de": "Wähle eine Zeitspanne"
+        },
+        "TimespanSeconds": {
+          "en": "Seconds (max. {Max})",
+          "de": "Sekunden (max. {Max})"
+        },
+        "TimespanMinutes": {
+          "en": "Minutes (max. {Max})",
+          "de": "Minuten (max. {Max})"
+        },
+        "TimespanHours": {
+          "en": "Hours (max. {Max})",
+          "de": "Stunden (max. {Max})"
+        },
+        "TimespanDays": {
+          "en": "Days  (max. {Max})",
+          "de": "Tage  (max. {Max})"
+        },
+        "CurrentTimespan": {
+          "en": "Currently selected Timespan",
+          "de": "Aktuell-gewählte Zeitspanne"
+        },
+        "ManuallyDefineTimespan": {
+          "en": "Manually define Timespan",
+          "de": "Zeitspanne manuell auswählen"
+        },
+        "CurrentDateTime": {
+          "en": "Currently selected Date & Time",
+          "de": "Aktuell-gewählter Zeitpunkt"
+        },
+        "SelectADateTime": {
+          "en": "Select a date and time",
+          "de": "Ein Datum auswählen"
+        },
+        "ManuallyDefineDateTime": {
+          "en": "Manually define Date & Time",
+          "de": "Zeitpunkt manuell auswählen"
+        },
+        "SelectTimezonePrompt": {
+          "en": "Please select your timezone.",
+          "de": "Bitte wähle deine Zeitzone aus."
+        },
+        "SelectTimezone": {
+          "en": "Change timezone",
+          "de": "Zeitzone ändern"
+        },
+        "DateTimeMinute": {
+          "en": "Minute",
+          "de": "Minute"
+        },
+        "DateTimeHour": {
+          "en": "Hour",
+          "de": "Stunde"
+        },
+        "DateTimeDay": {
+          "en": "Day",
+          "de": "Tag"
+        },
+        "DateTimeMonth": {
+          "en": "Month",
+          "de": "Monat"
+        },
+        "DateTimeYear": {
+          "en": "Year",
+          "de": "Jahr"
+        }
+      },
+      "Cooldown": {
+        "SlowDown": {
+          "en": "Please slow down. Your previous command is still queued.",
+          "de": "Bitte warte einen Moment. Dein vorheriger Befehl ist noch in der Warteschlange."
+        },
+        "CancelCommand": {
+          "en": "Cancel Command",
+          "de": "Befehl abbrechen"
+        },
+        "WaitingForCooldown": {
+          "en": "You're still on cooldown for this command. Your command will be executed {Timestamp}.",
+          "de": "Dein Befehl befindet sich in der Warteschlange. Dein Befehl wird {Timestamp} ausgeführt."
+        }
+      },
+      "UsedByFooter": {
+        "en": "Command used by {User}",
+        "de": "Befehl verwendet von {User}"
+      },
+      "InteractionTimeout": {
+        "en": "Interaction timed out",
+        "de": "Interaktionszeit ist abgelaufen"
+      },
+      "InteractionFinished": {
+        "en": "Interaction finished",
+        "de": "Interaktion abgeschlossen"
+      },
+      "DirectMessageRedirect": {
+        "en": "I've sent you a message via direct messages.",
+        "de": "Ich habe dir eine Nachricht via Direktnachrichten gesendet."
+      }
+    },
+    "ModuleNames": {
+      "Utility": {
+        "en": "Utility",
+        "de": "Allgemein"
+      },
+      "Social": {
+        "en": "Social",
+        "de": "Sozial"
+      },
+      "Music": {
+        "en": "Music",
+        "de": "Musik"
+      },
+      "Moderation": {
+        "en": "Moderation",
+        "de": "Moderation"
+      },
+      "Configuration": {
+        "en": "Configuration",
+        "de": "Konfiguration"
+      },
+      "Unknown": {
+        "en": "Unknown",
+        "de": "Unbekannt"
+      }
+    },
+    "Utility": {
+      "Help": {
+        "Module": {
+          "en": "{Module} Commands",
+          "de": "{Module} Befehle"
+        },
+        "Disclaimer": {
+          "en": "Arguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n**Do not include the brackets when using commands, they're merely an indicator for requirement.**",
+          "de": "Argumente in einem `[]` sind optional, Argumente in einem `<>` sind benötigt.\n**Dies sind nur Indikatoren, füge sie nicht hinzu wenn du einen Befehl benutzt.**"
+        },
+        "MissingCommand": {
+          "en": "No such command found.",
+          "de": "Dieser Befehl existiert nicht."
+        }
+      },
+      "Language": {
+        "Disclaimer": {
+          "en": "You can choose to override the chosen language on Discord.",
+          "de": "Du kannst dich dazu entscheiden die gewählte Sprache auf Discord zu überschreiben."
+        },
+        "Response": {
+          "en": "Current Locale",
+          "de": "Aktuelle Sprache"
+        },
+        "DisableOverride": {
+          "en": "Disable the current override",
+          "de": "Aktuelles Override deaktivieren"
+        },
+        "Selector": {
+          "en": "Select a new language..",
+          "de": "Eine neue Sprache wählen.. "
+        }
+      },
+      "Avatar": {
+        "Avatar": {
+          "en": "Avatar of {User}",
+          "de": "Profilbild von {User}"
+        },
+        "ShowServerProfile": {
+          "en": "Show Server Profile Picture",
+          "de": "Server Profilbild anzeigen"
+        },
+        "ShowUserProfile": {
+          "en": "Show Profile Picture",
+          "de": "Profilbild anzeigen"
+        }
+      },
+      "Banner": {
+        "Banner": {
+          "en": "Banner of {User}",
+          "de": "Banner von {User}"
+        },
+        "NoBanner": {
+          "en": "This user has no banner.",
+          "de": "Dieser Nutzer hat kein Banner."
+        }
+      },
+      "Credits": {
+        "Fetching": {
+          "en": "Fetching contributors..",
+          "de": "Lade Unterstützer.."
+        },
+        "Credits": {
+          "en": [
+            "{BotName} is mainly being developed and maintained by {Developer}.",
+            "",
+            "These people help me manage and/or test the bot: {DiscordStaffList}",
+            "",
+            "{BotName} had some help from the following people:",
+            "",
+            "{GitHubContList}",
+            "",
+            "{BotName} wouldn't be possible without {Library}, which was made by these people:",
+            "{LibraryContList} and {LibraryContCount} more.",
+            "",
+            "Special thanks go to {PhishingListRepos} who publicly provide a list of phishing urls."
+          ],
+          "de": [
+            "{BotName} wird hauptsächlich von {Developer} entwickelt.",
+            "",
+            "Diese Leute helfen mir, den Bot zu verwalten und/oder zu testen: {DiscordStaffList}",
+            "",
+            "{BotName} hatte Hilfe von den folgenden Personen:",
+            "",
+            "{GitHubContList}",
+            "",
+            "{BotName} wäre nicht möglich ohne {Library}, was von diesen netten Leuten entwickelt wird:",
+            "{LibraryContList} und {LibraryContCount} weitere.",
+            "",
+            "Ein dickes Danke geht an die, die öffentlich eine Liste von schädlichen Domains hosten: {PhishingListRepos}"
+          ]
+        }
+      },
+      "EmojiStealer": {
+        "Emoji": {
+          "en": "emojis",
+          "de": "Emojis"
+        },
+        "Sticker": {
+          "en": "stickers",
+          "de": "Sticker"
+        },
+        "DownloadingPre": {
+          "en": "Downloading emojis of this message..",
+          "de": "Lade Emojis dieser Nachricht herunter.."
+        },
+        "NoEmojis": {
+          "en": "This message doesn't contain any emojis or stickers.",
+          "de": "Diese Nachricht enthält keine Emojis oder Sticker."
+        },
+        "DownloadingEmojis": {
+          "en": "Downloading {Count} emojis of this message..",
+          "de": "Lade {Count} Emojis herunter.."
+        },
+        "DownloadingStickers": {
+          "en": "Downloading {Count} stickers of this message..",
+          "de": "Lade {Count} Sticker herunter.."
+        },
+        "NoSuccessfulDownload": {
+          "en": "This message doesn't contain any emojis or stickers.",
+          "de": "Diese Nachricht enthält keine Emojis oder Sticker."
+        },
+        "ReceivePrompt": {
+          "en": "Select how you want to receive the downloaded {Type}.",
+          "de": "Wähle wie die {Type} gesendet werden sollen."
+        },
+        "ToggleStickers": {
+          "en": "Include Stickers",
+          "de": "Sticker beinhalten"
+        },
+        "AddEmojisToServer": {
+          "en": "Add Emoji(s) to Server",
+          "de": "Emoji(s) zum Server hinzufügen"
+        },
+        "AddEmojisAndStickerToServer": {
+          "en": "Add Emoji(s) and Sticker(s) to Server",
+          "de": "Emoji(s) und Sticker zum Server hinzufügen"
+        },
+        "DirectMessageZip": {
+          "en": "Direct Message as Zip File",
+          "de": "Direktnachricht, als Zip Datei"
+        },
+        "DirectMessageSingle": {
+          "en": "Direct Message as Single Files",
+          "de": "Direktnachricht, als einzelne Dateien"
+        },
+        "CurrentChatZip": {
+          "en": "This chat as Zip File",
+          "de": "Dieser Kanal, als Zip Datei"
+        },
+        "AddEmojisToServerLoading": {
+          "en": "Adding {Min}/{Max} emojis to this server..",
+          "de": "Füge {Min}/{Max} Emojis zum Server hinzu.."
+        },
+        "AddStickersToServerLoading": {
+          "en": "Adding {Min}/{Max} stickers to this server..",
+          "de": "Füge {Min}/{Max} Sticker zum Server hinzu.."
+        },
+        "AddToServerLoadingNotice": {
+          "en": "_The bot most likely hit a rate limit. This can take up to an hour to continue._\n_If you want this to change, go scream at Discord. There's nothing i can do._",
+          "de": "_Der Bot hat wahrscheinlich ein Rate Limit überschritten._\n_Wenn du willst dass Emojis adden schneller geht, schrei Discord an. Es gibt nichts was ich tun kann._"
+        },
+        "NoMoreRoom": {
+          "en": "Downloaded and added {Count} emojis to the server. There is no more room for additional emojis.",
+          "de": "{Count} Emojis heruntergeladen und zum Server hinzugefügt. Es gibt keinen Platz für weitere Emojis."
+        },
+        "SuccessAdded": {
+          "en": "Downloaded and added {Count} emojis to the server.",
+          "de": "{Count} Emojis heruntergeladen und zum Server hinzugefügt."
+        },
+        "SendingDm": {
+          "en": "Sending the {Type} in your DMs..",
+          "de": "Sende die {Type} in deine Direktnachrichten.."
+        },
+        "SuccessDm": {
+          "en": "Heyho! Here's the {Type} you requested.",
+          "de": "Heyho! Hier sind die {Type} die du angefragt hast."
+        },
+        "SuccessDmMain": {
+          "en": "Downloaded and sent {Count} {Type} to your DMs.",
+          "de": "{Count} {Type} heruntergeladen und per Direktnachricht an dich gesendet."
+        },
+        "PreparingZip": {
+          "en": "Preparing your Zip File..",
+          "de": "Deine Zip Datei wird vorbereitet.."
+        },
+        "SendingZipDm": {
+          "en": "Sending your Zip File via DM..",
+          "de": "Deine Zip Datei wird per Direktnachricht gesendet.."
+        },
+        "SendingZipChat": {
+          "en": "Sending your Zip File in this chat..",
+          "de": "Deine Zip Datei wird hier gesendet.."
+        },
+        "SuccessChat": {
+          "en": "Downloaded {Count} {Type}. Attached is a Zip File containing them.",
+          "de": "{Count} {Type} heruntergeladen und in diesem Chat gesendet."
+        }
+      },
+      "GuildInfo": {
+        "Fetching": {
+          "en": "Fetching guild info..",
+          "de": "Lade Server Info.."
+        },
+        "MemberTitle": {
+          "en": "Members",
+          "de": "Benutzer"
+        },
+        "OnlineMembers": {
+          "en": "Online Members",
+          "de": "Online Benutzer"
+        },
+        "MaxMembers": {
+          "en": "Max Members",
+          "de": "Maximale Anzahl an Benutzer"
+        },
+        "GuildTitle": {
+          "en": "Guild Details",
+          "de": "Server Details"
+        },
+        "Owner": {
+          "en": "Owner",
+          "de": "Besitzer"
+        },
+        "Creation": {
+          "en": "Creation Date",
+          "de": "Erstellungsdatum"
+        },
+        "Locale": {
+          "en": "Preferred Locale",
+          "de": "Bevorzugte Sprache"
+        },
+        "Boosts": {
+          "en": "Boosts",
+          "de": "Boosts"
+        },
+        "BoostsNone": {
+          "en": "None",
+          "de": "Level 0"
+        },
+        "BoostsTierOne": {
+          "en": "Tier One",
+          "de": "Level 1"
+        },
+        "BoostsTierTwo": {
+          "en": "Tier Two",
+          "de": "Level 2"
+        },
+        "BoostsTierThree": {
+          "en": "Tier Three",
+          "de": "Level 3"
+        },
+        "Widget": {
+          "en": "Widget",
+          "de": "Widget"
+        },
+        "Community": {
+          "en": "Community",
+          "de": "Community"
+        },
+        "Security": {
+          "en": "Security",
+          "de": "Sicherheit"
+        },
+        "MultiFactor": {
+          "en": "2FA required for mods",
+          "de": "2-Faktor Authentifizierung benötigt für Mods"
+        },
+        "Screening": {
+          "en": "Membership Screening",
+          "de": "Benutzer Screening"
+        },
+        "WelcomeScreen": {
+          "en": "Welcome Screen",
+          "de": "Willkommensbildschirm"
+        },
+        "Verification": {
+          "en": "Verification Level",
+          "de": "Verifikationslevel"
+        },
+        "VerificationNone": {
+          "en": "None",
+          "de": "Aus"
+        },
+        "VerificationLow": {
+          "en": "Low",
+          "de": "Niedrig"
+        },
+        "VerificationMedium": {
+          "en": "Medium",
+          "de": "Mittel"
+        },
+        "VerificationHigh": {
+          "en": "High",
+          "de": "Hoch"
+        },
+        "VerificationHighest": {
+          "en": "Highest",
+          "de": "Am Höchsten"
+        },
+        "ExplicitContent": {
+          "en": "Scan for explicit content of",
+          "de": "Suche nach explizitem Content von"
+        },
+        "ExplicitContentNone": {
+          "en": "No members",
+          "de": "Niemanden"
+        },
+        "ExplicitContentNoRoles": {
+          "en": "Members without roles",
+          "de": "Benutzer ohne Rollen"
+        },
+        "ExplicitContentEveryone": {
+          "en": "All members",
+          "de": "Jedem"
+        },
+        "Nsfw": {
+          "en": "NSFW Level",
+          "de": "NSFW Level"
+        },
+        "NsfwNoRating": {
+          "en": "No Rating",
+          "de": "Keine Bewertung"
+        },
+        "NsfwExplicit": {
+          "en": "Explicit, Only suitable for mature audiences",
+          "de": "Explizit, Nur geeignet für Erwachsene"
+        },
+        "NsfwSafe": {
+          "en": "Safe, Suitable for all age groups",
+          "de": "Sicher, Geeignet für alle Altersgruppen"
+        },
+        "NsfwQuestionable": {
+          "en": "Questionable, May only be suitable for mature audiences",
+          "de": "Fragwürdig, Möglicherweise nur geeignet für Erwachsene"
+        },
+        "DefaultNotifications": {
+          "en": "Default Notifications",
+          "de": "Standard Nachrichten"
+        },
+        "DefaultNotificationsAll": {
+          "en": "All messages",
+          "de": "Alle Nachrichten"
+        },
+        "DefaultNotificationsMentions": {
+          "en": "Mentions only",
+          "de": "Nur Makierungen"
+        },
+        "SpecialChannels": {
+          "en": "Special Channels",
+          "de": "Spezialkanäle"
+        },
+        "Rules": {
+          "en": "Rules",
+          "de": "Regeln"
+        },
+        "CommunityUpdates": {
+          "en": "Community Updates",
+          "de": "Community Updates"
+        },
+        "InactiveChannel": {
+          "en": "Inactive Channel",
+          "de": "Inaktivitätskanal"
+        },
+        "InactiveTimeout": {
+          "en": "Inactive Timeout",
+          "de": "Inaktivitätstimeout"
+        },
+        "SystemMessages": {
+          "en": "System Messages",
+          "de": "System Nachrichten"
+        },
+        "SystemMessagesWelcome": {
+          "en": "Welcome Messages",
+          "de": "Willkommensnachrichten"
+        },
+        "SystemMessagesWelcomeStickers": {
+          "en": "Welcome Sticker Replies",
+          "de": "Stickerantworten für Willkommensnachrichten"
+        },
+        "SystemMessagesBoost": {
+          "en": "Boost Messages",
+          "de": "Boost Nachrichten"
+        },
+        "SystemMessagesRole": {
+          "en": "Role Purchase Message",
+          "de": "Rollenkaufnachrichten"
+        },
+        "SystemMessagesRoleSticker": {
+          "en": "Role Purchase Sticker Replies",
+          "de": "Stickerantworten für Rollenkaufnachrichten"
+        },
+        "SystemMessagesSetupTips": {
+          "en": "Server Setup Tips",
+          "de": "Servereinrichtungstipps"
+        },
+        "GuildFeatures": {
+          "en": "Guild Features",
+          "de": "Server Features"
+        },
+        "JoinServer": {
+          "en": "Join Guild",
+          "de": "Server beitreten"
+        },
+        "GuildPreviewNotice": {
+          "en": "Info fetched via Discord Guild Preview",
+          "de": "Info abgerufen durch Discord Server Vorschau"
+        },
+        "GuildWidgetNotice": {
+          "en": "Info fetched via Discord Guild Widget",
+          "de": "Info abgerufen durch Discord Server Widget"
+        },
+        "Mee6Notice": {
+          "en": "Info fetched via Mee6 Leaderboard",
+          "de": "Info abgerufen durch Mee6 Rangliste"
+        },
+        "NoGuildFound": {
+          "en": "Could not fetch any information about the server you specified.",
+          "de": "Es konnten keine Informationen über den angegebenen Server gefunden werden."
+        },
+        "Banner": {
+          "en": "Banner",
+          "de": "Banner"
+        },
+        "Splash": {
+          "en": "Splash",
+          "de": "Titelbild"
+        },
+        "DiscoverySplash": {
+          "en": "Discovery Splash",
+          "de": "Entdeckungs-Splash"
+        },
+        "HomeHeader": {
+          "en": "Home Header",
+          "de": "Startseiten-Header"
+        }
+      },
+      "Leaderboard": {
+        "Title": {
+          "en": "Experience Leaderboard",
+          "de": "Erfahrungsrangliste"
+        },
+        "Disabled": {
+          "en": "Experience is disabled on this server. Please run '{Command}' to configure the experience system.",
+          "de": "Erfahrung ist deaktiviert auf diesem Server. Bitte führe '{Command}' aus um das Erfahrungssystem zu konfigurieren."
+        },
+        "Fetching": {
+          "en": "Loading Leaderboard, please wait..",
+          "de": "Lade Rangliste, bitte warten.."
+        },
+        "Level": {
+          "en": "Level {Level} with {Points} XP",
+          "de": "Level {Level} mit {Points} XP"
+        },
+        "Placement": {
+          "en": "You're currently on the **{Placement}.** spot on the leaderboard.",
+          "de": "Du bist aktuell auf **{Placement}.** Platz in der Rangliste."
+        },
+        "NoPoints": {
+          "en": "No one on this server has collected enough experience to show up on the leaderboard, get to typing!",
+          "de": "Niemand hat genug Erfahrung gesammelt. Fangt an zu schreiben! ^^"
+        }
+      },
+      "Rank": {
+        "Title": {
+          "en": "Experience",
+          "de": "Erfahrung"
+        },
+        "Self": {
+          "en": "You're currently **Level {Level} with {Points} XP**",
+          "de": "Du bist aktuell **Level {Level} mit {Points} XP**"
+        },
+        "Other": {
+          "en": "{User} is currently **Level {Level} with {Points} XP**",
+          "de": "{User} ist aktuell **Level {Level} mit {Points} XP**"
+        },
+        "Progress": {
+          "en": "Level {Level} Progress",
+          "de": "Level {Level} Fortschritt"
+        }
+      },
+      "Reminders": {
+        "Title": {
+          "en": "Reminders",
+          "de": "Erinnerungen"
+        },
+        "NewReminder": {
+          "en": "New Reminder",
+          "de": "Neue Erinnerung"
+        },
+        "Snooze": {
+          "en": "Snooze",
+          "de": "Schlummern"
+        },
+        "DeleteReminder": {
+          "en": "Delete a Reminder",
+          "de": "Eine Erinnerung löschen"
+        },
+        "Count": {
+          "en": "You have {Count} reminders.",
+          "de": "Du hast {Count} Erinnerungen."
+        },
+        "CreatedOn": {
+          "en": "Created on {Guild}",
+          "de": "Erstellt auf {Guild}"
+        },
+        "CreatedAt": {
+          "en": "Created at {Timestamp}",
+          "de": "Erstellt um {Timestamp}"
+        },
+        "DueTime": {
+          "en": "Due {Relative} ({DateTime})",
+          "de": "Fällig {Relative} ({DateTime})"
+        },
+        "Notice": {
+          "en": "For reminders to work, you need to enable Direct Messages on at least one server you share with {Bot}",
+          "de": "Um dass Erinnerungen funktionieren musst du auf einem Server mit {Bot} teilst, Direktnachrichten aktivieren."
+        },
+        "InvalidDateTime": {
+          "en": "You specified a date in the past or a date further away than 6 months.",
+          "de": "Du hast eine Zeit in der Vergangenheit oder länger als 6 Monate in der Zukunft liegt gewählt."
+        },
+        "SetDescription": {
+          "en": "Set Description",
+          "de": "Beschreibung auswählen"
+        },
+        "SetDateTime": {
+          "en": "Set Due Date & Time",
+          "de": "Erinnerungszeit festlegen"
+        },
+        "Description": {
+          "en": "Description",
+          "de": "Beschreibung"
+        },
+        "DateTime": {
+          "en": "Due Date & Time",
+          "de": "Erinnerungszeit"
+        },
+        "SentLate": {
+          "en": "This reminder has been sent late because of a recent bot outage.",
+          "de": "Diese Erinnerung konnte nicht pünktlich gesendet werden auf Grund von einem Ausfall."
+        },
+        "ReminderNotification": {
+          "en": "Reminder Notification",
+          "de": "Erinnerungsnachricht"
+        }
+      },
+      "ReportHost": {
+        "Title": {
+          "en": "Malicious Host Submissions",
+          "de": "Böswillige Host Meldungen"
+        },
+        "AcceptTos": {
+          "en": "I accept these conditions",
+          "de": "Ich akzeptiere diese Regeln"
+        },
+        "Tos": {
+          "en": [
+            "{1}. You may not submit Hosts that are non-malicious.",
+            "{2}. You may not spam submissions.",
+            "{3}. You may not submit unregistered hosts.",
+            "{4}. You accept that your user account and current server will be tracked and visible to Makoto staff.",
+            "",
+            "We reserve the right to ban you for any reason that may not be listed.",
+            "**Failing to follow these conditions may get you or your guild blacklisted from using this bot.**",
+            "**This includes, but is not limited to, pre-existing guilds with your ownership and future guilds.**"
+          ],
+          "de": [
+            "{1}. Du darfst keine unschädlichen Hosts melden.",
+            "{2}. Du darfst Hosts nicht wiederholt melden.",
+            "{3}. Hosts müssen registriert sein.",
+            "{4}. Du akzeptierst dass dein Benutzer Account und aktueller Server der Einsendung beigelegt sind.",
+            "",
+            "Wir behalten außerdem das Recht dich auch für jeden anderen Grund vom System auszuschließen.",
+            "**Das Brechen oder Umgehen diesen Regeln wird dazu führen dass du oder dieser Server von der Verwendung des Bots ausgeschlossen wirst.**",
+            "**Das beinhaltet, ist aber nicht limiert auf, bereits existierende Server die du besitzt und Server die du zukünftig erstellst.**"
+          ]
+        },
+        "TosChangedNotice": {
+          "en": "The submission conditions have changed since you last accepted them. Please re-read them and agree to the new condiditions to continue.",
+          "de": "Die Einsendungsbedingungen haben sich geändert. Bitte lese sie erneut und stimme ihnen zu um fortzufahren."
+        },
+        "Processing": {
+          "en": "Processing your request..",
+          "de": "Verarbeite deine Anfrage.."
+        },
+        "CooldownError": {
+          "en": "You're on cooldown. You submit another host {Timestamp}.",
+          "de": "Du hast erst einen Host gemeldet. Du kannst einen weiteren Host {Timestamp} melden."
+        },
+        "LimitError": {
+          "en": "You have 5 open host submissions. Please wait before trying to submit another host.",
+          "de": "Du hast 5 offene Host Meldungen. Bitte warte bis du weitere Hosts meldest."
+        },
+        "InvalidHost": {
+          "en": "The host '{Host}' is invalid.",
+          "de": "Der Host '{Host}' ist ungültig."
+        },
+        "ConfirmHost": {
+          "en": "You are about to submit the host '{Host}'. Do you want to proceed?",
+          "de": "Du bist dabei den Host '{Host}' zu melden. Möchtest du fortfahren?"
+        },
+        "DatabaseCheck": {
+          "en": "Checking if your host is already in the datbase..",
+          "de": "Überprüfe ob sich der Host bereits in der Datenbank befindet.."
+        },
+        "DatabaseError": {
+          "en": "The host '{Host}' is already present in the database. Thanks for trying to contribute regardless.",
+          "de": "Der Host '{Host}' befindet sich bereits in der Datenbank. Wir danken allerdings trotzdem für den Versuch uns zu unterstützen."
+        },
+        "SubmissionCheck": {
+          "en": "Checking if your host has already been submitted..",
+          "de": "Überprüfe ob der Host bereits gemeldet wurde.."
+        },
+        "SubmissionError": {
+          "en": "The host '{Host}' has already been submitted. Thanks for trying to contribute regardless.",
+          "de": "Der Host '{Host}' wurde bereits gemeldet. Wir danken allerdings trotzdem für den Versuch uns zu unterstützen."
+        },
+        "CreatingSubmission": {
+          "en": "Creating submission..",
+          "de": "Erstelle Meldung.."
+        },
+        "SubmissionCreated": {
+          "en": "Submission created. Thank you for your contribution.",
+          "de": "Host gemeldet. Vielen Dank für deine Unterstützung."
+        }
+      },
+      "ReportTranslation": {
+        "Title": {
+          "en": "Translation Error Reports",
+          "de": "Übersetzungsfehler Meldungen"
+        },
+        "AcceptTos": {
+          "en": "I accept these conditions",
+          "de": "Ich akzeptiere diese Regeln"
+        },
+        "Tos": {
+          "en": [
+            "{1}. You may not report correct translations.",
+            "{2}. You may not spam reports.",
+            "{3}. You accept that your user account and current server will be tracked and visible to Makoto staff.",
+            "{4}. You accept that Makoto staff may contact you through direct messages or this guild for additional information.",
+            "",
+            "We reserve the right to ban you for any reason that may not be listed.",
+            "**Failing to follow these conditions may get you or your guild blacklisted from using this bot.**",
+            "**This includes, but is not limited to, pre-existing guilds with your ownership and future guilds.**"
+          ],
+          "de": [
+            "{1}. Du darfst keine korrekten Text melden.",
+            "{2}. Du darfst Meldungen nicht wiederholt senden.",
+            "{3}. Du akzeptierst dass dein Benutzer Account und aktueller Server der Einsendung beigelegt sind.",
+            "{4}. Du akzeptierst dass das Team von Makoto dich eventuell per Direktnachrichten oder diesen Server kontaktiert für weitere Informationen.",
+            "",
+            "Wir behalten außerdem das Recht dich auch für jeden anderen Grund vom System auszuschließen.",
+            "**Das Brechen oder Umgehen diesen Regeln wird dazu führen dass du oder dieser Server von der Verwendung des Bots ausgeschlossen wirst.**",
+            "**Das beinhaltet, ist aber nicht limiert auf, bereits existierende Server die du besitzt und Server die du zukünftig erstellst.**"
+          ]
+        },
+        "TosChangedNotice": {
+          "en": "The report conditions have changed since you last accepted them. Please re-read them and agree to the new condiditions to continue.",
+          "de": "Die Meldungsbedingungen haben sich geändert. Bitte lese sie erneut und stimme ihnen zu um fortzufahren."
+        },
+        "ConfirmationPrompt": {
+          "en": "Please remember, we may follow up on this report through direct messages or this server for more information. Should the report be submitted?",
+          "de": "Bitte denk daran dass wir eventuell mehr Information benötigen und dich auf Grund dessen über Direktnachrichten oder diesen Server kontaktieren. Soll die Meldung eingereicht werden?"
+        },
+        "RatelimitReached": {
+          "en": "You've reached your maximum amount of reports per day. Please try again {Timestamp}.",
+          "de": "Du hast die maxmimale Anzahl an Meldungen pro Tag erreicht. Bitte versuche es erneut {Timestamp}."
+        },
+        "ReportSubmitted": {
+          "en": "Your report has been submitted. We will check your report as soon as possible. Please remember, we may follow up on this report for more information.",
+          "de": "Deine Meldung wurde eingereicht. Wir werden die Meldung überprüfen sobald es uns möglich ist. Bitte denk daran dass wir eventuell mehr Information benötigen und dich auf Grund dessen kontaktieren."
+        }
+      },
+      "Upload": {
+        "NoInteraction": {
+          "en": "You have not yet started an upload interactions. Please only run this command when instructed to by the bot.",
+          "de": "Du hast keine Upload Interaktion gestartet. Bitte führe diesen Befehl nur aus wenn du dazu aufgefordert wirst vom Bot."
+        },
+        "AlreadyUploaded": {
+          "en": "You already uploaded your file.",
+          "de": "Du hast bereits eine Datei hochgeladen."
+        },
+        "TimedOut": {
+          "en": "Your upload interaction timed out {Timestamp}.",
+          "de": "Deine Upload Interakation ist {Timestamp} abgelaufen."
+        },
+        "Uploaded": {
+          "en": "Your file has been uploaded.",
+          "de": "Deine Datei wurde hochgeladen."
+        }
+      },
+      "UrbanDictionary": {
+        "AdultContentError": {
+          "en": "Urban Dictionary can potentially contain Adult Content. Please run this command within a channel marked as Age-Restricted.",
+          "de": "Urban Dictionary kann möglicherweise Inhalte nur für Erwachsene enthalten. Bitte führe diesen Befehl innerhalb eines Kanals aus welcher als altersbegrenzt makiert ist."
+        },
+        "AdultContentWarning": {
+          "en": "Urban Dictionary can potentially contain Adult Content. Continue?",
+          "de": "Urban Dictionary kann möglicherwise Inhalte nur für Erwachsene enthalten. Möchtest du fortfahren?"
+        },
+        "LookingUp": {
+          "en": "Looking up '{Term}'..",
+          "de": "Suche nach '{Term}'.."
+        },
+        "LookupFail": {
+          "en": "Failed to look up '{Term}'.",
+          "de": "Die Suche nach '{Term}' ist fehlgeschlagen."
+        },
+        "NotExist": {
+          "en": "'{Term}' was not found in the Urban Dictionary.",
+          "de": "'{Term}' wurde nicht im Urban Dictionary gefunden."
+        },
+        "WrittenBy": {
+          "en": "Written by {Author}",
+          "de": "Geschrieben von {Author}"
+        },
+        "Definition": {
+          "en": "Definition",
+          "de": "Definition"
+        },
+        "Example": {
+          "en": "Example",
+          "de": "Beispiel"
+        }
+      },
+      "UserInfo": {
+        "System": {
+          "en": "System",
+          "de": "System"
+        },
+        "Bot": {
+          "en": "Bot",
+          "de": "Bot"
+        },
+        "NeverJoined": {
+          "en": "User never joined this server.",
+          "de": "Nutzer ist diesem Server noch nie beigetreten."
+        },
+        "NoRoles": {
+          "en": "User doesn't have any roles.",
+          "de": "Nutzer hat keine Rollen."
+        },
+        "NoStoredRoles": {
+          "en": "User doesn't have any stored roles.",
+          "de": "Nutzer hatte keine Rollen."
+        },
+        "IsBanned": {
+          "en": "User is currently banned from this server.",
+          "de": "Nutzer ist aktuell von diesem Server gebannt."
+        },
+        "JoinedBefore": {
+          "en": "User is currently not in this server.",
+          "de": "Nutzer ist aktuell nicht auf dem Server."
+        },
+        "GlobalBanned": {
+          "en": "User is globally banned.",
+          "de": "Nutzer ist global gebannt."
+        },
+        "BotOwner": {
+          "en": "{Bot} Owner",
+          "de": "Besitzer von {Bot}"
+        },
+        "BotStaff": {
+          "en": "{Bot} Staff",
+          "de": "Team von {Bot}"
+        },
+        "Owner": {
+          "en": "This user owns this guild",
+          "de": "Dieser Nutzer besitzt diesen Server."
+        },
+        "DiscordStaff": {
+          "en": "Discord Staff",
+          "de": "Discord Mitarbeiter"
+        },
+        "CertifiedMod": {
+          "en": "Certified Content Moderator",
+          "de": "Zertifizierter Content Moderator"
+        },
+        "VerifiedBotDeveloper": {
+          "en": "Verified Bot Developer",
+          "de": "Verifizierter Bot Entwickler"
+        },
+        "DiscordPartner": {
+          "en": "Discord Partner",
+          "de": "Discord Partner"
+        },
+        "PendingMembership": {
+          "en": "User's Membership pending",
+          "de": "Mitgliedschaft noch nicht bestätigt"
+        },
+        "Roles": {
+          "en": "Roles",
+          "de": "Rollen"
+        },
+        "Backup": {
+          "en": "Backup",
+          "de": "Backup"
+        },
+        "BotNotes": {
+          "en": "{Bot} Staff Notes",
+          "de": "{Bot} Team Notizen"
+        },
+        "NoReason": {
+          "en": "No reason provided.",
+          "de": "Kein Grund angegeben"
+        },
+        "GlobalBanReason": {
+          "en": "Global Ban Reason",
+          "de": "Globaler Banngrund"
+        },
+        "GlobalBanMod": {
+          "en": "Global Ban Moderator",
+          "de": "Globaler Bannmoderator"
+        },
+        "GlobalBanDate": {
+          "en": "Global Ban Date",
+          "de": "Globales Banndatum"
+        },
+        "BanDetails": {
+          "en": "Ban Details",
+          "de": "Banndetails"
+        },
+        "InvitedBy": {
+          "en": "Invited By",
+          "de": "Eingeladen von"
+        },
+        "NoInviter": {
+          "en": "No Inviter found.",
+          "de": "Kein Einladungsdetails gefunden."
+        },
+        "UsersInvited": {
+          "en": "Users invited",
+          "de": "Anzahl von eingeladenen Nutzern"
+        },
+        "ShowProfileInviter": {
+          "en": "Show Profile of Inviter",
+          "de": "Profile vom Einladenen ansehen"
+        },
+        "ServerJoinDate": {
+          "en": "Server Join Date",
+          "de": "Serverbeitrittsdatum"
+        },
+        "ServerLeaveDate": {
+          "en": "Server Leave Date",
+          "de": "Serververlassungsdatum"
+        },
+        "FirstJoinDate": {
+          "en": "First Join Date",
+          "de": "Datum des ersten Beitritts"
+        },
+        "AccountCreationDate": {
+          "en": "Account Creation Date",
+          "de": "Accounterstellungsdatum"
+        },
+        "ServerBoosterSince": {
+          "en": "Server Booster Since",
+          "de": "Serverbooster seit"
+        },
+        "Pronouns": {
+          "en": "Pronouns",
+          "de": "Pronomen"
+        },
+        "BannerColor": {
+          "en": "Banner Color",
+          "de": "Banner Farbe"
+        },
+        "Presence": {
+          "en": "Current Presence",
+          "de": "Aktuelle Presenz"
+        },
+        "Desktop": {
+          "en": "Desktop",
+          "de": "PC"
+        },
+        "Mobile": {
+          "en": "Mobile",
+          "de": "Telefon"
+        },
+        "Web": {
+          "en": "Web",
+          "de": "Internetbrowser"
+        },
+        "Online": {
+          "en": "Online",
+          "de": "Online"
+        },
+        "Offline": {
+          "en": "Offline",
+          "de": "Offline"
+        },
+        "Idle": {
+          "en": "Idle",
+          "de": "Abwesend"
+        },
+        "DoNotDisturb": {
+          "en": "Do Not Disturb",
+          "de": "Bitte nicht stören"
+        },
+        "Activities": {
+          "en": "Current Activities",
+          "de": "Aktuelle Aktivitäten"
+        },
+        "Playing": {
+          "en": "Playing",
+          "de": "Spielt"
+        },
+        "Streaming": {
+          "en": "Streaming",
+          "de": "Streamt"
+        },
+        "ListeningTo": {
+          "en": "Listening to",
+          "de": "Hört"
+        },
+        "Watching": {
+          "en": "Watching",
+          "de": "Schaut"
+        },
+        "Competing": {
+          "en": "Competing",
+          "de": "Konkurriert"
+        },
+        "Status": {
+          "en": "Status",
+          "de": "Status"
+        },
+        "TimedOutUntil": {
+          "en": "Timed out until",
+          "de": "Ausgetimed bis"
+        },
+        "FetchUserError": {
+          "en": "Failed to fetch user '{User}'",
+          "de": "Konnte den Nutzer '{User}' nicht abfragen."
+        }
+      },
+      "Data": {
+        "Request": {
+          "TimeError": {
+            "en": "Your last request was {RequestTimestamp}, please wait until {WaitTimestamp} to request your user data again.",
+            "de": "Ihre letzte Anfrage war {RequestTimestamp}, bitte warten Sie bis {WaitTimestamp} um Ihre Daten erneut anzufragen."
+          },
+          "Fetching": {
+            "en": "Fetching all your user data. This might take a moment..",
+            "de": "Frage alle Ihre gespeicherten Nutzerdaten ab. Dies braucht eventuell einen Moment.."
+          },
+          "Confirm": {
+            "en": "Hello, {User}. Here's your user data you requested. This may contain sensitive information.",
+            "de": "Hallo, {User}. Hier sind Ihre angefragten Nutzerdaten. Dies enthält eventuell sensible Informationen."
+          },
+          "DmNotice": {
+            "en": "I sent your data via direct messages.",
+            "de": "Ich habe Ihnen ihre Nutzerdaten per Direktnachricht gesendet."
+          }
+        },
+        "Policy": {
+          "NoPolicy": {
+            "en": "The privacy policy was not loaded. This is most likely unintended, please report to {Bot} Staff.",
+            "de": "Die Privacy Policy wurde nicht geladen. Dies ist wahrscheinlich ungewohlt, bitte melden Sie dies an das {Bot} Team."
+          }
+        },
+        "Object": {
+          "ProfileAlreadyDeleted": {
+            "en": "You already objected to your data being processed and saved. Do you want to reverse that decision?",
+            "de": "Sie haben bereits das Verarbeiten ihrer Daten verweigert. Möchten Sie diese Entscheidung rückgängig machen?"
+          },
+          "EnablingDataProcessing": {
+            "en": "Okay, removing you from the objection list..",
+            "de": "Sie werden von der Verweigerungsliste entfernt.."
+          },
+          "EnablingDataProcessingError": {
+            "en": "I'm sorry but something went wrong while remove you from the objection list. This exception has been logged and will be fixed asap. Please retry in a few hours.",
+            "de": "Es ist ein Fehler aufgetreten bei dem Versuch Sie von der Verweigerungsliste zu entfernen. Der Fehler wurde gemeldet, bitte versuchen Sie es in wenigen Stunden erneut."
+          },
+          "EnablingDataProcessingSuccess": {
+            "en": "You've been removed from our objection list. You're now able to run commands again.",
+            "de": "Sie wurden von der Verweigerungsliste entfernt. Sie haben erneut Zugriff auf alle Befehle."
+          },
+          "DeletionAlreadyScheduled": {
+            "en": "You objected to your data being processed {RequestTimestamp}, your data will be deleted {ScheduleTimestamp}. Do you want to cancel your account's deletion?",
+            "de": "Sie haben das Verarbeiten ihrer Daten {RequestTimestamp} verweigert und ihre Daten werden {ScheduledTimestamp} gelöscht. Möchten Sie den Vorgang abbrechen?"
+          },
+          "DeletionScheduleReversed": {
+            "en": "Your user data is no longer scheduled for deletion.",
+            "de": "Ihre Nutzerdaten werden nicht mehr gelöscht."
+          },
+          "ObjectionDisclaimer": {
+            "en": [
+              "This action will delete all data related to your user account and object to further creation of an user account.",
+              "",
+              "This will prevent you from using any commands of the bot.",
+              "This will NOT delete data stored for guilds (see GuildData via '/data request').",
+              "**Additionally, this action will make the bot leave every server you own.",
+              "",
+              "**Are you sure you want to continue?"
+            ],
+            "de": [
+              "Dies wird alle Nutzerdaten von Ihnen löschen und weiteres Verarbeiten verbieten.",
+              "",
+              "Dies wird dazu führen, dass Sie keine Befehle mehr von diesem Bot verwenden können.",
+              "Dies wird NICHT server-spezifische Daten löschen. (um diese einzusehen, verwenden sie '/data request').",
+              "",
+              "Sind Sie sich sicher Sie möchten die Verarbeitung ihrer Daten verbieten?"
+            ]
+          },
+          "SecondaryConfirm": {
+            "en": "Please confirm again, are you sure?",
+            "de": "Bitte bestätigen Sie erneut, sind Sie sich sicher?"
+          },
+          "ProfileDeletionScheduled": {
+            "en": "Okay, your data was scheduled for deletion in 14 days.",
+            "de": "Ihre Nutzerdaten werden in 14 Tagen gelöscht."
+          }
+        }
+      },
+      "VoiceChannelCreator": {
+        "NotAVccChannel": {
+          "en": "You're not in a channel created by the Voice Channel Creator.",
+          "de": "Du bist nicht in einem Kanal der vom Voice Channel Creator erstellt wurde."
+        },
+        "NotAVccChannelOwner": {
+          "en": "You don't own this channel.",
+          "de": "Du besitzt diesen Kanal nicht."
+        },
+        "VictimNotPresent": {
+          "en": "{User} is not in your Voice Channel.",
+          "de": "{User} ist nicht in deinem Kanal."
+        },
+        "VictimIsBot": {
+          "en": "{User} is a bot.",
+          "de": "{User} ist ein Bot."
+        },
+        "Events": {
+          "DefaultChannelName": {
+            "en": "{User}'s Channel",
+            "de": "{User}s Kanal"
+          }
+        },
+        "Ban": {
+          "CannotBanSelf": {
+            "en": "You cannot ban yourself.",
+            "de": "Du kannst dich nicht selbst bannen."
+          },
+          "VictimAlreadyBanned": {
+            "en": "{User} has already been banned from your Voice Channel.",
+            "de": "{User} ist bereits von deinem Kanal gebannt."
+          },
+          "VictimBanned": {
+            "en": "{User} has been banned from this channel.",
+            "de": "{User} wurde von deinem Kanal gebannt."
+          }
+        },
+        "ChangeOwner": {
+          "AlreadyOwner": {
+            "en": "{User} is already the owner.",
+            "de": "{User} ist bereits der Besitzer."
+          },
+          "ForceAssign": {
+            "en": "{User} was forcefully assigned as the new owner of this channel.",
+            "de": "{User} wurde als Besitzer erwzungen."
+          },
+          "Success": {
+            "en": "{User} now owns this channel.",
+            "de": "{User} ist der neue Besitzer dieses Kanals."
+          }
+        },
+        "Close": {
+          "Success": {
+            "en": "The channel has been closed.",
+            "de": "Der Kanal wurde geschlossen."
+          }
+        },
+        "Invite": {
+          "CannotInviteSelf": {
+            "en": "You cannot invite yourself.",
+            "de": "Du kannst dich nicht selbst einladen."
+          },
+          "AlreadyPresent": {
+            "en": "{User} is already in your Voice Channel.",
+            "de": "{User} ist bereits in deinem Kanal."
+          },
+          "PartialSuccess": {
+            "en": "{User} can now join this channel. However, i was unable to send a Direct Message to them.",
+            "de": "{User} kann jetzt diesen Kanel beitreten, ich konnte allerdings keine Direktnachricht an {User} versenden."
+          },
+          "Success": {
+            "en": "{User} has been invited to this channel.",
+            "de": "{User} wurde zu diesem Kanal angeladen."
+          },
+          "VictimMessage": {
+            "en": "{User} has invited you to join {Channel}.",
+            "de": "{User} hat dich dazu eingeladen {Channel} zu joinen."
+          }
+        },
+        "Kick": {
+          "CannotKickSelf": {
+            "en": "You cannot kick yourself.",
+            "de": "Du kannst dich nicht selbst kicken."
+          },
+          "Success": {
+            "en": "{User} has been kicked from this channel.",
+            "de": "{User} wurde vom Kanal gekickt."
+          }
+        },
+        "Limit": {
+          "OutsideRange": {
+            "en": "Input outside of range.",
+            "de": "Eingabe außerhalb des Limits."
+          },
+          "Success": {
+            "en": "The channel's user limit has been changed to {Count}.",
+            "de": "Das Kanallimit wurde auf {Count} geändert."
+          }
+        },
+        "Name": {
+          "Cooldown": {
+            "en": "You're on cooldown for renaming this channel. You can rename it again {Timestamp}.",
+            "de": "Du musst noch warten bis du diesen Kanal erneut umbennen kannst. Versuche es erneut {Timestamp}."
+          },
+          "Success": {
+            "en": "The channel has been renamed to {Name}.",
+            "de": "Der Kanal wurde umbenannt zu {Name}."
+          }
+        },
+        "Open": {
+          "Success": {
+            "en": "The channel has been opened.",
+            "de": "Der Kanal wurde geöffnet."
+          }
+        },
+        "Unban": {
+          "VictimNotBanned": {
+            "en": "{User} is not banned from your Voice Channel.",
+            "de": "{User} ist nicht von deinem Kanal gebannt."
+          },
+          "VictimUnbanned": {
+            "en": "{User} has been unbanned from this channel.",
+            "de": "{User} wurde von deinem Kanal entbannt."
+          }
+        }
+      }
+    },
+    "Moderation": {
+      "NoReason": {
+        "en": "No reason provided.",
+        "de": "Kein Grund angegeben."
+      },
+      "Ban": {
+        "AuditLog": {
+          "en": "{FullUser} banned user: {Reason}",
+          "de": "{FullUser} hat Nutzer gebannt: {Reason}"
+        },
+        "Banning": {
+          "en": "Banning {Victim}..",
+          "de": "Banne {Victim}.."
+        },
+        "Banned": {
+          "en": "{Victim} was banned for '{Reason}' by {User}.",
+          "de": "{Victim} wurde von {User} für '{Reason}' gebannt."
+        },
+        "Errored": {
+          "en": "{Victim} could not be banned.",
+          "de": "{Victim} konnte nicht gebannt werden."
+        }
+      },
+      "ClearBackup": {
+        "IsOnServer": {
+          "en": "{Victim} is on the server and therefor their stored nickname and roles cannot be cleared.",
+          "de": "{Victim} ist auf dem Server und daher können deren Nickname und Rollen nicht gelöscht werden."
+        },
+        "Deleted": {
+          "en": "Deleted stored nickname and roles for {Victim}.",
+          "de": "Gespeicherter Nickname und Rollen für {Victim} gelöscht."
+        }
+      },
+      "CustomEmbed": {
+        "UploadNotice": {
+          "en": "Please note: Uploads are being moderated. If your upload is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Makoto. This includes the bot being removed from guilds you own or manage. Please keep it safe.",
+          "de": "Bitte beachte: Hochgeladene Dateien werden moderiert. Falls deine hochgeladene Datei als unangemessen oder andernfalls schädlich erkannt wurde, wird er entfernt und du verliest Zugriff auf Makoto. Dies beinhaltet dass der Bot von Servern entfernt wird welche die besitzt oder verwaltest."
+        },
+        "New": {
+          "en": "New Embed",
+          "de": "Neues Embed"
+        },
+        "SetTitleButton": {
+          "en": "Set Title",
+          "de": "Title setzen"
+        },
+        "SetAuthorButton": {
+          "en": "Set Author",
+          "de": "Autor"
+        },
+        "SetThumbnailButton": {
+          "en": "Set Thumbnail",
+          "de": "Thumbnail setzen"
+        },
+        "SetDescriptionButton": {
+          "en": "Set Description",
+          "de": "Beschreibung setzen"
+        },
+        "SetImageButton": {
+          "en": "Set Image",
+          "de": "Bild setzen"
+        },
+        "SetColorButton": {
+          "en": "Set Color",
+          "de": "Farbe setzen"
+        },
+        "SetTimestampButton": {
+          "en": "Set Timestamp",
+          "de": "Zeitstempel setzen"
+        },
+        "SetFooterButton": {
+          "en": "Set Footer",
+          "de": "Embedfuß setzen"
+        },
+        "AddFieldButton": {
+          "en": "Add Field",
+          "de": "Feld hinzufügen"
+        },
+        "ModifyFieldButton": {
+          "en": "Modify Field",
+          "de": "Feld bearbeiten"
+        },
+        "RemoveFieldButton": {
+          "en": "Remove Field",
+          "de": "Feld entfernen"
+        },
+        "SendEmbedButton": {
+          "en": "Send Embed",
+          "de": "Embed senden"
+        },
+        "ContinueTimer": {
+          "en": "Continuing {Timestamp}..",
+          "de": "Fahre {Timestamp} fort.."
+        },
+        "UploadImage": {
+          "en": "Please upload an image via '{Command}'.",
+          "de": "Bitte lade ein Bild mit dem Befehl '{Command}' hoch."
+        },
+        "ImportingUpload": {
+          "en": "Importing your upload..",
+          "de": "Importiere deine hochgeladene Datei.."
+        },
+        "ImportSizeError": {
+          "en": "Please attach an image below {Size}.",
+          "de": "Bitte hänge ein Bild unter {Size} an."
+        },
+        "ModifyingTitle": {
+          "en": "Modifying Title",
+          "de": "Titel modifizieren"
+        },
+        "TitleField": {
+          "en": "Title",
+          "de": "Titel"
+        },
+        "UrlField": {
+          "en": "Url",
+          "de": "Url"
+        },
+        "SetNameButton": {
+          "en": "Set Name",
+          "de": "Name setzen"
+        },
+        "SetUrlButton": {
+          "en": "Set Url",
+          "de": "Url setzen"
+        },
+        "SetIconButton": {
+          "en": "Set Icon",
+          "de": "Icon setzen"
+        },
+        "SetAsUserButton": {
+          "en": "Set as User",
+          "de": "Als einen Nutzer setzen"
+        },
+        "SetAsServer": {
+          "en": "Set as Server",
+          "de": "Als aktuellen Server setzen"
+        },
+        "ModifyingAuthorName": {
+          "en": "Modifying Author Name",
+          "de": "Autor Name modifizieren"
+        },
+        "NameField": {
+          "en": "Name",
+          "de": "Name"
+        },
+        "ModifyingAuthorUrl": {
+          "en": "Modifying Author Url",
+          "de": "Autor Url modifizieren"
+        },
+        "ModifyingAuthorbyUserId": {
+          "en": "Replacing Author with User",
+          "de": "Ersetze Autor mit Nutzer"
+        },
+        "UserIdField": {
+          "en": "User Id",
+          "de": "Nutzer Id"
+        },
+        "ModifyingDescription": {
+          "en": "Modifying Description",
+          "de": "Beschreibung modifizieren"
+        },
+        "DescriptionField": {
+          "en": "Description",
+          "de": "Beschreibung"
+        },
+        "ModifyingColor": {
+          "en": "Modifying Color",
+          "de": "Farbe modifizieren"
+        },
+        "ColorField": {
+          "en": "Color",
+          "de": "Farbe"
+        },
+        "SetTextButton": {
+          "en": "Set Text",
+          "de": "Text setzen"
+        },
+        "ModifyingFooterText": {
+          "en": "Modifying Footer Text",
+          "de": "Embedfuß- Text modifizieren"
+        },
+        "TextField": {
+          "en": "Text",
+          "de": "Text"
+        },
+        "ModifyingField": {
+          "en": "Modifying Field",
+          "de": "Feld modifizieren"
+        },
+        "InlineField": {
+          "en": "Inline",
+          "de": "Inline"
+        },
+        "NoValidChannels": {
+          "en": "Couldn't find any text or announcement channels in this server.",
+          "de": "Konnte keine Text oder News Kanal in dem Server finden."
+        }
+      },
+      "FollowUpdates": {
+        "Followed": {
+          "en": "Successfully followed {Channel}.",
+          "de": "Erfolgreich {Channel} gefolgt."
+        },
+        "Failed": {
+          "en": "Could not follow {Channel}.",
+          "de": "Konnte {Channel} nicht folgen."
+        }
+      },
+      "GuildPurge": {
+        "Scanning": {
+          "en": "Scanning all channels for messages sent by {Victim}..",
+          "de": "Suche durch alle Kanäle für Nachrichten von {Victim}.."
+        },
+        "Deleting": {
+          "en": "Found {Count} messages sent by {Victim}. Deleting..",
+          "de": "{Count} Nachrichten gefunden die von {Victim} versendet wurden. Lösche Nachrichten.."
+        },
+        "Ended": {
+          "en": "{Min}/{Max} messages across {ChannelCount} channel(s) sent by {Victim} deleted.",
+          "de": "{Mix}/{Max} Nachrichten von {Victim} in {ChannelCount} Kanälen gelöscht."
+        }
+      },
+      "Kick": {
+        "AuditLog": {
+          "en": "{FullUser} kick user: {Reason}",
+          "de": "{FullUser} hat Nutzer gekickt: {Reason}"
+        },
+        "Kicking": {
+          "en": "Kicking {Victim}..",
+          "de": "Kicke {Victim}.."
+        },
+        "Kicked": {
+          "en": "{Victim} was kicked for '{Reason}' by {User}.",
+          "de": "{Victim} wurde für '{Reason}' von {User} gekickt."
+        },
+        "Errored": {
+          "en": "{Victim} could not be kicked.",
+          "de": "{Victim} konnte nicht gekickt werden."
+        }
+      },
+      "ManualBump": {
+        "NotSetUp": {
+          "en": "The bump reminder is not set up.",
+          "de": "Der Bumpreminder ist nicht aktiv."
+        },
+        "Warning": {
+          "en": "Manually overwriting the last bump time will re-schedule the bump reminder as if the server was just bumped. Are you sure you want to continue?",
+          "de": "Manuell den letzten Bump zu überschreiben wird das Bumpen vom Server imitieren und die letzte Bumpzeit auf jetzt setzten. Möchtest du fortfahren?"
+        }
+      },
+      "Move": {
+        "NotAVc": {
+          "en": "The channel you selected is not a voice channel.",
+          "de": "Der Kanal den du gewählt hast ist kein Sprachkanal."
+        },
+        "VcEmpty": {
+          "en": "The channel you selected is empty.",
+          "de": "Der Kanal den du gewählt hast ist leer."
+        },
+        "Moving": {
+          "en": "Moving {Count} users from {Origin} to {Destination}..",
+          "de": "Verschiebe {Count} Benutzer von {Origin} zu {Destination}.."
+        },
+        "Moved": {
+          "en": "Moved {Count} users from {Origin} to {Destination}..",
+          "de": "{Count} Benutzer von {Origin} zu {Destination} verschoben."
+        }
+      },
+      "Purge": {
+        "Fetching": {
+          "en": "Fetching {Count} messages..",
+          "de": "Lade {Count} Nachrichten.."
+        },
+        "Fetched": {
+          "en": "Fetched {Count} messages..",
+          "de": "{Count} Nachrichten geladen.."
+        },
+        "NoMessages": {
+          "en": "No messages were found with the specified filter.",
+          "de": "Keine Nachrichten mit dem angegebenen Filter gefunden."
+        },
+        "Deleted": {
+          "en": "Successfully deleted {Count} messages.",
+          "de": "Erfolgreich {Count} Nachrichten gelöscht."
+        },
+        "Failed": {
+          "en": "Failed to delete {Count} messages because they were more than 14 days old.",
+          "de": "Konnte {Count} Nachrichten nicht löschen da sie älter als 14 Tage sind."
+        }
+      },
+      "RemoveTimeout": {
+        "Removing": {
+          "en": "Removing timeout for {Victim}..",
+          "de": "Entferne Timeout für {Victim}.."
+        },
+        "Removed": {
+          "en": "Removed timeout for {Victim}.",
+          "de": "Timeout von {Victim} entfernt."
+        },
+        "Failed": {
+          "en": "Couldn't remove timeout for {Victim}.",
+          "de": "Konnte den Timeout von {Victim} nicht entfernen."
+        }
+      },
+      "Softban": {
+        "AuditLog": {
+          "en": "{FullUser} soft-banned user: {Reason}",
+          "de": "{FullUser} hat Nutzer gesoftbannt: {Reason}"
+        },
+        "Banning": {
+          "en": "Softbanning {Victim}..",
+          "de": "Soft-banne {Victim}.."
+        },
+        "Banned": {
+          "en": "{Victim} was soft-banned for '{Reason}' by {User}.",
+          "de": "{Victim} wurde für '{Reason}' gesoft-bannt von {User}."
+        },
+        "Errored": {
+          "en": "{Victim} could not be soft-banned.",
+          "de": "{Victim} konnte nicht gesoft-bannt werden."
+        }
+      },
+      "Timeout": {
+        "AuditLog": {
+          "en": "{FullUser} timed user out: {Reason}",
+          "de": "{FullUser} hat Nutzer in Timeout gesetzt: {Reason}"
+        },
+        "TimingOut": {
+          "en": "Timing {Victim} out..",
+          "de": "Time {Victim} aus.."
+        },
+        "TimedOut": {
+          "en": "{Victim} was timed out for '{Reason}'. The timeout will run out {Timestamp}.",
+          "de": "{Victim} wurde für '{Reason}' in Timeout versetzt. Der Timeout wird {Timestamp} ablaufen."
+        },
+        "Failed": {
+          "en": "Couldn't timeout {Victim}.",
+          "de": "Konnte {Victim} nicht in den Timeout versetzen."
+        },
+        "Invalid": {
+          "en": "The Duration you specified is invalid.",
+          "de": "Die Zeitangabe ist ungeültig."
+        }
+      },
+      "Unban": {
+        "Removing": {
+          "en": "Unbanning {Victim}..",
+          "de": "Entbanne {Victim}.."
+        },
+        "Removed": {
+          "en": "{Victim} was unbanned.",
+          "de": "{Victim} wurde entbannt."
+        },
+        "Failed": {
+          "en": "Couldn't unban {Victim}.",
+          "de": "Konnte {Victim} nicht entbannen."
+        }
+      }
+    },
+    "Config": {
+      "ActionLog": {
+        "Title": {
+          "en": "Actionlog",
+          "de": "Aktionsprotokoll"
+        },
+        "ActionlogDisabled": {
+          "en": "The actionlog is disabled.",
+          "de": "Das Aktionsprotokoll ist deaktiviert."
+        },
+        "ActionLogChannel": {
+          "en": "Actionlog Channel",
+          "de": "Aktionsprotokoll Kanal"
+        },
+        "AttemptGatheringMoreDetails": {
+          "en": "Attempt gathering more details",
+          "de": "Versuchen weitere Details zu sammeln"
+        },
+        "UserStateUpdates": {
+          "en": "Joins, Leaves, Kicks",
+          "de": "Beitritte, Austritte, Rauswürfe"
+        },
+        "UserRoleUpdates": {
+          "en": "Nickname, Role Updates",
+          "de": "Nicknames, Rollenänderungen"
+        },
+        "UserProfileUpdates": {
+          "en": "User Profile Updates",
+          "de": "Nutzerprofiländerungen"
+        },
+        "MessageDeletions": {
+          "en": "Message Deletions",
+          "de": "Nachrichtenlöschungen"
+        },
+        "MessageModifications": {
+          "en": "Message Modifications",
+          "de": "Nachrichtenbearbeitung"
+        },
+        "RoleUpdates": {
+          "en": "Role Updates",
+          "de": "Rollenänderungen"
+        },
+        "BanUpdates": {
+          "en": "Banlist Updates",
+          "de": "Bannlistenänderungen"
+        },
+        "ServerModifications": {
+          "en": "Server Modifications",
+          "de": "Serverbearbeitungen"
+        },
+        "ChannelModifications": {
+          "en": "Channel Modifications",
+          "de": "Kanalbearbeitungen"
+        },
+        "VoiceChannelUpdates": {
+          "en": "Voice Channel Updates",
+          "de": "Sprachkanaländerungen"
+        },
+        "InviteModifications": {
+          "en": "Invite Modifications",
+          "de": "Einladungsänderungen"
+        },
+        "DisableActionLogButton": {
+          "en": "Disable Actionlog",
+          "de": "Aktionsprotokoll deaktivieren"
+        },
+        "SetChannelButton": {
+          "en": "Set Channel",
+          "de": "Kanal setzen"
+        },
+        "ChangeChannelButton": {
+          "en": "Change Channel",
+          "de": "Kanal ändern"
+        },
+        "ChangeFilterButton": {
+          "en": "Edit Filter",
+          "de": "Filter bearbeiten"
+        },
+        "OptionInaccurate": {
+          "en": "This option may sometimes be inaccurate.",
+          "de": "Diese Option verursacht eventuell falsche Informationen."
+        },
+        "NoOptions": {
+          "en": "No options selected.",
+          "de": "Keine Optionen ausgewählt."
+        }
+      },
+      "AutoCrosspost": {
+        "Title": {
+          "en": "Auto Crosspost",
+          "de": "Automatisches Crossposting"
+        },
+        "ExcludeBots": {
+          "en": "Exclude Bots",
+          "de": "Bots ausschließen"
+        },
+        "DelayBeforePosting": {
+          "en": "Delay before crossposting",
+          "de": "Verzögerung vor dem Crossposting"
+        },
+        "SetDelayButton": {
+          "en": "Set Delay",
+          "de": "Verzögerung festlegen"
+        },
+        "ToggleExcludeBotsButton": {
+          "en": "Toggle Exclude Bots",
+          "de": "Bots ausschließen umschalten"
+        },
+        "AddChannelButton": {
+          "en": "Add Channel",
+          "de": "Kanal hinzufügen"
+        },
+        "RemoveChannelButton": {
+          "en": "Remove Channel",
+          "de": "Kanal entfernen"
+        },
+        "DurationLimit": {
+          "en": "The duration has to be between 1 second and 5 minutes.",
+          "de": "Die Dauer muss zwischen 1 Sekunde und 5 Minuten liegen."
+        },
+        "ChannelLimit": {
+          "en": "You cannot add more than 20 channels to crosspost. Need more? Ask for approval on our development server: {Invite}",
+          "de": "Du kannst nicht mehr als 20 Kanäle zum Crossposting hinzufügen. Brauchst du mehr? Frage um Genehmigung auf unserem Entwicklungsserver an: {Invite}"
+        },
+        "NoCrosspostChannels": {
+          "en": "No Crosspost Channels are set up.",
+          "de": "Es sind keine Kanäle für das Crossposting eingerichtet."
+        }
+      },
+      "AutoUnarchive": {
+        "Title": {
+          "en": "Auto Thread Unarchiver",
+          "de": "Automatischer Thread-Entarchivierer"
+        },
+        "NoChannels": {
+          "en": "No channels defined.",
+          "de": "Keine Kanäle definiert."
+        },
+        "Explanation": {
+          "en": "This module allows you to automatically unarchive threads of certain channels. **You will need to lock threads to actually archive them.**",
+          "de": "Mit diesem Modul kannst du automatisch Threads bestimmter Kanäle entarchivieren. **Du musst Threads sperren, um sie tatsächlich zu archivieren.**"
+        },
+        "AddChannelButton": {
+          "en": "Add Channel",
+          "de": "Kanal hinzufügen"
+        },
+        "RemoveChannelButton": {
+          "en": "Remove Channel",
+          "de": "Kanal entfernen"
+        }
+      },
+      "BumpReminder": {
+        "Title": {
+          "en": "Bump Reminder",
+          "de": "Bump Erinnerungen"
+        },
+        "BumpReminderEnabled": {
+          "en": "Bump Reminder Enabled",
+          "de": "Bump-Erinnerungen aktiviert"
+        },
+        "BumpReminderChannel": {
+          "en": "Bump Reminder Channel",
+          "de": "Bump-Kanal"
+        },
+        "BumpReminderRole": {
+          "en": "Bump Reminder Role",
+          "de": "Bump-Erinnerungsrolle"
+        },
+        "SetupBumpReminderButton": {
+          "en": "Set up Bump Reminder",
+          "de": "Bump-Erinnerungen einrichten"
+        },
+        "DisableBumpReminderButton": {
+          "en": "Disable Bump Reminder",
+          "de": "Bump-Erinnerungen deaktivieren"
+        },
+        "ChangeChannelButton": {
+          "en": "Change Channel",
+          "de": "Kanal ändern"
+        },
+        "ChangeRoleButton": {
+          "en": "Change Role",
+          "de": "Rolle ändern"
+        },
+        "DisboardMissing": {
+          "en": "The Disboard bot is not on this server. Please create a guild listing on Disboard and invite their bot.",
+          "de": "Der Disboard-Bot ist nicht auf diesem Server. Bitte erstelle einen Eintrag auf Disboard und lade den Bot ein."
+        },
+        "SettingUp": {
+          "en": "Setting up Bump Reminder in this channel..",
+          "de": "Bump-Erinnerungen werden diesem Kanal eingerichtet.."
+        },
+        "SelectRole": {
+          "en": "Please select a role to ping when the server can be bumped.",
+          "de": "Bitte wähle eine Rolle aus, die benachrichtigt wird, wenn der Server wieder gebumpt werden kann."
+        },
+        "CantUseRole": {
+          "en": "The role you selected is already being assigned on join or part of a level reward.",
+          "de": "Die ausgewählte Rolle wird bereits beim Betreten zugewiesen oder ist Teil einer Level-Belohnung."
+        },
+        "ReactionRoleMessage": {
+          "en": "React to this message with {Emoji} to receive notifications as soon as the server can be bumped again.",
+          "de": "Reagiere auf diese Nachricht mit {Emoji}, um Benachrichtigungen zu erhalten, sobald der Server wieder gebumpt werden kann."
+        },
+        "SetupComplete": {
+          "en": "The Bump Reminder has been set up.",
+          "de": "Die Bump-Erinnerungen wurden eingerichtet."
+        },
+        "Disabled": {
+          "en": "The Bump Reminder has been disabled.",
+          "de": "Die Bump-Erinnerungen wurden deaktiviert."
+        }
+      },
+      "EmbedMessages": {
+        "Title": {
+          "en": "Embed Messages",
+          "de": "Nachrichten einbetten"
+        },
+        "EmbedMessageLinks": {
+          "en": "Embed Message Links",
+          "de": "Nachrichtenlink einbetten"
+        },
+        "EmbedGithubCode": {
+          "en": "Embed Github Code",
+          "de": "Github-Code einbetten"
+        },
+        "ToggleMessageLinkButton": {
+          "en": "Toggle Message Link Embeds",
+          "de": "Nachrichtenlink-Einbettungen umschalten"
+        },
+        "ToggleGithubCodeButton": {
+          "en": "Toggle Github Code Embeds",
+          "de": "Github-Code-Einbettungen umschalten"
+        }
+      },
+      "Experience": {
+        "Title": {
+          "en": "Experience",
+          "de": "Erfahrung"
+        },
+        "ExperienceEnabled": {
+          "en": "Experience Enabled",
+          "de": "Erfahrung aktiviert"
+        },
+        "ExperienceBoostForBumpers": {
+          "en": "Experience Boost for Bumpers",
+          "de": "Erfahrungsboost für Bumper"
+        },
+        "ToggleExperienceButton": {
+          "en": "Toggle Experience System",
+          "de": "Erfahrungssystem umschalten"
+        },
+        "ToggleExperienceBoostButton": {
+          "en": "Toggle Experience Boost for Bumpers",
+          "de": "Erfahrungsboost für Bumper umschalten"
+        }
+      },
+      "InviteNotes": {
+        "Title": {
+          "en": "Invite Notes",
+          "de": "Einladungsnotizen"
+        },
+        "NoNotesDefined": {
+          "en": "No Invite Notes defined.",
+          "de": "Keine Einladungsnotizen definiert."
+        },
+        "AddNoteButton": {
+          "en": "Add Note",
+          "de": "Notiz hinzufügen"
+        },
+        "RemoveNoteButton": {
+          "en": "Remove Note",
+          "de": "Notiz entfernen"
+        },
+        "SetNoteButton": {
+          "en": "Set Note",
+          "de": "Notiz setzen"
+        },
+        "SelectInviteButton": {
+          "en": "Select Invite",
+          "de": "Einladung auswählen"
+        },
+        "CreateButton": {
+          "en": "Create Invite Note",
+          "de": "Einladungsnotiz erstellen"
+        },
+        "Note": {
+          "en": "Note",
+          "de": "Notiz"
+        },
+        "Invite": {
+          "en": "Invite",
+          "de": "Einladung"
+        },
+        "InviteDescription": {
+          "en": "Uses: {Uses}; Creator: {Creator}",
+          "de": "Verwendungen: {Uses}; Ersteller: {Creator}"
+        }
+      },
+      "InviteTracker": {
+        "Title": {
+          "en": "Invite Tracker",
+          "de": "Einladungsverfolgung"
+        },
+        "InviteTrackerEnabled": {
+          "en": "Invite Tracker Enabled",
+          "de": "Einladungsverfolgung aktiviert"
+        },
+        "ToggleInviteTrackerButton": {
+          "en": "Toggle Invite Tracker",
+          "de": "Einladungsverfolgung umschalten"
+        }
+      },
+      "InVoicePrivacy": {
+        "Title": {
+          "en": "In-Voice Text Channel Privacy",
+          "de": "Privatsphäre im Sprach-Textkanal"
+        },
+        "ClearMessagesOnLeave": {
+          "en": "Clear User's Messages on Leave",
+          "de": "Nachrichten des Benutzers beim Verlassen löschen"
+        },
+        "SetPermissions": {
+          "en": "Set Permissions on User Join/Leave",
+          "de": "Berechtigungen beim Betreten/Verlassen des Benutzers festlegen"
+        },
+        "ToggleMessageDeletionButton": {
+          "en": "Toggle Message Deletion",
+          "de": "Nachrichtenlöschung umschalten"
+        },
+        "TogglePermissionProtectionButton": {
+          "en": "Toggle Permission Protection",
+          "de": "Berechtigungsschutz umschalten"
+        },
+        "EnabledInVoicePrivacy": {
+          "en": "Enabled In-Voice Privacy",
+          "de": "Privatsphäre im Sprachkanal aktiviert"
+        },
+        "DisabledInVoicePrivacy": {
+          "en": "Disabled In-Voice Privacy",
+          "de": "Privatsphäre im Sprachkanal deaktiviert"
+        }
+      },
+      "Join": {
+        "Title": {
+          "en": "Join Settings",
+          "de": "Beitrittseinstellungen"
+        },
+        "Autoban": {
+          "en": "Autoban Globally Banned Users",
+          "de": "Global-gebannte Benutzer bannen"
+        },
+        "JoinLogChannel": {
+          "en": "Joinlog Channel",
+          "de": "Beitrittsprotokoll-Kanal"
+        },
+        "Role": {
+          "en": "Role On Join",
+          "de": "Rolle beim Beitritt"
+        },
+        "ReApplyRoles": {
+          "en": "Re-Apply Roles on Rejoin",
+          "de": "Rollen zuweisen beim Wiedereintritt"
+        },
+        "ReApplyNickname": {
+          "en": "Re-Apply Nickname on Rejoin",
+          "de": "Nickname zuweisen beim Wiedereintritt"
+        },
+        "SecurityNotice": {
+          "en": "For security reasons, roles with any of the following permissions never get re-applied: {Permissions}",
+          "de": "Aus Sicherheitsgründen werden Rollen mit einer den folgenden Berechtigungen nicht erneut zugewiesen: {Permissions}"
+        },
+        "TimeNotice": {
+          "en": "In addition, if the user left the server 60+ days ago, neither roles nor nicknames will be re-applied.",
+          "de": "Darüber hinaus werden weder Rollen noch Spitznamen erneut zugewiesen, wenn der Benutzer vor mehr als 60 Tagen den Server verlassen hat."
+        },
+        "ToggleGlobalBansButton": {
+          "en": "Toggle Global Bans",
+          "de": "Globale Bannungen umschalten"
+        },
+        "ChangeJoinlogChannelButton": {
+          "en": "Change Joinlog Channel",
+          "de": "Beitrittsprotokoll-Kanal ändern"
+        },
+        "ChangeRoleButton": {
+          "en": "Change Role assigned on join",
+          "de": "Beim Beitritt zugewiesene Rolle ändern"
+        },
+        "ToggleReApplyRole": {
+          "en": "Toggle Role Re-Apply",
+          "de": "Rollen-Neuzuweisung umschalten"
+        },
+        "ToggleReApplyNickname": {
+          "en": "Toggle Nickname Re-Apply",
+          "de": "Spitznamen-Neuzuweisung umschalten"
+        },
+        "JoinLogChannelName": {
+          "en": "joinlog",
+          "de": "beitrittsprotokoll"
+        },
+        "DisableJoinlog": {
+          "en": "Disable Joinlog",
+          "de": "Beitrittsprotokoll deaktivieren"
+        },
+        "AutoAssignRoleName": {
+          "en": "Automatically Assigned Role",
+          "de": "Automatisch zugewiesene Rolle"
+        },
+        "DisableRoleOnJoin": {
+          "en": "Disable Role on join",
+          "de": "Rolle beim Beitritt deaktivieren"
+        },
+        "CantUseRole": {
+          "en": "You cannot set the bump reminder role to be automatically assigned on join.",
+          "de": "Du kannst die Erinnerungsrolle für das Bumpen nicht automatisch beim Beitritt zuweisen."
+        },
+        "AutoKickSpammer": {
+          "en": "Auto Kick Likely Spammer",
+          "de": "Mögliche Spammer auto-kicken"
+        },
+        "AutoKickNewAccounts": {
+          "en": "Kick Accounts younger than",
+          "de": "Accounts kicken die jünger sind als"
+        },
+        "AutoKickNoRoles": {
+          "en": "Kick Members without roles after",
+          "de": "Member ohne Rolle kicken nach"
+        },
+        "ToggleAutoKickSpammer": {
+          "en": "Toggle Auto Kick Likely Spammer",
+          "de": "Mögliche Spammer auto-kicken umschalten"
+        },
+        "ChangeAutoKickNewAccounts": {
+          "en": "Change Auto Kick New Accounts",
+          "de": "Neue Accounts auto-kicken ändern"
+        },
+        "ChangeAutoKickNoRoles": {
+          "en": "Change Auto Kick Members without Roles",
+          "de": "Neue Member ohne Rolle auto-kicken ändern"
+        },
+        "AutoKickNoRolesDurationLimit": {
+          "en": "The time span has to be between 0 seconds and 30 minutes.",
+          "de": "Die Zeitspanne muss zwischen 0 Sekunden und 30 Minuten liegen."
+        },
+        "AutoKickNewAccountsDurationLimit": {
+          "en": "The time span has to be between 0 seconds and 30 days.",
+          "de": "Die Zeitspanne muss zwischen 0 Sekunden und 30 Tagen liegen."
+        },
+        "AutoKickSpammerReason": {
+          "en": "Likely Spammer",
+          "de": "Wahrscheinlicher Spammer"
+        },
+        "AutoKickAccountAgeReason": {
+          "en": "Account too young",
+          "de": "Account zu jung"
+        },
+        "AutoKickNoRolesReason": {
+          "en": "User did not receive any roles",
+          "de": "Nutzer hat keine Rollen erhalten"
+        },
+        "LowTimeWarning": {
+          "en": "A time of {Time} may not be sufficient for the user to receive any roles. Please double check the selected time.",
+          "de": "{Time} sind eventuell nicht genug um eine Rolle zu erhalten, bitte überprüfe die gewählte Zeit."
+        }
+      },
+      "LevelRewards": {
+        "Title": {
+          "en": "Level Rewards",
+          "de": "Level-Belohnungen"
+        },
+        "Level": {
+          "en": "Level",
+          "de": "Level"
+        },
+        "Role": {
+          "en": "Role",
+          "de": "Rolle"
+        },
+        "Message": {
+          "en": "Message",
+          "de": "Nachricht"
+        },
+        "NoRewardsSetup": {
+          "en": "No Level Rewards are set up.",
+          "de": "Es sind keine Level-Belohnungen eingerichtet."
+        },
+        "Loading": {
+          "en": "Loading Level Rewards..",
+          "de": "Lade Level-Belohnungen.."
+        },
+        "SelectPrompt": {
+          "en": "Please select a Level Reward to modify or delete.",
+          "de": "Bitte wähle eine Level-Belohnung aus, um sie zu bearbeiten oder zu löschen."
+        },
+        "AddNewButton": {
+          "en": "Add new Level Reward",
+          "de": "Neue Level-Belohnung hinzufügen"
+        },
+        "ModifyButton": {
+          "en": "Modify Message",
+          "de": "Nachricht bearbeiten"
+        },
+        "RemoveButton": {
+          "en": "Delete",
+          "de": "Löschen"
+        },
+        "SelectDropdown": {
+          "en": "Select a Level Reward..",
+          "de": "Wähle eine Level-Belohnung aus.."
+        },
+        "DefaultCustomText": {
+          "en": "You received ##Role##!",
+          "de": "Du hast ##Role## erhalten!"
+        },
+        "SelectRoleButton": {
+          "en": "Select Role",
+          "de": "Rolle auswählen"
+        },
+        "SelectLevelButton": {
+          "en": "Select Level",
+          "de": "Level auswählen"
+        },
+        "ChangeMessageButton": {
+          "en": "Change Message",
+          "de": "Nachricht ändern"
+        },
+        "CantUseRole": {
+          "en": "You cannot set a bump reminder role to be automatically assigned as a reward.",
+          "de": "Du kannst die Erinnerungsrolle für das Bumpen nicht als automatische Belohnung festlegen."
+        },
+        "MessageTooLong": {
+          "en": "Your custom message can't contain more than 256 characters.",
+          "de": "Deine individuelle Nachricht darf nicht mehr als 256 Zeichen enthalten."
+        },
+        "AddedNewReward": {
+          "en": "The role {Role} will be assigned at Level {Level}.",
+          "de": "Die Rolle {Role} wird auf Level {Level} zugewiesen."
+        }
+      },
+      "PrefixConfigCommand": {
+        "Title": {
+          "en": "Prefix Commands",
+          "de": "Text Befehle"
+        },
+        "PrefixDisabled": {
+          "en": "Prefix Commands disabled",
+          "de": "Text Befehle deaktiviert"
+        },
+        "CurrentPrefix": {
+          "en": "Current Command Prefix",
+          "de": "Aktuelles Text Befehl Prefix"
+        },
+        "TogglePrefixCommands": {
+          "en": "Toggle Prefix Commands",
+          "de": "Text Befehle ein-/ausschalten"
+        },
+        "ChangePrefix": {
+          "en": "Change Prefix",
+          "de": "Prefix ändern"
+        },
+        "NewPrefixModalTitle": {
+          "en": "Select new Prefix",
+          "de": "Wähle ein neues Prefix"
+        },
+        "NewPrefix": {
+          "en": "New Prefix",
+          "de": "Neues Prefix"
+        }
+      },
+      "GuildLanguage": {
+        "Title": {
+          "en": "Guild Language",
+          "de": "Serversprache"
+        },
+        "Disclaimer": {
+          "en": "You can choose to override the chosen language on this Discord server.",
+          "de": "Du kannst dich dazu entscheiden die gewählte Sprache auf diesem Discordserver zu überschreiben."
+        },
+        "Response": {
+          "en": "Current Locale",
+          "de": "Aktuelle Sprache"
+        },
+        "DisableOverride": {
+          "en": "Disable the current override",
+          "de": "Aktuelles Override deaktivieren"
+        },
+        "Selector": {
+          "en": "Select a new language..",
+          "de": "Eine neue Sprache wählen.. "
+        }
+      },
+      "NameNormalizer": {
+        "Title": {
+          "en": "Name Normalizer",
+          "de": "Namennormalisierer"
+        },
+        "DefaultName": {
+          "en": "Pingable Name",
+          "de": "Pingbarer Name"
+        },
+        "NameNormalizerEnabled": {
+          "en": "Name Normalizer Enabled",
+          "de": "Namennormalisierer aktiviert"
+        },
+        "ToggleNameNormalizer": {
+          "en": "Toggle Name Normalizer",
+          "de": "Namennormalisierer umschalten"
+        },
+        "NormalizeNow": {
+          "en": "Normalize Everyone's name now",
+          "de": "Namen aller Mitglieder jetzt normalisieren"
+        },
+        "NormalizerRunning": {
+          "en": "A name normalizer is already running.",
+          "de": "Ein Namennormalisierer läuft bereits."
+        },
+        "RenamingAllMembers": {
+          "en": "Renaming all members. This might take a while..",
+          "de": "Alle Mitglieder werden umbenannt. Dies könnte eine Weile dauern..."
+        },
+        "RenamedMembers": {
+          "en": "Renamed {Count} members.",
+          "de": "{Count} Mitglieder wurden umbenannt."
+        }
+      },
+      "Phishing": {
+        "Title": {
+          "en": "Phishing Protection",
+          "de": "Phishing-Schutz"
+        },
+        "DetectPhishingLinks": {
+          "en": "Detect Phishing Links",
+          "de": "Phishing-Links erkennen"
+        },
+        "RedirectWarning": {
+          "en": "Redirect Warning",
+          "de": "Weiterleitungs-Warnung"
+        },
+        "AbuseIpDbReports": {
+          "en": "AbuseIPDB Reports",
+          "de": "AbuseIPDB-Berichte"
+        },
+        "PunishmentType": {
+          "en": "Punishment Type",
+          "de": "Strafmaß-Art"
+        },
+        "PunishmentTypeDelete": {
+          "en": "Delete Message",
+          "de": "Nachricht löschen"
+        },
+        "PunishmentTypeTimeout": {
+          "en": "Timeout Member",
+          "de": "Benutzer in Timeout versetzen"
+        },
+        "PunishmentTypeKick": {
+          "en": "Kick Member",
+          "de": "Benutzer kicken"
+        },
+        "PunishmentTypeBan": {
+          "en": "Ban Member",
+          "de": "Benutzer bannen"
+        },
+        "PunishmentTypeSoftban": {
+          "en": "Softban Member",
+          "de": "Benutzer softbannen"
+        },
+        "PunishmentTypeDeleteDescription": {
+          "en": "Only deletes the message containing the detected phishing link",
+          "de": "Löscht nur die Nachricht mit dem erkannten Phishing-Link"
+        },
+        "PunishmentTypeTimeoutDescription": {
+          "en": "Times the user out if a phishing link has been detected",
+          "de": "Timed den Benutzer aus, wenn ein Phishing-Link erkannt wurde"
+        },
+        "PunishmentTypeKickDescription": {
+          "en": "Kicks the user if a phishing link has been detected",
+          "de": "Kickt den Benutzer, wenn ein Phishing-Link erkannt wurde"
+        },
+        "PunishmentTypeBanDescription": {
+          "en": "Bans the user if a phishing link has been detected",
+          "de": "Bannt den Benutzer, wenn ein Phishing-Link erkannt wurde"
+        },
+        "PunishmentTypeSoftbanDescription": {
+          "en": "Softbans the user if a phishing link has been detected",
+          "de": "Softbannt den Benutzer, wenn ein Phishing-Link erkannt wurde"
+        },
+        "CustomPunishmentReason": {
+          "en": "Punishment Reason",
+          "de": "Grund für die Strafe"
+        },
+        "CustomTimeoutLength": {
+          "en": "Timeout Length",
+          "de": "Timeout-Dauer"
+        },
+        "ToggleDetection": {
+          "en": "Toggle Detection",
+          "de": "Erkennung umschalten"
+        },
+        "ToggleWarning": {
+          "en": "Toggle Redirect Warning",
+          "de": "Weiterleitungs-Warnung umschalten"
+        },
+        "ToggleAbuseIpDb": {
+          "en": "Toggle AbuseIPDB Reports",
+          "de": "AbuseIPDB-Berichte umschalten"
+        },
+        "ChangePunishmentType": {
+          "en": "Change Punishment",
+          "de": "Strafe ändern"
+        },
+        "ChangePunishmentReason": {
+          "en": "Change Reason",
+          "de": "Grund ändern"
+        },
+        "ChangeTimeoutLength": {
+          "en": "Change Timeout Length",
+          "de": "Sperrdauer ändern"
+        },
+        "DefineNewReason": {
+          "en": "New reason | Use %R to insert default reason",
+          "de": "Neuer Grund | Verwende %R, um den Standardgrund einzufügen"
+        },
+        "NotUsingType": {
+          "en": "You aren't using '{Type}' as your Punishment",
+          "de": "Du verwendest '{Type}' nicht als Strafe"
+        },
+        "InvalidDuration": {
+          "en": "The duration has to be between 10 seconds and 28 days.",
+          "de": "Die Dauer muss zwischen 10 Sekunden und 28 Tagen liegen."
+        }
+      },
+      "ReactionRoles": {
+        "Title": {
+          "en": "Reaction Roles",
+          "de": "Reaktionsrollen"
+        },
+        "LoadingReactionRoles": {
+          "en": "Loading Reaction Roles..",
+          "de": "Lade Reaktionsrollen.."
+        },
+        "AddNewReactionRole": {
+          "en": "Add a new reaction role",
+          "de": "Neue Reaktionsrolle hinzufügen"
+        },
+        "RemoveReactionRole": {
+          "en": "Remove a reaction role",
+          "de": "Reaktionsrolle entfernen"
+        },
+        "ReactionRoleCount": {
+          "en": "{Count} reaction roles are set up.",
+          "de": "{Count} Reaktionsrollen sind eingerichtet."
+        },
+        "SelectMessage": {
+          "en": "Select Message",
+          "de": "Nachricht auswählen"
+        },
+        "SelectEmoji": {
+          "en": "Select Emoji",
+          "de": "Emoji auswählen"
+        },
+        "SelectRole": {
+          "en": "Select Role",
+          "de": "Rolle auswählen"
+        },
+        "Message": {
+          "en": "Message",
+          "de": "Nachricht"
+        },
+        "Emoji": {
+          "en": "Emoji",
+          "de": "Emoji"
+        },
+        "Role": {
+          "en": "Role",
+          "de": "Rolle"
+        },
+        "MessageUrl": {
+          "en": "Message Url",
+          "de": "Nachrichten-URL"
+        },
+        "MessageUrlInstructions": {
+          "en": "Please copy and paste the message link of the message you want the reaction role to be added to.",
+          "de": "Bitte kopiere und füge den Nachrichtenlink der Nachricht ein, zu der du die Reaktionsrolle hinzufügen möchtest."
+        },
+        "InvalidMessageUrl": {
+          "en": "This doesn't look correct. A message url should look something like these:",
+          "de": "Das sieht nicht korrekt aus. Eine Nachrichten-URL sollte etwa so aussehen:"
+        },
+        "MessageUrlWrongGuild": {
+          "en": "The link you provided leads to another server.",
+          "de": "Der von dir angegebene Link führt zu einem anderen Server."
+        },
+        "MessageUrlNoChannel": {
+          "en": "The link you provided leads to a channel that doesn't exist.",
+          "de": "Der von dir angegebene Link führt zu einem nicht existierenden Kanal."
+        },
+        "MessageUrlNoMessage": {
+          "en": "The link you provided leads to a message that doesn't exist or the bot has no access to.",
+          "de": "Der von dir angegebene Link führt zu einer nicht existierenden Nachricht oder der Bot hat keinen Zugriff darauf."
+        },
+        "AddingReactionRole": {
+          "en": "Adding Reaction Role..",
+          "de": "Füge Reaktionsrolle hinzu.."
+        },
+        "SelectRolePrompt": {
+          "en": "Please select the role you want this reaction role to assign below.",
+          "de": "Bitte wähle unten die Rolle aus, die dieser Reaktionsrolle zugewiesen werden soll."
+        },
+        "NoRoles": {
+          "en": "Could not find any roles in your server.",
+          "de": "Es konnten keine Rollen in deinem Server gefunden werden."
+        },
+        "ReactWithEmoji": {
+          "en": "Please react to the message you're assigning the reaction role to with the emoji you'd like to use.",
+          "de": "Bitte reagiere auf die Nachricht, der du die Reaktionsrolle zuweisen möchtest, mit dem Emoji, das du verwenden möchtest."
+        },
+        "NoAccessToEmoji": {
+          "en": "The bot has no access to this emoji. Any emoji of this server and built-in Discord emojis should work.",
+          "de": "Der Bot hat keinen Zugriff auf dieses Emoji. Jedes Emoji dieses Servers und integrierte Discord-Emojis sollten funktionieren."
+        },
+        "ReactionRoleLimitReached": {
+          "en": "You've reached the limit of 100 reaction roles per guild. You cannot add more reaction roles unless you remove one.",
+          "de": "Du hast das Limit von 100 Reaktionsrollen pro Server erreicht. Du kannst keine weiteren Reaktionsrollen hinzufügen, es sei denn, du entfernst eine vorhandene."
+        },
+        "EmojiAlreadyUsed": {
+          "en": "The specified emoji has already been used for a reaction role on the selected message.",
+          "de": "Das angegebene Emoji wurde bereits für eine Reaktionsrolle in der ausgewählten Nachricht verwendet."
+        },
+        "RoleAlreadyUsed": {
+          "en": "The specified role has already been used for a reaction role.",
+          "de": "Die angegebene Rolle wurde bereits für eine Reaktionsrolle verwendet."
+        },
+        "AddedReactionRole": {
+          "en": "Added role {Role} to message sent by {User} in {Channel} with emoji {Emoji}.",
+          "de": "Die Rolle {Role} wurde zur Nachricht von {User} in {Channel} mit dem Emoji {Emoji} hinzugefügt."
+        },
+        "RemovingReactionRole": {
+          "en": "Removing Reaction Role..",
+          "de": "Entferne Reaktionsrolle.."
+        },
+        "ReactWithEmojiToRemove": {
+          "en": "Please react with the emoji you want to remove from the target message.",
+          "de": "Bitte reagiere mit dem Emoji, das du von der Zielnachricht entfernen möchtest."
+        },
+        "NoReactionRoleFound": {
+          "en": "The specified message doesn't contain a reaction role with the specified reaction.",
+          "de": "Die angegebene Nachricht enthält keine Reaktionsrolle mit der angegebenen Reaktion."
+        },
+        "RemovedReactionRole": {
+          "en": "Removed role {Role} from message sent by {User} in {Channel} with emoji {Emoji}.",
+          "de": "Die Rolle {Role} wurde von der Nachricht von {User} in {Channel} mit dem Emoji {Emoji} entfernt."
+        },
+        "RemovingAllReactionRoles": {
+          "en": "Removing all reaction roles..",
+          "de": "Entferne alle Reaktionsrollen.."
+        },
+        "NoReactionRoles": {
+          "en": "The specified message doesn't contain any reaction roles.",
+          "de": "Die angegebene Nachricht enthält keine Reaktionsrollen."
+        },
+        "RemovedAllReactionRoles": {
+          "en": "Removed all reaction roles from message sent by {User} in {Channel}.",
+          "de": "Alle Reaktionsrollen wurden von der Nachricht von {User} in {Channel} entfernt."
+        }
+      },
+      "TokenDetection": {
+        "Title": {
+          "en": "Token Detection",
+          "de": "Token-Erkennung"
+        },
+        "DetectTokens": {
+          "en": "Detect Tokens",
+          "de": "Tokens erkennen"
+        },
+        "ToggleTokenDetection": {
+          "en": "Toggle Token Detection",
+          "de": "Token-Erkennung umschalten"
+        }
+      },
+      "VcCreator": {
+        "Title": {
+          "en": "Voice Channel Creator",
+          "de": "Sprachkanal-Ersteller"
+        },
+        "SetVcCreator": {
+          "en": "Set Voice Channel Creator",
+          "de": "Sprachkanal-Ersteller festlegen"
+        },
+        "DisableVcCreator": {
+          "en": "Disable Voice Channel Creator",
+          "de": "Sprachkanal-Ersteller deaktivieren"
+        },
+        "NoChannels": {
+          "en": "No Voice Channels found in your server.",
+          "de": "Keine Sprachkanäle in deinem Server gefunden."
+        },
+        "CreateNewChannel": {
+          "en": "Create new Channel",
+          "de": "Neuen Kanal erstellen"
+        }
+      }
+    }
+  },
+  "Events": {
+    "Actionlog": {
+      "User": {
+        "en": "User",
+        "de": "Benutzer"
+      },
+      "UserId": {
+        "en": "User-Id",
+        "de": "Benutzer-ID"
+      },
+      "UserJoined": {
+        "en": "User joined",
+        "de": "Benutzer ist beigetreten"
+      },
+      "UserRejoined": {
+        "en": "User rejoined",
+        "de": "Benutzer ist erneut beigetreten"
+      },
+      "AccountAge": {
+        "en": "Account Age",
+        "de": "Kontoalter"
+      },
+      "StaffNotes": {
+        "en": "Makoto Staff Notes",
+        "de": "Makoto-Notizen des Personals"
+      },
+      "InviteNotes": {
+        "en": "Invite Notes",
+        "de": "Einladungsnotizen"
+      },
+      "InvitedBy": {
+        "en": "Invited by",
+        "de": "Eingeladen von"
+      },
+      "InviteCode": {
+        "en": "Invite Code",
+        "de": "Einladungscode"
+      },
+      "InviteNote": {
+        "en": "Invite Note",
+        "de": "Einladungsnotiz"
+      },
+      "UserLeft": {
+        "en": "User left",
+        "de": "Benutzer hat den Server verlassen"
+      },
+      "JoinedAt": {
+        "en": "Joined at",
+        "de": "Beigetreten am"
+      },
+      "Roles": {
+        "en": "Roles",
+        "de": "Rollen"
+      },
+      "UserKicked": {
+        "en": "User kicked",
+        "de": "Benutzer wurde gekickt"
+      },
+      "KickedBy": {
+        "en": "Kicked by",
+        "de": "Gekickt von"
+      },
+      "Reason": {
+        "en": "Reason",
+        "de": "Grund"
+      },
+      "FooterAuditLogDisclaimer": {
+        "en": "Please note that the {Fields} may not be accurate as the bot can't differentiate between similar audit log entries that affect the same things.",
+        "de": "Bitte beachte, dass die {Fields} möglicherweise nicht korrekt sind, da der Bot keine Unterscheidung zwischen ähnlichen Audit-Log-Einträgen treffen kann, die die gleichen Dinge betreffen."
+      },
+      "MessageDeleted": {
+        "en": "Message deleted",
+        "de": "Nachricht gelöscht"
+      },
+      "Channel": {
+        "en": "Channel",
+        "de": "Kanal"
+      },
+      "Content": {
+        "en": "Content",
+        "de": "Inhalt"
+      },
+      "Attachments": {
+        "en": "Attachments",
+        "de": "Anhänge"
+      },
+      "Stickers": {
+        "en": "Stickers",
+        "de": "Sticker"
+      },
+      "ReplyTo": {
+        "en": "Reply to",
+        "de": "Antworten auf"
+      },
+      "UserJoinedVoiceChannel": {
+        "en": "User joined Voice Channel",
+        "de": "Benutzer ist einem Sprachkanal beigetreten"
+      },
+      "UserLeftVoiceChannel": {
+        "en": "User left Voice Channel",
+        "de": "Benutzer hat einen Sprachkanal verlassen"
+      },
+      "UserSwitchedVoiceChannel": {
+        "en": "User switched Voice Channel",
+        "de": "Benutzer hat den Sprachkanal gewechselt"
+      },
+      "MultipleMessagesDeleted": {
+        "en": "Multiple Messages deleted",
+        "de": "Mehrere Nachrichten gelöscht"
+      },
+      "CheckAttachedFileForDeletedMessages": {
+        "en": "To view the messages, click the button below or download the attached file and view it in your browser.",
+        "de": "Um die gelöschten Dateien anzuzeigen, klicke den Knopf unter der Nachricht oder lade dir die angehängte Datei herunter und öffne sie mit deinem Browser."
+      },
+      "AffectedUsers": {
+        "en": "Affected Users",
+        "de": "Betroffene Benutzer"
+      },
+      "MessageUpdated": {
+        "en": "Message updated",
+        "de": "Nachricht aktualisiert"
+      },
+      "Message": {
+        "en": "Message",
+        "de": "Nachricht"
+      },
+      "PreviousContent": {
+        "en": "Previous Content",
+        "de": "Vorheriger Inhalt"
+      },
+      "NewContent": {
+        "en": "New Content",
+        "de": "Neuer Inhalt"
+      },
+      "NicknameUpdated": {
+        "en": "Nickname updated",
+        "de": "Spitzname aktualisiert"
+      },
+      "NicknameAdded": {
+        "en": "Nickname added",
+        "de": "Spitzname hinzugefügt"
+      },
+      "NicknameRemoved": {
+        "en": "Nickname removed",
+        "de": "Spitzname entfernt"
+      },
+      "PreviousNickname": {
+        "en": "Previous Nickname",
+        "de": "Vorheriger Spitzname"
+      },
+      "NewNickname": {
+        "en": "New Nickname",
+        "de": "Neuer Spitzname"
+      },
+      "RolesUpdated": {
+        "en": "Roles updated",
+        "de": "Rollen aktualisiert"
+      },
+      "RolesAdded": {
+        "en": "Roles added",
+        "de": "Rollen hinzugefügt"
+      },
+      "RolesRemoved": {
+        "en": "Roles removed",
+        "de": "Rollen entfernt"
+      },
+      "MembershipApproved": {
+        "en": "Membership approved",
+        "de": "Mitgliedschaft genehmigt"
+      },
+      "GuildProfilePictureUpdated": {
+        "en": "Member Guild Profile Picture updated",
+        "de": "Profilbild des Servermitglieds aktualisiert"
+      },
+      "TimedOut": {
+        "en": "User timed out",
+        "de": "Nutzer in den Timeout versetzt"
+      },
+      "TimedOutUntil": {
+        "en": "Timed out until",
+        "de": "Timeout gültig bis"
+      },
+      "TimeoutRemoved": {
+        "en": "User timeout removed",
+        "de": "Timeout vom Nutzer entfernt"
+      },
+      "Integration": {
+        "en": "Integration",
+        "de": "Integration"
+      },
+      "ServerBooster": {
+        "en": "Server Booster",
+        "de": "Server-Booster"
+      },
+      "RoleCreated": {
+        "en": "Role created",
+        "de": "Rolle erstellt"
+      },
+      "Role": {
+        "en": "Role",
+        "de": "Rolle"
+      },
+      "Color": {
+        "en": "Color",
+        "de": "Farbe"
+      },
+      "RoleId": {
+        "en": "Role-Id",
+        "de": "Rollen-ID"
+      },
+      "RoleIsIntegration": {
+        "en": "This role belongs to an integration and cannot be deleted.",
+        "de": "Diese Rolle gehört zu einer Integration und kann nicht gelöscht werden."
+      },
+      "RoleMentionable": {
+        "en": "Role mentionable by everyone",
+        "de": "Rolle kann von allen erwähnt werden"
+      },
+      "DisplayedRoleMembers": {
+        "en": "Display role members separately",
+        "de": "Mitglieder der Rolle separat anzeigen"
+      },
+      "Permissions": {
+        "en": "Permissions",
+        "de": "Berechtigungen"
+      },
+      "CreatedBy": {
+        "en": "Created by",
+        "de": "Erstellt von"
+      },
+      "RoleDeleted": {
+        "en": "Role deleted",
+        "de": "Rolle gelöscht"
+      },
+      "RoleWasIntegration": {
+        "en": "This role belonged to an integration and was therefore deleted automatically.",
+        "de": "Diese Rolle gehörte zu einer Integration und wurde daher automatisch gelöscht."
+      },
+      "DeletedBy": {
+        "en": "Deleted by",
+        "de": "Gelöscht von"
+      },
+      "PermissionsRemoved": {
+        "en": "Permissions removed",
+        "de": "Berechtigungen entfernt"
+      },
+      "PermissionsAdded": {
+        "en": "Permissions added",
+        "de": "Berechtigungen hinzugefügt"
+      },
+      "PermissionsUpdated": {
+        "en": "Permissions updated",
+        "de": "Berechtigungen aktualisiert"
+      },
+      "RoleUpdated": {
+        "en": "Role updated",
+        "de": "Rolle aktualisiert"
+      },
+      "ModifiedBy": {
+        "en": "Modified by",
+        "de": "Geändert von"
+      },
+      "BannedBy": {
+        "en": "Banned by",
+        "de": "Gebannt von"
+      },
+      "UserBanned": {
+        "en": "User banned",
+        "de": "Benutzer gebannt"
+      },
+      "UserUnbanned": {
+        "en": "User unbanned",
+        "de": "Benutzer entbannt"
+      },
+      "UnbannedBy": {
+        "en": "Unbanned by",
+        "de": "Entbannt von"
+      },
+      "Owner": {
+        "en": "Owner",
+        "de": "Besitzer"
+      },
+      "Name": {
+        "en": "Name",
+        "de": "Name"
+      },
+      "Description": {
+        "en": "Description",
+        "de": "Beschreibung"
+      },
+      "PreferredLocale": {
+        "en": "Preferred Locale",
+        "de": "Bevorzugte Sprache"
+      },
+      "VanityUrl": {
+        "en": "Vanity Url",
+        "de": "Vanity-URL"
+      },
+      "IconUpdated": {
+        "en": "Icon updated",
+        "de": "Symbol aktualisiert"
+      },
+      "DefaultNotificationSettings": {
+        "en": "Default Notification Settings",
+        "de": "Standardbenachrichtigungseinstellungen"
+      },
+      "VerificationLevel": {
+        "en": "Verification Level",
+        "de": "Verifizierungsstufe"
+      },
+      "BannerUpdated": {
+        "en": "Banner updated",
+        "de": "Banner aktualisiert"
+      },
+      "SplashUpdated": {
+        "en": "Splash updated",
+        "de": "Splash aktualisiert"
+      },
+      "HomeHeaderUpdated": {
+        "en": "Home Header updated",
+        "de": "Startseiten-Header aktualisiert"
+      },
+      "DiscoverySplashUpdated": {
+        "en": "Discovery Splash updated",
+        "de": "Discovery Splash aktualisiert"
+      },
+      "RequiredMfaLevel": {
+        "en": "Require 2-Factor Authentication for Mods",
+        "de": "Zwei-Faktor-Authentifizierung für Mods erforderlich"
+      },
+      "ExplicitContentFilter": {
+        "en": "Explicit Content Filter",
+        "de": "Expliziter Inhaltsfilter"
+      },
+      "GuildWidgetEnabled": {
+        "en": "Guild Widget Enabled",
+        "de": "Guild-Widget aktiviert"
+      },
+      "GuildWidgetChannel": {
+        "en": "Guild Widget Channel",
+        "de": "Guild-Widget-Kanal"
+      },
+      "LargeGuild": {
+        "en": "Large Guild",
+        "de": "Großer Server"
+      },
+      "NsfwGuild": {
+        "en": "Nsfw Guild",
+        "de": "NSFW-Server"
+      },
+      "CommunityGuild": {
+        "en": "Community Guild",
+        "de": "Community-Server"
+      },
+      "MembershipScreening": {
+        "en": "Membership Screening",
+        "de": "Mitgliedschaftsüberprüfung"
+      },
+      "WelcomeScreen": {
+        "en": "Welcome Screen",
+        "de": "Willkommensbildschirm"
+      },
+      "BoostProgressBar": {
+        "en": "Boost Progress Bar",
+        "de": "Boost-Fortschrittsleiste"
+      },
+      "RuleChannel": {
+        "en": "Rules Channel",
+        "de": "Regel-Kanal"
+      },
+      "AfkTimeout": {
+        "en": "Afk Timeout",
+        "de": "AFK-Timeout"
+      },
+      "AfkChannel": {
+        "en": "Afk Channel",
+        "de": "AFK-Kanal"
+      },
+      "SystemChannel": {
+        "en": "System Channel",
+        "de": "System-Kanal"
+      },
+      "DiscordUpdateChannel": {
+        "en": "Discord Update Channel",
+        "de": "Discord-Aktualisierungskanal"
+      },
+      "SafetyAlertsChannel": {
+        "en": "Safety Alerts Channel",
+        "de": "Sicherheitswarnungen-Kanal"
+      },
+      "MaximumMembers": {
+        "en": "Maximum Members",
+        "de": "Maximale Mitglieder"
+      },
+      "GuildUpdated": {
+        "en": "Guild updated",
+        "de": "Server aktualisiert"
+      },
+      "ChannelCreated": {
+        "en": "Channel created",
+        "de": "Kanal erstellt"
+      },
+      "ChannelDeleted": {
+        "en": "Channel deleted",
+        "de": "Kanal gelöscht"
+      },
+      "ChannelModified": {
+        "en": "Channel updated",
+        "de": "Kanal aktualisiert"
+      },
+      "ChannelId": {
+        "en": "Channel-Id",
+        "de": "Kanal-ID"
+      },
+      "NsfwChannel": {
+        "en": "Nsfw Channel",
+        "de": "NSFW-Kanal"
+      },
+      "Bitrate": {
+        "en": "Bitrate",
+        "de": "Bitrate"
+      },
+      "DefaultAutoArchiveDuration": {
+        "en": "Default Auto Archive Duration",
+        "de": "Standard-Auto-Archivdauer"
+      },
+      "Invite": {
+        "en": "Invite",
+        "de": "Einladung"
+      },
+      "InviteCreated": {
+        "en": "Invite created",
+        "de": "Einladung erstellt"
+      },
+      "InviteDeleted": {
+        "en": "Invite deleted",
+        "de": "Einladung gelöscht"
+      },
+      "NoInviter": {
+        "en": "No Inviter found.",
+        "de": "Kein Einlader gefunden."
+      }
+    },
+    "BumpReminder": {
+      "ServerBumped": {
+        "en": "Thanks a lot for supporting the server, {User}!",
+        "de": "Vielen Dank, dass du den Server unterstützt, {User}!"
+      },
+      "SubscribeRoleNotice": {
+        "en": "You can subscribe and unsubscribe to the bump reminder notifications at any time by reacting to the pinned message.",
+        "de": "Du kannst dich jederzeit durch Reaktion auf die angepinnte Nachricht für die Erinnerungen zum Bumpen anmelden oder abmelden."
+      },
+      "NextBumpTime": {
+        "en": "The server can be bumped {Timestamp}.",
+        "de": "Der Server kann {Timestamp} gebumpt werden."
+      },
+      "LastBumpBy": {
+        "en": "The server was last bumped by {User} {RTimestamp} at {FTimestamp}.",
+        "de": "Der Server wurde zuletzt von {User} {RTimestamp} um {FTimestamp} gebumpt."
+      },
+      "ServerCanBeBump": {
+        "en": "The server can be bumped!",
+        "de": "Der Server kann gebumpt werden!"
+      },
+      "BumpReminderDisabled": {
+        "en": "The bump reminder was disabled for the following reason:",
+        "de": "Die Bump-Erinnerung wurde aus folgendem Grund deaktiviert:"
+      },
+      "BumpReminderDisabledReactionRemoved": {
+        "en": "Self Role Message Reaction was removed.",
+        "de": "Die Reaktion auf die Self-Rolle-Nachricht wurde entfernt."
+      },
+      "BumpReminderDisabledNotPinned": {
+        "en": "Self Role Message is not pinned.",
+        "de": "Die Self-Rolle-Nachricht ist nicht angepinnt."
+      },
+      "BumpReminderDisabledMessageDeleted": {
+        "en": "Self Role Message was deleted.",
+        "de": "Die Self-Rolle-Nachricht wurde gelöscht."
+      },
+      "LastBumpMissed": {
+        "en": "The last bump was missed!",
+        "de": "Der letzte Bump wurde verpasst!"
+      },
+      "BumpNotification": {
+        "en": "The server can be bumped again!",
+        "de": "Der Server kann erneut gebumpt werden!"
+      }
+    },
+    "EmbedMessages": {
+      "Delete": {
+        "en": "Delete",
+        "de": "Löschen"
+      },
+      "Lines": {
+        "en": "lines {Start} to {End}",
+        "de": "Zeilen {Start} bis {End}"
+      },
+      "Line": {
+        "en": "Line {Start}",
+        "de": "Zeile {Start}"
+      },
+      "FailedToDelete": {
+        "en": "Failed to delete message.",
+        "de": "Nachricht konnte nicht gelöscht werden."
+      },
+      "NotAuthor": {
+        "en": "You are not the message author of the referenced message.",
+        "de": "Du bist nicht der Autor der referenzierten Nachricht."
+      }
+    },
+    "GenericEvent": {
+      "PingMessage": {
+        "en": [
+          "Hi {User}, i'm {Bot}. I support Slash Commands, but additionally you can use me via `;;` or {BotMention}. To get a list of all commands, type {Help}.",
+          "If you need help, feel free to join our Support and Development Server: {Invite}",
+          "",
+          "To find out more about me, check my Github Repository: {GithubRepo}"
+        ],
+        "de": [
+          "Hallo {User}, ich bin {Bot}. Ich unterstütze Slash-Befehle, aber du kannst mich auch mit `;;` oder {BotMention} verwenden. Um eine Liste aller Befehle zu erhalten, gib {Help} ein.",
+          "Wenn du Hilfe benötigst, kannst du gerne unserem Support- und Entwicklungsserver beitreten: {Invite}",
+          "",
+          "Um mehr über mich zu erfahren, schau dir mein Github-Repository an: {GithubRepo}"
+        ]
+      },
+      "LimitedReached": {
+        "en": [
+          "Hi, thanks for adding me to your server.",
+          "Unfortunately, I am not yet verified.",
+          "",
+          "Because i need several intents (read more about that here: {IntentsUrl}) like server members and message content, i am unable to operate in more than 99 servers.",
+          "To see how my verification is going, check our development and support server: {Invite}"
+        ],
+        "de": [
+          "Hallo, vielen Dank, dass du mich zu deinem Server hinzugefügt hast.",
+          "Leider bin ich noch nicht verifiziert.",
+          "",
+          "Da ich mehrere Intents benötige (hier kannst du mehr darüber lesen: {IntentsUrl}), wie zum Beispiel Servermitglieder und Nachrichteninhalt, kann ich in mehr als 99 Servern nicht funktionieren.",
+          "Um zu sehen, wie es mit meiner Verifizierung läuft, schau auf unserem Entwicklungs- und Support-Server vorbei: {Invite}"
+        ]
+      },
+      "SuccessfulJoin": {
+        "en": [
+          "Hi, i'm {Bot}. I support Slash Commands, but additionally you can use me via `;;` or {BotMention}. To get a list of all commands, type {Help}.",
+          "",
+          "**Important Notes",
+          "",
+          "• **Phishing Protection is enabled by default. To change this run: {Phishing}.",
+          "• **Automatic User/Bot Token invalidation is enabled by default. If you don't know what this means, just leave it on. If you do know what this means and you don't want it to happen, run: {TokenDetection}.",
+          "• Every server is opted into a global ban system. When someone is known to break Discord's TOS, us bot staff can quickly scoop them up and ban them even before their account gets terminated by Discord. You can opt out via {Join}.",
+          "",
+          "If you need help, feel free to join our Support and Development Server: {Invite}",
+          "To find out more about me, check my Github Repository: {GithubRepo}",
+          "",
+          "_This message will automatically be deleted {Timestamp}._"
+        ],
+        "de": [
+          "Hallo, ich bin {Bot}. Ich unterstütze Slash-Befehle, aber du kannst mich auch mit `;;` oder {BotMention} verwenden. Um eine Liste aller Befehle zu erhalten, gib {Help} ein.",
+          "",
+          "**Wichtige Hinweise**",
+          "",
+          "• **Phishing-Schutz ist standardmäßig aktiviert. Um dies zu ändern, führe {Phishing} aus.",
+          "• **Automatische Ungültigmachung von Benutzer-/Bot-Token ist standardmäßig aktiviert. Wenn du nicht weißt, was das bedeutet, lass es einfach so. Wenn du jedoch weißt, was das bedeutet und nicht möchtest, dass es geschieht, führe {TokenDetection} aus.",
+          "• Jeder Server ist in ein globales Sperrsystem eingebunden. Wenn jemand gegen die Discord-Nutzungsbedingungen verstößt, können wir Bot-Mitarbeiter sie schnell aufgreifen und sperren, noch bevor ihr Konto von Discord gesperrt wird. Du kannst dies über {Join} ablehnen.",
+          "",
+          "Wenn du Hilfe benötigst, kannst du gerne unserem Support- und Entwicklungsserver beitreten: {Invite}",
+          "Um mehr über mich zu erfahren, schau dir mein Github-Repository an: {GithubRepo}",
+          "",
+          "_Diese Nachricht wird automatisch gelöscht {Timestamp}._"
+        ]
+      }
+    },
+    "Experience": {
+      "GainedLevel": {
+        "en": "Congrats, {User}! You gained {Count} level.",
+        "de": "Glückwunsch, {User}! Du hast {Count} Level erreicht."
+      },
+      "GainedLevels": {
+        "en": "Congrats, {User}! You gained {Count} levels.",
+        "de": "Glückwunsch, {User}! Du hast {Count} Level erreicht."
+      },
+      "NewLevel": {
+        "en": "You're now on Level {Level}.",
+        "de": "Du bist jetzt auf Level {Level}."
+      },
+      "AutomaticDeletion": {
+        "en": "This message will be automatically deleted in {Seconds} seconds.",
+        "de": "Diese Nachricht wird in {Seconds} Sekunden automatisch gelöscht."
+      },
+      "DisableDirectMessages": {
+        "en": "Disable Direct Message Experience Notifications",
+        "de": "Deaktiviere Direktnachricht-Erfahrungsbenachrichtigungen"
+      },
+      "DirectMessagesDisabled": {
+        "en": "Alright, i will no longer send you any level up notifications via DM. If you wan't to re-enable this, run {Command} on any guild with {Bot}.",
+        "de": "In Ordnung, ich werde dir keine Level-Benachrichtigungen mehr per Direktnachricht senden. Wenn du dies wieder aktivieren möchtest, führe {Command} in einem beliebigen Server mit {Bot} aus."
+      }
+    },
+    "InVoicePrivacy": {
+      "CreatedWithSetPermissions": {
+        "en": "In-Voice Privacy 'Set permissions' is turned on",
+        "de": "In-Voice-Privatsphäre 'Berechtigungen festlegen' ist aktiviert"
+      },
+      "LeftWithSetPermissions": {
+        "en": "Left VC while In-Voice Privacy 'Set permissions' is turned on",
+        "de": "Verlassen des Sprachkanals, während die In-Voice-Privatsphäre 'Berechtigungen festlegen' aktiviert ist"
+      },
+      "JoinedWithSetPermissions": {
+        "en": "Joined VC while In-Voice Privacy 'Set permissions' is turned on",
+        "de": "Beitritt zum Sprachkanal, während die In-Voice-Privatsphäre 'Berechtigungen festlegen' aktiviert ist"
+      },
+      "LeftWithDeleteMessages": {
+        "en": "Joined VC while In-Voice Privacy 'Delete messages' is turned on",
+        "de": "Verlassen des Sprachkanals, während die In-Voice-Privatsphäre 'Nachrichten löschen' aktiviert ist"
+      }
+    },
+    "Join": {
+      "Globalban": {
+        "en": "Globalban",
+        "de": "Globalban"
+      },
+      "UserJoined": {
+        "en": "has joined {Guild}. Welcome!",
+        "de": "ist {Guild} beigetreten. Herzlich willkommen!"
+      },
+      "UserLeft": {
+        "en": [
+          "has left {Guild}.",
+          "They've been on the server for _{Timestamp}_."
+        ],
+        "de": [
+          "hat {Guild} verlassen.",
+          "Der Benutzer war _{Timestamp}_ auf dem Server."
+        ]
+      }
+    },
+    "Phishing": {
+      "AbuseIpDbReport": {
+        "en": "AbuseIPDB Report",
+        "de": "AbuseIPDB-Bericht"
+      },
+      "HostWasFoundInAbuseIpDb": {
+        "en": "{Host} was found in AbuseIPDB.",
+        "de": "{Host} wurde in AbuseIPDB gefunden."
+      },
+      "ConfidenceOfAbuse": {
+        "en": "Confidence of Abuse",
+        "de": "Missbrauchswahrscheinlichkeit"
+      },
+      "Country": {
+        "en": "Country",
+        "de": "Land"
+      },
+      "ISP": {
+        "en": "ISP",
+        "de": "Internetanbieter"
+      },
+      "DomainName": {
+        "en": "Domain Name",
+        "de": "Domain-Name"
+      },
+      "OpenInBrowser": {
+        "en": "Open in Browser",
+        "de": "Im Browser öffnen"
+      },
+      "RedirectCheckTimeoutError": {
+        "en": "Couldn't check this link for malicious redirects. Please proceed with caution.",
+        "de": "Es konnte nicht überprüft werden, ob dieser Link bösartige Weiterleitungen enthält. Bitte gehe vorsichtig vor."
+      },
+      "RedirectDepthLimitError": {
+        "en": "This link redirects an excessive amount and the unshortening attempt was cancelled. Please proceed with caution.",
+        "de": "Dieser Link leitet in übermäßigem Maße um, und der Versuch, ihn zu entkürzen, wurde abgebrochen. Bitte gehe vorsichtig vor."
+      },
+      "RedirectCheckTimeoutUnknownError": {
+        "en": "An unknown error occurred while trying to check for malicious redirects. Please proceed with caution.",
+        "de": "Beim Versuch, auf bösartige Weiterleitungen zu überprüfen, ist ein unbekannter Fehler aufgetreten. Bitte gehe vorsichtig vor."
+      },
+      "FoundRedirects": {
+        "en": "Found at least one redirected URLs in this message.",
+        "de": "In dieser Nachricht wurde mindestens eine weitergeleitete URL gefunden."
+      },
+      "DetectedMaliciousHost": {
+        "en": "Detected malicious host [{Host}]",
+        "de": "Bösartiger Host erkannt [{Host}]"
+      }
+    },
+    "TokenDetection": {
+      "TokenInvalidated": {
+        "en": [
+          "Heads up!",
+          "",
+          "I've detected {Count} authentication token(s) within your last message. The token(s) will soon be invalidated and the owner(s) of the bot(s) will receive an official notification from Discord",
+          "",
+          "Please be careful sharing your authentication tokens. If you think you know what you're doing, run '/config tokendetection' to disable this functionality."
+        ],
+        "de": [
+          "Achtung!",
+          "",
+          "Ich habe {Count} Authentifizierungstoken in deiner letzten Nachricht entdeckt. Die Token werden bald ungültig gemacht und die Besitzer der Bots erhalten eine offizielle Benachrichtigung von Discord.",
+          "",
+          "Bitte sei vorsichtig beim Teilen deiner Authentifizierungstoken. Wenn du denkst, dass du weißt, was du tust, führe '/config tokendetection' aus, um diese Funktion zu deaktivieren."
+        ]
+      }
+    },
+    "VcCreator": {
+      "DefaultChannelName": {
+        "en": "{User}'s Channel",
+        "de": "{User}s Kanal"
+      },
+      "NewChannelNotice": {
+        "en": [
+          "This is your temporary personal channel.",
+          "",
+          "If this channel becomes empty, it'll be deleted. Use the {Command} commands to manage this channel."
+        ],
+        "de": [
+          "Dies ist dein temporärer persönlicher Kanal.",
+          "",
+          "Wenn dieser Kanal leer wird, wird er gelöscht. Verwende die {Command} Befehle, um diesen Kanal zu verwalten."
+        ]
+      },
+      "NewOwner": {
+        "en": "The channel is now owned by {User}.",
+        "de": "Der Kanal gehört nun {User}."
+      },
+      "UserJoined": {
+        "en": "{User} joined.",
+        "de": "{User} ist beigetreten."
+      },
+      "UserLeft": {
+        "en": "{User} left.",
+        "de": "{User} hat den Kanal verlassen."
+      }
+    }
+  }
+}

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+    <CodeSnippet Format="1.0.0">
+        <Header>
+           <Title>Channel Selection</Title>
+           <Author>Myself</Author>
+           <Description>Channel Selection</Description>
+           <Shortcut>channelsel</Shortcut>
+        </Header>
+        <Snippet>
+            <Code Language="CSharp">
+                <![CDATA[var ChannelResult = await PromptChannelSelection();
+
+                if (ChannelResult.TimedOut)
+                {
+                    ModifyToTimedOut(true);
+                    return;
+                }
+                else if (ChannelResult.Cancelled)
+                {
+                    await ExecuteCommand(ctx, arguments);
+                    return;
+                }
+                else if (ChannelResult.Failed)
+                {
+                    if (ChannelResult.Exception.GetType() == typeof(NullReferenceException))
+                    {
+                        await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any _ channels in your server.`"));
+                        await Task.Delay(3000);
+                        await ExecuteCommand(ctx, arguments);
+                        return;
+                    }
+
+                    throw ChannelResult.Exception;
+                }]]>
+            </Code>
+        </Snippet>
+    </CodeSnippet>
+</CodeSnippets>

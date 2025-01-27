@@ -1,0 +1,33 @@
+[submodule "Xorog.UniversalExtensions"]
+	path = Dependencies/Xorog.UniversalExtensions
+	url = https://github.com/Fortunevale/Xorog.UniversalExtensions
+	branch = main
+[submodule "quickchart-csharp"]
+	path = Dependencies/quickchart-csharp
+	url = https://github.com/TheXorog/quickchart-csharp
+	branch = applied-editorconfig
+[submodule "DisCatSharp"]
+	path = Dependencies/DisCatSharp
+	url = https://github.com/Aiko-IT-Systems/DisCatSharp
+	branch = main
+[submodule "OfficialPlugins/Example"]
+	path = OfficialPlugins/Example
+	url = https://github.com/Fortunevale/ProjectMakoto.Plugins.Example
+	branch = main
+[submodule "OfficialPlugins/Social"]
+	path = OfficialPlugins/Social
+	url = https://github.com/Fortunevale/ProjectMakoto.Plugins.Social
+	branch = main
+[submodule "OfficialPlugins/Translations"]
+	path = OfficialPlugins/Translations
+	url = https://github.com/Fortunevale/ProjectMakoto.Plugins.Translations
+	branch = main
+[submodule "Tools"]
+	path = Tools
+	url = https://github.com/Fortunevale/ProjectMakoto.Tools
+[submodule "OfficialPlugins/ProjectMakoto.Plugins.Music"]
+	path = OfficialPlugins/Music
+	url = https://github.com/Fortunevale/ProjectMakoto.Plugins.Music
+[submodule "ScoreSaber"]
+	path = OfficialPlugins/ScoreSaber
+	url = https://github.com/Fortunevale/ProjectMakoto.Plugins.ScoreSaber

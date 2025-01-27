@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+    <CodeSnippet Format="1.0.0">
+        <Header>
+           <Title>TaskAdd</Title>
+           <Author>Myself</Author>
+           <Description>Generates async Task.Run with Add</Description>
+           <Shortcut>task</Shortcut>
+        </Header>
+        <Snippet>
+            <Code Language="CSharp">
+                <![CDATA[Task$end$.Run(async () => 
+                {
+                    $selected$
+                }).Add(_bot._watcher, ctx);]]>
+            </Code>
+        </Snippet>
+    </CodeSnippet>
+</CodeSnippets>
