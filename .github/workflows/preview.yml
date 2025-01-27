@@ -127,7 +127,7 @@ jobs:
         working-directory: ProjectMakotoPreview/ProjectMakoto/
 
       - name: Truncate String
-        uses: 2428392/gh-truncate-string-action@v1.3.0
+        uses: 2428392/gh-truncate-string-action@v1.4.1
         id: truncatedString
         with:
           stringToTruncate: ${{ github.sha }}
