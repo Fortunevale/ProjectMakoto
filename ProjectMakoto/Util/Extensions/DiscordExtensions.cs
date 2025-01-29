@@ -15,6 +15,9 @@ public static class DiscordExtensions
 {
     private static string? LoadedHtml = null;
 
+    public static DiscordMessageBuilder WithEmbed(this DiscordMessageBuilder builder, DiscordEmbed embed)
+        => builder.AddEmbed(embed);
+
     public static IReadOnlyDictionary<ulong, DiscordGuild> GetGuilds(this DiscordShardedClient client)
     {
         var Guilds = new Dictionary<ulong, DiscordGuild>();
