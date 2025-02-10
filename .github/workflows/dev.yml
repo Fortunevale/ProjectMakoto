@@ -18,7 +18,7 @@ jobs:
       with:
         exclude_path: 'SecretsIgnore.txt'
   spellcheck:
-    name: Clone Repository
+    name: Spell Check
     runs-on: self-hosted
     steps:
     - name: Checkout Actions Repository
