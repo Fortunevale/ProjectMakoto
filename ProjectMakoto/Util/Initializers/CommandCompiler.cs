@@ -137,11 +137,11 @@ internal static class CommandCompiler
                         case MakotoCommandType.SlashCommand:
                             if (command.IsGroup)
                                 return $$"""
-                                        [{{typeof(SlashCommandGroupAttribute).FullName}}("{{command.Name}}", "{{command.Description}}"{{(command.RequiredPermissions is null ? "" : $", {(long)command.RequiredPermissions}")}}, dmPermission: {{command.AllowPrivateUsage.ToString().ToLower()}}, isNsfw: {{command.IsNsfw.ToString().ToLower()}})]
+                                        [{{typeof(SlashCommandGroupAttribute).FullName}}("{{command.Name}}", "{{command.Description}}"{{(command.RequiredPermissions is null ? "" : $", {(long)command.RequiredPermissions}")}}, {{(command.AllowPrivateUsage ? string.Empty : "allowedContexts: [InteractionContextType.Guild]")}}, isNsfw: {{command.IsNsfw.ToString().ToLower()}})]
                                         """;
                             else
                                 return $$"""
-                                        [{{typeof(SlashCommandAttribute).FullName}}("{{command.Name}}", "{{command.Description}}"{{(command.RequiredPermissions is null ? "" : $", {(long)command.RequiredPermissions}")}}, dmPermission: {{command.AllowPrivateUsage.ToString().ToLower()}}, isNsfw: {{command.IsNsfw.ToString().ToLower()}})]
+                                        [{{typeof(SlashCommandAttribute).FullName}}("{{command.Name}}", "{{command.Description}}"{{(command.RequiredPermissions is null ? "" : $", {(long)command.RequiredPermissions}")}}, {{(command.AllowPrivateUsage ? string.Empty : "allowedContexts: [InteractionContextType.Guild]")}}, isNsfw: {{command.IsNsfw.ToString().ToLower()}})]
                                         """;
                         case MakotoCommandType.PrefixCommand:
                             if (command.IsGroup)
@@ -156,7 +156,7 @@ internal static class CommandCompiler
                                         """;
                         case MakotoCommandType.ContextMenu:
                             return $$"""
-                                        [{{typeof(ContextMenuAttribute).FullName}}({{typeof(ApplicationCommandType).FullName}}.{{Enum.GetName(typeof(ApplicationCommandType), command.ContextMenuType)}}, "{{command.Name}}", dmPermission: {{command.AllowPrivateUsage.ToString().ToLower()}}, isNsfw: {{command.IsNsfw.ToString().ToLower()}})]
+                                        [{{typeof(ContextMenuAttribute).FullName}}({{typeof(ApplicationCommandType).FullName}}.{{Enum.GetName(typeof(ApplicationCommandType), command.ContextMenuType)}}, "{{command.Name}}", {{(command.AllowPrivateUsage ? string.Empty : "allowedContexts: [InteractionContextType.Guild]")}}, isNsfw: {{command.IsNsfw.ToString().ToLower()}})]
                                         """;
 
                         default:
