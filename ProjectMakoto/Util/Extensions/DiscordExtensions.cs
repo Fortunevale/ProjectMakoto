@@ -185,7 +185,7 @@ public static class DiscordExtensions
 
                 return $"<discord-attachment slot=\"attachments\" " +
                 $"type=\"{type}\" " +
-                $"url=\"{Sanitize(x.Url)}\" " +
+                $"url=\"{Sanitize(x.Url.ToString())}\" " +
                 $"alt=\"{Sanitize(alt)}\" " +
                 $"size=\"{x.FileSize.Value.FileSizeToHumanReadable()}\" " +
                 $"height=\"{x.Height}\" " +
@@ -225,7 +225,7 @@ public static class DiscordExtensions
 
                 return $"<discord-attachment slot=\"attachments\" " +
                 $"type=\"{type}\" " +
-                $"url=\"{Sanitize(x.Url)}\" " +
+                $"url=\"{Sanitize(x.Url.ToString())}\" " +
                 $"alt=\"{Sanitize(alt)}\" " +
                 $"height=\"160\" " +
                 $"width=\"160\"/>";
