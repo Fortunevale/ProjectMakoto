@@ -1,4 +1,4 @@
-// Project Makoto
+﻿// Project Makoto
 // Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -225,7 +225,7 @@ internal sealed class CustomEmbedCommand : BaseCommand
 
                             var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.OtherAssets)).SendMessageAsync(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} `{ctx.User.GetUsernameWithIdentifier()} ({ctx.User.Id})`").WithFile($"{Guid.NewGuid()}.png", stream.stream));
 
-                            GeneratedEmbed.Author.IconUrl = asset.Attachments[0].Url;
+                            GeneratedEmbed.Author.IconUrl = asset.Attachments[0].Url.ToString();
                             continue;
                         }
                         else if (Menu2.GetCustomId() == SetByUser.CustomId)
@@ -320,7 +320,7 @@ internal sealed class CustomEmbedCommand : BaseCommand
 
                         var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.OtherAssets)).SendMessageAsync(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} `{ctx.User.GetUsernameWithIdentifier()} ({ctx.User.Id})`").WithFile($"{Guid.NewGuid()}.png", stream.stream));
 
-                        GeneratedEmbed.Thumbnail.Url = asset.Attachments[0].Url;
+                        GeneratedEmbed.Thumbnail.Url = asset.Attachments[0].Url.ToString();
                         continue;
                     }
                     else if (Menu1.GetCustomId() == SetDescription.CustomId)
@@ -384,7 +384,7 @@ internal sealed class CustomEmbedCommand : BaseCommand
 
                         var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.OtherAssets)).SendMessageAsync(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} `{ctx.User.GetUsernameWithIdentifier()} ({ctx.User.Id})`").WithFile($"{Guid.NewGuid()}.png", stream.stream));
 
-                        GeneratedEmbed.ImageUrl = asset.Attachments[0].Url;
+                        GeneratedEmbed.ImageUrl = asset.Attachments[0].Url.ToString();
                         continue;
                     }
                     else if (Menu1.GetCustomId() == SetColor.CustomId)
@@ -499,7 +499,7 @@ internal sealed class CustomEmbedCommand : BaseCommand
 
                             var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.OtherAssets)).SendMessageAsync(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} `{ctx.User.GetUsernameWithIdentifier()} ({ctx.User.Id})`").WithFile($"{Guid.NewGuid()}.png", stream.stream));
 
-                            GeneratedEmbed.Footer.IconUrl = asset.Attachments[0].Url;
+                            GeneratedEmbed.Footer.IconUrl = asset.Attachments[0].Url.ToString();
                             continue;
                         }
                         else if (Menu2.GetCustomId() == SetByUser.CustomId)

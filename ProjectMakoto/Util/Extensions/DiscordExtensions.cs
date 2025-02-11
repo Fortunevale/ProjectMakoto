@@ -1,4 +1,4 @@
-// Project Makoto
+﻿// Project Makoto
 // Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -159,23 +159,23 @@ public static class DiscordExtensions
             }))}" +
             $"{string.Join("", msg.Attachments?.Select(x =>
             {
-                var tempUrl = x.Url.TruncateAt(true, '?');
+                var tempUrl = x.Url.ToString().TruncateAt(true, '?');
                 var type = string.Empty;
                 var alt = x.Description;
 
-                if (x.Url.EndsWith(".jpg", StringComparison.InvariantCultureIgnoreCase) ||
-                    x.Url.EndsWith(".jpeg", StringComparison.InvariantCultureIgnoreCase) ||
-                    x.Url.EndsWith(".png", StringComparison.InvariantCultureIgnoreCase) ||
-                    x.Url.EndsWith(".webp", StringComparison.InvariantCultureIgnoreCase) ||
-                    x.Url.EndsWith(".gifv", StringComparison.InvariantCultureIgnoreCase) ||
-                    x.Url.EndsWith(".gif", StringComparison.InvariantCultureIgnoreCase))
+                if (x.Url.ToString().EndsWith(".jpg", StringComparison.InvariantCultureIgnoreCase) ||
+                    x.Url.ToString().EndsWith(".jpeg", StringComparison.InvariantCultureIgnoreCase) ||
+                    x.Url.ToString().EndsWith(".png", StringComparison.InvariantCultureIgnoreCase) ||
+                    x.Url.ToString().EndsWith(".webp", StringComparison.InvariantCultureIgnoreCase) ||
+                    x.Url.ToString().EndsWith(".gifv", StringComparison.InvariantCultureIgnoreCase) ||
+                    x.Url.ToString().EndsWith(".gif", StringComparison.InvariantCultureIgnoreCase))
                     type = "image";
-                else if (x.Url.EndsWith(".webm", StringComparison.InvariantCultureIgnoreCase) ||
-                    x.Url.EndsWith(".mp4", StringComparison.InvariantCultureIgnoreCase))
+                else if (x.Url.ToString().EndsWith(".webm", StringComparison.InvariantCultureIgnoreCase) ||
+                    x.Url.ToString().EndsWith(".mp4", StringComparison.InvariantCultureIgnoreCase))
                     type = "video";
-                else if (x.Url.EndsWith(".wav", StringComparison.InvariantCultureIgnoreCase) ||
-                    x.Url.EndsWith(".ogg", StringComparison.InvariantCultureIgnoreCase) ||
-                    x.Url.EndsWith(".mp3", StringComparison.InvariantCultureIgnoreCase))
+                else if (x.Url.ToString().EndsWith(".wav", StringComparison.InvariantCultureIgnoreCase) ||
+                    x.Url.ToString().EndsWith(".ogg", StringComparison.InvariantCultureIgnoreCase) ||
+                    x.Url.ToString().EndsWith(".mp3", StringComparison.InvariantCultureIgnoreCase))
                     type = "audio";
                 else
                 {
@@ -551,10 +551,10 @@ public static class DiscordExtensions
         => DigitsToEmotes(i.ToString());
 
     public static string ToTimestamp(this DateTime dateTime, TimestampFormat format = TimestampFormat.RelativeTime)
-        => Formatter.Timestamp(dateTime, format);
+        => dateTime.Timestamp(format);
 
     public static string ToTimestamp(this DateTimeOffset dateTime, TimestampFormat format = TimestampFormat.RelativeTime)
-        => Formatter.Timestamp(dateTime, format);
+        => dateTime.Timestamp(format);
 
     public static string GetCommandMention(this DiscordClient client, Bot bot, string command)
         => (bot.status.LoadedConfig.IsDev ?

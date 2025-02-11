@@ -1,4 +1,4 @@
-// Project Makoto
+﻿// Project Makoto
 // Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ internal sealed class EmbedMessagesEvents(Bot bot) : RequiresTranslation(bot)
                         ImageUrl = (message.Attachments?.Count > 0 && (message.Attachments[0].Filename.EndsWith(".png")
                                                                     || message.Attachments[0].Filename.EndsWith(".jpeg")
                                                                     || message.Attachments[0].Filename.EndsWith(".jpg")
-                                                                    || message.Attachments[0].Filename.EndsWith(".gif")) ? message.Attachments[0].Url : ""),
+                                                                    || message.Attachments[0].Filename.EndsWith(".gif")) ? message.Attachments[0].Url.ToString() : ""),
                         Timestamp = message.Timestamp,
                     }).AddComponents(JumpToMessage, Delete));
                 }

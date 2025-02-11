@@ -1,4 +1,4 @@
-// Project Makoto
+﻿// Project Makoto
 // Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -180,7 +180,7 @@ public sealed partial class DebugCommands : ApplicationCommandsModule
         }
     }
 
-    [SlashCommand("developertools", "Developer Tools used to manage Makoto.", dmPermission: false, defaultMemberPermissions: (long)Permissions.None)]
+    [SlashCommand("developertools", "Developer Tools used to manage Makoto.", defaultMemberPermissions: (long)Permissions.None, allowedContexts: [InteractionContextType.Guild])]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0075:Simplify conditional expression", Justification = "<Pending>")]
     public async Task DevTools(InteractionContext ctx,
         [Autocomplete(typeof(MaintainerAutoComplete))][Option("command", "The command to run.", true)] string command,
