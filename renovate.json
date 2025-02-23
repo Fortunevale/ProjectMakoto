@@ -12,6 +12,10 @@
       "matchPackagePrefixes": [ "DisCatSharp" ],
       "groupName": "discatsharp",
 	  "automerge": true
+    },
+    {
+      "managers": ["github-actions"],
+      "enabled": false
     }
   ],
   "git-submodules": {
