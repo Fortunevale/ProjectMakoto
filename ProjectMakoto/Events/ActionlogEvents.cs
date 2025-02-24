@@ -1,4 +1,4 @@
-// Project Makoto
+﻿// Project Makoto
 // Copyright (C) 2024  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -513,12 +513,12 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
 
         if (e.Role.IsManaged)
         {
-            if (e.Role.Tags?.PremiumSubscriber ?? false)
+            if (e.Role.Type is RoleType.Booster)
                 Integration = $"**{this.tKey.Integration.Get(this.Bot.Guilds[e.Guild.Id])}**: `{this.tKey.ServerBooster.Get(this.Bot.Guilds[e.Guild.Id])}`\n\n";
-
-            if (e.Role.Tags?.BotId is not null and not 0)
-            {
-                var bot = await sender.GetUserAsync((ulong)e.Role.Tags.BotId);
+            
+			if (e.Role.Type is RoleType.Bot)
+			{
+				var bot = await sender.GetUserAsync(e.Role.Tags!.BotId.Value);
 
                 Integration = $"**{this.tKey.Integration.Get(this.Bot.Guilds[e.Guild.Id])}**: {bot.Mention} `{bot.GetUsernameWithIdentifier()}`\n\n";
             }
@@ -573,12 +573,12 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
 
         if (e.Role.IsManaged)
         {
-            if (e.Role.Tags?.PremiumSubscriber ?? false)
+            if (e.Role.Type is RoleType.Booster)
                 Integration = $"**{this.tKey.Integration.Get(this.Bot.Guilds[e.Guild.Id])}**: `{this.tKey.ServerBooster.Get(this.Bot.Guilds[e.Guild.Id])}`\n\n";
 
-            if (e.Role.Tags.BotId is not null and not 0)
+            if (e.Role.Type is RoleType.Bot)
             {
-                var bot = await sender.GetUserAsync((ulong)e.Role.Tags.BotId);
+                var bot = await sender.GetUserAsync(e.Role.Tags!.BotId.Value);
 
                 Integration = $"**{this.tKey.Integration.Get(this.Bot.Guilds[e.Guild.Id])}**: {bot.Mention} `{bot.GetUsernameWithIdentifier()}`\n\n";
             }
@@ -671,12 +671,12 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
 
         if (e.RoleAfter.IsManaged)
         {
-            if (e.RoleAfter.Tags?.PremiumSubscriber ?? false)
+            if (e.RoleAfter.Type is RoleType.Booster)
                 Integration = $"**{this.tKey.Integration.Get(this.Bot.Guilds[e.Guild.Id])}**: `{this.tKey.ServerBooster.Get(this.Bot.Guilds[e.Guild.Id])}`\n\n";
-
-            if (e.RoleAfter.Tags?.BotId is not null and not 0)
-            {
-                var bot = await sender.GetUserAsync((ulong)e.RoleAfter.Tags.BotId);
+            
+			if (e.RoleAfter.Type is RoleType.Bot)
+			{
+				var bot = await sender.GetUserAsync(e.RoleAfter.Tags!.BotId.Value);
 
                 Integration = $"**{this.tKey.Integration.Get(this.Bot.Guilds[e.Guild.Id])}**: {bot.Mention} `{bot.GetUsernameWithIdentifier()}`\n\n";
             }
