@@ -260,7 +260,7 @@ internal static class DisCatSharpExtensionsLoader
             DebugStartup = true
         });
 
-        if (bot.status.CurrentAppHash != bot.status.LoadedConfig.DontModify.LastKnownHash)
+        if (bot.status.CurrentAppHash != bot.status.LoadedConfig.DontModify.LastKnownHash && Directory.Exists("CompiledCommands"))
         {
             Log.Debug("Clearing cached Commands..");
             await FileExtensions.CleanupFilesAndDirectories(new(), Directory.GetFiles("CompiledCommands").ToList());
