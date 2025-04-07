@@ -11,7 +11,8 @@
       "excludePackagePatterns": [ "Extensions" ],
       "matchPackagePrefixes": [ "DisCatSharp" ],
       "groupName": "discatsharp",
-	  "automerge": true
+	  "automerge": false,
+	  "enabled": false
     },
     {
       "managers": ["github-actions"],
