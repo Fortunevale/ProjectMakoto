@@ -52,6 +52,7 @@ public sealed class Status
         public EmojiConfig Emojis = new(config);
         public DiscordConfig Discord = new(config);
         public ChannelsConfig Channels = new(config);
+        public QuickChartConfig QuickChart = new(config);
 
         public sealed class DiscordConfig(Config config)
         {
@@ -112,6 +113,13 @@ public sealed class Status
             public ulong SoundCloud => config.Emojis.SoundCloud;
             public ulong AbuseIPDB => config.Emojis.AbuseIPDB;
             public ulong Spotify => config.Emojis.Spotify;
+        }
+
+        public sealed class QuickChartConfig(Config config)
+        {
+            public string? Scheme => config.Secrets.QuickChart.Scheme;
+            public string? Host = config.Secrets.QuickChart.Host;
+            public int? Port = config.Secrets.QuickChart.Port;
         }
     }
 

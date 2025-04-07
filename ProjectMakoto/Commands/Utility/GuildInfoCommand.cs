@@ -108,13 +108,13 @@ internal sealed class GuildInfoCommand : BaseCommand
                 if (guild.RawFeatures.Count > 0)
                     _ = embed.AddField(new DiscordEmbedField(this.GetString(CommandKey.GuildFeatures), $"{string.Join(", ", guild.RawFeatures.Select(x => $"`{string.Join(" ", x.Replace("_", " ").ToLower().Split(" ").Select(x => x.FirstLetterToUpper()))}`"))}"));
 
-                var builder = new DiscordMessageBuilder().WithEmbed(embed);
+                var builder = new DiscordMessageBuilder().AddEmbed(embed);
 
                 if (!guild.VanityUrlCode.IsNullOrWhiteSpace())
                     _ = builder.AddComponents(new DiscordLinkButtonComponent($"https://discord.gg/{guild.VanityUrlCode}", this.GetString(CommandKey.JoinServer), false, DiscordEmoji.FromUnicode("🔗").ToComponent()));
 
                 _ = await this.RespondOrEdit(new DiscordMessageBuilder()
-                    .WithEmbed(embed)
+                    .AddEmbed(embed)
                     .AddComponents(new DiscordLinkButtonComponent(guild.BannerUrl ?? "https://discord.gg", this.GetString(CommandKey.Banner), guild.BannerUrl is null),
                     new DiscordLinkButtonComponent(guild.SplashUrl ?? "https://discord.gg", this.GetString(CommandKey.Splash), guild.BannerUrl is null),
                     new DiscordLinkButtonComponent(guild.DiscoverySplashUrl ?? "https://discord.gg", this.GetString(CommandKey.DiscoverySplash), guild.BannerUrl is null),
@@ -127,7 +127,7 @@ internal sealed class GuildInfoCommand : BaseCommand
                 //    using (var file = new FileStream($"cache/{imageHash}", FileMode.Open, FileAccess.Read))
                 //    {
                 //        _ = await this.RespondOrEdit(new DiscordMessageBuilder()
-                //            .WithEmbed(embed)
+                //            .AddEmbed(embed)
                 //            .WithFile("banner.png", file));
                 //    }
                 //}
@@ -162,7 +162,7 @@ internal sealed class GuildInfoCommand : BaseCommand
                     _ = embed.AddField(new DiscordEmbedField(this.GetString(CommandKey.GuildFeatures), $"{string.Join(", ", preview.Features.Select(x => $"`{string.Join(" ", x.Replace("_", " ").ToLower().Split(" ").Select(x => x.FirstLetterToUpper()))}`"))}"));
 
 
-                    var builder = new DiscordMessageBuilder().WithEmbed(embed);
+                    var builder = new DiscordMessageBuilder().AddEmbed(embed);
 
                     var invite = "";
 
@@ -187,7 +187,7 @@ internal sealed class GuildInfoCommand : BaseCommand
 
                         _ = embed.AddField(new DiscordEmbedField(this.GetString(CommandKey.MemberTitle), $"🟢 `{widget.PresenceCount}` **{this.GetString(CommandKey.OnlineMembers)}**\n"));
 
-                        var builder = new DiscordMessageBuilder().WithEmbed(embed);
+                        var builder = new DiscordMessageBuilder().AddEmbed(embed);
 
                         if (!widget.InstantInviteUrl.IsNullOrWhiteSpace())
                             _ = builder.AddComponents(new DiscordLinkButtonComponent(widget.InstantInviteUrl, this.GetString(CommandKey.JoinServer), false, DiscordEmoji.FromUnicode("🔗").ToComponent()));

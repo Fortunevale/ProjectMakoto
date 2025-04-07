@@ -34,7 +34,7 @@ internal sealed class TokenDetectionCommand : BaseCommand
 
             var Toggle = new DiscordButtonComponent((ctx.DbGuild.TokenLeakDetection.DetectTokens ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.ToggleTokenDetection), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚠")));
 
-            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
                 Toggle

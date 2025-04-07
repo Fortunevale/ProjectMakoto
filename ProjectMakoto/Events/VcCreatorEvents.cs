@@ -49,7 +49,7 @@ internal sealed class VcCreatorEvents(Bot bot) : RequiresTranslation(bot)
 
                 _ = await newChannel.SendMessageAsync(new DiscordMessageBuilder()
                     .WithContent(e.User.Mention)
-                    .WithEmbed(new DiscordEmbedBuilder()
+                    .AddEmbed(new DiscordEmbedBuilder()
                         .WithAuthor(e.Guild.Name, "", e.Guild.IconUrl)
                         .WithColor(EmbedColors.Info)
                         .WithTimestamp(DateTime.UtcNow)

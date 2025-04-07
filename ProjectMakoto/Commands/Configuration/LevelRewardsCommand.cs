@@ -112,7 +112,7 @@ internal sealed class LevelRewardsCommand : BaseCommand
 
                 var Dropdown = new DiscordStringSelectComponent(this.GetString(CommandKey.SelectDropdown), DefinedRewards.Skip(CurrentPage * 20).Take(20).ToList(), "RewardSelection");
                 embed = embed.AsAwaitingInput(ctx, this.GetString(CommandKey.Title));
-                var builder = new DiscordMessageBuilder().WithEmbed(embed);
+                var builder = new DiscordMessageBuilder().AddEmbed(embed);
 
                 if (DefinedRewards.Count > 0)
                     _ = builder.AddComponents(Dropdown);
@@ -196,7 +196,7 @@ internal sealed class LevelRewardsCommand : BaseCommand
                                                   $"`{this.GetString(CommandKey.Message).PadRight(pad)}`: `{selectedCustomText}`"
                                 }.AsAwaitingInput(ctx, this.GetString(CommandKey.Title));
 
-                                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed)
+                                _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(action_embed)
                                     .AddComponents(new List<DiscordComponent> { SelectRole, SelectLevel, SelectCustomText, Finish })
                                     .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
 
@@ -316,7 +316,7 @@ internal sealed class LevelRewardsCommand : BaseCommand
                                     if (newMessage.Length > 256)
                                     {
                                         action_embed.Description = this.GetString(CommandKey.MessageTooLong, true);
-                                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
+                                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
                                         await Task.Delay(3000);
                                         continue;
                                     }
@@ -342,7 +342,7 @@ internal sealed class LevelRewardsCommand : BaseCommand
                                     });
 
                                     action_embed.Description = this.GetString(CommandKey.AddedNewReward, true, new TVar("Role", $"<@&{selectedRole.Id}>"), new TVar("Level", selectedLevel));
-                                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsSuccess(ctx, this.GetString(CommandKey.Title))));
+                                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(action_embed.AsSuccess(ctx, this.GetString(CommandKey.Title))));
 
                                     await Task.Delay(5000);
                                     await RefreshMessage();
@@ -391,7 +391,7 @@ internal sealed class LevelRewardsCommand : BaseCommand
 
                             if (result.Length > 256)
                             {
-                                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription(this.GetString(CommandKey.MessageTooLong, true)).AsError(ctx, this.GetString(CommandKey.Title))));
+                                _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed.WithDescription(this.GetString(CommandKey.MessageTooLong, true)).AsError(ctx, this.GetString(CommandKey.Title))));
                                 await Task.Delay(5000);
                                 await this.ExecuteCommand(ctx, arguments);
                                 return;

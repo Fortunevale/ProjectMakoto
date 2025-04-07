@@ -44,7 +44,7 @@ internal sealed class CustomEmbedCommand : BaseCommand
 
                     try
                     {
-                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(GeneratedEmbed)
+                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(GeneratedEmbed)
                                         .AddComponents(new List<DiscordComponent> { SetTitle, SetAuthor, SetThumbnail })
                                         .AddComponents(new List<DiscordComponent> { SetDescription, SetImage, SetColor })
                                         .AddComponents(new List<DiscordComponent> { SetFooter, SetTimestamp })
@@ -119,7 +119,7 @@ internal sealed class CustomEmbedCommand : BaseCommand
                         var SetByUser = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.SetAsUserButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
                         var SetByGuild = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.SetAsServer), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖥")));
 
-                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(GeneratedEmbed)
+                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(GeneratedEmbed)
                             .AddComponents(new List<DiscordComponent> { SetName, SetUrl, SetIcon })
                             .AddComponents(new List<DiscordComponent> { SetByUser, SetByGuild })
                             .AddComponents(new List<DiscordComponent> { MessageComponents.GetBackButton(ctx.DbUser, ctx.Bot) }));
@@ -425,7 +425,7 @@ internal sealed class CustomEmbedCommand : BaseCommand
                         var SetByUser = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.SetAsUserButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
                         var SetByGuild = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.SetAsServer), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖥")));
 
-                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(GeneratedEmbed)
+                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(GeneratedEmbed)
                             .AddComponents(new List<DiscordComponent> { SetText, SetIcon })
                             .AddComponents(new List<DiscordComponent> { SetByUser, SetByGuild })
                             .AddComponents(new List<DiscordComponent> { MessageComponents.GetBackButton(ctx.DbUser, ctx.Bot) }));

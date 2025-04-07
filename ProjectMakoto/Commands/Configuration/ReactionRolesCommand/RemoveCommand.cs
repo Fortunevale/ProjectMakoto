@@ -77,7 +77,7 @@ internal sealed class RemoveCommand : BaseCommand
                     case Enums.CommandType.ContextMenu:
                     {
                         embed.Description = this.GetString(CommandKey.ReactWithEmojiToRemove, true);
-                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsAwaitingInput(ctx, this.GetString(CommandKey.Title))));
+                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed.AsAwaitingInput(ctx, this.GetString(CommandKey.Title))));
 
                         var emoji_wait = await ctx.Client.GetInteractivity().WaitForReactionAsync(x => x.Channel.Id == ctx.Channel.Id && x.User.Id == ctx.User.Id && x.Message.Id == message.Id, TimeSpan.FromMinutes(2));
 
@@ -98,7 +98,7 @@ internal sealed class RemoveCommand : BaseCommand
             if (!ctx.DbGuild.ReactionRoles.Any(x => x.MessageId == message.Id && x.EmojiName == emoji_parameter.GetUniqueDiscordName()))
             {
                 embed.Description = this.GetString(CommandKey.NoReactionRoleFound);
-                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, this.GetString(CommandKey.Title))));
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed.AsError(ctx, this.GetString(CommandKey.Title))));
                 return;
             }
 
@@ -116,7 +116,7 @@ internal sealed class RemoveCommand : BaseCommand
                 new TVar("User", reactionMessage?.Author.Mention ?? "`/`"),
                 new TVar("Channel", reactionMessage?.Channel.Mention ?? "`/`"),
                 new TVar("Emoji", obj.GetEmoji(ctx.Client)));
-            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsSuccess(ctx, this.GetString(CommandKey.Title))));
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed.AsSuccess(ctx, this.GetString(CommandKey.Title))));
         });
     }
 }

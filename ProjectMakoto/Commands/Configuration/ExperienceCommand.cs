@@ -37,7 +37,7 @@ internal sealed class ExperienceCommand : BaseCommand
                 Description = GetCurrentConfiguration(ctx)
             }.AsAwaitingInput(ctx, this.GetString(CommandKey.Title));
 
-            var builder = new DiscordMessageBuilder().WithEmbed(embed);
+            var builder = new DiscordMessageBuilder().AddEmbed(embed);
 
             var ToggleExperienceSystem = new DiscordButtonComponent((ctx.DbGuild.Experience.UseExperience ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.ToggleExperienceButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✨")));
             var ToggleBumperBoost = new DiscordButtonComponent((ctx.DbGuild.Experience.BoostXpForBumpReminder ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.ToggleExperienceBoostButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⏫")));

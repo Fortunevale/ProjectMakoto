@@ -68,7 +68,7 @@ internal sealed class RemoveAllCommand : BaseCommand
             if (!ctx.DbGuild.ReactionRoles.Any(x => x.MessageId == message.Id))
             {
                 embed.Description = this.GetString(CommandKey.NoReactionRoles, true);
-                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, this.GetString(CommandKey.Title))));
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed.AsError(ctx, this.GetString(CommandKey.Title))));
                 return;
             }
 
@@ -80,7 +80,7 @@ internal sealed class RemoveAllCommand : BaseCommand
             embed.Description = this.GetString(CommandKey.RemovedAllReactionRoles, true,
                 new TVar("User", message?.Author.Mention ?? "`/`"),
                 new TVar("Channel", message?.Channel.Mention ?? "`/`"));
-            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsSuccess(ctx, this.GetString(CommandKey.Title))));
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed.AsSuccess(ctx, this.GetString(CommandKey.Title))));
         });
     }
 }

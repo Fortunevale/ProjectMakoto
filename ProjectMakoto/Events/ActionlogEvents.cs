@@ -42,7 +42,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
                 $"{string.Join("\n\n", globalNote.Notes.Select(x => $"{x.Reason.FullSanitize()} - <@{x.Moderator}> {x.Timestamp.ToTimestamp()}"))}".TruncateWithIndication(512)));
         }
 
-        var message = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+        var message = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().AddEmbed(embed));
 
         await Task.Delay(5000);
 
@@ -63,7 +63,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
         if (this.Bot.Guilds[e.Guild.Id].InviteNotes.Notes.Any(x => x.Invite == this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code))
             embed.Description += $"**{this.tKey.InviteNote.Get(this.Bot.Guilds[e.Guild.Id])}**: `{this.Bot.Guilds[e.Guild.Id].InviteNotes.Notes.First(x => x.Invite == this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code).Note.SanitizeForCode()}`";
 
-        _ = message.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+        _ = message.ModifyAsync(new DiscordMessageBuilder().AddEmbed(embed));
     }
 
     internal async Task UserLeft(DiscordClient sender, GuildMemberRemoveEventArgs e)
@@ -83,7 +83,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
         if (e.Member.Roles.Any())
             _ = embed.AddField(new DiscordEmbedField(this.tKey.Roles.Get(this.Bot.Guilds[e.Guild.Id]).Build(), $"{string.Join(", ", e.Member.Roles.Select(x => x.Mention))}".TruncateWithIndication(1000)));
 
-        var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+        var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().AddEmbed(embed));
 
         for (var i = 0; i < 3; i++)
         {
@@ -106,7 +106,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
                 embed.Footer = new();
                 embed.Footer.Text += $"\n({this.tKey.FooterAuditLogDisclaimer.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("Fields", $"'{this.tKey.KickedBy.Get(this.Bot.Guilds[e.Guild.Id])}' & '{this.tKey.Reason.Get(this.Bot.Guilds[e.Guild.Id])}'"))})";
 
-                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                _ = msg.ModifyAsync(new DiscordMessageBuilder().AddEmbed(embed));
                 break;
             }
 
@@ -160,7 +160,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
         if (embed.Fields.Count == 0)
             return;
 
-        _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+        _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().AddEmbed(embed));
     }
 
     internal async Task VoiceStateUpdated(DiscordClient sender, VoiceStateUpdateEventArgs e)
@@ -174,7 +174,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
         if (PreviousChannel != NewChannel)
             if (PreviousChannel is null && NewChannel is not null)
             {
-                _ = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                _ = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder()
                     .WithAuthor(this.tKey.UserJoinedVoiceChannel.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.VoiceStateUserJoined)
                     .WithThumbnail(e.User.AvatarUrl)
                     .WithColor(EmbedColors.Success)
@@ -185,7 +185,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
             }
             else if (PreviousChannel is not null && NewChannel is null)
             {
-                _ = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                _ = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder()
                     .WithAuthor(this.tKey.UserLeftVoiceChannel.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.VoiceStateUserLeft)
                     .WithThumbnail(e.User.AvatarUrl)
                     .WithColor(EmbedColors.Error)
@@ -196,7 +196,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
             }
             else if (PreviousChannel is not null && NewChannel is not null)
             {
-                _ = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                _ = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder()
                     .WithAuthor(this.tKey.UserSwitchedVoiceChannel.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.VoiceStateUserUpdated)
                     .WithThumbnail(e.User.AvatarUrl)
                     .WithColor(EmbedColors.Warning)
@@ -264,7 +264,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
 
         using (var fileStream = new MemoryStream(Encoding.UTF8.GetBytes(Messages)))
         {
-            _ = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed).WithFile(FileName, fileStream)
+            _ = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().AddEmbed(embed).WithFile(FileName, fileStream)
                 .AddComponents(new DiscordLinkButtonComponent($"{this.Bot.status.LoadedConfig.WebServer.UrlPrefix}/{e.Guild.Id}/DeletedMessages/{FileName}", "Open in Browser",
                 this.Bot.status.LoadedConfig.WebServer.UrlPrefix.IsNullOrWhiteSpace())));
         }
@@ -311,7 +311,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
             return;
         }
 
-        _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+        _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().AddEmbed(embed));
     }
 
     internal async Task MemberUpdated(DiscordClient sender, GuildMemberUpdateEventArgs e)
@@ -339,7 +339,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
             else
                 _ = embed.AddField(new DiscordEmbedField(this.tKey.NewNickname.Get(this.Bot.Guilds[e.Guild.Id]), $"`{e.NicknameAfter}`"));
 
-            _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+            _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().AddEmbed(embed));
         }
 
         var RolesUpdated = false;
@@ -427,7 +427,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
 
             embed.Description += $"\n\n{Roles}";
 
-            _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+            _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().AddEmbed(embed));
         }
 
         if (e.TimeoutBefore != e.TimeoutAfter)
@@ -436,7 +436,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
             var timeBefore = (e.TimeoutBefore ?? DateTime.Today.AddDays(-300)).ToUniversalTime();
 
             if (timeAfter > timeBefore)
-                _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder()
                     .WithAuthor(this.tKey.TimedOut.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.UserBanned)
                         .WithColor(EmbedColors.Error)
                         .WithFooter($"{this.tKey.UserId.Get(this.Bot.Guilds[e.Guild.Id])}: {e.Member.Id}")
@@ -446,7 +446,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
                                          $"**{this.tKey.TimedOutUntil.Get(this.Bot.Guilds[e.Guild.Id])}**: {timeAfter.Timestamp(TimestampFormat.LongDateTime)} ({timeAfter.Timestamp()})")));
 
             if (timeAfter < timeBefore)
-                _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder()
                     .WithAuthor(this.tKey.TimeoutRemoved.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.UserBanRemoved)
                         .WithColor(EmbedColors.Success)
                         .WithFooter($"{this.tKey.UserId.Get(this.Bot.Guilds[e.Guild.Id])}: {e.Member.Id}")
@@ -460,7 +460,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
             try
             {
                 if ((e.PendingBefore is null && e.PendingAfter is true) || (e.PendingAfter is true && e.PendingBefore is false))
-                    _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                    _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder()
                         .WithAuthor(this.tKey.MembershipApproved.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.UserAdded)
                         .WithColor(EmbedColors.Success)
                         .WithFooter($"{this.tKey.UserId.Get(this.Bot.Guilds[e.Guild.Id])}: {e.Member.Id}")
@@ -478,7 +478,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
         //{
         //    // Normal avatar updates don't seem to fire the member updated event, will keep this code for potential future updates.
 
-        //    _ = SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+        //    _ = SendActionlog(e.Guild, new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder()
         //    {
         //        Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = AuditLogIcons.UserUpdated, Name = $"Member Profile Picture updated" },
         //        Color = EmbedColors.Warning,
@@ -492,7 +492,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
 
         if (e.GuildAvatarHashBefore != e.GuildAvatarHashAfter)
         {
-            _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+            _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder()
                 .WithAuthor(this.tKey.GuildProfilePictureUpdated.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.UserUpdated)
                 .WithColor(EmbedColors.Warning)
                 .WithFooter($"{this.tKey.UserId.Get(this.Bot.Guilds[e.Guild.Id])}: {e.Member.Id}")
@@ -536,7 +536,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
                              $"{Integration}" +
                              $"\n**{this.tKey.Permissions.Get(this.Bot.Guilds[e.Guild.Id])}**: {GeneratePermissions}");
 
-        var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+        var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().AddEmbed(embed));
 
         if (!this.Bot.Guilds[e.Guild.Id].ActionLog.AttemptGettingMoreDetails)
             return;
@@ -555,7 +555,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
 
                 embed.Footer.Text += $"\n({this.tKey.FooterAuditLogDisclaimer.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("Fields", $"'{this.tKey.CreatedBy.Get(this.Bot.Guilds[e.Guild.Id])}'"))})";
 
-                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                _ = msg.ModifyAsync(new DiscordMessageBuilder().AddEmbed(embed));
                 break;
             }
 
@@ -597,7 +597,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
                              $"{Integration}\n" +
                              $"\n**{this.tKey.Permissions.Get(this.Bot.Guilds[e.Guild.Id])}**: {GeneratePermissions}");
 
-        var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+        var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().AddEmbed(embed));
 
         if (!this.Bot.Guilds[e.Guild.Id].ActionLog.AttemptGettingMoreDetails)
             return;
@@ -616,7 +616,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
 
                 embed.Footer.Text += $"\n({this.tKey.FooterAuditLogDisclaimer.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("Fields", $"'{this.tKey.DeletedBy.Get(this.Bot.Guilds[e.Guild.Id])}'"))})";
 
-                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                _ = msg.ModifyAsync(new DiscordMessageBuilder().AddEmbed(embed));
                 break;
             }
 
@@ -702,7 +702,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
                       $"{Integration}" +
                       $"{PermissionDifference}");
 
-        var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+        var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().AddEmbed(embed));
 
         if (!this.Bot.Guilds[e.Guild.Id].ActionLog.AttemptGettingMoreDetails)
             return;
@@ -721,7 +721,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
 
                 embed.Footer.Text += $"\n({this.tKey.FooterAuditLogDisclaimer.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("Fields", $"'{this.tKey.ModifiedBy.Get(this.Bot.Guilds[e.Guild.Id])}'"))})";
 
-                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                _ = msg.ModifyAsync(new DiscordMessageBuilder().AddEmbed(embed));
                 break;
             }
 
@@ -751,7 +751,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
                     .TruncateWithIndication(1000)));
         }
 
-        var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+        var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().AddEmbed(embed));
 
         if (!this.Bot.Guilds[e.Guild.Id].ActionLog.AttemptGettingMoreDetails)
             return;
@@ -772,7 +772,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
 
                 embed.Footer.Text += $"\n({this.tKey.FooterAuditLogDisclaimer.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("Fields", $"'{this.tKey.BannedBy.Get(this.Bot.Guilds[e.Guild.Id])}' & '{this.tKey.Reason.Get(this.Bot.Guilds[e.Guild.Id])}'"))})";
 
-                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                _ = msg.ModifyAsync(new DiscordMessageBuilder().AddEmbed(embed));
                 break;
             }
 
@@ -793,7 +793,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
             .WithThumbnail(e.Member.AvatarUrl)
             .WithDescription($"**{this.tKey.User.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`");
 
-        var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+        var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().AddEmbed(embed));
 
         if (!this.Bot.Guilds[e.Guild.Id].ActionLog.AttemptGettingMoreDetails)
             return;
@@ -811,7 +811,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
 
                 embed.Footer.Text += $"\n({this.tKey.FooterAuditLogDisclaimer.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("Fields", $"'{this.tKey.UnbannedBy.Get(this.Bot.Guilds[e.Guild.Id])}'"))})";
 
-                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                _ = msg.ModifyAsync(new DiscordMessageBuilder().AddEmbed(embed));
                 break;
             }
 
@@ -927,7 +927,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
         if (e.GuildBefore.IconHash != e.GuildAfter.IconHash)
             embed.ImageUrl = e.GuildAfter.IconUrl;
 
-        var msg = await this.SendActionlog(e.GuildAfter, new DiscordMessageBuilder().WithEmbed(embed));
+        var msg = await this.SendActionlog(e.GuildAfter, new DiscordMessageBuilder().AddEmbed(embed));
 
         if (!this.Bot.Guilds[e.GuildAfter.Id].ActionLog.AttemptGettingMoreDetails)
             return;
@@ -946,7 +946,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
                 embed.Footer = new();
                 embed.Footer.Text += $"\n({this.tKey.FooterAuditLogDisclaimer.Get(this.Bot.Guilds[e.GuildAfter.Id]).Build(new TVar("Fields", $"'{this.tKey.ModifiedBy.Get(this.Bot.Guilds[e.GuildAfter.Id])}'"))})";
 
-                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                _ = msg.ModifyAsync(new DiscordMessageBuilder().AddEmbed(embed));
                 break;
             }
 
@@ -966,7 +966,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
             .WithTimestamp(DateTime.UtcNow)
             .WithDescription($"**{this.tKey.Name.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Channel.Mention} `[{e.Channel.GetIcon()}{e.Channel.Name}]`");
 
-        var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+        var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().AddEmbed(embed));
 
         if (!this.Bot.Guilds[e.Guild.Id].ActionLog.AttemptGettingMoreDetails)
             return;
@@ -985,7 +985,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
 
                 embed.Footer.Text += $"\n({this.tKey.FooterAuditLogDisclaimer.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("Fields", $"'{this.tKey.CreatedBy.Get(this.Bot.Guilds[e.Guild.Id])}'"))})";
 
-                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                _ = msg.ModifyAsync(new DiscordMessageBuilder().AddEmbed(embed));
                 break;
             }
 
@@ -1005,7 +1005,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
             .WithTimestamp(DateTime.UtcNow)
             .WithDescription($"**{this.tKey.Name.Get(this.Bot.Guilds[e.Guild.Id])}**: `[{e.Channel.GetIcon()}{e.Channel.Name}]`");
 
-        var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+        var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().AddEmbed(embed));
 
         if (!this.Bot.Guilds[e.Guild.Id].ActionLog.AttemptGettingMoreDetails)
             return;
@@ -1024,7 +1024,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
 
                 embed.Footer.Text += $"\n({this.tKey.FooterAuditLogDisclaimer.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("Fields", $"'{this.tKey.DeletedBy.Get(this.Bot.Guilds[e.Guild.Id])}'"))})";
 
-                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                _ = msg.ModifyAsync(new DiscordMessageBuilder().AddEmbed(embed));
                 break;
             }
 
@@ -1055,7 +1055,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
             .WithTimestamp(DateTime.UtcNow)
             .WithDescription(Description);
 
-        var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+        var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().AddEmbed(embed));
 
         if (!this.Bot.Guilds[e.Guild.Id].ActionLog.AttemptGettingMoreDetails)
             return;
@@ -1074,7 +1074,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
 
                 embed.Footer.Text += $"\n({this.tKey.FooterAuditLogDisclaimer.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("Fields", $"'{this.tKey.ModifiedBy.Get(this.Bot.Guilds[e.Guild.Id])}'"))})";
 
-                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                _ = msg.ModifyAsync(new DiscordMessageBuilder().AddEmbed(embed));
                 break;
             }
 
@@ -1087,7 +1087,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
         if (!await this.ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.InvitesModified)
             return;
 
-        _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+        _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder()
             .WithAuthor(this.tKey.InviteCreated.Get(this.Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.InviteAdded)
             .WithColor(EmbedColors.Success)
             .WithTimestamp(DateTime.UtcNow)
@@ -1109,7 +1109,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
                              $"**{this.tKey.CreatedBy.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Invite.Inviter?.Mention ?? this.tKey.NoInviter.Get(this.Bot.Guilds[e.Guild.Id]).Build(true)} `{e.Invite.Inviter?.GetUsernameWithIdentifier() ?? "-"}`\n" +
                              $"**{this.tKey.Channel.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Channel.Mention} `[{e.Channel.GetIcon()}{e.Channel.Name}]`");
 
-        var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+        var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().AddEmbed(embed));
 
 
         if (!this.Bot.Guilds[e.Guild.Id].ActionLog.AttemptGettingMoreDetails)
@@ -1130,7 +1130,7 @@ internal sealed class ActionlogEvents(Bot bot) : RequiresTranslation(bot)
                 embed.Footer = new();
                 embed.Footer.Text += $"\n({this.tKey.FooterAuditLogDisclaimer.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("Fields", $"'{this.tKey.DeletedBy.Get(this.Bot.Guilds[e.Guild.Id])}'"))})";
 
-                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                _ = msg.ModifyAsync(new DiscordMessageBuilder().AddEmbed(embed));
                 break;
             }
 

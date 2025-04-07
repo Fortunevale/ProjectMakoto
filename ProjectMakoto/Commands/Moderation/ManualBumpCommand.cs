@@ -28,7 +28,7 @@ internal sealed class ManualBumpCommand : BaseCommand
             DiscordButtonComponent YesButton = new(ButtonStyle.Success, Guid.NewGuid().ToString(), this.GetString(this.t.Common.Yes), false, DiscordEmoji.FromUnicode("✅").ToComponent());
 
             _ = await this.RespondOrEdit(new DiscordMessageBuilder()
-                .WithEmbed(new DiscordEmbedBuilder().WithDescription(this.GetString(CommandKey.Warning, true)).AsWarning(ctx))
+                .AddEmbed(new DiscordEmbedBuilder().WithDescription(this.GetString(CommandKey.Warning, true)).AsWarning(ctx))
                 .AddComponents(new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), this.GetString(this.t.Common.No), false, DiscordEmoji.FromUnicode("❌").ToComponent()), YesButton));
 
             var e = await ctx.ResponseMessage.WaitForButtonAsync(ctx.User);

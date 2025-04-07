@@ -34,7 +34,7 @@ internal sealed class VcCreatorCommand : BaseCommand
 
             var SetChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.SetVcCreator), false, EmojiTemplates.GetChannel(ctx.Bot).ToComponent());
 
-            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
                 SetChannel

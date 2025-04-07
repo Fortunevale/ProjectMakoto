@@ -55,7 +55,7 @@ internal sealed class EmbedMessagesEvents(Bot bot) : RequiresTranslation(bot)
 
                     var JumpToMessage = new DiscordLinkButtonComponent(message.JumpLink.ToString(), this.t.Common.JumpToMessage.Get(this.Bot.Guilds[e.Guild.Id]), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
                     
-                    var msg = await e.Message.RespondAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                    var msg = await e.Message.RespondAsync(new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder
                     {
                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = message.Author.AvatarUrl, Name = $"{message.Author.GetUsernameWithIdentifier()}" },
                         Color = message.Author.BannerColor ?? EmbedColors.Info,

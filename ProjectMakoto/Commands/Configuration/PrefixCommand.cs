@@ -36,7 +36,7 @@ internal sealed class PrefixCommand : BaseCommand
             var TogglePrefixCommands = new DiscordButtonComponent((ctx.DbGuild.PrefixSettings.PrefixDisabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(this.t.Commands.Config.PrefixConfigCommand.TogglePrefixCommands), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⌨")));
             var ChangePrefix = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), this.GetString(this.t.Commands.Config.PrefixConfigCommand.ChangePrefix), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗝")));
 
-            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
                 { TogglePrefixCommands },

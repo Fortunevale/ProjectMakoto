@@ -53,7 +53,7 @@ internal sealed class JoinCommand : BaseCommand
                 Description = GetCurrentConfiguration(ctx)
             }.AsAwaitingInput(ctx, this.GetString(CommandKey.Title));
 
-            var builder = new DiscordMessageBuilder().WithEmbed(embed);
+            var builder = new DiscordMessageBuilder().AddEmbed(embed);
 
             var ToggleGlobalban = new DiscordButtonComponent((ctx.DbGuild.Join.AutoBanGlobalBans ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.ToggleGlobalBansButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🌐")));
             var ChangeJoinlogChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.ChangeJoinlogChannelButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👋")));

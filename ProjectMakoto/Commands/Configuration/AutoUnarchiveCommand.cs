@@ -41,7 +41,7 @@ internal sealed class AutoUnarchiveCommand : BaseCommand
             var Add = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), this.GetString(CommandKey.AddChannelButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
             var Remove = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), this.GetString(CommandKey.RemoveChannelButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
 
-            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
                 Add,

@@ -78,7 +78,7 @@ internal sealed class AddCommand : BaseCommand
                     case Enums.CommandType.ContextMenu:
                     {
                         embed.Description = this.GetString(CommandKey.SelectRolePrompt, true);
-                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsAwaitingInput(ctx, this.GetString(CommandKey.Title))));
+                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed.AsAwaitingInput(ctx, this.GetString(CommandKey.Title))));
                         var RoleResult = await this.PromptRoleSelection();
 
                         if (RoleResult.TimedOut)
@@ -122,7 +122,7 @@ internal sealed class AddCommand : BaseCommand
                     case Enums.CommandType.ContextMenu:
                     {
                         embed.Description = this.GetString(CommandKey.ReactWithEmoji, true);
-                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsAwaitingInput(ctx, this.GetString(CommandKey.Title))));
+                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed.AsAwaitingInput(ctx, this.GetString(CommandKey.Title))));
 
                         var emoji_wait = await ctx.Client.GetInteractivity().WaitForReactionAsync(x => x.Channel.Id == ctx.Channel.Id && x.User.Id == ctx.User.Id && x.Message.Id == message.Id, TimeSpan.FromMinutes(2));
 
@@ -141,7 +141,7 @@ internal sealed class AddCommand : BaseCommand
                         if (emoji_parameter.Id != 0 && !ctx.Guild.Emojis.ContainsKey(emoji_parameter.Id))
                         {
                             embed.Description = this.GetString(CommandKey.NoAccessToEmoji);
-                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, this.GetString(CommandKey.Title))));
+                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed.AsError(ctx, this.GetString(CommandKey.Title))));
                             return;
                         }
 
@@ -157,28 +157,28 @@ internal sealed class AddCommand : BaseCommand
             if (ctx.DbGuild.ReactionRoles.Length > 100)
             {
                 embed.Description = this.GetString(CommandKey.ReactionRoleLimitReached, true);
-                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, this.GetString(CommandKey.Title))));
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed.AsError(ctx, this.GetString(CommandKey.Title))));
                 return;
             }
 
             if (emoji_parameter.Id != 0 && !ctx.Guild.Emojis.ContainsKey(emoji_parameter.Id))
             {
                 embed.Description = this.GetString(CommandKey.NoAccessToEmoji, true);
-                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, this.GetString(CommandKey.Title))));
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed.AsError(ctx, this.GetString(CommandKey.Title))));
                 return;
             }
 
             if (ctx.DbGuild.ReactionRoles.Any(x => (x.MessageId == message.Id && x.EmojiName == emoji_parameter.GetUniqueDiscordName())))
             {
                 embed.Description = this.GetString(CommandKey.EmojiAlreadyUsed, true);
-                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, this.GetString(CommandKey.Title))));
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed.AsError(ctx, this.GetString(CommandKey.Title))));
                 return;
             }
 
             if (ctx.DbGuild.ReactionRoles.Any(x => x.RoleId == role_parameter.Id))
             {
                 embed.Description = this.GetString(CommandKey.RoleAlreadyUsed, true);
-                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, this.GetString(CommandKey.Title))));
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed.AsError(ctx, this.GetString(CommandKey.Title))));
                 return;
             }
 
@@ -198,7 +198,7 @@ internal sealed class AddCommand : BaseCommand
                 new TVar("User", message.Author.Mention),
                 new TVar("Channel", message.Channel.Mention),
                 new TVar("Emoji", emoji_parameter));
-            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsSuccess(ctx, this.GetString(CommandKey.Title))));
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed.AsSuccess(ctx, this.GetString(CommandKey.Title))));
         });
     }
 }

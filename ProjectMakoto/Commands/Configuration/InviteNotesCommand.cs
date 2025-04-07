@@ -39,7 +39,7 @@ internal sealed class InviteNotesCommand : BaseCommand
 
             if (!(ctx.DbGuild.InviteNotes.Notes.Length > 19))
             {
-                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed)
                 .AddComponents(new List<DiscordComponent>
                 {
                     AddButton,
@@ -48,7 +48,7 @@ internal sealed class InviteNotesCommand : BaseCommand
             }
             else
             {
-                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed)
                     .AddComponents(new List<DiscordComponent> { RemoveButton }).AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
             }
 
@@ -81,7 +81,7 @@ internal sealed class InviteNotesCommand : BaseCommand
                                       $"`{this.GetString(CommandKey.Invite).PadRight(pad)}`: `{(SelectedInvite is null ? this.GetString(this.t.Common.NotSelected) : $"{SelectedInvite.Code}")}`"
                     }.AsAwaitingInput(ctx, this.GetString(CommandKey.Title));
 
-                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
+                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed)
                         .AddComponents(new List<DiscordComponent> { SelectTextButton, SelectInviteButton, Finish })
                         .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
 

@@ -173,7 +173,7 @@ internal sealed class ExperienceHandler : RequiresTranslation
 
                                 this.Bot.Users[user.Id].ExperienceUser.DirectMessageOptOut = true;
 
-                                _ = await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                                _ = await msg.ModifyAsync(new DiscordMessageBuilder().AddEmbed(embed));
 
                                 _ = await (await user.CreateDmChannelAsync()).SendMessageAsync(this.tKey.AutomaticDeletion.Get(this.Bot.Users[user.Id]).Build(
                                     new TVar("Command", "`/levelrewards-optin`"),
@@ -187,7 +187,7 @@ internal sealed class ExperienceHandler : RequiresTranslation
                         { new DiscordButtonComponent(ButtonStyle.Secondary, "opt-out-experience-dm", this.tKey.DisableDirectMessages.Get(this.Bot.Users[user.Id]), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⛔"))) },
                     };
 
-                    msg = await (await user.CreateDmChannelAsync()).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(discordComponents));
+                    msg = await (await user.CreateDmChannelAsync()).SendMessageAsync(new DiscordMessageBuilder().AddEmbed(embed).AddComponents(discordComponents));
 
                     this.Bot.DiscordClient.ComponentInteractionCreated += RunInteraction;
 
@@ -195,7 +195,7 @@ internal sealed class ExperienceHandler : RequiresTranslation
                     {
                         await Task.Delay(3600000);
                         embed.Footer.Text += $" • {this.t.Commands.Common.InteractionTimeout.Get(this.Bot.Users[user.Id])}";
-                        _ = await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                        _ = await msg.ModifyAsync(new DiscordMessageBuilder().AddEmbed(embed));
 
                         this.Bot.DiscordClient.ComponentInteractionCreated -= RunInteraction;
                     }

@@ -32,7 +32,7 @@ internal sealed class UrbanDictionaryCommand : BaseCommand
             var Yes = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), this.GetString(this.t.Common.Yes), false, new DiscordComponentEmoji(true.ToEmote(ctx.Bot)));
             var No = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), this.GetString(this.t.Common.No), false, new DiscordComponentEmoji(false.ToEmote(ctx.Bot)));
 
-            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder
             {
                 Description = this.GetString(this.t.Commands.Utility.UrbanDictionary.AdultContentWarning, true)
             }.AsAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));

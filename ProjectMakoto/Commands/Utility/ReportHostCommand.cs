@@ -40,7 +40,7 @@ internal sealed class ReportHostCommand : BaseCommand
                     tos_embed.Description = tos_embed.Description.Insert(0, $"**{this.GetString(this.t.Commands.Utility.ReportHost.TosChangedNotice)}**\n\n");
                 }
 
-                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(tos_embed).AddComponents(button));
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(tos_embed).AddComponents(button));
 
                 var TosAccept = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
 
@@ -100,7 +100,7 @@ internal sealed class ReportHostCommand : BaseCommand
 
             var ContinueButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), this.GetString(this.t.Common.Confirm), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
-            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent>
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed).AddComponents(new List<DiscordComponent>
             {
                 { ContinueButton },
                 { MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot) }
@@ -158,7 +158,7 @@ internal sealed class ReportHostCommand : BaseCommand
                 var BanUserButton = new DiscordButtonComponent(ButtonStyle.Danger, "ban_user", "Deny submission & ban submitter", false, new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, 1005430134070841395)));
                 var BanGuildButton = new DiscordButtonComponent(ButtonStyle.Danger, "ban_guild", "Deny submission & ban guild", false, new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, 1005430134070841395)));
 
-                var submittedMsg = await channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                var submittedMsg = await channel.SendMessageAsync(new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = StatusIndicatorIcons.Success, Name = this.GetString(this.t.Commands.Utility.ReportHost.Title) },
                     Color = EmbedColors.Success,

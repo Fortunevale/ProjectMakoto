@@ -13,7 +13,7 @@ for /d /r %%i in (*deps*) do (
 
 cd /d "%original_dir%"
 
-git submodule update --init --depth 0
+REM git submodule update --init --depth 0
 
 for /D %%i in (*) do (
 	if /I "%%i" neq "deps" (

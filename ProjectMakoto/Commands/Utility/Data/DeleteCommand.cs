@@ -23,7 +23,7 @@ internal sealed class DeleteCommand : BaseCommand
 
             if (ctx.Bot.objectedUsers.Contains(ctx.User.Id))
             {
-                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder
                 {
                     Description = this.GetString(this.t.Commands.Utility.Data.Object.ProfileAlreadyDeleted, true)
                 }.AsAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
@@ -75,7 +75,7 @@ internal sealed class DeleteCommand : BaseCommand
 
             if (ctx.DbUser.Data.DeletionRequested)
             {
-                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder
                 {
                     Description = this.GetString(this.t.Commands.Utility.Data.Object.DeletionAlreadyScheduled, true,
                     new TVar("RequestTimestamp", ctx.DbUser.Data.DeletionRequestDate.AddDays(-14).ToTimestamp()),
@@ -110,7 +110,7 @@ internal sealed class DeleteCommand : BaseCommand
                 return;
             }
 
-            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder
             {
                 Description = this.GetString(this.t.Commands.Utility.Data.Object.ObjectionDisclaimer, true, true)
             }.AsAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
@@ -127,7 +127,7 @@ internal sealed class DeleteCommand : BaseCommand
 
             if (Menu.GetCustomId() == Yes.CustomId)
             {
-                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder
                 {
                     Description = $"**{this.GetString(this.t.Commands.Utility.Data.Object.SecondaryConfirm, true)}**"
                 }.AsAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { No, Yes }));

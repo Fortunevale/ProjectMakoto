@@ -23,7 +23,7 @@ internal sealed class EvaluationCommand : BaseCommand
         {
             if (ctx.CommandType is not Enums.CommandType.ApplicationCommand and not Enums.CommandType.ContextMenu)
             {
-                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder().WithDescription("Evaluating CScript has the potential of leaking confidential information. Are you sure you want to run this command as Prefix Command?").AsWarning(ctx))
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription("Evaluating CScript has the potential of leaking confidential information. Are you sure you want to run this command as Prefix Command?").AsWarning(ctx))
                     .AddComponents(new List<DiscordComponent> { new DiscordButtonComponent(ButtonStyle.Success, "yes", "Yes"),
                                                                 new DiscordButtonComponent(ButtonStyle.Danger, "no", "No")}));
 

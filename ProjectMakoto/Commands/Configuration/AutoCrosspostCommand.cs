@@ -47,7 +47,7 @@ internal sealed class AutoCrosspostCommand : BaseCommand
             var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.AddChannelButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
             var RemoveButton = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), this.GetString(CommandKey.RemoveChannelButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
 
-            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
                 ExcludeBots,
@@ -96,7 +96,7 @@ internal sealed class AutoCrosspostCommand : BaseCommand
                 {
                     if (ModalResult.Exception.GetType() == typeof(InvalidOperationException))
                     {
-                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription(this.GetString(CommandKey.DurationLimit, true)).AsError(ctx, this.GetString(CommandKey.Title))));
+                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed.WithDescription(this.GetString(CommandKey.DurationLimit, true)).AsError(ctx, this.GetString(CommandKey.Title))));
                         await Task.Delay(5000);
                         await this.ExecuteCommand(ctx, arguments);
                         return;
@@ -123,7 +123,7 @@ internal sealed class AutoCrosspostCommand : BaseCommand
                 {
                     embed.Description = this.GetString(CommandKey.ChannelLimit, true, new TVar("Invite", ctx.Bot.status.DevelopmentServerInvite));
                     embed = embed.AsError(ctx, this.GetString(CommandKey.Title));
-                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed));
                     await Task.Delay(5000);
                     await this.ExecuteCommand(ctx, arguments);
                     return;
@@ -156,7 +156,7 @@ internal sealed class AutoCrosspostCommand : BaseCommand
 
                 if (ChannelResult.Result.Type != ChannelType.News)
                 {
-                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription(this.GetString(this.t.Commands.Common.Errors.NoChannels, true)).AsError(ctx, this.GetString(CommandKey.Title))));
+                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed.WithDescription(this.GetString(this.t.Commands.Common.Errors.NoChannels, true)).AsError(ctx, this.GetString(CommandKey.Title))));
                     await Task.Delay(5000);
                     await this.ExecuteCommand(ctx, arguments);
                     return;

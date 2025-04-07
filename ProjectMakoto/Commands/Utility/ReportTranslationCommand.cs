@@ -49,7 +49,7 @@ internal sealed class ReportTranslationCommand : BaseCommand
                     tos_embed.Description = tos_embed.Description.Insert(0, $"**{this.GetString(CommandKey.TosChangedNotice)}**\n\n");
                 }
 
-                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(tos_embed).AddComponents(button));
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(tos_embed).AddComponents(button));
 
                 var TosAccept = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
 

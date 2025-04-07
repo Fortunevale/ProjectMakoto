@@ -34,7 +34,7 @@ internal sealed class RemindersCommand : BaseCommand
             if (snoozeDescription is null)
             {
                 _ = await this.RespondOrEdit(new DiscordMessageBuilder()
-                    .WithEmbed(new DiscordEmbedBuilder()
+                    .AddEmbed(new DiscordEmbedBuilder()
                         .WithDescription($"{this.GetString(this.t.Commands.Utility.Reminders.Count, true, new TVar("Count", rem.ScheduledReminders.Length))}\n\n" +
                          $"{string.Join("\n\n", rem.ScheduledReminders.Select(x => $"> {x.Description.FullSanitize()}\n{this.GetString(this.t.Commands.Utility.Reminders.CreatedOn, new TVar("Guild", $"**{x.CreationPlace}**"))}\n{this.GetString(this.t.Commands.Utility.Reminders.DueTime, new TVar("Relative", x.DueTime.ToTimestamp()), new TVar("DateTime", x.DueTime.ToTimestamp(TimestampFormat.LongDateTime)))}").ToList())}\n\n" +
                          $"**⚠ {this.GetString(this.t.Commands.Utility.Reminders.Notice)}**")
@@ -80,7 +80,7 @@ internal sealed class RemindersCommand : BaseCommand
                                       $"`{this.GetString(this.t.Commands.Utility.Reminders.DateTime).PadRight(padding)}`: {(selectedDueDate is null ? $"`{this.GetString(this.t.Common.NotSelected)}`" : $"{selectedDueDate.Value.ToTimestamp(TimestampFormat.LongDateTime)} ({selectedDueDate.Value.ToTimestamp()})")}"
                     }.AsAwaitingInput(ctx, this.GetString(this.t.Commands.Utility.Reminders.Title));
 
-                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed)
+                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(action_embed)
                         .AddComponents(new List<DiscordComponent> { SelectDescriptionButton, SelectDueDateButton, Finish })
                         .AddComponents(MessageComponents.GetBackButton(ctx.DbUser, ctx.Bot)));
 

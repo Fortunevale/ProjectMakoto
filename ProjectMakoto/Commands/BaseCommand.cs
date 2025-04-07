@@ -253,10 +253,10 @@ public abstract class BaseCommand
 
     #region RespondOrEdit
     public Task<DiscordMessage> RespondOrEdit(DiscordEmbed embed)
-        => this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+        => this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed));
 
     public Task<DiscordMessage> RespondOrEdit(DiscordEmbedBuilder embed)
-        => this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.Build()));
+        => this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed.Build()));
 
     public Task<DiscordMessage> RespondOrEdit(string content)
         => this.RespondOrEdit(new DiscordMessageBuilder().WithContent(content));
@@ -274,7 +274,9 @@ public abstract class BaseCommand
                 foreach (var b in discordMessageBuilder.Files)
                     files.Add(b.Filename, b.Stream);
 
-                _ = discordWebhookBuilder.AddComponents(discordMessageBuilder.Components);
+                if (discordMessageBuilder.Components.IsNotNullAndNotEmpty())
+                    _ = discordWebhookBuilder.AddComponents(discordMessageBuilder.Components);
+
                 _ = discordWebhookBuilder.AddEmbeds(discordMessageBuilder.Embeds);
                 _ = discordWebhookBuilder.AddFiles(files);
                 discordWebhookBuilder.Content = discordMessageBuilder.Content;
@@ -293,7 +295,9 @@ public abstract class BaseCommand
                 foreach (var b in discordMessageBuilder.Files)
                     files.Add(b.Filename, b.Stream);
 
-                _ = discordWebhookBuilder.AddComponents(discordMessageBuilder.Components);
+                if (discordMessageBuilder.Components.IsNotNullAndNotEmpty())
+                    _ = discordWebhookBuilder.AddComponents(discordMessageBuilder.Components);
+
                 _ = discordWebhookBuilder.AddEmbeds(discordMessageBuilder.Embeds);
                 _ = discordWebhookBuilder.AddFiles(files);
                 discordWebhookBuilder.Content = discordMessageBuilder.Content;
@@ -312,7 +316,9 @@ public abstract class BaseCommand
                 foreach (var b in discordMessageBuilder.Files)
                     files.Add(b.Filename, b.Stream);
 
-                _ = discordWebhookBuilder.AddComponents(discordMessageBuilder.Components);
+                if (discordMessageBuilder.Components.IsNotNullAndNotEmpty())
+                    _ = discordWebhookBuilder.AddComponents(discordMessageBuilder.Components);
+
                 _ = discordWebhookBuilder.AddEmbeds(discordMessageBuilder.Embeds);
                 _ = discordWebhookBuilder.AddFiles(files);
                 discordWebhookBuilder.Content = discordMessageBuilder.Content;
@@ -437,7 +443,7 @@ public abstract class BaseCommand
         async Task RefreshMessage()
         {
             var dropdown = new DiscordRoleSelectComponent(this.GetString(this.t.Commands.Common.Prompts.SelectARole), SelectionInteractionId, 1, 1, false);
-            var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(this.ctx.ResponseMessage.Embeds[0]).AsAwaitingInput(this.ctx)).AddComponents(dropdown).WithContent(this.ctx.ResponseMessage.Content);
+            var builder = new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder(this.ctx.ResponseMessage.Embeds[0]).AsAwaitingInput(this.ctx)).AddComponents(dropdown).WithContent(this.ctx.ResponseMessage.Content);
 
             if (Selected.IsNullOrWhiteSpace())
                 _ = ConfirmSelectionButton.Disable();
@@ -541,7 +547,7 @@ public abstract class BaseCommand
 
         this.ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
-        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(this.ctx.ResponseMessage.Embeds[0]).WithContent(this.ctx.ResponseMessage.Content));
+        _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(this.ctx.ResponseMessage.Embeds[0]).WithContent(this.ctx.ResponseMessage.Content));
 
         if (ExceptionOccurred)
             return new InteractionResult<DiscordRole>(ThrownException);
@@ -578,7 +584,7 @@ public abstract class BaseCommand
         async Task RefreshMessage()
         {
             var dropdown = new DiscordChannelSelectComponent(this.GetString(this.t.Commands.Common.Prompts.SelectAChannel), channelTypes, SelectionInteractionId);
-            var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(this.ctx.ResponseMessage.Embeds[0]).AsAwaitingInput(this.ctx)).AddComponents(dropdown).WithContent(this.ctx.ResponseMessage.Content);
+            var builder = new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder(this.ctx.ResponseMessage.Embeds[0]).AsAwaitingInput(this.ctx)).AddComponents(dropdown).WithContent(this.ctx.ResponseMessage.Content);
 
             if (Selected.IsNullOrWhiteSpace())
                 _ = ConfirmSelectionButton.Disable();
@@ -662,7 +668,7 @@ public abstract class BaseCommand
         }
 
         this.ctx.Client.ComponentInteractionCreated -= RunInteraction;
-        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(this.ctx.ResponseMessage.Embeds[0]).WithContent(this.ctx.ResponseMessage.Content));
+        _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(this.ctx.ResponseMessage.Embeds[0]).WithContent(this.ctx.ResponseMessage.Content));
 
         if (ExceptionOccurred)
             return new InteractionResult<DiscordChannel>(ThrownException);
@@ -707,7 +713,7 @@ public abstract class BaseCommand
         async Task RefreshMessage()
         {
             var dropdown = new DiscordStringSelectComponent(CustomPlaceHolder, options.Skip(CurrentPage * 25).Take(25).Select(x => new DiscordStringSelectComponentOption(x.Label, x.Value, x.Description, (x.Value == Selected), x.Emoji)), SelectionInteractionId);
-            var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(this.ctx.ResponseMessage.Embeds[0]).AsAwaitingInput(this.ctx)).AddComponents(dropdown).WithContent(this.ctx.ResponseMessage.Content);
+            var builder = new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder(this.ctx.ResponseMessage.Embeds[0]).AsAwaitingInput(this.ctx)).AddComponents(dropdown).WithContent(this.ctx.ResponseMessage.Content);
 
             _ = NextPageButton.SetState(options.Skip(CurrentPage * 25).Count() <= 25);
             _ = PrevPageButton.SetState(CurrentPage == 0);
@@ -784,7 +790,7 @@ public abstract class BaseCommand
 
         this.ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
-        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(this.ctx.ResponseMessage.Embeds[0]).WithContent(this.ctx.ResponseMessage.Content));
+        _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(this.ctx.ResponseMessage.Embeds[0]).WithContent(this.ctx.ResponseMessage.Content));
 
         if (ExceptionOccurred)
             return new InteractionResult<string>(ThrownException);
@@ -807,7 +813,7 @@ public abstract class BaseCommand
 
         var ReOpen = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(this.t.Commands.Common.Prompts.ReOpenModal), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔄")));
 
-        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(customEmbed ?? new DiscordEmbedBuilder
+        _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(customEmbed ?? new DiscordEmbedBuilder
         {
             Description = this.GetString(this.t.Commands.Common.Prompts.WaitingForModalResponse, true)
         }.AsAwaitingInput(this.ctx)).AddComponents(new List<DiscordComponent> { ReOpen, MessageComponents.GetCancelButton(this.ctx.DbUser, this.ctx.Bot) }));
@@ -872,7 +878,7 @@ public abstract class BaseCommand
         this.ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
         if (ResetToOriginalEmbed)
-            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(oriEmbed));
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(oriEmbed));
 
         if (ExceptionOccurred)
             return new InteractionResult<ComponentInteractionCreateEventArgs>(ThrownException);
@@ -1445,7 +1451,7 @@ public abstract class BaseCommand
         {
             if (this.ctx.DbUser.PendingUserUpload.TimeOut.GetTotalSecondsUntil() > 0 && !this.ctx.DbUser.PendingUserUpload.InteractionHandled)
             {
-                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder
                 {
                     Description = $"`An upload interaction is already taking place. Please finish it beforehand.`",
                 }.AsError(this.ctx)));
@@ -1479,7 +1485,7 @@ public abstract class BaseCommand
     #region FinishInteraction
     public void ModifyToTimedOut(bool Delete = false)
     {
-        _ = this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(this.ctx.ResponseMessage.Embeds[0]).WithFooter(this.ctx.ResponseMessage.Embeds[0]?.Footer?.Text + $" • {this.GetString(this.t.Commands.Common.InteractionTimeout)}").WithColor(DiscordColor.Gray)));
+        _ = this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder(this.ctx.ResponseMessage.Embeds[0]).WithFooter(this.ctx.ResponseMessage.Embeds[0]?.Footer?.Text + $" • {this.GetString(this.t.Commands.Common.InteractionTimeout)}").WithColor(DiscordColor.Gray)));
 
         if (Delete)
             _ = Task.Delay(5000).ContinueWith(_ =>
@@ -1635,19 +1641,19 @@ public abstract class BaseCommand
         }.AsError(this.ctx));
 
     public void SendVoiceStateError()
-        => _ = this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+        => _ = this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder
         {
             Description = this.GetString(this.t.Commands.Common.Errors.VoiceChannel).Build(true),
         }.AsError(this.ctx)));
 
     public void SendUserBanError(BanDetails entry)
-        => _ = this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+        => _ = this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder
         {
             Description = this.t.Commands.Common.Errors.UserBan.t["en"].Build(true, new TVar("Reason", entry.Reason)),
         }.AsError(this.ctx)));
 
     public void SendGuildBanError(BanDetails entry)
-        => _ = this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+        => _ = this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder
         {
             Description = this.GetString(this.t.Commands.Common.Errors.GuildBan, true, new TVar("Reason", entry.Reason)),
         }.AsError(this.ctx)));
@@ -1667,20 +1673,20 @@ public abstract class BaseCommand
         };
 
     public void SendDataError()
-        => _ = this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+        => _ = this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder
         {
             Description = this.GetString(this.t.Commands.Common.Errors.Data, true, new TVar("Command", $"{this.ctx.Prefix}data delete")),
         }.AsError(this.ctx)));
 
     public void SendDmError()
-        => _ = this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+        => _ = this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder
         {
             Description = $"📩 {this.GetString(this.t.Commands.Common.Errors.DirectMessage, true)}",
             ImageUrl = (this.ctx.User.Presence.ClientStatus.Mobile.HasValue ? "https://cdn.discordapp.com/attachments/1005430437952356423/1144961395515998238/34rhz83ghtzu3ght.gif" : "https://cdn.discordapp.com/attachments/1005430437952356423/1144964670197862400/et2grtzu2ghrzi52.gif")
         }.AsError(this.ctx)));
 
     public void SendDmRedirect()
-        => _ = this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+        => _ = this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder
         {
             Description = $"📩 {this.GetString(this.t.Commands.Common.DirectMessageRedirect, true)}",
         }.AsSuccess(this.ctx)));
@@ -1708,7 +1714,7 @@ public abstract class BaseCommand
             Description = $"**`{ctx.Prefix}{ctx.Command.Name}{(ctx.RawArgumentString != "" ? $" {ctx.RawArgumentString.SanitizeForCode().Replace("\\", "")}" : "")}` is not a valid way of using this command.**\nUse it like this instead: `{ctx.Prefix}{ctx.Command.GenerateUsage()}`\n\nArguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n**Do not include the brackets when using commands, they're merely an indicator for requirement.**",
         }.AsError(this.ctx);
 
-        _ = this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).WithContent(this.ctx.User.Mention));
+        _ = this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed).WithContent(this.ctx.User.Mention));
     }
     #endregion
 }

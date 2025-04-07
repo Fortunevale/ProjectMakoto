@@ -189,7 +189,7 @@ internal sealed class UserInfoCommand : BaseCommand
             if (bMember is not null && bMember.CommunicationDisabledUntil.HasValue && bMember.CommunicationDisabledUntil.Value.GetTotalSecondsUntil() > 0)
                 _ = embed.AddField(new DiscordEmbedField(this.GetString(this.t.Commands.Utility.UserInfo.TimedOutUntil), $"{Formatter.Timestamp(bMember.CommunicationDisabledUntil.Value, TimestampFormat.LongDateTime)}", true));
 
-            _ = await this.RespondOrEdit(builder.WithEmbed(embed));
+            _ = await this.RespondOrEdit(builder.AddEmbed(embed));
 
             if (InviterButtonAdded)
             {

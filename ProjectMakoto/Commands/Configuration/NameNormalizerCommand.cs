@@ -35,7 +35,7 @@ internal sealed class NameNormalizerCommand : BaseCommand
             var Toggle = new DiscordButtonComponent((ctx.DbGuild.NameNormalizer.NameNormalizerEnabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.ToggleNameNormalizer), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
             var SearchAllNames = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), this.GetString(CommandKey.NormalizeNow), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔨")));
 
-            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
                 Toggle,
@@ -64,7 +64,7 @@ internal sealed class NameNormalizerCommand : BaseCommand
             {
                 if (ctx.DbGuild.NameNormalizer.NameNormalizerRunning)
                 {
-                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, this.GetString(CommandKey.Title))
+                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed.AsError(ctx, this.GetString(CommandKey.Title))
                                                                                    .WithDescription(this.GetString(CommandKey.NormalizerRunning, true))));
                     await Task.Delay(5000);
                     await this.ExecuteCommand(ctx, arguments);
@@ -78,7 +78,7 @@ internal sealed class NameNormalizerCommand : BaseCommand
 
                 try
                 {
-                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsLoading(ctx, this.GetString(CommandKey.Title))
+                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed.AsLoading(ctx, this.GetString(CommandKey.Title))
                                                                                    .WithDescription(this.GetString(CommandKey.RenamingAllMembers, true))));
 
                     var members = await ctx.Guild.GetAllMembersAsync();
@@ -101,7 +101,7 @@ internal sealed class NameNormalizerCommand : BaseCommand
                         }
                     }
 
-                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsSuccess(ctx, this.GetString(CommandKey.Title))
+                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed.AsSuccess(ctx, this.GetString(CommandKey.Title))
                                                                                    .WithDescription(this.GetString(CommandKey.RenamedMembers, true, new TVar("Count", Renamed)))));
                     await Task.Delay(5000);
                     ctx.DbGuild.NameNormalizer.NameNormalizerRunning = false;

@@ -42,7 +42,7 @@ internal sealed class BumpReminderCommand : BaseCommand
             var ChangeChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.ChangeChannelButton), ctx.DbGuild.BumpReminder.ChannelId == 0, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
             var ChangeRole = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.ChangeRoleButton), ctx.DbGuild.BumpReminder.ChannelId == 0, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
 
-            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder()
                 .WithDescription(GetCurrentConfiguration(ctx)).AsAwaitingInput(ctx, this.GetString(CommandKey.Title)))
             .AddComponents(new List<DiscordComponent>
             {

@@ -44,7 +44,7 @@ internal sealed class GlobalNotesCommand : BaseCommand
             var RemoveButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Remove Notes", (!ctx.Bot.globalNotes.ContainsKey(victim.Id)), DiscordEmoji.FromUnicode("➖").ToComponent());
 
             _ = await this.RespondOrEdit(new DiscordMessageBuilder()
-                .WithEmbed(new DiscordEmbedBuilder()
+                .AddEmbed(new DiscordEmbedBuilder()
                     .WithDescription($"{victim.Mention} `has {(ctx.Bot.globalNotes.TryGetValue(victim.Id, out var noteObj) ? noteObj.Notes.Length : 0)} global notes.`")
                     .AddFields((noteObj is not null ? noteObj.Notes.Take(20).Select(x => new DiscordEmbedField("󠂪 󠂪", $"{x.Reason.FullSanitize()} - `{(ModeratorCache[x.Moderator] is null ? "Unknown#0000" : ModeratorCache[x.Moderator].GetUsernameWithIdentifier())}` {x.Timestamp.ToTimestamp()}")) : new List<DiscordEmbedField>())))
                 .AddComponents(new List<DiscordComponent> { AddButton, RemoveButton })

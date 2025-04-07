@@ -37,7 +37,7 @@ internal sealed class AvatarCommand : BaseCommand
             var ServerProfilePictureButton = new DiscordButtonComponent(ButtonStyle.Secondary, "ShowServer", this.GetString(this.t.Commands.Utility.Avatar.ShowServerProfile), (string.IsNullOrWhiteSpace(member?.GuildAvatarHash)), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖥")));
             var ProfilePictureButton = new DiscordButtonComponent(ButtonStyle.Secondary, "ShowProfile", this.GetString(this.t.Commands.Utility.Avatar.ShowUserProfile), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
 
-            var builder = new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ServerProfilePictureButton);
+            var builder = new DiscordMessageBuilder().AddEmbed(embed).AddComponents(ServerProfilePictureButton);
 
             var msg = await this.RespondOrEdit(builder);
 
@@ -77,12 +77,12 @@ internal sealed class AvatarCommand : BaseCommand
                         if (e.GetCustomId() == ServerProfilePictureButton.CustomId)
                         {
                             embed.ImageUrl = member.GuildAvatarUrl;
-                            _ = this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ProfilePictureButton));
+                            _ = this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed).AddComponents(ProfilePictureButton));
                         }
                         else if (e.GetCustomId() == ProfilePictureButton.CustomId)
                         {
                             embed.ImageUrl = member.AvatarUrl;
-                            _ = this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ServerProfilePictureButton));
+                            _ = this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed).AddComponents(ServerProfilePictureButton));
                         }
                     }
                 }).Add(ctx.Bot, ctx);

@@ -40,7 +40,7 @@ internal sealed class EmbedMessageCommand : BaseCommand
             var ToggleMsg = new DiscordButtonComponent((ctx.DbGuild.EmbedMessage.UseEmbedding ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.ToggleMessageLinkButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
             var ToggleGithub = new DiscordButtonComponent((ctx.DbGuild.EmbedMessage.UseGithubEmbedding ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.ToggleGithubCodeButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🤖")));
 
-            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
                 ToggleMsg,

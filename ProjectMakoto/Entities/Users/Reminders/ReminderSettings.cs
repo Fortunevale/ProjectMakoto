@@ -48,7 +48,7 @@ public sealed class ReminderSettings : RequiresParent<User>
 
                         var user = await this.Bot.DiscordClient.GetFirstShard().GetUserAsync(this.Parent.Id);
 
-                        var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                        var builder = new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder()
                             .WithDescription($"> {b.Description.FullSanitize()}\n" +
                             $"{CommandKey.CreatedOn.Get(this.Bot.Users[user.Id]).Build(new TVar("Guild", b.CreationPlace))}\n" +
                             $"{CommandKey.CreatedAt.Get(this.Bot.Users[user.Id]).Build(new TVar("Timestamp", $"{b.CreationTime.ToTimestamp()} ({b.CreationTime.ToTimestamp(TimestampFormat.LongDateTime)})"))}\n" +

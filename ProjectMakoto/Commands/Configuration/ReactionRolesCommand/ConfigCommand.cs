@@ -37,7 +37,7 @@ internal sealed class ConfigCommand : BaseCommand
                 Description = this.GetString(CommandKey.ReactionRoleCount, true, new TVar("Count", ctx.DbGuild.ReactionRoles.Length))
             }.AsAwaitingInput(ctx, this.GetString(CommandKey.Title));
 
-            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
                 AddButton, RemoveButton
@@ -80,13 +80,13 @@ internal sealed class ConfigCommand : BaseCommand
                     if (ctx.DbGuild.ReactionRoles.Length > 100)
                     {
                         action_embed.Description = this.GetString(CommandKey.ReactionRoleLimitReached, true);
-                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
+                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
                         await Task.Delay(5000);
                         await this.ExecuteCommand(ctx, arguments);
                         return;
                     }
 
-                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed)
+                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(action_embed)
                         .AddComponents(new List<DiscordComponent> { SelectMessage, SelectEmoji, SelectRole, Finish })
                         .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
 
@@ -132,7 +132,7 @@ internal sealed class ConfigCommand : BaseCommand
                                                        $"`https://ptb.discord.com/channels/012345678901234567/012345678901234567/012345678912345678`\n" +
                                                        $"`https://canary.discord.com/channels/012345678901234567/012345678901234567/012345678912345678`";
                             action_embed.ImageUrl = "";
-                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
+                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
                             await Task.Delay(3000);
                             continue;
                         }
@@ -141,7 +141,7 @@ internal sealed class ConfigCommand : BaseCommand
                         {
                             action_embed.Description = this.GetString(CommandKey.MessageUrlWrongGuild, true);
                             action_embed.ImageUrl = "";
-                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
+                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
                             await Task.Delay(3000);
                             continue;
                         }
@@ -150,7 +150,7 @@ internal sealed class ConfigCommand : BaseCommand
                         {
                             action_embed.Description = this.GetString(CommandKey.MessageUrlNoChannel, true);
                             action_embed.ImageUrl = "";
-                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
+                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
                             await Task.Delay(3000);
                             continue;
                         }
@@ -161,7 +161,7 @@ internal sealed class ConfigCommand : BaseCommand
                         {
                             action_embed.Description = this.GetString(CommandKey.MessageUrlNoMessage, true);
                             action_embed.ImageUrl = "";
-                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
+                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
                             await Task.Delay(3000);
                             continue;
                         }
@@ -175,7 +175,7 @@ internal sealed class ConfigCommand : BaseCommand
 
                         action_embed.Description = this.GetString(CommandKey.ReactWithEmoji, true);
                         action_embed.ImageUrl = "";
-                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsAwaitingInput(ctx, this.GetString(CommandKey.Title))));
+                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(action_embed.AsAwaitingInput(ctx, this.GetString(CommandKey.Title))));
 
                         var emoji_wait = await ctx.Client.GetInteractivity().WaitForReactionAsync(x => x.Channel.Id == ctx.Channel.Id && x.User.Id == ctx.User.Id && x.Message.Id == selectedMessage.Id, TimeSpan.FromMinutes(2));
 
@@ -194,7 +194,7 @@ internal sealed class ConfigCommand : BaseCommand
                         if (emoji.Id != 0 && !ctx.Guild.Emojis.ContainsKey(emoji.Id))
                         {
                             action_embed.Description = this.GetString(CommandKey.NoAccessToEmoji, true);
-                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
+                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
                             await Task.Delay(3000);
                             continue;
                         }
@@ -202,7 +202,7 @@ internal sealed class ConfigCommand : BaseCommand
                         if (ctx.DbGuild.ReactionRoles.Any(x => (x.MessageId == selectedMessage.Id && x.EmojiName == emoji.GetUniqueDiscordName())))
                         {
                             action_embed.Description = this.GetString(CommandKey.EmojiAlreadyUsed, true);
-                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
+                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
                             await Task.Delay(3000);
                             continue;
                         }
@@ -242,7 +242,7 @@ internal sealed class ConfigCommand : BaseCommand
                         if (ctx.DbGuild.ReactionRoles.Any(x => x.RoleId == RoleResult.Result.Id))
                         {
                             action_embed.Description = this.GetString(CommandKey.RoleAlreadyUsed, true);
-                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
+                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
                             await Task.Delay(3000);
                             continue;
                         }
@@ -257,7 +257,7 @@ internal sealed class ConfigCommand : BaseCommand
                         if (ctx.DbGuild.ReactionRoles.Length > 100)
                         {
                             action_embed.Description = this.GetString(CommandKey.ReactionRoleLimitReached, true);
-                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
+                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
                             await Task.Delay(5000);
                             await this.ExecuteCommand(ctx, arguments);
                             return;
@@ -266,7 +266,7 @@ internal sealed class ConfigCommand : BaseCommand
                         if (ctx.DbGuild.ReactionRoles.Any(x => x.RoleId == selectedRole.Id))
                         {
                             action_embed.Description = this.GetString(CommandKey.RoleAlreadyUsed, true);
-                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
+                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
                             await Task.Delay(5000);
                             await this.ExecuteCommand(ctx, arguments);
                             return;
@@ -275,7 +275,7 @@ internal sealed class ConfigCommand : BaseCommand
                         if (selectedEmoji.Id != 0 && !ctx.Guild.Emojis.ContainsKey(selectedEmoji.Id))
                         {
                             action_embed.Description = this.GetString(CommandKey.NoAccessToEmoji, true);
-                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
+                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
                             await Task.Delay(5000);
                             await this.ExecuteCommand(ctx, arguments);
                             return;
@@ -284,7 +284,7 @@ internal sealed class ConfigCommand : BaseCommand
                         if (ctx.DbGuild.ReactionRoles.Any(x => (x.MessageId == selectedMessage.Id && x.EmojiName == selectedEmoji.GetUniqueDiscordName())))
                         {
                             action_embed.Description = this.GetString(CommandKey.EmojiAlreadyUsed, true);
-                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
+                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(action_embed.AsError(ctx, this.GetString(CommandKey.Title))));
                             await Task.Delay(5000);
                             await this.ExecuteCommand(ctx, arguments);
                             return;
@@ -306,7 +306,7 @@ internal sealed class ConfigCommand : BaseCommand
                             new TVar("User", selectedMessage.Author.Mention),
                             new TVar("Channel", selectedMessage.Channel.Mention),
                             new TVar("Emoji", selectedEmoji));
-                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsSuccess(ctx, this.GetString(CommandKey.Title))));
+                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(action_embed.AsSuccess(ctx, this.GetString(CommandKey.Title))));
                         await Task.Delay(5000);
                         await this.ExecuteCommand(ctx, arguments);
                         return;
@@ -357,7 +357,7 @@ internal sealed class ConfigCommand : BaseCommand
                     new TVar("User", reactionMessage?.Author.Mention ?? "`/`"),
                     new TVar("Channel", reactionMessage?.Channel.Mention ?? "`/`"),
                     new TVar("Emoji", obj.GetEmoji(ctx.Client)));
-                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsSuccess(ctx, this.GetString(CommandKey.Title))));
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed.AsSuccess(ctx, this.GetString(CommandKey.Title))));
                 await Task.Delay(5000);
                 await this.ExecuteCommand(ctx, arguments);
                 return;

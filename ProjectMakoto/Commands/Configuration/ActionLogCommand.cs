@@ -60,7 +60,7 @@ internal sealed class ActionLogCommand : BaseCommand
             var ChangeChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), $"{(ctx.DbGuild.ActionLog.Channel == 0 ? this.GetString(CommandKey.SetChannelButton) : this.GetString(CommandKey.ChangeChannelButton))}", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
             var ChangeFilter = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.ChangeFilterButton), (ctx.DbGuild.ActionLog.Channel == 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📣")));
 
-            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
                 { Disable }
@@ -153,7 +153,7 @@ internal sealed class ActionLogCommand : BaseCommand
                         new(this.GetString(CommandKey.InviteModifications), "log_invites_modified", null, ctx.DbGuild.ActionLog.InvitesModified, new DiscordComponentEmoji(EmojiTemplates.GetInvite(ctx.Bot))),
                     };
 
-                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new DiscordStringSelectComponent(this.GetString(CommandKey.NoOptions), Selections, Guid.NewGuid().ToString(), 0, Selections.Count, false)));
+                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed).AddComponents(new DiscordStringSelectComponent(this.GetString(CommandKey.NoOptions), Selections, Guid.NewGuid().ToString(), 0, Selections.Count, false)));
 
                     var e = await ctx.Client.GetInteractivity().WaitForSelectAsync(ctx.ResponseMessage, x => x.User.Id == ctx.User.Id, ComponentType.StringSelect, TimeSpan.FromMinutes(2));
 

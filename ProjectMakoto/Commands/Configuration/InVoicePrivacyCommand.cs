@@ -40,7 +40,7 @@ internal sealed class InVoicePrivacyCommand : BaseCommand
             var ToggleDeletion = new DiscordButtonComponent((ctx.DbGuild.InVoiceTextPrivacy.ClearTextEnabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.ToggleMessageDeletionButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
             var TogglePermission = new DiscordButtonComponent((ctx.DbGuild.InVoiceTextPrivacy.SetPermissionsEnabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.TogglePermissionProtectionButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📋")));
 
-            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
                 ToggleDeletion,

@@ -198,7 +198,7 @@ internal sealed class EmojiStealerCommand : BaseCommand
 
                 var SendHereButton = new DiscordButtonComponent(ButtonStyle.Secondary, "SendHere", this.GetString(this.t.Commands.Utility.EmojiStealer.CurrentChatZip), !(ctx.Member.Permissions.HasPermission(Permissions.AttachFiles)), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
 
-                var builder = new DiscordMessageBuilder().WithEmbed(embed);
+                var builder = new DiscordMessageBuilder().AddEmbed(embed);
 
                 if (SanitizedEmoteList.Any(x => x.Value.EntryType == EmojiType.STICKER))
                     _ = builder.AddComponents(IncludeStickersButton);
@@ -268,7 +268,7 @@ internal sealed class EmojiStealerCommand : BaseCommand
                                         new TVar("Min", 0),
                                         new TVar("Max", (IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.EntryType == EmojiType.EMOJI).Count())));
                                     _ = embed.AsLoading(ctx);
-                                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed));
 
                                     for (var i = 0; i < SanitizedEmoteList.Count; i++)
                                     {
@@ -369,7 +369,7 @@ internal sealed class EmojiStealerCommand : BaseCommand
 
                                     embed.Description = this.GetString(this.t.Commands.Utility.EmojiStealer.SendingDm, true, new TVar("Type", emojiText));
                                     _ = embed.AsLoading(ctx);
-                                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed));
 
                                     try
                                     {
@@ -416,7 +416,7 @@ internal sealed class EmojiStealerCommand : BaseCommand
                                     cancellationTokenSource.Cancel();
 
                                     embed.Description = this.GetString(this.t.Commands.Utility.EmojiStealer.PreparingZip, true);
-                                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsLoading(ctx)));
+                                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed.AsLoading(ctx)));
 
                                     using (var archive = new ZipArchive(zipFileStream, ZipArchiveMode.Create, true))
                                     {
@@ -476,7 +476,7 @@ internal sealed class EmojiStealerCommand : BaseCommand
                                             new TVar("Type", emojiText));
 
                                         _ = zipFileStream.Seek(0, SeekOrigin.Begin);
-                                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithFile($"Emotes.zip", zipFileStream).WithEmbed(embed.AsSuccess(ctx)));
+                                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithFile($"Emotes.zip", zipFileStream).AddEmbed(embed.AsSuccess(ctx)));
                                     }
                                     return;
                                 }
@@ -493,7 +493,7 @@ internal sealed class EmojiStealerCommand : BaseCommand
                                     IncludeStickersButton = new DiscordButtonComponent((IncludeStickers ? ButtonStyle.Success : ButtonStyle.Danger), "ToggleStickers", this.GetString(this.t.Commands.Utility.EmojiStealer.ToggleStickers), !SanitizedEmoteList.Any(x => x.Value.EntryType == EmojiType.EMOJI), new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, (ulong)(IncludeStickers ? 970278964755038248 : 970278964079767574))));
                                     AddToServerButton = new DiscordButtonComponent(ButtonStyle.Success, "AddToServer", (IncludeStickers ? this.GetString(this.t.Commands.Utility.EmojiStealer.AddEmojisAndStickerToServer) : this.GetString(this.t.Commands.Utility.EmojiStealer.AddEmojisToServer)), !ctx.Member.Permissions.HasPermission(Permissions.ManageGuildExpressions), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
 
-                                    var builder = new DiscordMessageBuilder().WithEmbed(embed);
+                                    var builder = new DiscordMessageBuilder().AddEmbed(embed);
 
                                     if (SanitizedEmoteList.Any(x => x.Value.EntryType == EmojiType.STICKER))
                                         _ = builder.AddComponents(IncludeStickersButton);

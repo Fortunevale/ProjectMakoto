@@ -55,7 +55,7 @@ internal sealed class RequestCommand : BaseCommand
             {
                 case Enums.CommandType.ApplicationCommand:
                 {
-                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder
                     {
                         Description = this.GetString(this.t.Commands.Utility.Data.Request.Confirm, true)
                     }.AsSuccess(ctx)).WithFile("userdata.json", stream));
@@ -66,7 +66,7 @@ internal sealed class RequestCommand : BaseCommand
                 {
                     try
                     {
-                        _ = await ctx.User.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                        _ = await ctx.User.SendMessageAsync(new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder
                         {
                             Description = this.GetString(this.t.Commands.Utility.Data.Request.Confirm, true)
                         }.AsSuccess(ctx)).WithFile("userdata.json", stream));

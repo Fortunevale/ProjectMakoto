@@ -29,7 +29,7 @@ internal sealed class BannerCommand : BaseCommand
                 Description = victim.BannerUrl.IsNullOrWhiteSpace() ? this.GetString(this.t.Commands.Utility.Banner.NoBanner, true) : ""
             }.AsInfo(ctx, this.GetString(this.t.Commands.Utility.Banner.Banner, false, new TVar("User", victim.GetUsernameWithIdentifier())));
 
-            var builder = new DiscordMessageBuilder().WithEmbed(embed);
+            var builder = new DiscordMessageBuilder().AddEmbed(embed);
 
             _ = await this.RespondOrEdit(builder);
         });

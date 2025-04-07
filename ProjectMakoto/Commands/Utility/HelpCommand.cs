@@ -177,7 +177,7 @@ internal sealed class HelpCommand : BaseCommand
                 var PreviousButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(this.t.Common.PreviousPage), (Page <= 0), DiscordEmoji.FromUnicode("◀").ToComponent());
                 var NextButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(this.t.Common.NextPage), (Page >= discordEmbeds.Count - 1), DiscordEmoji.FromUnicode("▶").ToComponent());
 
-                var builder = new DiscordMessageBuilder().WithEmbed(discordEmbeds.ElementAt(Page));
+                var builder = new DiscordMessageBuilder().AddEmbed(discordEmbeds.ElementAt(Page));
 
                 if (!PreviousButton.Disabled || !NextButton.Disabled)
                     _ = builder.AddComponents(PreviousButton, NextButton);

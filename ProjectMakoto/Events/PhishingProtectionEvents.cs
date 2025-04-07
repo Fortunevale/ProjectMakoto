@@ -81,7 +81,7 @@ internal sealed class PhishingProtectionEvents(Bot bot) : RequiresTranslation(bo
 
                 _ = embed.AddFields(report_fields.Take(2));
 
-                _ = e.RespondAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new DiscordLinkButtonComponent($"https://www.abuseipdb.com/check/{parsedIp[0]}", this.tKey.OpenInBrowser.Get(this.Bot.Guilds[guild.Id]))));
+                _ = e.RespondAsync(new DiscordMessageBuilder().AddEmbed(embed).AddComponents(new DiscordLinkButtonComponent($"https://www.abuseipdb.com/check/{parsedIp[0]}", this.tKey.OpenInBrowser.Get(this.Bot.Guilds[guild.Id]))));
             }
         }
 

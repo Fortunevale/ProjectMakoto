@@ -73,7 +73,7 @@ internal sealed class PhishingCommand : BaseCommand
             var ChangeReasonButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), this.GetString(CommandKey.ChangePunishmentReason), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
             var ChangeTimeoutLengthButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), this.GetString(CommandKey.ChangeTimeoutLength), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
 
-            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
                 { ToggleDetectionButton },
@@ -188,7 +188,7 @@ internal sealed class PhishingCommand : BaseCommand
             {
                 if (ctx.DbGuild.PhishingDetection.PunishmentType != PhishingPunishmentType.Timeout)
                 {
-                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription(this.GetString(CommandKey.NotUsingType, true, new TVar("Type", this.GetString(CommandKey.PunishmentTypeTimeout))))));
+                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed.WithDescription(this.GetString(CommandKey.NotUsingType, true, new TVar("Type", this.GetString(CommandKey.PunishmentTypeTimeout))))));
                     await Task.Delay(5000);
                     await this.ExecuteCommand(ctx, arguments);
                     return;
@@ -211,7 +211,7 @@ internal sealed class PhishingCommand : BaseCommand
                 {
                     if (ModalResult.Exception.GetType() == typeof(InvalidOperationException))
                     {
-                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription(this.GetString(CommandKey.InvalidDuration, true)).AsError(ctx, this.GetString(CommandKey.Title))));
+                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(embed.WithDescription(this.GetString(CommandKey.InvalidDuration, true)).AsError(ctx, this.GetString(CommandKey.Title))));
                         await Task.Delay(5000);
                         await this.ExecuteCommand(ctx, arguments);
                         return;

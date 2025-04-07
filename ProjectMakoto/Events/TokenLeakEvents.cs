@@ -87,7 +87,7 @@ internal sealed class TokenLeakEvents(Bot bot) : RequiresTranslation(bot)
 
         var s = (InvalidateCount > 1 ? "s" : "");
 
-        _ = e.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(
+        _ = e.Channel.SendMessageAsync(new DiscordMessageBuilder().AddEmbed(
         new DiscordEmbedBuilder()
         .WithColor(EmbedColors.Error)
         .WithAuthor(sender.CurrentUser.GetUsername(), null, sender.CurrentUser.AvatarUrl)

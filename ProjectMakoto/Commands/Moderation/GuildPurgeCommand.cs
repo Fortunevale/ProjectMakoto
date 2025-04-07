@@ -31,7 +31,7 @@ internal sealed class GuildPurgeCommand : BaseCommand
                 return;
             }
 
-            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder().
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder().
                 WithDescription(this.GetString(CommandKey.Scanning, true, new TVar("Victim", victim.Mention)))
                 .AsLoading(ctx)));
 
@@ -49,7 +49,7 @@ internal sealed class GuildPurgeCommand : BaseCommand
 
                 currentProg++;
 
-                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder().
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder().
                     WithDescription($"{this.GetString(CommandKey.Scanning, true, new TVar("Victim", victim.Mention))}\n" +
                                     $"`{StringTools.GenerateASCIIProgressbar(currentProg, maxProg)} {MathTools.CalculatePercentage(currentProg, maxProg),3}%`")
                     .AsLoading(ctx)));
@@ -118,7 +118,7 @@ internal sealed class GuildPurgeCommand : BaseCommand
                     if (message.CreationTimestamp.GetTimespanSince() > TimeSpan.FromDays(14))
                         _ = channel.Value.Remove(message);
 
-            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder()
                 .WithDescription($"{this.GetString(CommandKey.Deleting, true, new TVar("Victim", victim.Mention), new TVar("Count", allMsg))}\n" +
                                  $"`{StringTools.GenerateASCIIProgressbar(currentProg, maxProg)} {MathTools.CalculatePercentage(currentProg, maxProg)}%`")
                 .AsLoading(ctx)));
@@ -133,7 +133,7 @@ internal sealed class GuildPurgeCommand : BaseCommand
             {
                 try
                 {
-                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder()
                         .WithDescription($"{this.GetString(CommandKey.Deleting, true, new TVar("Victim", victim.Mention), new TVar("Count", allMsg))}\n" +
                                          $"`{StringTools.GenerateASCIIProgressbar(currentProg, maxProg)} {MathTools.CalculatePercentage(currentProg, maxProg)}%`")
                         .AsLoading(ctx)));
@@ -149,7 +149,7 @@ internal sealed class GuildPurgeCommand : BaseCommand
                 catch { }
             }
 
-            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbed(new DiscordEmbedBuilder()
                 .WithDescription(this.GetString(CommandKey.Ended, true, new TVar("Victim", victim.Mention), new TVar("Min", currentProg), new TVar("Max", maxProg), new TVar("ChannelCount", channelList.Count)))
                 .AsSuccess(ctx)));
         });
