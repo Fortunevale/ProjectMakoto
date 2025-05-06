@@ -14,10 +14,13 @@ internal static class SyncTasks
 {
     internal static async Task GuildDownloadCompleted(Bot bot, DiscordClient sender, GuildDownloadCompletedEventArgs e)
     {
+        if (bot.status.DiscordGuildDownloadCompleted)
+            return;
+
+        bot.status.DiscordGuildDownloadCompleted = true;
+
         _ = Task.Run(async () =>
         {
-            bot.status.DiscordGuildDownloadCompleted = true;
-
             Log.Information("I'm on {GuildsCount} guilds.", e.Guilds.Count);
 
             _ = Task.Run(async () =>
@@ -121,8 +124,14 @@ internal static class SyncTasks
         }).Add(bot);
     }
 
+    internal static DateTime lastSyncTaskTime = DateTime.MinValue;
     internal static async Task ExecuteSyncTasks(Bot bot, DiscordShardedClient shardedClient)
     {
+        if (lastSyncTaskTime.GetTimespanSince() < TimeSpan.FromSeconds(30))
+            return;
+
+        lastSyncTaskTime = DateTime.UtcNow;
+
         var Guilds = shardedClient.GetGuilds();
 
         ObservableList<Task> runningTasks = new();
