@@ -14,7 +14,7 @@ internal sealed class LeaderboardCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var ShowAmount = arguments.ContainsKey("arguments") ? (int)arguments["amount"] : 10;
+            var ShowAmount = arguments.ContainsKey("amount") ? (int)arguments["amount"] : 10;
 
             if (await ctx.DbUser.Cooldown.WaitForModerate(ctx))
                 return;
