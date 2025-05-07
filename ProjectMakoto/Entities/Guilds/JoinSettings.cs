@@ -24,6 +24,27 @@ public sealed class JoinSettings(Bot bot, Guild parent) : RequiresParent<Guild>(
         get => this.Bot.DatabaseClient.GetValue<ulong>("guilds", "serverid", this.Parent.Id, "joinlog_channel_id", this.Bot.DatabaseClient.mainDatabaseConnection);
         set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "joinlog_channel_id", value, this.Bot.DatabaseClient.mainDatabaseConnection);
     }
+    
+    [ColumnName("usercount_channel_last_edit"), ColumnType(ColumnTypes.BigInt), Default("0")]
+    public DateTime UserCountChannelLastEdit
+    {
+        get => this.Bot.DatabaseClient.GetValue<DateTime>("guilds", "serverid", this.Parent.Id, "usercount_channel_last_edit", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "usercount_channel_last_edit", value, this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
+    
+    [ColumnName("usercount_channel_id"), ColumnType(ColumnTypes.BigInt), Default("0")]
+    public ulong UserCountChannelId
+    {
+        get => this.Bot.DatabaseClient.GetValue<ulong>("guilds", "serverid", this.Parent.Id, "usercount_channel_id", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "usercount_channel_id", value, this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
+
+    [ColumnName("usercount_channel_format"), ColumnType(ColumnTypes.Text), Nullable]
+    public string? UserCountChannelFormat
+    {
+        get => this.Bot.DatabaseClient.GetValue<string?>("guilds", "serverid", this.Parent.Id, "usercount_channel_format", this.Bot.DatabaseClient.mainDatabaseConnection);
+        set => _ = this.Bot.DatabaseClient.SetValue("guilds", "serverid", this.Parent.Id, "usercount_channel_format", value, this.Bot.DatabaseClient.mainDatabaseConnection);
+    }
 
     [ColumnName("autoban_global_ban"), ColumnType(ColumnTypes.TinyInt), Default("0")]
     public bool AutoBanGlobalBans

@@ -3780,6 +3780,14 @@
           "en": "Joinlog Channel",
           "de": "Beitrittsprotokoll-Kanal"
         },
+        "UserCountChannel": {
+          "en": "User Count Channel",
+          "de": "Benutzeranzahl-Kanal"
+        },
+        "UserCountChannelFormat": {
+          "en": "User Count Format",
+          "de": "Benutzeranzahl-Format"
+        },
         "Role": {
           "en": "Role On Join",
           "de": "Rolle beim Beitritt"
@@ -3808,6 +3816,18 @@
           "en": "Change Joinlog Channel",
           "de": "Beitrittsprotokoll-Kanal ändern"
         },
+        "ChangeUserCountChannel": {
+          "en": "Change User Count Channel",
+          "de": "Benutzeranzahl-Kanal ändern"
+        },
+        "ChangeUserCountChannelFormat": {
+          "en": "Change User Count Format",
+          "de": "Benutzeranzahl-Format ändern"
+        },
+        "ChangeUserCountChannelFormatModal": {
+          "en": "User Count Format | %s as placeholder",
+          "de": "Benutzeranzahl-Format | %s für Platzhalter"
+        },
         "ChangeRoleButton": {
           "en": "Change Role assigned on join",
           "de": "Beim Beitritt zugewiesene Rolle ändern"
@@ -3827,6 +3847,10 @@
         "DisableJoinlog": {
           "en": "Disable Joinlog",
           "de": "Beitrittsprotokoll deaktivieren"
+        },
+        "DisableUserCountChannel": {
+          "en": "Disable User Count Channel",
+          "de": "Benutzeranzahl-Kanal deaktivieren"
         },
         "AutoAssignRoleName": {
           "en": "Automatically Assigned Role",

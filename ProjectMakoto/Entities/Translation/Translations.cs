@@ -380,11 +380,15 @@ public class Translations : ITranslations
                 public SingleTranslationKey CantUseRole;
                 public SingleTranslationKey DisableRoleOnJoin;
                 public SingleTranslationKey AutoAssignRoleName;
+                public SingleTranslationKey DisableUserCountChannel;
                 public SingleTranslationKey DisableJoinlog;
                 public SingleTranslationKey JoinLogChannelName;
                 public SingleTranslationKey ToggleReApplyNickname;
                 public SingleTranslationKey ToggleReApplyRole;
                 public SingleTranslationKey ChangeRoleButton;
+                public SingleTranslationKey ChangeUserCountChannelFormatModal;
+                public SingleTranslationKey ChangeUserCountChannelFormat;
+                public SingleTranslationKey ChangeUserCountChannel;
                 public SingleTranslationKey ChangeJoinlogChannelButton;
                 public SingleTranslationKey ToggleGlobalBansButton;
                 public SingleTranslationKey TimeNotice;
@@ -392,6 +396,8 @@ public class Translations : ITranslations
                 public SingleTranslationKey ReApplyNickname;
                 public SingleTranslationKey ReApplyRoles;
                 public SingleTranslationKey Role;
+                public SingleTranslationKey UserCountChannelFormat;
+                public SingleTranslationKey UserCountChannel;
                 public SingleTranslationKey JoinLogChannel;
                 public SingleTranslationKey Autoban;
                 public SingleTranslationKey Title;

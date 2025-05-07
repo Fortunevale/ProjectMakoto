@@ -26,6 +26,8 @@ internal sealed class JoinCommand : BaseCommand
                 var pad = TranslationUtil.CalculatePadding(ctx.DbUser, 
                     CommandKey.Autoban, 
                     CommandKey.JoinLogChannel, 
+                    CommandKey.UserCountChannel, 
+                    CommandKey.UserCountChannelFormat,
                     CommandKey.Role, 
                     CommandKey.ReApplyRoles, 
                     CommandKey.ReApplyNickname, 
@@ -35,6 +37,7 @@ internal sealed class JoinCommand : BaseCommand
 
                 return $"{"🌐".UnicodeToEmoji()} `{CommandKey.Autoban.Get(ctx.DbUser).PadRight(pad)}`: {ctx.DbGuild.Join.AutoBanGlobalBans.ToEmote(ctx.Bot)}\n" +
                         $"{"👋".UnicodeToEmoji()} `{CommandKey.JoinLogChannel.Get(ctx.DbUser).PadRight(pad)}`: {(ctx.DbGuild.Join.JoinlogChannelId != 0 ? $"<#{ctx.DbGuild.Join.JoinlogChannelId}>" : false.ToEmote(ctx.Bot))}\n" +
+                        $"{"🔢".UnicodeToEmoji()} `{CommandKey.UserCountChannel.Get(ctx.DbUser).PadRight(pad)}`: {(ctx.DbGuild.Join.UserCountChannelId != 0 ? $"<#{ctx.DbGuild.Join.UserCountChannelId}> (`{(ctx.DbGuild.Join.UserCountChannelFormat is not null ? ctx.DbGuild.Join.UserCountChannelFormat : "Users: %s")}`)" : false.ToEmote(ctx.Bot))}\n" +
                         $"{"👤".UnicodeToEmoji()} `{CommandKey.Role.Get(ctx.DbUser).PadRight(pad)}`: {(ctx.DbGuild.Join.AutoAssignRoleId != 0 ? $"<@&{ctx.DbGuild.Join.AutoAssignRoleId}>" : false.ToEmote(ctx.Bot))}\n" +
                         $"{"👥".UnicodeToEmoji()} `{CommandKey.ReApplyRoles.Get(ctx.DbUser).PadRight(pad)}`: {ctx.DbGuild.Join.ReApplyRoles.ToEmote(ctx.Bot)}\n" +
                         $"{"💬".UnicodeToEmoji()} `{CommandKey.ReApplyNickname.Get(ctx.DbUser).PadRight(pad)}`: {ctx.DbGuild.Join.ReApplyNickname.ToEmote(ctx.Bot)}\n\n" +
@@ -57,6 +60,8 @@ internal sealed class JoinCommand : BaseCommand
 
             var ToggleGlobalban = new DiscordButtonComponent((ctx.DbGuild.Join.AutoBanGlobalBans ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.ToggleGlobalBansButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🌐")));
             var ChangeJoinlogChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.ChangeJoinlogChannelButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👋")));
+            var ChangeUserCountChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.ChangeUserCountChannel), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔢")));
+            var ChangeUserCountFormat = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.ChangeUserCountChannelFormat), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔢")));
             var ChangeRoleOnJoin = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.ChangeRoleButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
             var ToggleReApplyRoles = new DiscordButtonComponent((ctx.DbGuild.Join.ReApplyRoles ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.ToggleReApplyRole), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👥")));
             var ToggleReApplyName = new DiscordButtonComponent((ctx.DbGuild.Join.ReApplyNickname ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.ToggleReApplyNickname), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
@@ -76,6 +81,8 @@ internal sealed class JoinCommand : BaseCommand
             {
                 ChangeJoinlogChannel,
                 ChangeRoleOnJoin,
+                ChangeUserCountChannel,
+                ChangeUserCountFormat,
             })
             .AddComponents(new List<DiscordComponent>
             {
@@ -93,7 +100,8 @@ internal sealed class JoinCommand : BaseCommand
                 return;
             }
 
-            _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+            if (e.GetCustomId() != ChangeUserCountFormat.CustomId)
+                _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
             if (e.GetCustomId() == ToggleGlobalban.CustomId)
             {
@@ -152,6 +160,81 @@ internal sealed class JoinCommand : BaseCommand
                 }
 
                 ctx.DbGuild.Join.JoinlogChannelId = ChannelResult.Result is null ? 0 : ChannelResult.Result.Id;
+
+                await this.ExecuteCommand(ctx, arguments);
+                return;
+            }
+            else if (e.GetCustomId() == ChangeUserCountChannel.CustomId)
+            {
+                var ChannelResult = await this.PromptChannelSelection(ChannelType.Text, new ChannelPromptConfiguration
+                {
+                    CreateChannelOption = new()
+                    {
+                        Name = "tmp-usercount",
+                        ChannelType = ChannelType.Text
+                    },
+                    DisableOption = this.GetString(CommandKey.DisableUserCountChannel)
+                });
+
+                if (ChannelResult.TimedOut)
+                {
+                    this.ModifyToTimedOut(true);
+                    return;
+                }
+                else if (ChannelResult.Cancelled)
+                {
+                    await this.ExecuteCommand(ctx, arguments);
+                    return;
+                }
+                else if (ChannelResult.Failed)
+                {
+                    if (ChannelResult.Exception.GetType() == typeof(NullReferenceException))
+                    {
+                        _ = await this.RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(this.GetString(this.t.Commands.Common.Errors.NoChannels)));
+                        await Task.Delay(3000);
+                        await this.ExecuteCommand(ctx, arguments);
+                        return;
+                    }
+
+                    throw ChannelResult.Exception;
+                }
+
+                ctx.DbGuild.Join.UserCountChannelId = ChannelResult.Result is null ? 0 : ChannelResult.Result.Id;
+
+                await this.ExecuteCommand(ctx, arguments);
+                return;
+            }
+            else if (e.GetCustomId() == ChangeUserCountFormat.CustomId)
+            {
+                var modelResult = await this.PromptModalWithRetry(e.Result.Interaction,
+                    new DiscordInteractionModalBuilder(this.GetString(CommandKey.ChangeUserCountChannelFormat))
+                    .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "new_format", this.GetString(CommandKey.ChangeUserCountChannelFormatModal), null, 2, 16)),
+                    false);
+
+                if (modelResult.TimedOut)
+                {
+                    this.ModifyToTimedOut(true);
+                    return;
+                }
+                else if (modelResult.Cancelled)
+                {
+                    await this.ExecuteCommand(ctx, arguments);
+                    return;
+                }
+                else if (modelResult.Failed)
+                {
+                    if (modelResult.Exception.GetType() == typeof(NullReferenceException))
+                    {
+                        _ = await this.RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(this.GetString(this.t.Commands.Common.Errors.NoChannels)));
+                        await Task.Delay(3000);
+                        await this.ExecuteCommand(ctx, arguments);
+                        return;
+                    }
+
+                    throw modelResult.Exception;
+                }
+
+                ctx.DbGuild.Join.UserCountChannelFormat = modelResult.Result.Interaction.GetModalValueByCustomId("new_format");
 
                 await this.ExecuteCommand(ctx, arguments);
                 return;
