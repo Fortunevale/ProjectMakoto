@@ -61,7 +61,7 @@ internal sealed class JoinCommand : BaseCommand
             var ToggleGlobalban = new DiscordButtonComponent((ctx.DbGuild.Join.AutoBanGlobalBans ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.ToggleGlobalBansButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🌐")));
             var ChangeJoinlogChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.ChangeJoinlogChannelButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👋")));
             var ChangeUserCountChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.ChangeUserCountChannel), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔢")));
-            var ChangeUserCountFormat = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.ChangeUserCountChannelFormat), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔢")));
+            var ChangeUserCountFormat = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.ChangeUserCountChannelFormat), ctx.DbGuild.Join.UserCountChannelId == 0, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔢")));
             var ChangeRoleOnJoin = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.ChangeRoleButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
             var ToggleReApplyRoles = new DiscordButtonComponent((ctx.DbGuild.Join.ReApplyRoles ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.ToggleReApplyRole), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👥")));
             var ToggleReApplyName = new DiscordButtonComponent((ctx.DbGuild.Join.ReApplyNickname ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.ToggleReApplyNickname), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
@@ -201,6 +201,9 @@ internal sealed class JoinCommand : BaseCommand
 
                 ctx.DbGuild.Join.UserCountChannelId = ChannelResult.Result is null ? 0 : ChannelResult.Result.Id;
 
+                if (ChannelResult.Result is not null)
+                    await JoinEvents.RunUserCountUpdater(ctx.Bot, ctx.Guild);
+
                 await this.ExecuteCommand(ctx, arguments);
                 return;
             }
@@ -235,6 +238,9 @@ internal sealed class JoinCommand : BaseCommand
                 }
 
                 ctx.DbGuild.Join.UserCountChannelFormat = modelResult.Result.Interaction.GetModalValueByCustomId("new_format");
+
+                if (ctx.DbGuild.Join.UserCountChannelId != 0)
+                    await JoinEvents.RunUserCountUpdater(ctx.Bot, ctx.Guild);
 
                 await this.ExecuteCommand(ctx, arguments);
                 return;

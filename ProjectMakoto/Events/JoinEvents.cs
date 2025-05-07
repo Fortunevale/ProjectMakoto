@@ -54,7 +54,7 @@ internal sealed class JoinEvents(Bot bot) : RequiresTranslation(bot)
             }
         }
 
-        await this.RunUserCountUpdater(e.Guild);
+        await RunUserCountUpdater(this.Bot, e.Guild);
         await this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].PerformAutoKickChecks(e.Guild, e.Member);
     }
 
@@ -83,14 +83,14 @@ internal sealed class JoinEvents(Bot bot) : RequiresTranslation(bot)
             }
         }
 
-        await this.RunUserCountUpdater(e.Guild);
+        await RunUserCountUpdater(this.Bot, e.Guild);
     }
 
-    private async Task RunUserCountUpdater(DiscordGuild Guild)
+    internal static async Task RunUserCountUpdater(Bot bot, DiscordGuild Guild)
     {
-        if (this.Bot.Guilds[Guild.Id].Join.UserCountChannelId != 0)
+        if (bot.Guilds[Guild.Id].Join.UserCountChannelId != 0)
         {
-            if (Guild.Channels.ContainsKey(this.Bot.Guilds[Guild.Id].Join.UserCountChannelId))
+            if (Guild.Channels.ContainsKey(bot.Guilds[Guild.Id].Join.UserCountChannelId))
             {
                 foreach (var b in ScheduledTaskExtensions.GetScheduledTasks())
                 {
@@ -103,16 +103,16 @@ internal sealed class JoinEvents(Bot bot) : RequiresTranslation(bot)
 
                 _ = new Func<Task>(async () =>
                 {
-                    _ = Guild.GetChannel(this.Bot.Guilds[Guild.Id].Join.UserCountChannelId).ModifyAsync(x =>
+                    _ = Guild.GetChannel(bot.Guilds[Guild.Id].Join.UserCountChannelId).ModifyAsync(x =>
                     {
-                        x.Name = (this.Bot.Guilds[Guild.Id].Join.UserCountChannelFormat is null ? "Count: %s" : this.Bot.Guilds[Guild.Id].Join.UserCountChannelFormat)
+                        x.Name = (bot.Guilds[Guild.Id].Join.UserCountChannelFormat is null ? "Count: %s" : bot.Guilds[Guild.Id].Join.UserCountChannelFormat)
                         .Replace("%s", Guild.MemberCount);
                     })
                     .ContinueWith(x =>
                     {
-                        this.Bot.Guilds[Guild.Id].Join.UserCountChannelLastEdit = DateTime.UtcNow;
+                        bot.Guilds[Guild.Id].Join.UserCountChannelLastEdit = DateTime.UtcNow;
                     });
-                }).CreateScheduledTask(this.Bot.Guilds[Guild.Id].Join.UserCountChannelLastEdit.AddMinutes(5),
+                }).CreateScheduledTask(bot.Guilds[Guild.Id].Join.UserCountChannelLastEdit.AddMinutes(5),
                     new ScheduledTaskIdentifier(Guild.Id, "", "usercount"));
             }
         }
