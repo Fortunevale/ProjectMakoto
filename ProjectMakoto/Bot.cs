@@ -334,6 +334,7 @@ public sealed class Bot
                 }
             });
 
+            _ = this.CleanupOldPrunedMessages().Add(this);
             _ = this.ProcessDeletionRequests().Add(this);
         }).Add(this).IsVital();
 
@@ -520,6 +521,42 @@ public sealed class Bot
         Environment.Exit(0);
         await Task.Delay(10000);
         Environment.FailFast("Failed to exit");
+    }
+
+    private async Task CleanupOldPrunedMessages()
+    {
+        _ = new Func<Task>(async () =>
+        {
+            _ = this.CleanupOldPrunedMessages().Add(this);
+        }).CreateScheduledTask(DateTime.UtcNow.AddHours(24));
+
+        foreach (var guildDirectory in Directory.GetDirectories("WebServer").Select(x => new DirectoryInfo(x)))
+        {
+            if (guildDirectory.GetDirectories().Any(x => x.Name.Equals("DeletedMessages", StringComparison.CurrentCultureIgnoreCase)))
+            {
+                var deletedMessagesDirectory = guildDirectory.GetDirectories().First(x => x.Name.Equals("DeletedMessages", StringComparison.CurrentCultureIgnoreCase));
+                foreach (var deletedMessageFile in deletedMessagesDirectory.GetFiles())
+                {
+                    if (deletedMessageFile.LastWriteTimeUtc.GetTimespanSince() > TimeSpan.FromDays(30))
+                    {
+                        Log.Information("Deleting '{File}'..", deletedMessageFile.FullName);
+                        deletedMessageFile.Delete();
+                    }
+                }
+
+                if (deletedMessagesDirectory.GetFiles().Length == 0)
+                {
+                    Log.Information("Deleting '{File}'..", deletedMessagesDirectory.FullName);
+                    deletedMessagesDirectory.Delete();
+                }
+            }
+
+            if (guildDirectory.GetFiles().Length == 0 && guildDirectory.GetDirectories().Length == 0)
+            {
+                Log.Information("Deleting '{File}'..", guildDirectory.FullName);
+                guildDirectory.Delete();
+            }
+        }
     }
 
     private async Task ProcessDeletionRequests()
