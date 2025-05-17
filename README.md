@@ -1,7 +1,6 @@
 <h1 align="center">Makoto</h1>
 <p align="center"><img src="ProjectMakoto/Assets/Prod.png" width=250 align="center"></p>
 <p align="center" style="font-weight:bold;">A feature packed discord bot!</p>
-<a href="#getting-makoto" ><p align="center"><img src="ProjectMakoto/Assets/AddToServer.png" width=350 align="center"></p></a>
 
 <p align="center"><img src="https://github.com/Fortunevale/ProjectMakoto/actions/workflows/dev.yml/badge.svg?branch=dev" align="center">
 <p align="center"><img src="https://img.shields.io/github/contributors/Fortunevale/ProjectMakoto" align="center"> <img src="https://img.shields.io/github/issues-raw/Fortunevale/ProjectMakoto" align="center"></p>
@@ -45,7 +44,7 @@ Makoto has a lot of features, current notable features are:
 <br></br>
 ## Getting Makoto
 
-## [Click here to invite the bot](https://discord.com/api/oauth2/authorize?client_id=947716263394824213&permissions=8&scope=bot%20applications.commands)
+## The bot is no longer publicly available. Feel free to host it yourself.
 
 - Phishing Protection is enabled by default, people will be banned if they send a link known to be malicious. To change this, run `/config phishing`.
 - Automatic User/Bot Token invalidation is turned on by default. If you don't know what this means, just leave it on. If you know what this means and you don't want this happen, run `/config tokendetection` to disable it.
